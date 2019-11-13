@@ -1,6 +1,6 @@
 # Subqueries
 
-Subqueries can be written just like in knex: by passing a function in place of a value. A bunch of query building methods accept a function. See the knex.js documentation or just try it out. A function is accepted in most places you would expect. You can also pass [QueryBuilder](/api/query-builder/) instances or knex queries instead of functions.
+Subqueries can be written just like in knex: by passing a function in place of a value. A bunch of query building methods accept a function. See the knex.js documentation or just try it out. A function is accepted in most places you would expect. You can also pass [QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/) instances or knex queries instead of functions.
 
 Using a function:
 
@@ -14,7 +14,7 @@ const peopleOlderThanAverage = await Person
 console.log(peopleOlderThanAverage);
 ```
 
-Using a [QueryBuilder](/api/query-builder/):
+Using a [QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/):
 
 ```js
 const peopleOlderThanAverage = await Person
@@ -24,7 +24,7 @@ const peopleOlderThanAverage = await Person
 console.log(peopleOlderThanAverage);
 ```
 
-You can use [ref](/api/objection.js#ref) to reference the parent query  in subqueries:
+You can use [ref](https://github.com/Vincit/objection.js/tree/v1/doc/api/objection.js#ref) to reference the parent query  in subqueries:
 
 ```js
 const { ref } = require('objection');
@@ -39,7 +39,7 @@ const peopleWithPetCount = await Person
 console.log(peopleWithPetCount[4].petCount);
 ```
 
-The above query can also be written using the [relatedQuery](/api/model/static-methods.html#static-relatedquery) (assuming a relation `pets` has been defined for `Person`):
+The above query can also be written using the [relatedQuery](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/static-methods.md#static-relatedquery) (assuming a relation `pets` has been defined for `Person`):
 
 ```js
 

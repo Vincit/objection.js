@@ -1,10 +1,10 @@
 # Validation
 
-[JSON schema](http://json-schema.org/) validation can be enabled by setting the [jsonSchema](/api/model/static-properties.html#static-jsonschema) property of a model class. The validation is ran each time a [Model](/api/model/) instance is created.
+[JSON schema](http://json-schema.org/) validation can be enabled by setting the [jsonSchema](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/static-properties.md#static-jsonschema) property of a model class. The validation is ran each time a [Model](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/) instance is created.
 
-You rarely need to call [$validate](/api/model/instance-methods.html#validate) method explicitly, but you can do it when needed. If validation fails a [ValidationError](/api/types/#class-validationerror) will be thrown. Since we use Promises, this usually means that a promise will be rejected with an instance of [ValidationError](/api/types/#class-validationerror).
+You rarely need to call [$validate](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/instance-methods.md#validate) method explicitly, but you can do it when needed. If validation fails a [ValidationError](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#class-validationerror) will be thrown. Since we use Promises, this usually means that a promise will be rejected with an instance of [ValidationError](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#class-validationerror).
 
-See [the recipe book](/recipes/custom-validation.html) for instructions if you want to use some other validation library.
+See [the recipe book](https://github.com/Vincit/objection.js/tree/v1/doc/recipes/custom-validation.md) for instructions if you want to use some other validation library.
 
 ## Examples
 
@@ -46,7 +46,7 @@ try {
 }
 ```
 
-Error parameters returned by [ValidationError](/api/types/#class-validationerror) could be used to provide custom error messages:
+Error parameters returned by [ValidationError](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#class-validationerror) could be used to provide custom error messages:
 
 ```js
 try {

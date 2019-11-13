@@ -1,10 +1,10 @@
 # Custom validation
 
-If you want to use the json schema validation but add some custom validation on top of it you can override the [$beforeValidate](/api/model/instance-methods.html#beforevalidate) or [$afterValidate](/api/model/instance-methods.html#aftervalidate) method.
+If you want to use the json schema validation but add some custom validation on top of it you can override the [$beforeValidate](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/instance-methods.md#beforevalidate) or [$afterValidate](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/instance-methods.md#aftervalidate) method.
 
-If you need to do validation on insert or update you can throw exceptions from the [$beforeInsert](/api/model/instance-methods.html#beforeinsert) and [$beforeUpdate](/api/model/instance-methods.html#beforeupdate) methods.
+If you need to do validation on insert or update you can throw exceptions from the [$beforeInsert](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/instance-methods.md#beforeinsert) and [$beforeUpdate](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/instance-methods.md#beforeupdate) methods.
 
-If you don't want to use the built-in json schema validation, you can just ignore the [jsonSchema](/api/model/instance-methods.html#jsonschema) property. It is completely optional. If you want to use some other validation library you need to implement a custom [Validator](/api/types/#class-validator) (see the example).
+If you don't want to use the built-in json schema validation, you can just ignore the [jsonSchema](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/instance-methods.md#jsonschema) property. It is completely optional. If you want to use some other validation library you need to implement a custom [Validator](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#class-validator) (see the example).
 
 ## Examples
 
@@ -46,7 +46,7 @@ class Model {
 }
 ```
 
-Replace JSON schema validation with any other validation scheme by implementing a custom [Validator](/api/types/#class-validator):
+Replace JSON schema validation with any other validation scheme by implementing a custom [Validator](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#class-validator):
 
 ```js
 // MyCustomValidator.js

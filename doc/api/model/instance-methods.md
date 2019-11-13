@@ -22,7 +22,7 @@ transactionOrKnex|object|Optional transaction or knex instance for the query. Th
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|query builder
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|query builder
 
 ##### Examples
 
@@ -73,9 +73,9 @@ console.log('person deleted');
 const builder = person.$relatedQuery(relationName, transactionOrKnex);
 ```
 
-Use this to build a query that only affects the items related to an instance through a relation. By default, any fetched or inserted items are also stored to the owner model’s property named after the relation. See [relatedFindQueryMutates](/api/model/static-properties.html#static-relatedfindquerymutates) or [relatedInsertQueryMutates](/api/model/static-properties.html#static-relatedinsertquerymutates) to change this behaviour.
+Use this to build a query that only affects the items related to an instance through a relation. By default, any fetched or inserted items are also stored to the owner model’s property named after the relation. See [relatedFindQueryMutates](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/static-properties.md#static-relatedfindquerymutates) or [relatedInsertQueryMutates](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/static-properties.md#static-relatedinsertquerymutates) to change this behaviour.
 
-See the examples below and [here](/guide/query-examples.html#relation-queries).
+See the examples below and [here](https://github.com/Vincit/objection.js/tree/v1/doc/guide/query-examples.md#relation-queries).
 
 ##### Arguments
 
@@ -88,7 +88,7 @@ transactionOrKnex|object|Optional transaction or knex instance for the query. Th
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|A query builder
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|A query builder
 
 ##### Examples
 
@@ -206,7 +206,7 @@ If you start a query from this hook, make sure you specify `queryContext.transac
 
 Argument|Type|Description
 --------|----|-------------------
-queryContext|Object|The context object of the insert query. See [context](/api/query-builder/other-methods.html#context).
+queryContext|Object|The context object of the insert query. See [context](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/other-methods.md#context).
 
 ##### Return value
 
@@ -253,7 +253,7 @@ You can return a promise from this function if you need to do asynchronous stuff
 
 Argument|Type|Description
 --------|----|-------------------
-queryContext|Object|The context object of the insert query. See [context](/api/query-builder/other-methods.html#context).
+queryContext|Object|The context object of the insert query. See [context](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/other-methods.md#context).
 
 ##### Return value
 
@@ -298,14 +298,14 @@ you need to do update specific validation.
 
 This method is also called before a model is patched. Therefore all the model's properties may not exist. You can check if the update operation is a patch by checking the `opt.patch` boolean.
 
-Inside the hook, `this` contains the values to be updated. If (and only if) the query is started for an existing model instance using [$query](/api/model/instance-methods.html#query), `opt.old` object contains the old values. The old values are never fetched from the database implicitly. For non-instance queries the `opt.old` object is `undefined`. See the examples.
+Inside the hook, `this` contains the values to be updated. If (and only if) the query is started for an existing model instance using [$query](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/instance-methods.md#query), `opt.old` object contains the old values. The old values are never fetched from the database implicitly. For non-instance queries the `opt.old` object is `undefined`. See the examples.
 
 ##### Arguments
 
 Argument|Type|Description
 --------|----|-------------------
-opt|[ModelOptions](/api/types/#type-modeloptions)|Update options.
-queryContext|Object|The context object of the update query. See [context](/api/query-builder/other-methods.html#context).
+opt|[ModelOptions](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#type-modeloptions)|Update options.
+queryContext|Object|The context object of the update query. See [context](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/other-methods.md#context).
 
 ##### Return value
 
@@ -367,14 +367,14 @@ You can return a promise from this function if you need to do asynchronous stuff
 
 This method is also called after a model is patched. Therefore all the model's properties may not exist. You can check if the update operation is a patch by checking the `opt.patch` boolean.
 
-Inside the hook, `this` contains the values to be updated. If (and only if) the query is started for an existing model instance using [$query](/api/model/instance-methods.html#query), `opt.old` object contains the old values. The old values are never fetched from the database implicitly. For non-instance queries the `opt.old` object is `undefined`. See the examples.
+Inside the hook, `this` contains the values to be updated. If (and only if) the query is started for an existing model instance using [$query](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/instance-methods.md#query), `opt.old` object contains the old values. The old values are never fetched from the database implicitly. For non-instance queries the `opt.old` object is `undefined`. See the examples.
 
 ##### Arguments
 
 Argument|Type|Description
 --------|----|-------------------
-opt|[ModelOptions](/api/types/#type-modeloptions)|Update options.
-queryContext|Object|The context object of the update query. See [context](/api/query-builder/other-methods.html#context).
+opt|[ModelOptions](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#type-modeloptions)|Update options.
+queryContext|Object|The context object of the update query. See [context](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/other-methods.md#context).
 
 ##### Return value
 
@@ -435,14 +435,14 @@ Called before a model is deleted.
 You can return a promise from this function if you need to do asynchronous stuff.
 
 ::: warning
-This method is only called for instance deletes started with [$query()](/api/model/instance-methods.html#query) method. All hooks are instance methods. For deletes there is no instance for which to call the hook, except when [$query()](/api/model/instance-methods.html#query) is used. Objection doesn't fetch the item just to call the hook for it to ensure predictable performance and prevent a whole class of concurrency bugs.
+This method is only called for instance deletes started with [$query()](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/instance-methods.md#query) method. All hooks are instance methods. For deletes there is no instance for which to call the hook, except when [$query()](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/instance-methods.md#query) is used. Objection doesn't fetch the item just to call the hook for it to ensure predictable performance and prevent a whole class of concurrency bugs.
 :::
 
 ##### Arguments
 
 Argument|Type|Description
 --------|----|-------------------
-queryContext|Object|The context object of the update query. See [context](/api/query-builder/other-methods.html#context).
+queryContext|Object|The context object of the update query. See [context](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/other-methods.md#context).
 
 ##### Return value
 
@@ -485,14 +485,14 @@ Called after a model is deleted.
 You can return a promise from this function if you need to do asynchronous stuff.
 
 ::: warning
-This method is only called for instance deletes started with [$query()](/api/model/instance-methods.html#query) method. All hooks are instance methods. For deletes there is no instance for which to call the hook, except when [$query()](/api/model/instance-methods.html#query) is used. Objection doesn't fetch the item just to call the hook for it to ensure predictable performance and prevent a whole class of concurrency bugs.
+This method is only called for instance deletes started with [$query()](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/instance-methods.md#query) method. All hooks are instance methods. For deletes there is no instance for which to call the hook, except when [$query()](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/instance-methods.md#query) is used. Objection doesn't fetch the item just to call the hook for it to ensure predictable performance and prevent a whole class of concurrency bugs.
 :::
 
 ##### Arguments
 
 Argument|Type|Description
 --------|----|-------------------
-queryContext|Object|The context object of the update query. See [context](/api/query-builder/other-methods.html#context).
+queryContext|Object|The context object of the update query. See [context](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/other-methods.md#context).
 
 ##### Return value
 
@@ -539,7 +539,7 @@ You can return a promise from this function if you need to do asynchronous stuff
 
 Argument|Type|Description
 --------|----|-------------------
-queryContext|Object|The context object of the update query. See [context](/api/query-builder/other-methods.html#context).
+queryContext|Object|The context object of the update query. See [context](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/other-methods.md#context).
 
 ##### Return value
 
@@ -573,19 +573,19 @@ const clone = modelInstance.$clone(options);
 
 Returns a (deep) copy of a model instance.
 
-If the item to be cloned has instances of [Model](/api/model/) as properties (or arrays of them) they are cloned using their `$clone()` method. A shallow copy without relations can be created by passing the `shallow: true` option.
+If the item to be cloned has instances of [Model](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/) as properties (or arrays of them) they are cloned using their `$clone()` method. A shallow copy without relations can be created by passing the `shallow: true` option.
 
 ##### Arguments
 
 Argument|Type|Description
 --------|----|--------------------
-opt|[CloneOptions](/api/types/#type-cloneoptions)|Optional options
+opt|[CloneOptions](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#type-cloneoptions)|Optional options
 
 ##### Return value
 
 Type|Description
 ----|-----------------------------
-[Model](/api/model/)|Deep clone of `this`
+[Model](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/)|Deep clone of `this`
 
 ##### Examples
 
@@ -601,13 +601,13 @@ const jsonObj = modelInstance.toJSON(opt);
 
 Exports this model as a JSON object.
 
-See [this section](/api/model/overview.html#model-data-lifecycle) for more information.
+See [this section](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/overview.md#model-data-lifecycle) for more information.
 
 ##### Arguments
 
 Argument|Type|Description
 --------|----|--------------------
-opt|[ToJsonOptions](/api/types/#type-tojsonoptions)|Optional options
+opt|[ToJsonOptions](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#type-tojsonoptions)|Optional options
 
 ##### Return value
 
@@ -627,7 +627,7 @@ const onlySomeVirtuals = modelInstance.toJSON({ virtuals: ['fullName'] });
 
 ## $toJson()
 
-Alias for [toJSON](/api/model/instance-methods.html#tojson)
+Alias for [toJSON](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/instance-methods.md#tojson)
 
 ## $toDatabaseJson()
 
@@ -639,7 +639,7 @@ Exports this model as a database JSON object.
 
 This method is called internally to convert a model into a database row.
 
-See [this section](/api/model/overview.html#model-data-lifecycle) for more information.
+See [this section](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/overview.md#model-data-lifecycle) for more information.
 
 ##### Return value
 
@@ -660,9 +660,9 @@ class Person extends Model {
 }
 ```
 
-This is called when a [Model](/api/model/) instance is created from a database JSON object. This method converts the JSON object from the database format to the internal format.
+This is called when a [Model](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/) instance is created from a database JSON object. This method converts the JSON object from the database format to the internal format.
 
-You can override this method to carry out whatever conversions you want for the data when it's fetched from the database, before it's converted into a model instance. See [this section](/api/model/overview.html#model-data-lifecycle) for more information.
+You can override this method to carry out whatever conversions you want for the data when it's fetched from the database, before it's converted into a model instance. See [this section](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/overview.md#model-data-lifecycle) for more information.
 
 There are a couple of requirements for the implementation:
 
@@ -695,9 +695,9 @@ class Person extends Model {
 }
 ```
 
-This is called when a [Model](/api/model/) is converted to database format.
+This is called when a [Model](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/) is converted to database format.
 
-You can override this method to carry out whatever conversions you want for the data when it's being sent to the database driver. See [this section](/api/model/overview.html#model-data-lifecycle) for more information.
+You can override this method to carry out whatever conversions you want for the data when it's being sent to the database driver. See [this section](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/overview.md#model-data-lifecycle) for more information.
 
 There are a couple of requirements for the implementation:
 
@@ -730,9 +730,9 @@ class Person extends Model {
 }
 ```
 
-This is called when a [Model](/api/model/) is created from a JSON object. Converts the JSON object from the external format to the internal format.
+This is called when a [Model](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/) is created from a JSON object. Converts the JSON object from the external format to the internal format.
 
-You can override this method to carry out whatever conversions you want for the data when a model instance is being created from external data. See [this section](/api/model/overview.html#model-data-lifecycle) for more information.
+You can override this method to carry out whatever conversions you want for the data when a model instance is being created from external data. See [this section](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/overview.md#model-data-lifecycle) for more information.
 
 There are a couple of requirements for the implementation:
 
@@ -745,7 +745,7 @@ There are a couple of requirements for the implementation:
 Argument|Type|Description
 --------|----|-------------------
 json|Object|The JSON POJO in external format
-opt|[ModelOptions](/api/types/#type-modeloptions)|Optional options
+opt|[ModelOptions](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#type-modeloptions)|Optional options
 
 ##### Return value
 
@@ -766,9 +766,9 @@ class Person extends Model {
 }
 ```
 
-This is called when a [Model](/api/model/) is converted to JSON. Converts the JSON object from the internal format to the external format.
+This is called when a [Model](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/) is converted to JSON. Converts the JSON object from the internal format to the external format.
 
-You can override this method to carry out whatever conversions you want for the data when a model instance is being converted into external representation. See [this section](/api/model/overview.html#model-data-lifecycle) for more information.
+You can override this method to carry out whatever conversions you want for the data when a model instance is being converted into external representation. See [this section](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/overview.md#model-data-lifecycle) for more information.
 
 There are a couple of requirements for the implementation:
 
@@ -803,13 +803,13 @@ Validates the JSON before setting values.
 Argument|Type|Description
 --------|----|-------------------
 json|Object|The JSON POJO to set
-opt|[ModelOptions](/api/types/#type-modeloptions)|Optional options
+opt|[ModelOptions](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#type-modeloptions)|Optional options
 
 ##### Return value
 
 Type|Description
 ----|-----------------------------
-[Model](/api/model/)|`this` for chaining
+[Model](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/)|`this` for chaining
 
 ## $setDatabaseJson()
 
@@ -829,7 +829,7 @@ json|Object|The JSON POJO in database format
 
 Type|Description
 ----|-----------------------------
-[Model](/api/model/)|`this` for chaining
+[Model](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/)|`this` for chaining
 
 ## $set()
 
@@ -839,7 +839,7 @@ modelInstance.$set(json);
 
 Sets the values from another model instance or object.
 
-Unlike [$setJson](/api/model/instance-methods.html#setjson), this doesn't call any [$parseJson](/api/model/instance-methods.html#parsejson) hooks or validate the input. This simply sets each value in the object to this object.
+Unlike [$setJson](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/instance-methods.md#setjson), this doesn't call any [$parseJson](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/instance-methods.md#parsejson) hooks or validate the input. This simply sets each value in the object to this object.
 
 ##### Arguments
 
@@ -851,7 +851,7 @@ obj|Object|The values to set
 
 Type|Description
 ----|-----------------------------
-[Model](/api/model/)|`this` for chaining
+[Model](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/)|`this` for chaining
 
 ## $setRelated()
 
@@ -865,14 +865,14 @@ Sets related models to a corresponding property in the object.
 
 Argument|Type|Description
 --------|----|-------------------
-relation|string&#124;[Relation](/api/types/#class-relation)|Relation name or a relation instance to set.
-relatedModels|[Model](/api/model/)&#124;[Model](/api/model/)[]|Models to set.
+relation|string&#124;[Relation](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#class-relation)|Relation name or a relation instance to set.
+relatedModels|[Model](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/)&#124;[Model](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/)[]|Models to set.
 
 ##### Return value
 
 Type|Description
 ----|-----------------------------
-[Model](/api/model/)|`this` for chaining
+[Model](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/)|`this` for chaining
 
 ##### Examples
 
@@ -898,14 +898,14 @@ Appends related models to a corresponding property in the object.
 
 Argument|Type|Description
 --------|----|-------------------
-relation|string&#124;[Relation](/api/types/#class-relation)|Relation name or a relation instance to append to.
-relatedModels|[Model](/api/model/)&#124;[Model](/api/model/)[]|Models to append.
+relation|string&#124;[Relation](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#class-relation)|Relation name or a relation instance to append to.
+relatedModels|[Model](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/)&#124;[Model](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/)[]|Models to append.
 
 ##### Return value
 
 Type|Description
 ----|-----------------------------
-[Model](/api/model/)|`this` for chaining
+[Model](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/)|`this` for chaining
 
 ##### Examples
 
@@ -932,7 +932,7 @@ const builder = person.$loadRelated(
 );
 ```
 
-Shortcut for [Person.loadRelated(person, expression, filter, transactionOrKnex)](/api/model/static-methods.html#static-loadrelated)
+Shortcut for [Person.loadRelated(person, expression, filter, transactionOrKnex)](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/static-methods.md#static-loadrelated)
 
 ## $traverse()
 
@@ -940,7 +940,7 @@ Shortcut for [Person.loadRelated(person, expression, filter, transactionOrKnex)]
 person.$traverse(filterConstructor, callback)
 ```
 
-Shortcut for [Model.traverse(filterConstructor, this, callback)](/api/model/static-methods.html#static-traverse).
+Shortcut for [Model.traverse(filterConstructor, this, callback)](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/static-methods.md#static-traverse).
 
 ## $traverseAsync()
 
@@ -948,7 +948,7 @@ Shortcut for [Model.traverse(filterConstructor, this, callback)](/api/model/stat
 person.$traverseAsync(filterConstructor, callback)
 ```
 
-Shortcut for [Model.traverseAsync(filterConstructor, this, callback)](/api/model/static-methods.html#static-traverseasync).
+Shortcut for [Model.traverseAsync(filterConstructor, this, callback)](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/static-methods.md#static-traverseasync).
 
 ## $knex()
 
@@ -956,7 +956,7 @@ Shortcut for [Model.traverseAsync(filterConstructor, this, callback)](/api/model
 const knex = person.$knex()
 ```
 
-Shortcut for [Person.knex()](/api/model/static-methods.html#static-knex).
+Shortcut for [Person.knex()](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/static-methods.md#static-knex).
 
 ## $transaction()
 
@@ -964,7 +964,7 @@ Shortcut for [Person.knex()](/api/model/static-methods.html#static-knex).
 const knex = person.$transaction()
 ```
 
-Shortcut for [Person.knex()](/api/model/static-methods.html#static-knex).
+Shortcut for [Person.knex()](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/static-methods.md#static-knex).
 
 ## $id()
 
@@ -1013,7 +1013,7 @@ Argument|Type|Description
 --------|----|-------------------
 jsonSchema|Object|A deep clone of this class's jsonSchema
 json|Object|The JSON object to be validated
-opt|[ModelOptions](/api/types/type-modeloptions)|Optional options
+opt|[ModelOptions](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/type-modeloptions)|Optional options
 
 ##### Return value
 
@@ -1042,7 +1042,7 @@ You can do further validation here and throw an error if something goes wrong.
 Argument|Type|Description
 --------|----|-------------------
 json|Object|The JSON object to be validated
-opt|[ModelOptions](/api/types/type-modeloptions)|Optional options
+opt|[ModelOptions](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/type-modeloptions)|Optional options
 
 ## $validate()
 
@@ -1052,14 +1052,14 @@ modelInstance.$validate();
 
 Validates the model instance.
 
-Calls [$beforeValidate](/api/model/instance-methods.html#beforevalidate) and [$afterValidate](/api/model/instance-methods.html#aftervalidate) methods. This method is called automatically from [fromJson](/api/model/static-methods.html#static-fromjson) and [$setJson](/api/model/instance-methods.html#setjson) methods. This method can also be
+Calls [$beforeValidate](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/instance-methods.md#beforevalidate) and [$afterValidate](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/instance-methods.md#aftervalidate) methods. This method is called automatically from [fromJson](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/static-methods.md#static-fromjson) and [$setJson](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/instance-methods.md#setjson) methods. This method can also be
 called explicitly when needed.
 
 ##### Throws
 
 Type|Description
 ----|-----------------------------
-[ValidationError](/api/types/#class-validationerror)|If validation fails.
+[ValidationError](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#class-validationerror)|If validation fails.
 
 ## $omit()
 
@@ -1079,7 +1079,7 @@ keys|string<br>string[]<br>Object&lt;string,&nbsp;boolean&gt;|keys to omit
 
 Type|Description
 ----|-----------------------------
-[Model](/api/model/)|`this` for chaining
+[Model](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/)|`this` for chaining
 
 ##### Examples
 
@@ -1130,7 +1130,7 @@ keys|string<br>string[]<br>Object&lt;string,&nbsp;boolean&gt;|keys to pick
 
 Type|Description
 ----|-----------------------------
-[Model](/api/model/)|`this` for chaining
+[Model](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/)|`this` for chaining
 
 ##### Examples
 

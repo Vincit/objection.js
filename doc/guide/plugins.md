@@ -1,6 +1,6 @@
 # Plugins
 
-A curated list of plugins and modules for objection. Only plugins that follow [the best practices](/guide/contributing.html#plugin-development-best-practices) are accepted on this list. Other modules like plugins for other frameworks and things that cannot be implemented following the best practices are an exception to this rule. If you are a developer of or otherwise know of a good plugin/module for objection, please create a pull request or an issue to get it added to this list.
+A curated list of plugins and modules for objection. Only plugins that follow [the best practices](https://github.com/Vincit/objection.js/tree/v1/doc/guide/contributing.md#plugin-development-best-practices) are accepted on this list. Other modules like plugins for other frameworks and things that cannot be implemented following the best practices are an exception to this rule. If you are a developer of or otherwise know of a good plugin/module for objection, please create a pull request or an issue to get it added to this list.
 
 ## 3rd party plugins
 
@@ -19,7 +19,7 @@ A curated list of plugins and modules for objection. Only plugins that follow [t
 
 ## Plugin development best practices
 
-When possible, objection.js plugins should be implemented as [class mixins](http://justinfagnani.com/2015/12/21/real-mixins-with-javascript-classes/). A mixin is simply a function that takes a class as an argument and returns a subclass. Plugins should not modify [objection.Model](/api/model/), [objection.QueryBuilder](/api/query-builder/) or any other global variables directly. See the [example plugin](https://github.com/Vincit/objection.js/tree/master/examples/plugin) for more info. There is also [another example](https://github.com/Vincit/objection.js/tree/master/examples/plugin-with-options) that should be followed if your plugin takes options or configuration parameters.
+When possible, objection.js plugins should be implemented as [class mixins](http://justinfagnani.com/2015/12/21/real-mixins-with-javascript-classes/). A mixin is simply a function that takes a class as an argument and returns a subclass. Plugins should not modify [objection.Model](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/), [objection.QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/) or any other global variables directly. See the [example plugin](https://github.com/Vincit/objection.js/tree/master/examples/plugin) for more info. There is also [another example](https://github.com/Vincit/objection.js/tree/master/examples/plugin-with-options) that should be followed if your plugin takes options or configuration parameters.
 
 Mixin is just a function that takes a class and returns an extended subclass.
 

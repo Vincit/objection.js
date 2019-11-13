@@ -1,6 +1,6 @@
 # Paging
 
-Most of the queries can be paged using the [page](/api/query-builder/other-methods.html#page) or [range](/api/query-builder/other-methods.html#range) method.
+Most of the queries can be paged using the [page](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/other-methods.md#page) or [range](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/other-methods.md#range) method.
 
 ```js
 const result = await Person
@@ -12,9 +12,9 @@ console.log(result.results.length); // --> 100
 console.log(result.total); // --> 3341
 ```
 
-There are some cases where [page](/api/query-builder/other-methods.html#page) and [range](/api/query-builder/other-methods.html#range) don't work.
+There are some cases where [page](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/other-methods.md#page) and [range](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/other-methods.md#range) don't work.
 
-1. In [modifyEager](/api/query-builder/other-methods.html#modifyeager) or named filters:
+1. In [modifyEager](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/other-methods.md#modifyeager) or named filters:
 
 ```js
 // This doesn't work because the query `qb` fetches the

@@ -6,7 +6,7 @@
 const builder = QueryBuilder.forClass(modelClass);
 ```
 
-Create QueryBuilder for a Model subclass. You rarely need to call this. Query builders are created using the [Model.query()](/api/model/static-methods.html#query) and other query methods.
+Create QueryBuilder for a Model subclass. You rarely need to call this. Query builders are created using the [Model.query()](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/static-methods.md#query) and other query methods.
 
 ##### Arguments
 
@@ -18,7 +18,7 @@ modelClass|ModelClass|A Model class constructor
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|The created query builder
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|The created query builder
 
 ## parseRelationExpression()
 
@@ -26,13 +26,13 @@ Type|Description
 const exprObj = QueryBuilder.parseRelationExpression(expr);
 ```
 
-Parses a string relation expression into the [object notation](/api/types/#relationexpression-object-notation).
+Parses a string relation expression into the [object notation](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#relationexpression-object-notation).
 
 ##### Arguments
 
 Argument|Type|Description
 --------|----|--------------------
-expr|[RelationExpression](/api/types/#type-relationexpression)|A relation expression string or object.
+expr|[RelationExpression](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#type-relationexpression)|A relation expression string or object.
 
 ##### Return value
 

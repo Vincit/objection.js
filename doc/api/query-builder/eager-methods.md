@@ -8,9 +8,9 @@ queryBuilder = queryBuilder.eager(relationExpression, modifiers);
 
 Fetch relations eagerly for the result rows.
 
-See the [eager loading](/guide/query-examples.html#eager-loading) section for more examples and [RelationExpression](/api/types/#type-relationexpression) for more info on the relation expression language.
+See the [eager loading](https://github.com/Vincit/objection.js/tree/v1/doc/guide/query-examples.md#eager-loading) section for more examples and [RelationExpression](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#type-relationexpression) for more info on the relation expression language.
 
-You can choose the way objection performs the eager loading by using [eagerAlgorithm](/api/query-builder/eager-methods.html#eageralgorithm) method on a query builder or by setting the [defaultEagerAlgorithm](/api/model/static-properties.html#static-defaulteageralgorithm) property of a model. The three algorithms currently available are `Model.WhereInEagerAlgorithm` (the default) `Model.JoinEagerAlgorithm` and `Model.NaiveEagerAlgorithm`. All three have their strengths and weaknesses. We will go through the main differences below. You can always see the executed SQL by calling the [debug](/api/query-builder/other-methods.html#debug) method for the query builder.
+You can choose the way objection performs the eager loading by using [eagerAlgorithm](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/eager-methods.md#eageralgorithm) method on a query builder or by setting the [defaultEagerAlgorithm](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/static-properties.md#static-defaulteageralgorithm) property of a model. The three algorithms currently available are `Model.WhereInEagerAlgorithm` (the default) `Model.JoinEagerAlgorithm` and `Model.NaiveEagerAlgorithm`. All three have their strengths and weaknesses. We will go through the main differences below. You can always see the executed SQL by calling the [debug](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/other-methods.md#debug) method for the query builder.
 
 <b>WhereInEagerAlgorithm</b>
 
@@ -44,14 +44,14 @@ cases where performance doesn't matter and when it is the only option to get the
 
 Argument|Type|Description
 --------|----|--------------------
-relationExpression|[RelationExpression](/api/types/#type-relationexpression)|The eager expression
-modifiers|Object&lt;string,&nbsp;function([QueryBuilder](/api/query-builder/))&gt;|The modifier functions for the expression
+relationExpression|[RelationExpression](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#type-relationexpression)|The eager expression
+modifiers|Object&lt;string,&nbsp;function([QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/))&gt;|The modifier functions for the expression
 
 ##### Return value
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ##### Examples
 
@@ -87,7 +87,7 @@ console.log(people[0].children[0].pets[0].name);
 cconsole.log(people[0].children[0].movies[0].id);
 ```
 
-Reusable modifiers can be defined for a model class using [modifiers](/api/model/static-properties.html#static-modifiers)
+Reusable modifiers can be defined for a model class using [modifiers](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/static-properties.md#static-modifiers)
 
 ```js
 class Person extends Model {
@@ -131,7 +131,7 @@ console.log(people[0].children[0].pets[0].name);
 console.log(people[0].children[0].movies[0].id);
 ```
 
-Filters can also be registered using the [modifyEager](/api/query-builder/other-methods.html#modifyeager) method:
+Filters can also be registered using the [modifyEager](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/other-methods.md#modifyeager) method:
 
 ```js
 const people = await Person
@@ -188,7 +188,7 @@ console.log(people[0].children[9].children.length); // --> 10
 
 The person has 10 children and they all have 10 children. The query above will return 100 database rows but will generate only three database queries when using `WhereInEagerAlgorithm` and only one query when using `JoinEagerAlgorithm`.
 
-The loading algorithm can be changed using the [eagerAlgorithm](/api/query-builder/eager-methods.html#eageralgorithm) method:
+The loading algorithm can be changed using the [eagerAlgorithm](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/eager-methods.md#eageralgorithm) method:
 
 ```js
 const people = await Person
@@ -209,7 +209,7 @@ queryBuilder = queryBuilder.eagerAlgorithm(algo);
 ```
 
 Select the eager loading algorithm for the query. See comparison between
-the available algorithms [here](/api/query-builder/eager-methods.html#eager).
+the available algorithms [here](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/eager-methods.md#eager).
 
 ##### Arguments
 
@@ -221,7 +221,7 @@ algo|EagerAlgorithm|The eager loading algorithm to use. One of `Model.JoinEagerA
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ##### Examples
 
@@ -238,19 +238,19 @@ const people = await Person
 queryBuilder = queryBuilder.eagerOptions(options);
 ```
 
-Sets [options](/api/types/#type-eageroptions) for the eager query.
+Sets [options](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#type-eageroptions) for the eager query.
 
 ##### Arguments
 
 Argument|Type|Description
 --------|----|--------------------
-options|[EagerOptions](/api/types/#type-eageroptions)|Options to set.
+options|[EagerOptions](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#type-eageroptions)|Options to set.
 
 ##### Return value
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ##### Examples
 
@@ -293,20 +293,20 @@ queryBuilder
 
 ## mergeEager()
 
-Just like [eager](/api/query-builder/eager-methods.html#eager) but instead of replacing query builder's eager expression this method merges the given expression to the existing expression.
+Just like [eager](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/eager-methods.md#eager) but instead of replacing query builder's eager expression this method merges the given expression to the existing expression.
 
 ##### Arguments
 
 Argument|Type|Description
 --------|----|--------------------
-relationExpression|[RelationExpression](/api/types/#type-relationexpression)|The eager expression
-modifiers|Object&lt;string,&nbsp;function([QueryBuilder](/api/query-builder/))&gt;|The modifier functions for the expression
+relationExpression|[RelationExpression](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#type-relationexpression)|The eager expression
+modifiers|Object&lt;string,&nbsp;function([QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/))&gt;|The modifier functions for the expression
 
 ##### Return value
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ##### Examples
 
@@ -365,7 +365,7 @@ builder.eager(eagerObject)
 
 Returns the object representation of the current eager expression.
 
-See [this section](/api/types/#relationexpression-object-notation) for more examples and information about the structure of the returned object.
+See [this section](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#relationexpression-object-notation) for more examples and information about the structure of the returned object.
 
 ##### Return value
 
@@ -402,7 +402,7 @@ queryBuilder = queryBuilder.allowEager(relationExpression);
 
 Sets the allowed eager expression.
 
-Any subset of the allowed expression is accepted by [eager](/api/query-builder/eager-methods.html#eager) method. For example setting the allowed expression to `a.b.c` expressions `a`, `a.b` and `a.b.c` are accepted by [eager](/api/query-builder/eager-methods.html#eager) method. Setting any other expression will reject the query and cause the promise error handlers to be called.
+Any subset of the allowed expression is accepted by [eager](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/eager-methods.md#eager) method. For example setting the allowed expression to `a.b.c` expressions `a`, `a.b` and `a.b.c` are accepted by [eager](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/eager-methods.md#eager) method. Setting any other expression will reject the query and cause the promise error handlers to be called.
 
 This method is useful when the eager expression comes from an untrusted source like query parameters of a http request.
 
@@ -410,13 +410,13 @@ This method is useful when the eager expression comes from an untrusted source l
 
 Argument|Type|Description
 --------|----|--------------------
-relationExpression|[RelationExpression](/api/types/#type-relationexpression)|The allowed eager expression
+relationExpression|[RelationExpression](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#type-relationexpression)|The allowed eager expression
 
 ##### Return value
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ##### Examples
 
@@ -429,19 +429,19 @@ Person
 
 ## mergeAllowEager()
 
-Just like [allowEager](/api/query-builder/eager-methods.html#alloweager) but instead of replacing query builder's allowEager expression this method merges the given expression to the existing expression.
+Just like [allowEager](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/eager-methods.md#alloweager) but instead of replacing query builder's allowEager expression this method merges the given expression to the existing expression.
 
 ##### Arguments
 
 Argument|Type|Description
 --------|----|--------------------
-relationExpression|[RelationExpression](/api/types/#type-relationexpression)|The allowed eager expression
+relationExpression|[RelationExpression](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#type-relationexpression)|The allowed eager expression
 
 ##### Return value
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ##### Examples
 
@@ -491,14 +491,14 @@ The following query would filter out the children's pets that are <= 10 years ol
 
 Argument|Type|Description
 --------|----|--------------------
-pathExpression|[RelationExpression](/api/types/#type-relationexpression)|Expression that specifies the queries for which to give the filter.
-modifier|function([QueryBuilder](/api/query-builder/)&nbsp;&#124;&nbsp;string&nbsp;&#124;&nbsp;string[]|A modifier function, [model modifier](/api/model/static-properties.html#static-modifiers) name or an array of model modifier names.
+pathExpression|[RelationExpression](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#type-relationexpression)|Expression that specifies the queries for which to give the filter.
+modifier|function([QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)&nbsp;&#124;&nbsp;string&nbsp;&#124;&nbsp;string[]|A modifier function, [model modifier](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/static-properties.md#static-modifiers) name or an array of model modifier names.
 
 ##### Return value
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ##### Examples
 
@@ -533,7 +533,7 @@ Person
   })
 ```
 
-The modifier can also be a [Model modifier](/api/model/static-properties.html#static-modifiers) name, or an array of them:
+The modifier can also be a [Model modifier](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/static-properties.md#static-modifiers) name, or an array of them:
 
 ```js
 Person
@@ -544,4 +544,4 @@ Person
 
 ## filterEager()
 
-Alias for [modifyEager](/api/query-builder/other-methods.html#modifyeager).
+Alias for [modifyEager](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/other-methods.md#modifyeager).

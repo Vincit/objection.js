@@ -15,20 +15,20 @@ Objection.js is built on an SQL query builder called [knex](http://knexjs.org). 
 
 What objection.js gives you:
 
- * **An easy declarative way of [defining models](/guide/models.html) and relationships between them**
- * **Simple and fun way to [fetch, insert, update and delete](/guide/query-examples.html#basic-queries) objects using the full power of SQL**
- * **Powerful mechanisms for [eager loading](/guide/query-examples.html#eager-loading), [inserting](/guide/query-examples.html#graph-inserts) and [upserting](/guide/query-examples.html#graph-upserts) object graphs**
- * **Easy to use [transactions](/guide/transactions.html)**
+ * **An easy declarative way of [defining models](https://github.com/Vincit/objection.js/tree/v1/doc/guide/models.md) and relationships between them**
+ * **Simple and fun way to [fetch, insert, update and delete](https://github.com/Vincit/objection.js/tree/v1/doc/guide/query-examples.md#basic-queries) objects using the full power of SQL**
+ * **Powerful mechanisms for [eager loading](https://github.com/Vincit/objection.js/tree/v1/doc/guide/query-examples.md#eager-loading), [inserting](https://github.com/Vincit/objection.js/tree/v1/doc/guide/query-examples.md#graph-inserts) and [upserting](https://github.com/Vincit/objection.js/tree/v1/doc/guide/query-examples.md#graph-upserts) object graphs**
+ * **Easy to use [transactions](https://github.com/Vincit/objection.js/tree/v1/doc/guide/transactions.md)**
  * **Official [TypeScript](https://github.com/Vincit/objection.js/blob/master/typings/objection/index.d.ts) support**
- * **Optional [JSON schema](/guide/validation.html) validation**
-  * **A way to [store complex documents](/guide/documents.html) as single rows**
+ * **Optional [JSON schema](https://github.com/Vincit/objection.js/tree/v1/doc/guide/validation.md) validation**
+  * **A way to [store complex documents](https://github.com/Vincit/objection.js/tree/v1/doc/guide/documents.md) as single rows**
 
 What objection.js **doesn't** give you:
 
  * **A custom query DSL. SQL is used as a query language.**
   This doesn't mean you have to write SQL strings though. A query builder based on [knex](http://knexjs.org) is
     used to build the SQL. However, if the query builder fails you for some reason, raw SQL strings can be easily
-    written using the [raw](/api/objection/#raw) helper function.
+    written using the [raw](https://github.com/Vincit/objection.js/tree/v1/doc/api/objection/#raw) helper function.
  * **Automatic database schema creation and migration from model definitions.**
     For simple things it is useful that the database schema is automatically generated from the model definitions,
     but usually just gets in your way when doing anything non-trivial. Objection.js leaves the schema related things

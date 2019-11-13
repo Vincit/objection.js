@@ -4,7 +4,7 @@ sidebar: auto
 
 # Types
 
-This page contains the documentation of all other types and classes than [Model](/api/model/) and [QueryBuilder](/api/query-builder/). There are two types of items on this page:
+This page contains the documentation of all other types and classes than [Model](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/) and [QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/). There are two types of items on this page:
 
 1. `type`: A type is just a POJO (Plain Old Javascript Object) with a set of properties.
 2. `class`: A class is a JavaScript class with properties and methods.
@@ -14,29 +14,29 @@ This page contains the documentation of all other types and classes than [Model]
 Property|Type|Description
 --------|----|-----------
 relation|function|The relation type. One of `Model.BelongsToOneRelation`, `Model.HasOneRelation`, `Model.HasManyRelation`, `Model.ManyToManyRelation` and `Model.HasOneThroughRelation`.
-modelClass|[Model](/api/model/)<br>string|Constructor of the related model class, an absolute path to a module that exports one or a path relative to [modelPaths](/api/model/static-properties.html#static-modelpaths) that exports a model class.
-join|[RelationJoin](/api/types/#type-relationjoin)|Describes how the models are related to each other. See [RelationJoin](/api/types/#type-relationjoin).
-modify|function([QueryBuilder](/api/query-builder/))<br>string<br>object|Optional modifier for the relation query. If specified as a function, it will be called each time before fetching the relation. If specified as a string, named filter with specified name will be applied each time when fetching the relation. If specified as an object, it will be used as an additional query parameter - e. g. passing {name: 'Jenny'} would additionally narrow fetched rows to the ones with the name 'Jenny'.
-filter|function([QueryBuilder](/api/query-builder/))<br>string<br>object|Alias for modify.
-beforeInsert|function([Model](/api/model/),&nbsp;[QueryContext](/api/query-builder/other-methods.html#context))|Optional insert hook that is called for each inserted model instance. This function can be async.
+modelClass|[Model](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/)<br>string|Constructor of the related model class, an absolute path to a module that exports one or a path relative to [modelPaths](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/static-properties.md#static-modelpaths) that exports a model class.
+join|[RelationJoin](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#type-relationjoin)|Describes how the models are related to each other. See [RelationJoin](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#type-relationjoin).
+modify|function([QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/))<br>string<br>object|Optional modifier for the relation query. If specified as a function, it will be called each time before fetching the relation. If specified as a string, named filter with specified name will be applied each time when fetching the relation. If specified as an object, it will be used as an additional query parameter - e. g. passing {name: 'Jenny'} would additionally narrow fetched rows to the ones with the name 'Jenny'.
+filter|function([QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/))<br>string<br>object|Alias for modify.
+beforeInsert|function([Model](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/),&nbsp;[QueryContext](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/other-methods.md#context))|Optional insert hook that is called for each inserted model instance. This function can be async.
 
 ## `type` RelationJoin
 
 Property|Type|Description
 --------|----|-----------
-from|string<br>[ReferenceBuilder](/api/objection/#ref)<br>Array|The relation column in the owner table. Must be given with the table name. For example `persons.id`. Composite key can be specified using an array of columns e.g. `['persons.a', 'persons.b']`. Note that neither this nor `to` need to be foreign keys or primary keys. You can join any column to any column. You can even join nested json fields using the [ref](/api/objection/#ref) helper.
-to|string<br>[ReferenceBuilder](/api/objection/#ref)<br>Array|The relation column in the related table. Must be given with the table name. For example `movies.id`. Composite key can be specified using an array of columns e.g. `['movies.a', 'movies.b']`. Note that neither this nor `from` need to be foreign keys or primary keys. You can join any column to any column. You can even join nested json fields using the [ref](/api/objection/#ref) helper.
-through|[RelationThrough](/api/types/#type-relationthrough)|Describes the join table if the models are related through one.
+from|string<br>[ReferenceBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/objection/#ref)<br>Array|The relation column in the owner table. Must be given with the table name. For example `persons.id`. Composite key can be specified using an array of columns e.g. `['persons.a', 'persons.b']`. Note that neither this nor `to` need to be foreign keys or primary keys. You can join any column to any column. You can even join nested json fields using the [ref](https://github.com/Vincit/objection.js/tree/v1/doc/api/objection/#ref) helper.
+to|string<br>[ReferenceBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/objection/#ref)<br>Array|The relation column in the related table. Must be given with the table name. For example `movies.id`. Composite key can be specified using an array of columns e.g. `['movies.a', 'movies.b']`. Note that neither this nor `from` need to be foreign keys or primary keys. You can join any column to any column. You can even join nested json fields using the [ref](https://github.com/Vincit/objection.js/tree/v1/doc/api/objection/#ref) helper.
+through|[RelationThrough](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#type-relationthrough)|Describes the join table if the models are related through one.
 
 ## `type` RelationThrough
 
 Property|Type|Description
 --------|----|-----------
-from|string<br>[ReferenceBuilder](/api/objection/#ref)<br>Array|The column that is joined to `from` property of the `RelationJoin`. For example `Person_movies.actorId` where `Person_movies` is the join table. Composite key can be specified using an array of columns e.g. `['persons_movies.a', 'persons_movies.b']`. You can join nested json fields using the [ref](/api/objection/#ref) helper.
-to|string<br>[ReferenceBuilder](/api/objection/#ref)<br>Array|The column that is joined to `to` property of the `RelationJoin`. For example `Person_movies.movieId` where `Person_movies` is the join table. Composite key can be specified using an array of columns e.g. `['persons_movies.a', 'persons_movies.b']`. You can join nested json fields using the [ref](/api/objection/#ref) helper.
+from|string<br>[ReferenceBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/objection/#ref)<br>Array|The column that is joined to `from` property of the `RelationJoin`. For example `Person_movies.actorId` where `Person_movies` is the join table. Composite key can be specified using an array of columns e.g. `['persons_movies.a', 'persons_movies.b']`. You can join nested json fields using the [ref](https://github.com/Vincit/objection.js/tree/v1/doc/api/objection/#ref) helper.
+to|string<br>[ReferenceBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/objection/#ref)<br>Array|The column that is joined to `to` property of the `RelationJoin`. For example `Person_movies.movieId` where `Person_movies` is the join table. Composite key can be specified using an array of columns e.g. `['persons_movies.a', 'persons_movies.b']`. You can join nested json fields using the [ref](https://github.com/Vincit/objection.js/tree/v1/doc/api/objection/#ref) helper.
 modelClass|string<br>ModelClass|If you have a model class for the join table, you should specify it here. This is optional so you don't need to create a model class if you don't want to.
-extra|string[]<br>Object|Join table columns listed here are automatically joined to the related objects when they are fetched and automatically written to the join table instead of the related table on insert. The values can be aliased by providing an object `{propertyName: 'columnName', otherPropertyName: 'otherColumnName'} instead of array` See [this recipe](/recipes/extra-properties.html) for more info.
-beforeInsert|function([Model](/api/model/),&nbsp;[QueryContext](/api/query-builder/other-methods.html#context))|Optional insert hook that is called for each inserted join table model instance. This function can be async.
+extra|string[]<br>Object|Join table columns listed here are automatically joined to the related objects when they are fetched and automatically written to the join table instead of the related table on insert. The values can be aliased by providing an object `{propertyName: 'columnName', otherPropertyName: 'otherColumnName'} instead of array` See [this recipe](https://github.com/Vincit/objection.js/tree/v1/doc/recipes/extra-properties.md) for more info.
+beforeInsert|function([Model](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/),&nbsp;[QueryContext](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/other-methods.md#context))|Optional insert hook that is called for each inserted join table model instance. This function can be async.
 
 ## `type` ModelOptions
 
@@ -72,21 +72,21 @@ joinOperation|string|Which join type to use `['leftJoin', 'innerJoin', 'rightJoi
 
 Property|Type|Description
 --------|----|-----------
-relate|boolean<br>string[]|If true, relations are related instead of inserted. Relate functionality can be enabled for a subset of relations of the graph by providing a list of relation expressions. See the examples [here](/guide/query-examples.html#graph-upserts).
-unrelate|boolean<br>string[]|If true, relations are unrelated instead of deleted. Unrelate functionality can be enabled for a subset of relations of the graph by providing a list of relation expressions. See the examples [here](/guide/query-examples.html#graph-upserts).
-insertMissing|boolean<br>string[]|If true, models that have identifiers _and_ are not found, are inserted. By default this is false and an error is thrown. This functionality can be enabled for a subset of relations of the graph by providing a list of relation expressions. See the examples [here](/guide/query-examples.html#graph-upserts).
-update|boolean<br>string[]|If true, update operations are performed instead of patch when altering existing models, affecting the way the data is validated. With update operations, all required fields need to be present in the data provided. This functionality can be enabled for a subset of relations of the graph by providing a list of relation expressions. See the examples [here](/guide/query-examples.html#graph-upserts).
-noInsert|boolean<br>string[]|If true, no inserts are performed. Inserts can be disabled for a subset of relations of the graph by providing a list of relation expressions. See the examples [here](/guide/query-examples.html#graph-upserts).
-noUpdate|boolean<br>string[]|If true, no updates are performed. Updates can be disabled for a subset of relations of the graph by providing a list of relation expressions. See the examples [here](/guide/query-examples.html#graph-upserts).
-noDelete|boolean<br>string[]|If true, no deletes are performed. Deletes can be disabled for a subset of relations of the graph by providing a list of relation expressions. See the examples [here](/guide/query-examples.html#graph-upserts).
-noRelate|boolean<br>string[]|If true, no relates are performed. Relate operations can be disabled for a subset of relations of the graph by providing a list of relation expressions. See the examples [here](/guide/query-examples.html#graph-upserts).
-noUnrelate|boolean<br>string[]|If true, no unrelate operations are performed. Unrelate operations can be disabled for a subset of relations of the graph by providing a list of relation expressions. See the examples [here](/guide/query-examples.html#graph-upserts).
+relate|boolean<br>string[]|If true, relations are related instead of inserted. Relate functionality can be enabled for a subset of relations of the graph by providing a list of relation expressions. See the examples [here](https://github.com/Vincit/objection.js/tree/v1/doc/guide/query-examples.md#graph-upserts).
+unrelate|boolean<br>string[]|If true, relations are unrelated instead of deleted. Unrelate functionality can be enabled for a subset of relations of the graph by providing a list of relation expressions. See the examples [here](https://github.com/Vincit/objection.js/tree/v1/doc/guide/query-examples.md#graph-upserts).
+insertMissing|boolean<br>string[]|If true, models that have identifiers _and_ are not found, are inserted. By default this is false and an error is thrown. This functionality can be enabled for a subset of relations of the graph by providing a list of relation expressions. See the examples [here](https://github.com/Vincit/objection.js/tree/v1/doc/guide/query-examples.md#graph-upserts).
+update|boolean<br>string[]|If true, update operations are performed instead of patch when altering existing models, affecting the way the data is validated. With update operations, all required fields need to be present in the data provided. This functionality can be enabled for a subset of relations of the graph by providing a list of relation expressions. See the examples [here](https://github.com/Vincit/objection.js/tree/v1/doc/guide/query-examples.md#graph-upserts).
+noInsert|boolean<br>string[]|If true, no inserts are performed. Inserts can be disabled for a subset of relations of the graph by providing a list of relation expressions. See the examples [here](https://github.com/Vincit/objection.js/tree/v1/doc/guide/query-examples.md#graph-upserts).
+noUpdate|boolean<br>string[]|If true, no updates are performed. Updates can be disabled for a subset of relations of the graph by providing a list of relation expressions. See the examples [here](https://github.com/Vincit/objection.js/tree/v1/doc/guide/query-examples.md#graph-upserts).
+noDelete|boolean<br>string[]|If true, no deletes are performed. Deletes can be disabled for a subset of relations of the graph by providing a list of relation expressions. See the examples [here](https://github.com/Vincit/objection.js/tree/v1/doc/guide/query-examples.md#graph-upserts).
+noRelate|boolean<br>string[]|If true, no relates are performed. Relate operations can be disabled for a subset of relations of the graph by providing a list of relation expressions. See the examples [here](https://github.com/Vincit/objection.js/tree/v1/doc/guide/query-examples.md#graph-upserts).
+noUnrelate|boolean<br>string[]|If true, no unrelate operations are performed. Unrelate operations can be disabled for a subset of relations of the graph by providing a list of relation expressions. See the examples [here](https://github.com/Vincit/objection.js/tree/v1/doc/guide/query-examples.md#graph-upserts).
 
 ## `type` InsertGraphOptions
 
 Property|Type|Description
 --------|----|-----------
-relate|boolean<br>string[]|If true, models with an `id` are related instead of inserted. Relate functionality can be enabled for a subset of relations of the graph by providing a list of relation expressions. See the examples [here](/guide/query-examples.html#graph-inserts).
+relate|boolean<br>string[]|If true, models with an `id` are related instead of inserted. Relate functionality can be enabled for a subset of relations of the graph by providing a list of relation expressions. See the examples [here](https://github.com/Vincit/objection.js/tree/v1/doc/guide/query-examples.md#graph-inserts).
 
 ## `type` TableMetadataFetchOptions
 
@@ -133,7 +133,7 @@ Caveats when using special characters in keys:
 4. Keys containing square brackets and quotes `objectColumn:['Double."Quote".[]']` and `objectColumn:["Sinlge.'Quote'.[]"]` Column `{ "Double.\"Quote\".[]" : "I was referred",  "Sinlge.'Quote'.[]" : "Mee too!" }`
 99. Keys containing dots, square brackets, single quotes and double quotes in one json key is not currently supported
 
-There are some special methods that accept `FieldExpression` strings directly, like [whereJsonSupersetOf](/api/query-builder/find-methods.html#wherejsonsupersetof) but you can use `FieldExpressions` anywhere with [ref](/api/objection/#ref). Here's an example:
+There are some special methods that accept `FieldExpression` strings directly, like [whereJsonSupersetOf](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/find-methods.md#wherejsonsupersetof) but you can use `FieldExpressions` anywhere with [ref](https://github.com/Vincit/objection.js/tree/v1/doc/api/objection/#ref). Here's an example:
 
 ```js
 const { ref } = require('objection');
@@ -213,7 +213,7 @@ const people = await Person
 console.log(people[0].children[0].movies[0].actors[0].pets[0].name);
 ```
 
-Relation expressions can have arguments. Arguments are used to refer to modifier functions (either [global](/api/model/static-properties.html#static-modifiers) or [local](/api/query-builder/eager-methods.html#eager)). Arguments are listed in parenthesis after the relation names like this:
+Relation expressions can have arguments. Arguments are used to refer to modifier functions (either [global](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/static-properties.md#static-modifiers) or [local](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/eager-methods.md#eager)). Arguments are listed in parenthesis after the relation names like this:
 
 ```js
 Person
@@ -339,9 +339,9 @@ The string expression in the comment is equivalent to the object expression belo
 
 ## `type` TransactionObject
 
-This is nothing more than a knex transaction object. It can be used as a knex query builder, it can be [passed to objection queries](/guide/transactions.html#passing-around-a-transaction-object) and [models can be bound to it](/guide/transactions.html#binding-models-to-a-transaction)
+This is nothing more than a knex transaction object. It can be used as a knex query builder, it can be [passed to objection queries](https://github.com/Vincit/objection.js/tree/v1/doc/guide/transactions.md#passing-around-a-transaction-object) and [models can be bound to it](https://github.com/Vincit/objection.js/tree/v1/doc/guide/transactions.md#binding-models-to-a-transaction)
 
-See the section about [transactions](/guide/transactions.html) for more info and examples.
+See the section about [transactions](https://github.com/Vincit/objection.js/tree/v1/doc/guide/transactions.md) for more info and examples.
 
 ### Instance Methods
 
@@ -376,9 +376,9 @@ If `type` is anything else but `"ModelValidation"`, `data` can be any object tha
 
 Error of this class is thrown by default if validation of any input fails. By input we mean any data that can come from the outside world, like model instances (or POJOs), relation expressions object graphs etc.
 
-You can replace this error by overriding [Model.createValidationError()](/api/model/static-methods.html#static-createvalidationerror) method.
+You can replace this error by overriding [Model.createValidationError()](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/static-methods.md#static-createvalidationerror) method.
 
-See the [error handling recipe](/recipes/error-handling.html) for more info.
+See the [error handling recipe](https://github.com/Vincit/objection.js/tree/v1/doc/recipes/error-handling.md) for more info.
 
 Property|Type|Description
 --------|----|-----------
@@ -423,17 +423,17 @@ const { NotFoundError } = require('objection');
 throw new NotFoundError(data);
 ```
 
-Error of this class is thrown by default by [throwIfNotFound()](/api/query-builder/other-methods.html#throwifnotfound)
+Error of this class is thrown by default by [throwIfNotFound()](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/other-methods.md#throwifnotfound)
 
-You can replace this error by overriding [Model.createNotFoundError()](/api/model/static-methods.html#static-createnotfounderror) method.
+You can replace this error by overriding [Model.createNotFoundError()](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/static-methods.md#static-createnotfounderror) method.
 
-See the [error handling recipe](/recipes/error-handling.html) for more info.
+See the [error handling recipe](https://github.com/Vincit/objection.js/tree/v1/doc/recipes/error-handling.md) for more info.
 
 ## `class` Relation
 
-`Relation` is a parsed and normalized instance of a [RelationMapping](/api/types/#type-relationmapping). `Relation`s can be accessed using the [getRelations](/api/model/static-methods.html#static-getrelations) method.
+`Relation` is a parsed and normalized instance of a [RelationMapping](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#type-relationmapping). `Relation`s can be accessed using the [getRelations](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/static-methods.md#static-getrelations) method.
 
-`Relation` holds a [RelationProperty](/api/types/#class-relationproperty) instance for each property that is used to create the relationship between two tables.
+`Relation` holds a [RelationProperty](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#class-relationproperty) instance for each property that is used to create the relationship between two tables.
 
 `Relation` is actually a base class for all relation types `BelongsToOneRelation`, `HasManyRelation` etc. You can use `instanceof` to determine the type of the relations (see the example on the right). Note that `HasOneRelation` is a subclass of `HasManyRelation` and `HasOneThroughRelation` is a subclass of `ManyToManyRelation`. Arrange your `instanceof` checks accordingly.
 
@@ -442,12 +442,12 @@ Property|Type|Description
 name|string|Name of the relation. For example `pets` or `children`.
 ownerModelClass|function|The model class that has defined the relation.
 relatedModelClass|function|The model class of the related objects.
-ownerProp|[RelationProperty](/api/types/#class-relationproperty)|The relation property in the `ownerModelClass`.
-relatedProp|[RelationProperty](/api/types/#class-relationproperty)|The relation property in the `relatedModelClass`.
-joinModelClass|function|The model class representing the join table. This class is automatically generated by Objection if none is provided in the `join.through.modelClass` setting of the relation mapping, see [RelationThrough](/api/types/#type-relationthrough).
+ownerProp|[RelationProperty](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#class-relationproperty)|The relation property in the `ownerModelClass`.
+relatedProp|[RelationProperty](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#class-relationproperty)|The relation property in the `relatedModelClass`.
+joinModelClass|function|The model class representing the join table. This class is automatically generated by Objection if none is provided in the `join.through.modelClass` setting of the relation mapping, see [RelationThrough](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#type-relationthrough).
 joinTable|string|The name of the join table (only for `ManyToMany` and `HasOneThrough` relations).
-joinTableOwnerProp|[RelationProperty](/api/types/#class-relationproperty)|The join table property pointing to `ownerProp` (only for `ManyToMany` and `HasOneThrough` relations).
-joinTableRelatedProp|[RelationProperty](/api/types/#class-relationproperty)|The join table property pointing to `relatedProp` (only for `ManyToMany` and `HasOneThrough` relations).
+joinTableOwnerProp|[RelationProperty](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#class-relationproperty)|The join table property pointing to `ownerProp` (only for `ManyToMany` and `HasOneThrough` relations).
+joinTableRelatedProp|[RelationProperty](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#class-relationproperty)|The join table property pointing to `relatedProp` (only for `ManyToMany` and `HasOneThrough` relations).
 
 Note that `Relation` instances are actually instances of the relation classes used in `relationMappings`. For example:
 
@@ -516,7 +516,7 @@ const col = property.fullCol(builder, index);
 ```
 
 Returns the property's index:th column name with the correct table reference. Something like `"Table.column"`.
-The first argument must be an objection [QueryBuilder](/api/types/#querybuilder) instance.
+The first argument must be an objection [QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#querybuilder) instance.
 
 #### ref()
 
@@ -532,7 +532,7 @@ const ref = property.ref(builder, 0);
 builder.where(ref, '>', 10);
 ```
 
-Returns a [ReferenceBuilder](/api/objection/#ref) instance that points to the index:th column.
+Returns a [ReferenceBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/objection/#ref) instance that points to the index:th column.
 
 #### patch()
 
@@ -553,7 +553,7 @@ Appends an update operation for the index:th column into `patchObj` object.
 
 ## `class` ReferenceBuilder
 
-An instance of this is returned from the [ref](/api/objection/#ref) helper function.
+An instance of this is returned from the [ref](https://github.com/Vincit/objection.js/tree/v1/doc/api/objection/#ref) helper function.
 
 ### Instance Methods
 
@@ -610,7 +610,7 @@ Gives an alias for the reference `.select(ref('age').as('yougness'))`
 
 ## `class` LiteralBuilder
 
-An instance of this is returned from the [lit](/api/objection/#lit) helper function. If an object
+An instance of this is returned from the [lit](https://github.com/Vincit/objection.js/tree/v1/doc/api/objection/#lit) helper function. If an object
 is given as a value, it is cast to json by default.
 
 ### Instance Methods
@@ -684,7 +684,7 @@ Gives an alias for the reference `.select(ref('age').as('yougness'))`
 
 ## `class` RawBuilder
 
-An instance of this is returned from the [raw](/api/objection/#raw) helper function.
+An instance of this is returned from the [raw](https://github.com/Vincit/objection.js/tree/v1/doc/api/objection/#raw) helper function.
 
 ### Instance Methods
 
@@ -700,7 +700,7 @@ You should use this instead of inserting the alias to the SQL to give objection 
 const { Validator } = require('objection');
 ```
 
-Abstract class from which model validators must be inherited. See the example for explanation. Also check out the [createValidator](/api/model/static-methods.html#static-createvalidator) method.
+Abstract class from which model validators must be inherited. See the example for explanation. Also check out the [createValidator](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/static-methods.md#static-createvalidator) method.
 
 #### Examples
 
@@ -765,8 +765,8 @@ const { AjvValidator } = require('objection');
 ```
 
 The default [Ajv](https://github.com/epoberezkin/ajv) based json schema
-validator. You can override the [createValidator](/api/model/static-methods.html#static-createvalidator)
-method of [Model](/api/model/) like in the example to modify the validator.
+validator. You can override the [createValidator](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/static-methods.md#static-createvalidator)
+method of [Model](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/) like in the example to modify the validator.
 
 #### Examples
 

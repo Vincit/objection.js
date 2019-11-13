@@ -12,14 +12,14 @@ Joins a set of relations described by `relationExpression`. See the examples for
 
 Argument|Type|Description
 --------|----|--------------------
-relationExpression|[RelationExpression](/api/types/#type-relationexpression)|An expression describing which relations to join.
+relationExpression|[RelationExpression](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#type-relationexpression)|An expression describing which relations to join.
 opt|object|Optional options. See the examples.
 
 ##### Return value
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ##### Examples
 
@@ -51,7 +51,7 @@ await Person
   .where('parent.name', 'Arnold');
 ```
 
-You can also use the [object notation](/api/types/#relationexpression-object-notation)
+You can also use the [object notation](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#relationexpression-object-notation)
 
 ```js
 await Person
@@ -101,31 +101,31 @@ await Person
 
 ## innerJoinRelation()
 
-Alias for [joinRelation](/api/query-builder/join-methods.html#joinrelation).
+Alias for [joinRelation](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/join-methods.md#joinrelation).
 
 ## outerJoinRelation()
 
-Outer join version of the [joinRelation](/api/query-builder/join-methods.html#joinrelation) method.
+Outer join version of the [joinRelation](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/join-methods.md#joinrelation) method.
 
 ## leftJoinRelation()
 
-Left join version of the [joinRelation](/api/query-builder/join-methods.html#joinrelation) method.
+Left join version of the [joinRelation](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/join-methods.md#joinrelation) method.
 
 ## leftOuterJoinRelation()
 
-Left outer join version of the [joinRelation](/api/query-builder/join-methods.html#joinrelation) method.
+Left outer join version of the [joinRelation](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/join-methods.md#joinrelation) method.
 
 ## rightJoinRelation()
 
-Right join version of the [joinRelation](/api/query-builder/join-methods.html#joinrelation) method.
+Right join version of the [joinRelation](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/join-methods.md#joinrelation) method.
 
 ## rightOuterJoinRelation()
 
-Left outer join version of the [joinRelation](/api/query-builder/join-methods.html#joinrelation) method.
+Left outer join version of the [joinRelation](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/join-methods.md#joinrelation) method.
 
 ## fullOuterJoinRelation()
 
-Full outer join version of the [joinRelation](/api/query-builder/join-methods.html#joinrelation) method.
+Full outer join version of the [joinRelation](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/join-methods.md#joinrelation) method.
 
 ## join()
 
@@ -135,7 +135,7 @@ See [knex documentation](http://knexjs.org/#Builder-join)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## joinRaw()
 
@@ -145,7 +145,7 @@ See [knex documentation](http://knexjs.org/#Builder-joinRaw)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## innerJoin()
 
@@ -155,7 +155,7 @@ See [knex documentation](http://knexjs.org/#Builder-innerJoin)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## leftJoin()
 
@@ -165,7 +165,7 @@ See [knex documentation](http://knexjs.org/#Builder-leftJoin)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## leftOuterJoin()
 
@@ -175,7 +175,7 @@ See [knex documentation](http://knexjs.org/#Builder-leftOuterJoin)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## rightJoin()
 
@@ -185,7 +185,7 @@ See [knex documentation](http://knexjs.org/#Builder-rightJoin)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## rightOuterJoin()
 
@@ -195,7 +195,7 @@ See [knex documentation](http://knexjs.org/#Builder-rightOuterJoin)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## outerJoin()
 
@@ -205,7 +205,7 @@ See [knex documentation](http://knexjs.org/#Builder-outerJoin)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## fullOuterJoin()
 
@@ -215,7 +215,7 @@ See [knex documentation](http://knexjs.org/#Builder-fullOuterJoin)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## crossJoin()
 
@@ -225,4 +225,4 @@ See [knex documentation](http://knexjs.org/#Builder-crossJoin)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.

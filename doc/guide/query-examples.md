@@ -4,23 +4,23 @@ sidebarDepth: 3
 
 # Query examples
 
-The `Person` model used in the examples is defined [here](/guide/models.html#examples).
+The `Person` model used in the examples is defined [here](https://github.com/Vincit/objection.js/tree/v1/doc/guide/models.md#examples).
 
-All queries are started with one of the [Model](/api/model/) methods [query](/api/model/static-methods.html#static-query), [$query](/api/model/instance-methods.html#query) or [$relatedQuery](/api/model/instance-methods.html#relatedquery). All these methods return a [QueryBuilder](/api/query-builder/) instance that can be used just like a [knex QueryBuilder](http://knexjs.org/#Builder) but they also have a bunch of methods added by objection.
+All queries are started with one of the [Model](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/) methods [query](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/static-methods.md#static-query), [$query](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/instance-methods.md#query) or [$relatedQuery](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/instance-methods.md#relatedquery). All these methods return a [QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/) instance that can be used just like a [knex QueryBuilder](http://knexjs.org/#Builder) but they also have a bunch of methods added by objection.
 
 ## Basic queries
 
 ### Find queries
 
-Find queries can be created by calling [Model.query()](/api/model/static-methods.html#static-query) and chaining query builder methods for the returned
-[QueryBuilder](/api/query-builder/) instance.
+Find queries can be created by calling [Model.query()](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/static-methods.md#static-query) and chaining query builder methods for the returned
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/) instance.
 
 In addition to the examples here, you can find more examples behind these links.
 
-* [subqueries](/recipes/subqueries.html)
-* [raw queries](/recipes/raw-queries.html)
+* [subqueries](https://github.com/Vincit/objection.js/tree/v1/doc/recipes/subqueries.md)
+* [raw queries](https://github.com/Vincit/objection.js/tree/v1/doc/recipes/raw-queries.md)
 
- There's also a large amount of examples in the [API documentation](/api/query-builder/).
+ There's also a large amount of examples in the [API documentation](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/).
 
 ##### Examples
 
@@ -50,7 +50,7 @@ console.log('there are', people.length, 'People in total');
 select "people".* from "people"
 ```
 
-The return value of the [query](/api/model/static-methods.html#static-query) method is an instance of [QueryBuilder](/api/query-builder/) that has all the methods a [knex QueryBuilder](http://knexjs.org/#Builder) has and a lot more. Here is a simple example that uses some of them:
+The return value of the [query](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/static-methods.md#static-query) method is an instance of [QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/) that has all the methods a [knex QueryBuilder](http://knexjs.org/#Builder) has and a lot more. Here is a simple example that uses some of them:
 
 ```js
 const middleAgedJennifers = await Person
@@ -106,7 +106,7 @@ and exists (
 order by "persons"."lastName" asc
 ```
 
-In addition to knex methods, the [QueryBuilder](/api/query-builder/) has a lot of helpers for dealing with relations like the [joinRelation](/api/query-builder/join-methods.html#joinrelation) method:
+In addition to knex methods, the [QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/) has a lot of helpers for dealing with relations like the [joinRelation](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/join-methods.md#joinrelation) method:
 
 ```js
 const people = await Person
@@ -150,12 +150,12 @@ order by "lastName" asc
 
 ### Insert queries
 
-Insert queries are created by chaining the [insert](/api/query-builder/mutate-methods.html#insert) method to the query. See the [insertGraph](/api/query-builder/mutate-methods.html#insertgraph) method for inserting object graphs.
+Insert queries are created by chaining the [insert](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/mutate-methods.md#insert) method to the query. See the [insertGraph](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/mutate-methods.md#insertgraph) method for inserting object graphs.
 
 In addition to the examples here, you can find more examples behind these links.
 
-* [insert API reference](/api/query-builder/mutate-methods.html#insert)
-* [graph inserts](/guide/query-examples.html#graph-inserts)
+* [insert API reference](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/mutate-methods.md#insert)
+* [graph inserts](https://github.com/Vincit/objection.js/tree/v1/doc/guide/query-examples.md#graph-inserts)
 
 ##### Examples
 
@@ -175,12 +175,12 @@ insert into "persons" ("firstName", "lastName") values ('Jennifer', 'Lawrence')
 
 ### Update queries
 
-Update queries are created by chaining the [update](/api/query-builder/mutate-methods.html#update) or [patch](/api/query-builder/mutate-methods.html#patch) method to the query. [patch](/api/query-builder/mutate-methods.html#patch) and [update](/api/query-builder/mutate-methods.html#update) return the number of updated rows. If you want the freshly updated model as a result you can use the helper method [patchAndFetchById](/api/query-builder/mutate-methods.html#patchandfetchbyid) and [updateAndFetchById](/api/query-builder/mutate-methods.html#updateandfetchbyid). On postgresql you can simply chain [.returning('*')](/api/query-builder/find-methods.html#returning) or take a look at [this recipe](/recipes/returning-tricks.html) for more ideas. See [update](/api/query-builder/mutate-methods.html#update) and [patch](/api/query-builder/mutate-methods.html#patch) API documentation for discussion about their differences.
+Update queries are created by chaining the [update](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/mutate-methods.md#update) or [patch](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/mutate-methods.md#patch) method to the query. [patch](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/mutate-methods.md#patch) and [update](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/mutate-methods.md#update) return the number of updated rows. If you want the freshly updated model as a result you can use the helper method [patchAndFetchById](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/mutate-methods.md#patchandfetchbyid) and [updateAndFetchById](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/mutate-methods.md#updateandfetchbyid). On postgresql you can simply chain [.returning('*')](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/find-methods.md#returning) or take a look at [this recipe](https://github.com/Vincit/objection.js/tree/v1/doc/recipes/returning-tricks.md) for more ideas. See [update](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/mutate-methods.md#update) and [patch](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/mutate-methods.md#patch) API documentation for discussion about their differences.
 
 In addition to the examples here, you can find more examples behind these links.
 
-* [patch API reference](/api/query-builder/mutate-methods.html#patch)
-* [raw queries](/recipes/raw-queries.html)
+* [patch API reference](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/mutate-methods.md#patch)
+* [raw queries](https://github.com/Vincit/objection.js/tree/v1/doc/recipes/raw-queries.md)
 
 ##### Examples
 
@@ -230,9 +230,9 @@ select "persons".* from "persons" where "id" = 246
 
 ### Delete queries
 
-Delete queries are created by chaining the [delete](/api/query-builder/mutate-methods.html#delete) method to the query.
+Delete queries are created by chaining the [delete](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/mutate-methods.md#delete) method to the query.
 
-NOTE: The return value of the query will be the number of deleted rows. *If you're using Postgres take a look at [this recipe](/recipes/returning-tricks.html) if you'd like the deleted rows to be returned as Model instances*.
+NOTE: The return value of the query will be the number of deleted rows. *If you're using Postgres take a look at [this recipe](https://github.com/Vincit/objection.js/tree/v1/doc/recipes/returning-tricks.md) if you'd like the deleted rows to be returned as Model instances*.
 
 ##### Examples
 
@@ -263,7 +263,7 @@ console.log(numDeleted, 'people were deleted');
 delete from "persons" where lower("firstName") like '%ennif%'
 ```
 
-You can always use [subqueries](/recipes/subqueries.html), [raw](/api/objection/#raw), [ref](/api/objection/#ref), [lit](/api/objection/#lit) and all query building methods with [delete](/api/query-builder/mutate-methods.html#delete) queries, just like with every query in objection. With some databases, you cannot use joins with deletes (db restriction, not objection). You can replace joins with subqueries like this:
+You can always use [subqueries](https://github.com/Vincit/objection.js/tree/v1/doc/recipes/subqueries.md), [raw](https://github.com/Vincit/objection.js/tree/v1/doc/api/objection/#raw), [ref](https://github.com/Vincit/objection.js/tree/v1/doc/api/objection/#ref), [lit](https://github.com/Vincit/objection.js/tree/v1/doc/api/objection/#lit) and all query building methods with [delete](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/mutate-methods.md#delete) queries, just like with every query in objection. With some databases, you cannot use joins with deletes (db restriction, not objection). You can replace joins with subqueries like this:
 
 ```js
 // This query deletes all people that have a pet named "Fluffy".
@@ -311,13 +311,13 @@ where exists (
 
 ## Relation queries
 
-While the static [query](/api/model/static-methods.html#static-query) method can be used to create a query to a whole table [$relatedQuery](/api/model/instance-methods.html#relatedquery) method can be used to query a single relation. [$relatedQuery](/api/model/instance-methods.html#relatedquery) returns an instance of [QueryBuilder](/api/query-builder/) just like the [query](/api/model/static-methods.html#static-query) method.
+While the static [query](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/static-methods.md#static-query) method can be used to create a query to a whole table [$relatedQuery](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/instance-methods.md#relatedquery) method can be used to query a single relation. [$relatedQuery](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/instance-methods.md#relatedquery) returns an instance of [QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/) just like the [query](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/static-methods.md#static-query) method.
 
 ### Find queries
 
-Simply call [$relatedQuery('relationName')](/api/model/instance-methods.html#relatedquery) for a model _instance_ to fetch a relation for it. The relation name is given as the only argument. The return value is a [QueryBuilder](/api/query-builder/) so you once again have all the query methods at your disposal. In many cases it's more convenient to use [eager loading](/guide/query-examples.html#eager-loading) to fetch relations. [$relatedQuery](/api/model/instance-methods.html#relatedquery) is better when you only need one relation and you need to filter the query extensively.
+Simply call [$relatedQuery('relationName')](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/instance-methods.md#relatedquery) for a model _instance_ to fetch a relation for it. The relation name is given as the only argument. The return value is a [QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/) so you once again have all the query methods at your disposal. In many cases it's more convenient to use [eager loading](https://github.com/Vincit/objection.js/tree/v1/doc/guide/query-examples.md#eager-loading) to fetch relations. [$relatedQuery](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/instance-methods.md#relatedquery) is better when you only need one relation and you need to filter the query extensively.
 
-By default the fetched related models are assigned to the parent model to a property by the same name as the relation. For example in our `person.$relatedQuery('pets')` example query, the return value would be assigned to `person.pets`. This behaviour can be modified using [relatedFindQueryMutates](/api/model/static-properties.html#static-relatedfindquerymutates). Also check out [$setRelated](/api/model/instance-methods.html#setrelated) and [$appendRelated](/api/model/instance-methods.html#appendrelated) helpers.
+By default the fetched related models are assigned to the parent model to a property by the same name as the relation. For example in our `person.$relatedQuery('pets')` example query, the return value would be assigned to `person.pets`. This behaviour can be modified using [relatedFindQueryMutates](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/static-properties.md#static-relatedfindquerymutates). Also check out [$setRelated](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/instance-methods.md#setrelated) and [$appendRelated](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/instance-methods.md#appendrelated) helpers.
 
 ##### Examples
 
@@ -341,10 +341,10 @@ order by "name" asc
 
 ### Insert queries
 
-Chain the [insert](/api/query-builder/mutate-methods.html#insert) method to a [$relatedQuery](/api/model/instance-methods.html#relatedquery) call to insert a related object for a model _instance_. The query inserts a new object to the related table and updates the needed tables to create the relation. In case of many-to-many relation a row is inserted to the join table etc. Also check out [insertGraph](/api/query-builder/mutate-methods.html#insertgraph) method for an alternative way to insert related models.
+Chain the [insert](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/mutate-methods.md#insert) method to a [$relatedQuery](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/instance-methods.md#relatedquery) call to insert a related object for a model _instance_. The query inserts a new object to the related table and updates the needed tables to create the relation. In case of many-to-many relation a row is inserted to the join table etc. Also check out [insertGraph](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/mutate-methods.md#insertgraph) method for an alternative way to insert related models.
 
-By default the inserted related models are appended to the parent model to a property by the same name as the relation. For example in our `person.$relatedQuery('pets').insert(obj)` example query, the return value would be appended to `person.pets`. This behaviour can be modified using [relatedInsertQueryMutates](/api/model/static-properties.html#static-relatedinsertquerymutates). Also check out the [$setRelated](/api/model/instance-methods.html#setrelated) and
-[$appendRelated](/api/model/instance-methods.html#appendrelated) helpers.
+By default the inserted related models are appended to the parent model to a property by the same name as the relation. For example in our `person.$relatedQuery('pets').insert(obj)` example query, the return value would be appended to `person.pets`. This behaviour can be modified using [relatedInsertQueryMutates](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/static-properties.md#static-relatedinsertquerymutates). Also check out the [$setRelated](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/instance-methods.md#setrelated) and
+[$appendRelated](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/instance-methods.md#appendrelated) helpers.
 
 ##### Examples
 
@@ -363,7 +363,7 @@ console.log(person.pets.indexOf(fluffy) !== -1); // --> true
 insert into "animals" ("name", "ownerId") values ('Fluffy', 1)
 ```
 
-If you want to write columns to the join table of a many-to-many relation you first need to specify the columns in the `extra` array of the `through` object in [relationMappings](/api/model/static-properties.html#static-relationmappings) (see the examples behind the link). For example, if you specified an array `extra: ['awesomeness']` in [relationMappings](/api/model/static-properties.html#static-relationmappings) then `awesomeness` is written to the join table in the following example:
+If you want to write columns to the join table of a many-to-many relation you first need to specify the columns in the `extra` array of the `through` object in [relationMappings](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/static-properties.md#static-relationmappings) (see the examples behind the link). For example, if you specified an array `extra: ['awesomeness']` in [relationMappings](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/static-properties.md#static-relationmappings) then `awesomeness` is written to the join table in the following example:
 
 ```js
 // `person` is an instance of `Person` model.
@@ -382,31 +382,31 @@ insert into "persons_movies" ("movieId", "personId", "awesomeness")
 values (14, 25, 9001)
 ```
 
-See [this recipe](/recipes/extra-properties.html) for more information about `extra` properties.
+See [this recipe](https://github.com/Vincit/objection.js/tree/v1/doc/recipes/extra-properties.md) for more information about `extra` properties.
 
 ### Update queries
 
-See the [API documentation](/api/query-builder/mutate-methods.html#update) of `update` method.
+See the [API documentation](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/mutate-methods.md#update) of `update` method.
 
 ### Delete queries
 
-See the [API documentation](/api/query-builder/mutate-methods.html#delete) of `delete` method.
+See the [API documentation](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/mutate-methods.md#delete) of `delete` method.
 
 ### Relate queries
 
-See the [API documentation](/api/query-builder/mutate-methods.html#relate) of `relate` method.
+See the [API documentation](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/mutate-methods.md#relate) of `relate` method.
 
 ### Unrelate queries
 
-See the [API documentation](/api/query-builder/mutate-methods.html#unrelate) of `unrelate` method.
+See the [API documentation](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/mutate-methods.md#unrelate) of `unrelate` method.
 
 ## Eager loading
 
-You can fetch an arbitrary graph of relations for the results of any query by chaining the [eager](/api/query-builder/eager-methods.html#eager) method. [eager](/api/query-builder/eager-methods.html#eager) takes a [relation expression](/api/types/#type-relationexpression) string as a parameter. In addition to making your life easier, eager queries avoid the "select N+1" problem and provide a great performance.
+You can fetch an arbitrary graph of relations for the results of any query by chaining the [eager](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/eager-methods.md#eager) method. [eager](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/eager-methods.md#eager) takes a [relation expression](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#type-relationexpression) string as a parameter. In addition to making your life easier, eager queries avoid the "select N+1" problem and provide a great performance.
 
-Because the eager expressions are strings (there's also an optional [object notation](/api/types/#relationexpression-object-notation)) they can be easily passed for example as a query parameter of an HTTP request. However, allowing the client to execute expressions like this without any limitations is not very secure. Therefore the [QueryBuilder](/api/query-builder/) has the [allowEager](/api/query-builder/eager-methods.html#alloweager) method. [allowEager](/api/query-builder/eager-methods.html#alloweager) can be used to  limit the allowed eager expression to a certain subset.
+Because the eager expressions are strings (there's also an optional [object notation](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#relationexpression-object-notation)) they can be easily passed for example as a query parameter of an HTTP request. However, allowing the client to execute expressions like this without any limitations is not very secure. Therefore the [QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/) has the [allowEager](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/eager-methods.md#alloweager) method. [allowEager](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/eager-methods.md#alloweager) can be used to  limit the allowed eager expression to a certain subset.
 
-By giving expression `[pets, children.pets]` for [allowEager](/api/query-builder/eager-methods.html#alloweager) the value passed to [eager](/api/query-builder/eager-methods.html#eager) is allowed to be one of:
+By giving expression `[pets, children.pets]` for [allowEager](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/eager-methods.md#alloweager) the value passed to [eager](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/eager-methods.md#eager) is allowed to be one of:
 
  * `'pets'`
  * `'children'`
@@ -421,10 +421,10 @@ Examples of expressions that would cause the query to be rejected:
  * `'[pets, children.children]'`
  * `'notEvenAnExistingRelation'`
 
-In addition to the [eager](/api/query-builder/eager-methods.html#eager) method, relations can be fetched using the [loadRelated](/api/model/static-properties.html#static-loadrelated) and
-[$loadRelated](/api/model/instance-methods.html#loadrelated) methods.
+In addition to the [eager](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/eager-methods.md#eager) method, relations can be fetched using the [loadRelated](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/static-properties.md#static-loadrelated) and
+[$loadRelated](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/instance-methods.md#loadrelated) methods.
 
-By default eager loading is done using multiple separate queries (for details see [this blog post](https://www.vincit.fi/en/blog/nested-eager-loading-and-inserts-with-objection-js/)). You can choose to use a join based eager loading algorithm that only performs one single query to fetch the whole eager tree. You can select which algorithm to use per query using [eagerAlgorithm](/api/query-builder/eager-methods.html#eageralgorithm) method or per model by setting the [defaultEagerAlgorithm](/api/model/static-properties.html#static-defaulteageralgorithm) property. All algorithms have their strengths and weaknesses, which are discussed in detail [here](/api/query-builder/eager-methods.html#eager).
+By default eager loading is done using multiple separate queries (for details see [this blog post](https://www.vincit.fi/en/blog/nested-eager-loading-and-inserts-with-objection-js/)). You can choose to use a join based eager loading algorithm that only performs one single query to fetch the whole eager tree. You can select which algorithm to use per query using [eagerAlgorithm](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/eager-methods.md#eageralgorithm) method or per model by setting the [defaultEagerAlgorithm](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/static-properties.md#static-defaulteageralgorithm) property. All algorithms have their strengths and weaknesses, which are discussed in detail [here](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/eager-methods.md#eager).
 
 ##### Examples
 
@@ -457,7 +457,7 @@ console.log(people[1].children[2].pets[1].name);
 console.log(people[1].children[2].children[0].name);
 ```
 
-Here's the previous query using the optional [object notation](/api/types/#relationexpression-object-notation)
+Here's the previous query using the optional [object notation](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#relationexpression-object-notation)
 
 ```js
 const people = await Person
@@ -494,7 +494,7 @@ const people = await Person
 console.log(people[0].children[0].children[0].children[0].firstName);
 ```
 
-Relations can be modified using the [modifyEager](/api/query-builder/other-methods.html#modifyeager) method:
+Relations can be modified using the [modifyEager](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/other-methods.md#modifyeager) method:
 
 ```js
 const people = await Person
@@ -528,7 +528,7 @@ console.log(people[0].children[0].pets[0].name);
 console.log(people[0].children[0].movies[0].id);
 ```
 
-Reusable named filters can be defined for models using [modifiers](/api/model/static-properties.html#static-modifiers)
+Reusable named filters can be defined for models using [modifiers](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/static-properties.md#static-modifiers)
 
 ```js
 // Person.js
@@ -598,7 +598,7 @@ console.log(people[0].kids[0].dogs[0].name);
 console.log(people[0].kids[0].movies[0].id);
 ```
 
-Example usage for [allowEager](/api/query-builder/eager-methods.html#alloweager) in an express route:
+Example usage for [allowEager](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/eager-methods.md#alloweager) in an express route:
 
 ```js
 expressApp.get('/people', async (req, res, next) => {
@@ -611,7 +611,7 @@ expressApp.get('/people', async (req, res, next) => {
 });
 ```
 
-Eager loading algorithm can be changed using the [eagerAlgorithm](/api/query-builder/eager-methods.html#eageralgorithm) method:
+Eager loading algorithm can be changed using the [eagerAlgorithm](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/eager-methods.md#eageralgorithm) method:
 
 ```js
 const people = await Person
@@ -630,13 +630,13 @@ const people = await Person
 
 ## Graph inserts
 
-Arbitrary relation graphs can be inserted using the [insertGraph](/api/query-builder/mutate-methods.html#insertgraph) method. This is best explained using examples, so check them out.
+Arbitrary relation graphs can be inserted using the [insertGraph](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/mutate-methods.md#insertgraph) method. This is best explained using examples, so check them out.
 
-See the [allowInsert](/api/query-builder/mutate-methods.html#allowinsert) method if you need to limit which relations can be inserted using [insertGraph](/api/query-builder/mutate-methods.html#insertgraph) method to avoid security issues. [allowInsert](/api/query-builder/mutate-methods.html#allowinsert) works like [allowEager](/api/query-builder/eager-methods.html#alloweager).
+See the [allowInsert](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/mutate-methods.md#allowinsert) method if you need to limit which relations can be inserted using [insertGraph](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/mutate-methods.md#insertgraph) method to avoid security issues. [allowInsert](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/mutate-methods.md#allowinsert) works like [allowEager](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/eager-methods.md#alloweager).
 
 If you are using Postgres the inserts are done in batches for maximum performance. On other databases the rows need to be inserted one at a time. This is because postgresql is the only database engine that returns the identifiers of all inserted rows and not just the first or the last one.
 
-[insertGraph](/api/query-builder/mutate-methods.html#insertgraph) operation is __not__ atomic by default! You need to start a transaction and pass it to the query using any of the supported ways. See the section about [transactions](/guide/transactions.html) for more information.
+[insertGraph](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/mutate-methods.md#insertgraph) operation is __not__ atomic by default! You need to start a transaction and pass it to the query using any of the supported ways. See the section about [transactions](https://github.com/Vincit/objection.js/tree/v1/doc/guide/transactions.md) for more information.
 
 You can read more about graph inserts from [this blog post](https://www.vincit.fi/en/blog/nested-eager-loading-and-inserts-with-objection-js/).
 
@@ -665,7 +665,7 @@ const graph = await Person
   });
 ```
 
-The query above will insert 'Sylvester', 'Sage' and 'Fluffy' into db and create relationships between them as defined in the [relationMappings](/api/model/static-properties.html#static-relationmappings) of the models. Technically [insertGraph](/api/query-builder/mutate-methods.html#insertgraph) builds a dependency graph from the object graph and inserts the models that don't depend on any other models until the whole graph is inserted.
+The query above will insert 'Sylvester', 'Sage' and 'Fluffy' into db and create relationships between them as defined in the [relationMappings](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/static-properties.md#static-relationmappings) of the models. Technically [insertGraph](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/mutate-methods.md#insertgraph) builds a dependency graph from the object graph and inserts the models that don't depend on any other models until the whole graph is inserted.
 
 If you need to refer to the same model in multiple places you can use the special properties `#id` and `#ref` like this:
 
@@ -691,7 +691,7 @@ await Person
   }]);
 ```
 
-The query above will insert only one movie (the 'Silver Linings Playbook') but both 'Jennifer' and 'Bradley' will have the movie related to them through the many-to-many relation `movies`. The `#id` can be any string. There are no format or length requirements for them. It is quite easy to create circular dependencies using `#id` and `#ref`. Luckily [insertGraph](/api/query-builder/mutate-methods.html#insertgraph) detects them and rejects the query with a clear error message.
+The query above will insert only one movie (the 'Silver Linings Playbook') but both 'Jennifer' and 'Bradley' will have the movie related to them through the many-to-many relation `movies`. The `#id` can be any string. There are no format or length requirements for them. It is quite easy to create circular dependencies using `#id` and `#ref`. Luckily [insertGraph](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/mutate-methods.md#insertgraph) detects them and rejects the query with a clear error message.
 
 You can refer to the properties of other models anywhere in the graph using expressions of format `#ref{<id>.<property>}` as long as the reference doesn't create a circular dependency. For example:
 
@@ -793,17 +793,17 @@ await Person
 
 ## Graph upserts
 
-Arbitrary relation graphs can be upserted (insert + update + delete) using the [upsertGraph](/api/query-builder/mutate-methods.html#upsertgraph) method. This is best explained using examples, so check them out.
+Arbitrary relation graphs can be upserted (insert + update + delete) using the [upsertGraph](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/mutate-methods.md#upsertgraph) method. This is best explained using examples, so check them out.
 
-By default [upsertGraph](/api/query-builder/mutate-methods.html#upsertgraph) method updates the objects that have an id, inserts objects that don't have an id and deletes all objects that are not present. This functionality can be modified in many ways by providing [UpsertGraphOptions](/api/types/#type-upsertgraphoptions) object as the second argument.
+By default [upsertGraph](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/mutate-methods.md#upsertgraph) method updates the objects that have an id, inserts objects that don't have an id and deletes all objects that are not present. This functionality can be modified in many ways by providing [UpsertGraphOptions](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#type-upsertgraphoptions) object as the second argument.
 
-The [upsertGraph](/api/query-builder/mutate-methods.html#upsertgraph) method works a little different than the other update and patch methods. When using [upsertGraph](/api/query-builder/mutate-methods.html#upsertgraph) any `where` or `having` methods are ignored. The models are updated based on the id properties in the graph. This is also clarified in the examples.
+The [upsertGraph](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/mutate-methods.md#upsertgraph) method works a little different than the other update and patch methods. When using [upsertGraph](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/mutate-methods.md#upsertgraph) any `where` or `having` methods are ignored. The models are updated based on the id properties in the graph. This is also clarified in the examples.
 
-[upsertGraph](/api/query-builder/mutate-methods.html#upsertgraph) uses [insertGraph](/api/query-builder/mutate-methods.html#insertgraph) under the hood for inserts. That means that you can insert object graphs for relations and use all [insertGraph](/api/query-builder/mutate-methods.html#insertgraph) features like `#ref` references.
+[upsertGraph](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/mutate-methods.md#upsertgraph) uses [insertGraph](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/mutate-methods.md#insertgraph) under the hood for inserts. That means that you can insert object graphs for relations and use all [insertGraph](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/mutate-methods.md#insertgraph) features like `#ref` references.
 
-[upsertGraph](/api/query-builder/mutate-methods.html#upsertgraph) operation is __not__ atomic by default! You need to start a transaction and pass it to the query using any of the supported ways. See the section about [transactions](/guide/transactions.html) for more information.
+[upsertGraph](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/mutate-methods.md#upsertgraph) operation is __not__ atomic by default! You need to start a transaction and pass it to the query using any of the supported ways. See the section about [transactions](https://github.com/Vincit/objection.js/tree/v1/doc/guide/transactions.md) for more information.
 
-See the [allowUpsert](/api/query-builder/mutate-methods.html#allowupsert) method if you need to limit  which relations can be modified using [upsertGraph](/api/query-builder/mutate-methods.html#upsertgraph) method to avoid security issues. [allowUpsert](/api/query-builder/mutate-methods.html#allowupsert) works like [allowInsert](/api/query-builder/mutate-methods.html#allowinsert).
+See the [allowUpsert](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/mutate-methods.md#allowupsert) method if you need to limit  which relations can be modified using [upsertGraph](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/mutate-methods.md#upsertgraph) method to avoid security issues. [allowUpsert](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/mutate-methods.md#allowupsert) works like [allowInsert](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/mutate-methods.md#allowinsert).
 
 ##### Examples
 
@@ -858,7 +858,7 @@ For the following examples, assume this is the content of the database:
 }]
 ```
 
-By default [upsertGraph](/api/query-builder/mutate-methods.html#upsertgraph) method updates the objects that have an id, inserts objects that don't have an id and deletes all objects that are not present. Off course the delete only applies to relations and not the root. Here's a basic example:
+By default [upsertGraph](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/mutate-methods.md#upsertgraph) method updates the objects that have an id, inserts objects that don't have an id and deletes all objects that are not present. Off course the delete only applies to relations and not the root. Here's a basic example:
 
 ```js
 // The return value of `upsertGraph` is the input graph converted into
@@ -977,7 +977,7 @@ await Person
   }, options);
 ```
 
-`relate` and `unrelate` (and all other [options](/api/types/#type-upsertgraphoptions) can also be lists of relation paths. In that case the option is only applied for the listed relations.
+`relate` and `unrelate` (and all other [options](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#type-upsertgraphoptions) can also be lists of relation paths. In that case the option is only applied for the listed relations.
 
 ```js
 const options = {
@@ -1032,4 +1032,4 @@ await Person
   }, options);
 ```
 
-You can disable updates, inserts, deletes etc. for the whole [upsertGraph](/api/query-builder/mutate-methods.html#upsertgraph) operation or for individual relations by using the `noUpdate`, `noInsert`, `noDelete` etc. options. See [UpsertGraphOptions](/api/types/#type-upsertgraphoptions) docs for more info.
+You can disable updates, inserts, deletes etc. for the whole [upsertGraph](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/mutate-methods.md#upsertgraph) operation or for individual relations by using the `noUpdate`, `noInsert`, `noDelete` etc. options. See [UpsertGraphOptions](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#type-upsertgraphoptions) docs for more info.

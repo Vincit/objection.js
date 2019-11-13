@@ -8,33 +8,33 @@ queryBuilder = queryBuilder.insert(modelsOrObjects);
 
 Creates an insert query.
 
-The inserted objects are validated against the model's [jsonSchema](/api/model/static-properties.html#static-jsonschema). If validation fails
-the Promise is rejected with a [ValidationError](/api/types/#class-validationerror).
+The inserted objects are validated against the model's [jsonSchema](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/static-properties.md#static-jsonschema). If validation fails
+the Promise is rejected with a [ValidationError](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#class-validationerror).
 
 NOTE: The return value of the insert query _only_ contains the properties given to the insert
 method plus the identifier. This is because we don't make an additional fetch query after
-the insert. Using postgres you can chain [returning('*')](/api/query-builder/find-methods.html#returning) to the query to get all
-properties - see [this recipe](/recipes/returning-tricks.html) for some examples. If you use
+the insert. Using postgres you can chain [returning('*')](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/find-methods.md#returning) to the query to get all
+properties - see [this recipe](https://github.com/Vincit/objection.js/tree/v1/doc/recipes/returning-tricks.md) for some examples. If you use
 `returning(['only', 'some', 'props'])` note that the result object will still contain the input properies
-__plus__ the properties listed in `returning`. On other databases you can use the [insertAndFetch](/api/query-builder/mutate-methods.html#insertandfetch) method.
+__plus__ the properties listed in `returning`. On other databases you can use the [insertAndFetch](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/mutate-methods.md#insertandfetch) method.
 
 Batch inserts only work on Postgres because Postgres is the only database engine
 that returns the identifiers of _all_ inserted rows. knex supports batch inserts on
 other databases also, but you only get the id of the first (or last) inserted object
 as a result. If you need batch insert on other databases you can use knex directly
-through [knexQuery](/api/model/static-methods.html#static-knexquery).
+through [knexQuery](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/static-methods.md#static-knexquery).
 
 ##### Arguments
 
 Argument|Type|Description
 --------|----|--------------------
-modelsOrObjects|Object&nbsp;&#124;&nbsp;[Model](/api/model/)&nbsp;&#124;&nbsp;Object[]&nbsp;&#124;&nbsp;[Model](/api/model/)[]|Objects to insert
+modelsOrObjects|Object&nbsp;&#124;&nbsp;[Model](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/)&nbsp;&#124;&nbsp;Object[]&nbsp;&#124;&nbsp;[Model](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/)[]|Objects to insert
 
 ##### Return value
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ##### Examples
 
@@ -73,9 +73,9 @@ await Person
   });
 ```
 
-Fields marked as `extras` for many-to-many relations in [relationMappings](/api/model/static-properties.html#static-relationmappings) are automatically
+Fields marked as `extras` for many-to-many relations in [relationMappings](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/static-properties.md#static-relationmappings) are automatically
 written to the join table instead of the target table. The `someExtra` field in the following example is written
-to the join table if the `extra` array of the relation mapping contains the string `'someExtra'`. See [this recipe](/recipes/extra-properties.html) for more info.
+to the join table if the `extra` array of the relation mapping contains the string `'someExtra'`. See [this recipe](https://github.com/Vincit/objection.js/tree/v1/doc/recipes/extra-properties.md) for more info.
 
 ```js
 const jennifer = await someMovie
@@ -95,21 +95,21 @@ console.log(jennifer.someExtra);
 queryBuilder = queryBuilder.insertAndFetch(modelsOrObjects);
 ```
 
-Just like [insert](/api/query-builder/mutate-methods.html#insert) but also fetches the item afterwards.
+Just like [insert](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/mutate-methods.md#insert) but also fetches the item afterwards.
 
-Note that on postgresql you can just chain [returning('*')](/api/query-builder/find-methods.html#returning) to the normal insert query to get the same result without an additional query. See [this recipe](/recipes/returning-tricks.html) for some examples.
+Note that on postgresql you can just chain [returning('*')](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/find-methods.md#returning) to the normal insert query to get the same result without an additional query. See [this recipe](https://github.com/Vincit/objection.js/tree/v1/doc/recipes/returning-tricks.md) for some examples.
 
 ##### Arguments
 
 Argument|Type|Description
 --------|----|--------------------
-modelsOrObjects|Object&nbsp;&#124;&nbsp;[Model](/api/model/)&nbsp;&#124;&nbsp;Object[]&nbsp;&#124;&nbsp;[Model](/api/model/)[]|Objects to insert
+modelsOrObjects|Object&nbsp;&#124;&nbsp;[Model](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/)&nbsp;&#124;&nbsp;Object[]&nbsp;&#124;&nbsp;[Model](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/)[]|Objects to insert
 
 ##### Return value
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## insertGraph()
 
@@ -117,20 +117,20 @@ Type|Description
 queryBuilder = queryBuilder.insertGraph(graph, options);
 ```
 
-See the [section about graph inserts](/guide/query-examples.html#graph-inserts).
+See the [section about graph inserts](https://github.com/Vincit/objection.js/tree/v1/doc/guide/query-examples.md#graph-inserts).
 
 ##### Arguments
 
 Argument|Type|Description
 --------|----|--------------------
-graph|Object&nbsp;&#124;&nbsp;[Model](/api/model/)&nbsp;&#124;&nbsp;Object[]&nbsp;&#124;&nbsp;[Model](/api/model/)[]|Objects to insert
-options|[InsertGraphOptions](/api/types/#type-insertgraphoptions)|Optional options.
+graph|Object&nbsp;&#124;&nbsp;[Model](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/)&nbsp;&#124;&nbsp;Object[]&nbsp;&#124;&nbsp;[Model](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/)[]|Objects to insert
+options|[InsertGraphOptions](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#type-insertgraphoptions)|Optional options.
 
 ##### Return value
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## allowInsert()
 
@@ -138,23 +138,23 @@ Type|Description
 queryBuilder = queryBuilder.allowInsert(relationExpression);
 ```
 
-Sets the allowed tree of relations to insert using [insertGraph](/api/query-builder/mutate-methods.html#insertgraph) method.
+Sets the allowed tree of relations to insert using [insertGraph](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/mutate-methods.md#insertgraph) method.
 
-If the model tree given to the [insertGraph](/api/query-builder/mutate-methods.html#insertgraph) method isn't a subtree of the given expression, the query is rejected.
+If the model tree given to the [insertGraph](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/mutate-methods.md#insertgraph) method isn't a subtree of the given expression, the query is rejected.
 
-See methods [eager](/api/query-builder/eager-methods.html#eager), [allowEager](/api/query-builder/eager-methods.html#alloweager), [RelationExpression](/api/types/#type-relationexpression) and the guide section about [eager loading](/guide/query-examples.html#eager-loading) for more information on relation expressions.
+See methods [eager](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/eager-methods.md#eager), [allowEager](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/eager-methods.md#alloweager), [RelationExpression](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#type-relationexpression) and the guide section about [eager loading](https://github.com/Vincit/objection.js/tree/v1/doc/guide/query-examples.md#eager-loading) for more information on relation expressions.
 
 ##### Arguments
 
 Argument|Type|Description
 --------|----|--------------------
-relationExpression|[RelationExpression](/api/types/#type-relationexpression)|The allowed eager expression
+relationExpression|[RelationExpression](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#type-relationexpression)|The allowed eager expression
 
 ##### Return value
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ##### Examples
 
@@ -179,7 +179,7 @@ const insertedPerson = await Person
 
 ## insertGraphAndFetch()
 
-Exactly like [insertGraph](/api/query-builder/mutate-methods.html#insertgraph) but also fetches the graph from the db after insert. Note that on postgres, you can simply chain [returning('*')](/api/query-builder/find-methods.html#returning) to the normal `insertGraph` query to get the same result without additional queries.
+Exactly like [insertGraph](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/mutate-methods.md#insertgraph) but also fetches the graph from the db after insert. Note that on postgres, you can simply chain [returning('*')](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/find-methods.md#returning) to the normal `insertGraph` query to get the same result without additional queries.
 
 ## insertWithRelated()
 
@@ -187,7 +187,7 @@ Exactly like [insertGraph](/api/query-builder/mutate-methods.html#insertgraph) b
 Deprecated! Will be removed in version 2.0.
 :::
 
-Alias for [insertGraph](/api/query-builder/mutate-methods.html#insertgraph).
+Alias for [insertGraph](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/mutate-methods.md#insertgraph).
 
 ## insertWithRelatedAndFetch()
 
@@ -195,7 +195,7 @@ Alias for [insertGraph](/api/query-builder/mutate-methods.html#insertgraph).
 Deprecated! Will be removed in version 2.0.
 :::
 
-Alias for [insertGraphAndFetch](/api/query-builder/mutate-methods.html#insertgraphandfetch).
+Alias for [insertGraphAndFetch](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/mutate-methods.md#insertgraphandfetch).
 
 ## patch()
 
@@ -205,31 +205,31 @@ queryBuilder = queryBuilder.patch(modelOrObject);
 
 Creates a patch query.
 
-The patch object is validated against the model's [jsonSchema](/api/model/static-properties.html#static-jsonschema) (if one is defined) _but_ the `required` property of the [jsonSchema](/api/model/static-properties.html#static-jsonschema) is ignored. This way the properties in the patch object are still validated but an error isn't thrown if the patch object doesn't contain all required properties.
+The patch object is validated against the model's [jsonSchema](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/static-properties.md#static-jsonschema) (if one is defined) _but_ the `required` property of the [jsonSchema](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/static-properties.md#static-jsonschema) is ignored. This way the properties in the patch object are still validated but an error isn't thrown if the patch object doesn't contain all required properties.
 
-If validation fails the Promise is rejected with a [ValidationError](/api/types/#class-validationerror).
+If validation fails the Promise is rejected with a [ValidationError](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#class-validationerror).
 
-The return value of the query will be the number of affected rows. If you want to update a single row and retrieve the updated row as a result, you may want to use the [patchAndFetchById](/api/query-builder/mutate-methods.html#patchandfetchbyid) method or *take a look at [this recipe](/recipes/returning-tricks.html) if you're using Postgres*.
+The return value of the query will be the number of affected rows. If you want to update a single row and retrieve the updated row as a result, you may want to use the [patchAndFetchById](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/mutate-methods.md#patchandfetchbyid) method or *take a look at [this recipe](https://github.com/Vincit/objection.js/tree/v1/doc/recipes/returning-tricks.md) if you're using Postgres*.
 
 ::: tip
-This generates an SQL `update` query. While there's also the [update](/api/query-builder/mutate-methods.html#update) method, `patch` is what you want to use most of the time for updates. Read both methods' documentation carefully. If unsure or hate reading, use `patch` to update stuff :smile:
+This generates an SQL `update` query. While there's also the [update](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/mutate-methods.md#update) method, `patch` is what you want to use most of the time for updates. Read both methods' documentation carefully. If unsure or hate reading, use `patch` to update stuff :smile:
 :::
 
 ::: warning
-[raw](/api/objection/#raw), [lit](/api/objection/#lit), subqueries and other "query properties" in the patch object are not validated. Also fields specified using [FieldExpressions](/api/types/#type-fieldexpression) are not validated.
+[raw](https://github.com/Vincit/objection.js/tree/v1/doc/api/objection/#raw), [lit](https://github.com/Vincit/objection.js/tree/v1/doc/api/objection/#lit), subqueries and other "query properties" in the patch object are not validated. Also fields specified using [FieldExpressions](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#type-fieldexpression) are not validated.
 :::
 
 ##### Arguments
 
 Argument|Type|Description
 --------|----|--------------------
-modelOrObject|Object&nbsp;&#124;&nbsp;[Model](/api/model/)|The patch object
+modelOrObject|Object&nbsp;&#124;&nbsp;[Model](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/)|The patch object
 
 ##### Return value
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ##### Examples
 
@@ -262,7 +262,7 @@ const numberOfAffectedRows = await Person
   .where('age', '<', 50)
 ```
 
-You can also give raw expressions, subqueries and `ref()` as values and [FieldExpressions](/api/types/#type-fieldexpression) as keys. Note that none of these are validated. Objection cannot know what their values will be at the time the validation is done.
+You can also give raw expressions, subqueries and `ref()` as values and [FieldExpressions](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#type-fieldexpression) as keys. Note that none of these are validated. Objection cannot know what their values will be at the time the validation is done.
 
 ```js
 const { ref, raw } = require('objection');
@@ -287,20 +287,20 @@ await Person
 queryBuilder = queryBuilder.patchAndFetchById(id, modelOrObject);
 ```
 
-Just like [patch](/api/query-builder/mutate-methods.html#patch) for a single item, but also fetches the updated row from the database afterwards.
+Just like [patch](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/mutate-methods.md#patch) for a single item, but also fetches the updated row from the database afterwards.
 
 ##### Arguments
 
 Argument|Type|Description
 --------|----|--------------------
 id|any|Identifier of the item to update. Can be a composite key.
-modelOrObject|Object&nbsp;&#124;&nbsp;[Model](/api/model/)|The patch object
+modelOrObject|Object&nbsp;&#124;&nbsp;[Model](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/)|The patch object
 
 ##### Return value
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ##### Examples
 
@@ -318,19 +318,19 @@ console.log(updatedPerson.firstName);
 queryBuilder = queryBuilder.patchAndFetchById(id, modelOrObject);
 ```
 
-Just like [patchAndFetchById](/api/query-builder/mutate-methods.html#patchandfetchbyid) but can be used in an instance [$query](/api/model/instance-methods.html#query) without the need to specify the id.
+Just like [patchAndFetchById](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/mutate-methods.md#patchandfetchbyid) but can be used in an instance [$query](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/instance-methods.md#query) without the need to specify the id.
 
 ##### Arguments
 
 Argument|Type|Description
 --------|----|--------------------
-modelOrObject|Object&nbsp;&#124;&nbsp;[Model](/api/model/)|The patch object
+modelOrObject|Object&nbsp;&#124;&nbsp;[Model](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/)|The patch object
 
 ##### Return value
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ##### Examples
 
@@ -349,23 +349,23 @@ queryBuilder = queryBuilder.update(modelOrObject);
 
 Creates an update query.
 
-The update object is validated against the model's [jsonSchema](/api/model/static-properties.html#static-jsonschema). If validation fails the Promise is rejected with a [ValidationError](/api/types/#class-validationerror).
+The update object is validated against the model's [jsonSchema](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/static-properties.md#static-jsonschema). If validation fails the Promise is rejected with a [ValidationError](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#class-validationerror).
 
-Use `update` if you update the whole row with all its columns. Otherwise, using the [patch](/api/query-builder/mutate-methods.html#patch) method is recommended. When `update` method is used, the validation respects the schema's `required` properties and throws a [ValidationError](/api/types/#class-validationerror) if any of them are missing. [patch](/api/query-builder/mutate-methods.html#patch) ignores the `required` properties and only validates the ones that are found.
+Use `update` if you update the whole row with all its columns. Otherwise, using the [patch](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/mutate-methods.md#patch) method is recommended. When `update` method is used, the validation respects the schema's `required` properties and throws a [ValidationError](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#class-validationerror) if any of them are missing. [patch](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/mutate-methods.md#patch) ignores the `required` properties and only validates the ones that are found.
 
-The return value of the query will be the number of affected rows. If you want to update a single row and retrieve the updated row as a result, you may want to use the [updateAndFetchById](/api/query-builder/mutate-methods.html#updateandfetchbyid) method or *take a look at [this recipe](/recipes/returning-tricks.html) if you're using Postgres*.
+The return value of the query will be the number of affected rows. If you want to update a single row and retrieve the updated row as a result, you may want to use the [updateAndFetchById](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/mutate-methods.md#updateandfetchbyid) method or *take a look at [this recipe](https://github.com/Vincit/objection.js/tree/v1/doc/recipes/returning-tricks.md) if you're using Postgres*.
 
 ##### Arguments
 
 Argument|Type|Description
 --------|----|--------------------
-modelOrObject|Object&nbsp;&#124;&nbsp;[Model](/api/model/)|The update object
+modelOrObject|Object&nbsp;&#124;&nbsp;[Model](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/)|The update object
 
 ##### Return value
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ##### Examples
 
@@ -410,20 +410,20 @@ await Person
 queryBuilder = queryBuilder.updateAndFetchById(id, modelOrObject);
 ```
 
-Just like [update](/api/query-builder/mutate-methods.html#update) for a single item, but also fetches the updated row from the database afterwards.
+Just like [update](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/mutate-methods.md#update) for a single item, but also fetches the updated row from the database afterwards.
 
 ##### Arguments
 
 Argument|Type|Description
 --------|----|--------------------
 id|any|Identifier of the item to update. Can be a composite key.
-modelOrObject|Object&nbsp;&#124;&nbsp;[Model](/api/model/)|The update object
+modelOrObject|Object&nbsp;&#124;&nbsp;[Model](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/)|The update object
 
 ##### Return value
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ##### Examples
 
@@ -441,19 +441,19 @@ console.log(updatedPerson.firstName);
 queryBuilder = queryBuilder.updateAndFetchById(id, modelOrObject);
 ```
 
-Just like [updateAndFetchById](/api/query-builder/mutate-methods.html#updateandfetchbyid) but can be used in an instance [$query](/api/model/instance-methods.html#query) without the need to specify the id.
+Just like [updateAndFetchById](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/mutate-methods.md#updateandfetchbyid) but can be used in an instance [$query](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/instance-methods.md#query) without the need to specify the id.
 
 ##### Arguments
 
 Argument|Type|Description
 --------|----|--------------------
-modelOrObject|Object&nbsp;&#124;&nbsp;[Model](/api/model/)|The update object
+modelOrObject|Object&nbsp;&#124;&nbsp;[Model](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/)|The update object
 
 ##### Return value
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ##### Examples
 
@@ -470,28 +470,28 @@ console.log(updatedJennifer.firstName);
 queryBuilder = queryBuilder.upsertGraph(graph, options);
 ```
 
-See the [section about graph upserts](/guide/query-examples.html#graph-upserts)
+See the [section about graph upserts](https://github.com/Vincit/objection.js/tree/v1/doc/guide/query-examples.md#graph-upserts)
 
 ##### Arguments
 
 Argument|Type|Description
 --------|----|--------------------
-graph|Object&nbsp;&#124;&nbsp;[Model](/api/model/)&nbsp;&#124;&nbsp;Object[]&nbsp;&#124;&nbsp;[Model](/api/model/)[]|Objects to upsert
-options|[UpsertGraphOptions](/api/types/#type-upsertgraphoptions)|Optional options.
+graph|Object&nbsp;&#124;&nbsp;[Model](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/)&nbsp;&#124;&nbsp;Object[]&nbsp;&#124;&nbsp;[Model](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/)[]|Objects to upsert
+options|[UpsertGraphOptions](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#type-upsertgraphoptions)|Optional options.
 
 ##### Return value
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## allowUpsert()
 
-Just like [allowInsert](/api/query-builder/mutate-methods.html#allowinsert) but this one works with [upsertGraph](/api/query-builder/mutate-methods.html#upsertgraph).
+Just like [allowInsert](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/mutate-methods.md#allowinsert) but this one works with [upsertGraph](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/mutate-methods.md#upsertgraph).
 
 ## upsertGraphAndFetch()
 
-Exactly like [upsertGraph](/api/query-builder/mutate-methods.html#upsertgraph) but also fetches the graph from the db after the upsert operation.
+Exactly like [upsertGraph](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/mutate-methods.md#upsertgraph) but also fetches the graph from the db after the upsert operation.
 
 ## delete()
 
@@ -502,15 +502,15 @@ queryBuilder = queryBuilder.delete();
 Creates a delete query.
 
 The return value of the query will be the number of deleted rows. if you're using Postgres
-and want to get the deleted rows, *take a look at [this recipe](/recipes/returning-tricks.html)*.
+and want to get the deleted rows, *take a look at [this recipe](https://github.com/Vincit/objection.js/tree/v1/doc/recipes/returning-tricks.md)*.
 
-Also see [deleteById](/api/query-builder/mutate-methods.html#deletebyid).
+Also see [deleteById](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/mutate-methods.md#deletebyid).
 
 ##### Return value
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ##### Examples
 
@@ -547,7 +547,7 @@ await Person
   );
 ```
 
-Delete can of course be used with [$relatedQuery](/api/model/instance-methods.html#relatedquery) and [$query](/api/model/instance-methods.html#query) too.
+Delete can of course be used with [$relatedQuery](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/instance-methods.md#relatedquery) and [$query](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/instance-methods.md#query) too.
 
 ```js
 const person = await Person.query().findById(personId);
@@ -572,7 +572,7 @@ queryBuilder = queryBuilder.deleteById(id);
 
 Deletes an item by id.
 
-The return value of the query will be the number of deleted rows. if you're using Postgres and want to get the deleted rows, *take a look at [this recipe](/recipes/returning-tricks.html)*.
+The return value of the query will be the number of deleted rows. if you're using Postgres and want to get the deleted rows, *take a look at [this recipe](https://github.com/Vincit/objection.js/tree/v1/doc/recipes/returning-tricks.md)*.
 
 ##### Arguments
 
@@ -584,7 +584,7 @@ id|any&nbsp;&#124;&nbsp;any[]|The id. Array for composite keys. This method does
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ##### Examples
 
@@ -629,7 +629,7 @@ ids|number&nbsp;&#124;&nbsp;string&nbsp;&#124;&nbsp;Array&nbsp;&#124;&nbsp;Objec
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ##### Examples
 
@@ -662,7 +662,7 @@ const numRelatedRows = await person
 console.log(`${numRelatedRows} rows were related`);
 ```
 
-Fields marked as [extras](/api/types/#type-relationthrough) for many-to-many relations in [relationMappings](/api/model/static-properties.html#static-relationmappings) are automatically written to the join table. The `someExtra` field in the following example is written to the join table if the `extra` array of the relation mapping contains the string `'someExtra'`.
+Fields marked as [extras](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#type-relationthrough) for many-to-many relations in [relationMappings](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/static-properties.md#static-relationmappings) are automatically written to the join table. The `someExtra` field in the following example is written to the join table if the `extra` array of the relation mapping contains the string `'someExtra'`.
 
 ```js
 const numRelatedRows = await someMovie
@@ -694,7 +694,7 @@ Use `unrelate` like `delete` and filter the rows using the returned query builde
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ##### Examples
 
@@ -720,7 +720,7 @@ See [knex documentation](http://knexjs.org/#Builder-increment)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## decrement()
 
@@ -730,7 +730,7 @@ See [knex documentation](http://knexjs.org/#Builder-decrement)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## truncate()
 
@@ -740,4 +740,4 @@ See [knex documentation](http://knexjs.org/#Builder-truncate)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.

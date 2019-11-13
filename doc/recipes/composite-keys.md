@@ -1,17 +1,17 @@
 # Composite keys
 
-Composite (compound) keys are fully supported. Just give an array of columns where you would normally give a single column name. Composite primary key can be specified by setting an array of column names to the [idColumn](/api/model/static-properties.html#static-idcolumn) of a model class.
+Composite (compound) keys are fully supported. Just give an array of columns where you would normally give a single column name. Composite primary key can be specified by setting an array of column names to the [idColumn](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/static-properties.md#static-idcolumn) of a model class.
 
 Here's a list of methods that may help working with composite keys:
 
- * [whereComposite](/api/query-builder/find-methods.html#wherecomposite)
- * [whereInComposite](/api/query-builder/find-methods.html#whereincomposite)
- * [findById](/api/query-builder/find-methods.html#findbyid)
- * [findByIds](/api/query-builder/find-methods.html#findbyids)
- * [deleteById](/api/query-builder/mutate-methods.html#deletebyid)
- * [updateAndFetchById](/api/query-builder/mutate-methods.html#updateandfetchbyid)
- * [patchAndFetchById](/api/query-builder/mutate-methods.html#patchandfetchbyid)
- * [$id](/api/model/instance-methods.html#id)
+ * [whereComposite](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/find-methods.md#wherecomposite)
+ * [whereInComposite](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/find-methods.md#whereincomposite)
+ * [findById](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/find-methods.md#findbyid)
+ * [findByIds](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/find-methods.md#findbyids)
+ * [deleteById](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/mutate-methods.md#deletebyid)
+ * [updateAndFetchById](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/mutate-methods.md#updateandfetchbyid)
+ * [patchAndFetchById](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/mutate-methods.md#patchandfetchbyid)
+ * [$id](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/instance-methods.md#id)
 
 ## Examples
 
@@ -56,7 +56,7 @@ class Person extends Model {
 };
 ```
 
-[findById](/api/query-builder/find-methods.html#findbyid):
+[findById](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/find-methods.md#findbyid):
 
 ```js
 await Person
@@ -65,7 +65,7 @@ await Person
 ```
 
 
-[whereComposite](/api/query-builder/find-methods.html#wherecomposite):
+[whereComposite](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/find-methods.md#wherecomposite):
 
 ```js
 await Person
@@ -73,7 +73,7 @@ await Person
   .whereComposite(['foo', 'bar'], [1, 'barValue']);
 ```
 
-[whereInComposite](/api/query-builder/find-methods.html#whereincomposite):
+[whereInComposite](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/find-methods.md#whereincomposite):
 
 ```js
 await Person

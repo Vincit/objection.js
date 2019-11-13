@@ -17,14 +17,14 @@ The objection module is what you get when you import objection. It has a bunch o
 const { Model } = require('objection');
 ```
 
-[The model class](/api/model/)
+[The model class](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/)
 
 ## transaction
 
 ```js
 const { transaction } = require('objection');
 ```
-[The transaction function](/guide/transactions.html)
+[The transaction function](https://github.com/Vincit/objection.js/tree/v1/doc/guide/transactions.md)
 
 ## ref
 
@@ -32,9 +32,9 @@ const { transaction } = require('objection');
 const { ref } = require('objection');
 ```
 
-Factory function that returns a [ReferenceBuilder](/api/types/#class-referencebuilder) instance, that makes it easier to refer to tables, columns, json attributes etc. [ReferenceBuilder](/api/types/#class-referencebuilder) can also be used to type cast and alias the references.
+Factory function that returns a [ReferenceBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#class-referencebuilder) instance, that makes it easier to refer to tables, columns, json attributes etc. [ReferenceBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#class-referencebuilder) can also be used to type cast and alias the references.
 
-See [FieldExpression](/api/types/#type-fieldexpression) for more information about how to refer to json fields.
+See [FieldExpression](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#type-fieldexpression) for more information about how to refer to json fields.
 
 ##### Examples
 
@@ -62,9 +62,9 @@ await Model.query()
 const { raw } = require('objection');
 ```
 
-Factory function that returns a [RawBuilder](/api/types/#class-rawbuilder) instance. [RawBuilder](/api/types/#class-rawbuilder) is a wrapper for knex raw method that doesn't depend on knex. Instances of [RawBuilder](/api/types/#class-rawbuilder) are converted to knex raw instances lazily when the query is executed.
+Factory function that returns a [RawBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#class-rawbuilder) instance. [RawBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#class-rawbuilder) is a wrapper for knex raw method that doesn't depend on knex. Instances of [RawBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#class-rawbuilder) are converted to knex raw instances lazily when the query is executed.
 
-Also see [the raw query recipe](/recipes/raw-queries.html).
+Also see [the raw query recipe](https://github.com/Vincit/objection.js/tree/v1/doc/recipes/raw-queries.md).
 
 ##### Examples
 
@@ -131,7 +131,7 @@ await Person
 const { lit } = require('objection')
 ```
 
-Factory function that returns a [LiteralBuilder](/api/types/#class-literalbuilder) instance. [LiteralBuilder](/api/types/#class-literalbuilder) helps build literals of different types.
+Factory function that returns a [LiteralBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#class-literalbuilder) instance. [LiteralBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#class-literalbuilder) helps build literals of different types.
 
 ##### Examples
 
@@ -161,7 +161,7 @@ await Model
 const { mixin } = require('objection');
 ```
 
-The mixin helper for applying multiple [plugins](/guide/plugins.html).
+The mixin helper for applying multiple [plugins](https://github.com/Vincit/objection.js/tree/v1/doc/guide/plugins.md).
 
 ##### Examples
 
@@ -185,7 +185,7 @@ class Person extends mixin(Model, [
 const { compose } = require('objection');
 ```
 
-The compose helper for applying multiple [plugins](/guide/plugins.html).
+The compose helper for applying multiple [plugins](https://github.com/Vincit/objection.js/tree/v1/doc/guide/plugins.md).
 
 ##### Examples
 
@@ -211,7 +211,7 @@ class Person extends mixins(Model) {
 const { snakeCaseMappers } = require('objection');
 ```
 
-Function for adding snake_case to camelCase conversion to objection models. Better documented [here](/recipes/snake-case-to-camel-case-conversion.html). The `snakeCaseMappers` function accepts an options object. The available options are:
+Function for adding snake_case to camelCase conversion to objection models. Better documented [here](https://github.com/Vincit/objection.js/tree/v1/doc/recipes/snake-case-to-camel-case-conversion.md). The `snakeCaseMappers` function accepts an options object. The available options are:
 
 Option|Type|Description
 ---------|-------|------------------------
@@ -247,7 +247,7 @@ class Person extends Model {
 const { knexSnakeCaseMappers } = require('objection');
 ```
 
-Function for adding a snake_case to camelCase conversion to `knex`. Better documented [here](/recipes/snake-case-to-camel-case-conversion.html). The `knexSnakeCaseMappers` function accepts an options object. The available options are:
+Function for adding a snake_case to camelCase conversion to `knex`. Better documented [here](https://github.com/Vincit/objection.js/tree/v1/doc/recipes/snake-case-to-camel-case-conversion.md). The `knexSnakeCaseMappers` function accepts an options object. The available options are:
 
 Option|Type|Description
 ---------|-------|------------------------
@@ -316,7 +316,7 @@ const knex = Knex({
 const { knexIdentifierMapping } = require('objection');
 ```
 
-Like [knexSnakeCaseMappers](/api/objection/#knexsnakecasemappers), but can be used to make an arbitrary static mapping between column names and property names. In the examples, you would have identifiers `MyId`, `MyProp` and `MyAnotherProp` in the database and you would like to map them into `id`, `prop` and `anotherProp` in the code.
+Like [knexSnakeCaseMappers](https://github.com/Vincit/objection.js/tree/v1/doc/api/objection/#knexsnakecasemappers), but can be used to make an arbitrary static mapping between column names and property names. In the examples, you would have identifiers `MyId`, `MyProp` and `MyAnotherProp` in the database and you would like to map them into `id`, `prop` and `anotherProp` in the code.
 
 ##### Examples
 
@@ -406,7 +406,7 @@ const knex = Knex({
 const { ValidationError } = require('objection');
 ```
 
-The [ValidationError](/api/types/#class-validationerror) class.
+The [ValidationError](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#class-validationerror) class.
 
 ## NotFoundError
 
@@ -414,4 +414,4 @@ The [ValidationError](/api/types/#class-validationerror) class.
 const { NotFoundError } = require('objection');
 ```
 
-The [NotFoundError](/api/types/#class-notfounderror) class.
+The [NotFoundError](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#class-notfounderror) class.

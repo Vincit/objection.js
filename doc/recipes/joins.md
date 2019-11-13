@@ -11,7 +11,7 @@ const people = await Person
 console.log(people[0].parentName);
 ```
 
-Objection also has helpers like the [joinRelation](/api/query-builder/join-methods.html#joinrelation) method family:
+Objection also has helpers like the [joinRelation](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/join-methods.md#joinrelation) method family:
 
 ```js
 const people = await Person

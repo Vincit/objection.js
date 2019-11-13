@@ -8,7 +8,7 @@ See [knex documentation](http://knexjs.org/#Builder-debug)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## context()
 
@@ -20,15 +20,15 @@ Sets/gets the query context.
 
 Some query builder methods create more than one query. The query context is an object that is shared with all queries started by a query builder.
 
-The context is also passed to [$beforeInsert](/api/model/instance-methods.html#beforeinsert), [$afterInsert](/api/model/instance-methods.html#afterinsert), [$beforeUpdate](/api/model/instance-methods.html#beforeupdate), [$afterUpdate](/api/model/instance-methods.html#afterupdate), [$beforeDelete](/api/model/instance-methods.html#beforedelete), [$afterDelete](/api/model/instance-methods.html#afterdelete) and [$afterGet](/api/model/instance-methods.html#afterget) calls that the query creates.
+The context is also passed to [$beforeInsert](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/instance-methods.md#beforeinsert), [$afterInsert](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/instance-methods.md#afterinsert), [$beforeUpdate](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/instance-methods.md#beforeupdate), [$afterUpdate](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/instance-methods.md#afterupdate), [$beforeDelete](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/instance-methods.md#beforedelete), [$afterDelete](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/instance-methods.md#afterdelete) and [$afterGet](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/instance-methods.md#afterget) calls that the query creates.
 
-In addition to properties added using this method (and [mergeContext](/api/query-builder/other-methods.html#mergecontext)) the query context object always has a `transaction` property that holds the active transaction. If there is no active transaction the `transaction` property contains the normal knex instance. In both cases the value can be passed anywhere where a transaction object can be passed so you never need to check for the existence of the `transaction` property.
+In addition to properties added using this method (and [mergeContext](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/other-methods.md#mergecontext)) the query context object always has a `transaction` property that holds the active transaction. If there is no active transaction the `transaction` property contains the normal knex instance. In both cases the value can be passed anywhere where a transaction object can be passed so you never need to check for the existence of the `transaction` property.
 
-See the methods [runBefore](/api/query-builder/other-methods.html#runbefore), [onBuild](/api/query-builder/other-methods.html#onbuild) and [runAfter](/api/query-builder/other-methods.html#runafter)
+See the methods [runBefore](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/other-methods.md#runbefore), [onBuild](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/other-methods.md#onbuild) and [runAfter](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/other-methods.md#runafter)
 for more information about the hooks.
 
 ::: tip
-Most of the time, you should be using [mergeContext](/api/query-builder/other-methods.html#mergecontext) instead of this method. This method replaces the whole context, while `mergeContext` merges the values with the current ones.
+Most of the time, you should be using [mergeContext](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/other-methods.md#mergecontext) instead of this method. This method replaces the whole context, while `mergeContext` merges the values with the current ones.
 :::
 
 ##### Arguments
@@ -41,7 +41,7 @@ queryContext|Object|The query context object
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ##### Examples
 
@@ -96,7 +96,7 @@ queryBuilder = queryBuilder.mergeContext(queryContext);
 
 Merges values into the query context.
 
-This method is like [context](/api/query-builder/other-methods.html#context) but instead of replacing the whole context this method merges the objects.
+This method is like [context](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/other-methods.md#context) but instead of replacing the whole context this method merges the objects.
 
 ##### Arguments
 
@@ -108,7 +108,7 @@ queryContext|Object|The object to merge into the query context.
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## tableNameFor()
 
@@ -116,7 +116,7 @@ Type|Description
 const tableName = queryBuilder.tableNameFor(modelClass);
 ```
 
-Returns the table name for a given model class in the query. Usually the table name can be fetched through `Model.tableName` but if the source table has been changed for example using the [QueryBuilder#table](/api/query-builder/find-methods.html#table) method `tableNameFor` will return the correct value.
+Returns the table name for a given model class in the query. Usually the table name can be fetched through `Model.tableName` but if the source table has been changed for example using the [QueryBuilder#table](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/find-methods.md#table) method `tableNameFor` will return the correct value.
 
 ##### Arguments
 
@@ -170,7 +170,7 @@ reson| |The rejection reason
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## resolve()
 
@@ -190,7 +190,7 @@ value| |The resolve value
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## isExecutable()
 
@@ -202,7 +202,7 @@ Returns false if this query will never be executed.
 
 This may be true in multiple cases:
 
-1. The query is explicitly resolved or rejected using the [resolve](/api/query-builder/other-methods.html#resolve) or [reject](/api/query-builder/other-methods.html#reject) methods.
+1. The query is explicitly resolved or rejected using the [resolve](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/other-methods.md#resolve) or [reject](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/other-methods.md#reject) methods.
 2. The query starts a different query when it is executed.
 
 ##### Return value
@@ -397,7 +397,7 @@ selector|string&nbsp;&#124;&nbsp;regexp|A name or regular expression to match al
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ##### Examples
 
@@ -417,13 +417,13 @@ Registers a function to be called before just the database query when the builde
 
 Argument|Type|Description
 --------|----|--------------------
-runBefore|function(result,&nbsp;[QueryBuilder](/api/query-builder/))|The function to be executed. This function can be async. Note that it needs to return the result used for further processing in the chain of calls.
+runBefore|function(result,&nbsp;[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/))|The function to be executed. This function can be async. Note that it needs to return the result used for further processing in the chain of calls.
 
 ##### Return value
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ##### Examples
 
@@ -456,7 +456,7 @@ await query;
 queryBuilder = queryBuilder.onBuild(onBuild);
 ```
 
-Functions registered with this method are called each time the query is built into an SQL string. This method is ran after [runBefore](/api/query-builder/other-methods.html#runbefore) methods but before [runAfter](/api/query-builder/other-methods.html#runafter) methods.
+Functions registered with this method are called each time the query is built into an SQL string. This method is ran after [runBefore](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/other-methods.md#runbefore) methods but before [runAfter](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/other-methods.md#runafter) methods.
 
 If you need to modify the SQL query at query build time, this is the place to do it. You shouldn't modify the query in any of the `run` methods.
 
@@ -466,13 +466,13 @@ Unlike the `run` methods (`runAfter`, `runBefore` etc.) these must be synchronou
 
 Argument|Type|Description
 --------|----|--------------------
-onBuild|function([QueryBuilder](/api/query-builder/))|The **synchronous** function to be executed.
+onBuild|function([QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/))|The **synchronous** function to be executed.
 
 ##### Return value
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ##### Eamples
 
@@ -494,7 +494,7 @@ query
 queryBuilder = queryBuilder.onBuildKnex(onBuildKnex);
 ```
 
-Functions registered with this method are called each time the query is built into an SQL string. This method is ran after [onBuild](/api/query-builder/other-methods.html#onbuild) methods but before [runAfter](/api/query-builder/other-methods.html#runafter) methods.
+Functions registered with this method are called each time the query is built into an SQL string. This method is ran after [onBuild](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/other-methods.md#onbuild) methods but before [runAfter](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/other-methods.md#runafter) methods.
 
 If you need to modify the SQL query at query build time, this is the place to do it in addition to `onBuild`. The only difference between `onBuildKnex` and `onBuild` is that in `onBuild` you can modify the objection's query builder. In `onBuildKnex` the objection builder has been compiled into a knex query builder and any modifications to the objection builder will be ignored.
 
@@ -508,13 +508,13 @@ You should never call any query building (or any other mutating) method on the `
 
 Argument|Type|Description
 --------|----|--------------------
-onBuildKnex|function(`KnexQueryBuilder`,&nbsp;[QueryBuilder](/api/query-builder/))|The function to be executed.
+onBuildKnex|function(`KnexQueryBuilder`,&nbsp;[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/))|The function to be executed.
 
 ##### Return value
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ##### Examples
 
@@ -535,19 +535,19 @@ queryBuilder = queryBuilder.runAfter(runAfter);
 
 Registers a function to be called when the builder is executed.
 
-These functions are executed as the last thing before any promise handlers registered using the [then](/api/query-builder/other-methods.html#then) method. Multiple functions can be chained like [then](/api/query-builder/other-methods.html#then)  methods of a promise.
+These functions are executed as the last thing before any promise handlers registered using the [then](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/other-methods.md#then) method. Multiple functions can be chained like [then](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/other-methods.md#then)  methods of a promise.
 
 ##### Arguments
 
 Argument|Type|Description
 --------|----|--------------------
-runAfter|function(result,&nbsp;[QueryBuilder](/api/query-builder/))|The function to be executed. This function can be async. Note that it needs to return the result used for further processing in the chain of calls.
+runAfter|function(result,&nbsp;[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/))|The function to be executed. This function can be async. Note that it needs to return the result used for further processing in the chain of calls.
 
 ##### Return value
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ##### Examples
 
@@ -578,13 +578,13 @@ Registers an error handler. Just like `catch` but doesn't execute the query.
 
 Argument|Type|Description
 --------|----|--------------------
-onError|function(Error,&nbsp;[QueryBuilder](/api/query-builder/))|The function to be executed on error.
+onError|function(Error,&nbsp;[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/))|The function to be executed on error.
 
 ##### Return value
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ##### Examples
 
@@ -618,13 +618,13 @@ Sets the model class of the result rows.
 
 Type|Description
 ----|-----------------------------
-[ModelClass](/api/model/)|The model class of the result rows.
+[ModelClass](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/)|The model class of the result rows.
 
 ##### Return value
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ##### Examples
 
@@ -667,7 +667,7 @@ Gets the Model subclass this builder is bound to.
 
 Type|Description
 ----|-----------------------------
-[Model](/api/model/)|The Model subclass this builder is bound to
+[Model](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/)|The Model subclass this builder is bound to
 
 ## toString()
 
@@ -721,7 +721,7 @@ For example the following query will return all `Person` rows if `req.query.firs
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining
 
 ##### Examples
 
@@ -750,7 +750,7 @@ transaction|object|A transaction object
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining
 
 ## clone()
 
@@ -762,7 +762,7 @@ Create a clone of this builder.
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|Clone of the query builder
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|Clone of the query builder
 
 ## execute()
 
@@ -947,7 +947,7 @@ Type|Description
 const promise = queryBuilder.resultSize();
 ```
 
-Returns the amount of rows the current query would produce without [limit](/api/query-builder/find-methods.html#limit) and [offset](/api/query-builder/find-methods.html#offset) applied. Note that this executes a copy of the query and returns a Promise.
+Returns the amount of rows the current query would produce without [limit](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/find-methods.md#limit) and [offset](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/find-methods.md#offset) applied. Note that this executes a copy of the query and returns a Promise.
 
 This method is often more convenient than `count` which returns an array of objects instead a single number.
 
@@ -1003,7 +1003,7 @@ pageSize|number|The page size
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining
 
 ## range()
 
@@ -1030,7 +1030,7 @@ end|number|The index of the last result (inclusive)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining
 
 ##### Examples
 
@@ -1075,7 +1075,7 @@ propertyName|string|The name of the property to pluck
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining
 
 ##### Examples
 
@@ -1096,15 +1096,15 @@ queryBuilder = queryBuilder.first();
 
 If the result is an array, selects the first item.
 
-NOTE: This doesn't add `limit 1` to the query by default. You can override the [Model.useLimitInFirst](/api/model/static-properties.html#static-uselimitinfirst) property to change this behaviour.
+NOTE: This doesn't add `limit 1` to the query by default. You can override the [Model.useLimitInFirst](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/static-properties.md#static-uselimitinfirst) property to change this behaviour.
 
-Also see [findById](/api/query-builder/find-methods.html#findbyid) and [findOne](/api/query-builder/find-methods.html#findone) shorthand methods.
+Also see [findById](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/find-methods.md#findbyid) and [findOne](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/find-methods.md#findone) shorthand methods.
 
 ##### Return value
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining
 
 ##### Examples
 
@@ -1122,15 +1122,15 @@ console.log(firstPerson.age);
 queryBuilder = queryBuilder.throwIfNotFound();
 ```
 
-Causes a [Model.NotFoundError](/api/types/#class-notfounderror) to be thrown if the query result is empty.
+Causes a [Model.NotFoundError](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#class-notfounderror) to be thrown if the query result is empty.
 
-You can replace `Model.NotFoundError` with your own error by implementing the static [Model.createNotFoundError(ctx)](/api/model/static-methods.html#static-createnotfounderror) method.
+You can replace `Model.NotFoundError` with your own error by implementing the static [Model.createNotFoundError(ctx)](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/static-methods.md#static-createnotfounderror) method.
 
 ##### Return value
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining
 
 ##### Examples
 
@@ -1161,14 +1161,14 @@ The optional first parameter can be a constructor. If given, the traverser funct
 
 Argument|Type|Description
 --------|----|--------------------
-modelClass|[Model](/api/model/)|The optional model class filter. If given, the traverser function is only called for models of this class.
-traverser|function([Model](/api/model/), [Model](/api/model/), string)|The traverser function that is called for each model. The first argument is the model itself. If the model is in a relation of some other model the second argument is the parent model and the third argument is the name of the relation.
+modelClass|[Model](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/)|The optional model class filter. If given, the traverser function is only called for models of this class.
+traverser|function([Model](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/), [Model](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/), string)|The traverser function that is called for each model. The first argument is the model itself. If the model is in a relation of some other model the second argument is the parent model and the third argument is the name of the relation.
 
 ##### Return value
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining
 
 ##### Examples
 
@@ -1213,14 +1213,14 @@ instances and `id` and `name` properties of all `Animal` instances.
 
 Argument|Type|Description
 --------|----|--------------------
-modelClass|[Model](/api/model/)|The optional model class filter
+modelClass|[Model](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/)|The optional model class filter
 properties|string[]|The properties to pick
 
 ##### Return value
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining
 
 ##### Examples
 
@@ -1260,14 +1260,14 @@ and `species` properties of all `Animal` instances.
 
 Argument|Type|Description
 --------|----|--------------------
-modelClass|[Model](/api/model/)|The optional model class filter
+modelClass|[Model](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/)|The optional model class filter
 properties|string[]|The properties to omit
 
 ##### Return value
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining
 
 ##### Examples
 
@@ -1298,7 +1298,7 @@ See [knex documentation](http://knexjs.org/#Builder-timeout)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 
 ## connection()
@@ -1309,11 +1309,11 @@ See [knex documentation](http://knexjs.org/#Builder-connection)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## modify()
 
-Works like `knex`'s [modify](http://knexjs.org/#Builder-modify) function but in addition you can specify model [modifier](/api/model/static-properties.html#static-modifiers) by providing modifier names.
+Works like `knex`'s [modify](http://knexjs.org/#Builder-modify) function but in addition you can specify model [modifier](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/static-properties.md#static-modifiers) by providing modifier names.
 
 See [knex documentation](http://knexjs.org/#Builder-modify)
 
@@ -1321,14 +1321,14 @@ See [knex documentation](http://knexjs.org/#Builder-modify)
 
 Argument|Type|Description
 --------|----|--------------------
-modifier|function([QueryBuilder](/api/query-builder/))&nbsp;&#124;&nbsp;string&nbsp;&#124;&nbsp;string[]|The modify callback function, receiving the builder as its first argument, followed by the optional arguments. If a string is provided, the corresponding [modifier](/api/model/static-properties.html#static-modifiers) is executed instead.
+modifier|function([QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/))&nbsp;&#124;&nbsp;string&nbsp;&#124;&nbsp;string[]|The modify callback function, receiving the builder as its first argument, followed by the optional arguments. If a string is provided, the corresponding [modifier](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/static-properties.md#static-modifiers) is executed instead.
 *arguments|...any|The optional arguments passed to the modify function
 
 ##### Return value
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## applyModifier()
 
@@ -1338,15 +1338,15 @@ Applies modifiers to the query builder.
 
 Argument|Type|Description
 --------|----|--------------------
-modifier|string|The name of the modifier, as found in [modifier](/api/model/static-properties.html#static-modifiers).
+modifier|string|The name of the modifier, as found in [modifier](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/static-properties.md#static-modifiers).
 *arguments| |When providing multiple arguments, all provided modifiers will be applied.
 
 ##### Return value
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## applyFilter()
 
-An alias for [applyModifier](/api/query-builder/other-methods.html#applymodifier)
+An alias for [applyModifier](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/other-methods.md#applymodifier)

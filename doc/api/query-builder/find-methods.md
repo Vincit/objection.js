@@ -18,7 +18,7 @@ id|any&nbsp;&#124;&nbsp;any[]|The identifier.
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ##### Examples
 
@@ -56,7 +56,7 @@ ids|any[]|A List of identifiers.
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ##### Examples
 
@@ -82,13 +82,13 @@ Shorthand for `where(...whereArgs).first()`.
 
 Argument|Type|Description
 --------|----|--------------------
-whereArgs|...any|Anything the [where](/api/query-builder/find-methods.html#where) method accepts.
+whereArgs|...any|Anything the [where](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/find-methods.md#where) method accepts.
 
 ##### Return value
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ##### Examples
 
@@ -126,7 +126,7 @@ alias|string|Table alias for the query.
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ##### Examples
 
@@ -157,7 +157,7 @@ alias|string|The alias.
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ##### Examples
 
@@ -190,7 +190,7 @@ See [knex documentation](http://knexjs.org/#Builder-select)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## forUpdate()
 
@@ -200,7 +200,7 @@ See [knex documentation](http://knexjs.org/#Builder-forUpdate)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## forShare()
 
@@ -210,7 +210,7 @@ See [knex documentation](http://knexjs.org/#Builder-forShare)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## as()
 
@@ -220,7 +220,7 @@ See [knex documentation](http://knexjs.org/#Builder-as)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## columns()
 
@@ -230,7 +230,7 @@ See [knex documentation](http://knexjs.org/#Builder-columns)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## column()
 
@@ -240,7 +240,7 @@ See [knex documentation](http://knexjs.org/#Builder-column)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## from()
 
@@ -250,7 +250,7 @@ See [knex documentation](http://knexjs.org/#Builder-from)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## into()
 
@@ -260,7 +260,7 @@ See [knex documentation](http://knexjs.org/#Builder-into)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## with()
 
@@ -270,7 +270,7 @@ See [knex documentation](http://knexjs.org/#Builder-with)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## withSchema()
 
@@ -280,7 +280,7 @@ See [knex documentation](http://knexjs.org/#Builder-withSchema)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## table()
 
@@ -290,7 +290,7 @@ See [knex documentation](http://knexjs.org/#Builder-table)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## distinct()
 
@@ -300,7 +300,7 @@ See [knex documentation](http://knexjs.org/#Builder-distinct)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## where()
 
@@ -310,7 +310,7 @@ See [knex documentation](http://knexjs.org/#Builder-where)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 
 ## andWhere()
@@ -321,7 +321,7 @@ See [knex documentation](http://knexjs.org/#Builder-where)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## orWhere()
 
@@ -331,7 +331,7 @@ See [knex documentation](http://knexjs.org/#Builder-where)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## whereNot()
 
@@ -341,7 +341,7 @@ See [knex documentation](http://knexjs.org/#Builder-where)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## orWhereNot()
 
@@ -351,7 +351,7 @@ See [knex documentation](http://knexjs.org/#Builder-where)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## whereRaw()
 
@@ -361,7 +361,7 @@ See [knex documentation](http://knexjs.org/#Builder-whereRaw)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## whereWrapped()
 
@@ -371,7 +371,7 @@ See [knex documentation](http://knexjs.org/#Builder-wheres)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## havingWrapped()
 
@@ -381,7 +381,7 @@ See [knex documentation](http://knexjs.org/#Builder-having)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## orWhereRaw()
 
@@ -391,7 +391,7 @@ See [knex documentation](http://knexjs.org/#Builder-whereRaw)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## whereExists()
 
@@ -401,7 +401,7 @@ See [knex documentation](http://knexjs.org/#Builder-whereExists)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## orWhereExists()
 
@@ -411,7 +411,7 @@ See [knex documentation](http://knexjs.org/#Builder-whereExists)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## whereNotExists()
 
@@ -421,7 +421,7 @@ See [knex documentation](http://knexjs.org/#Builder-whereNotExists)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## orWhereNotExists()
 
@@ -431,7 +431,7 @@ See [knex documentation](http://knexjs.org/#Builder-whereNotExists)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## whereIn()
 
@@ -441,7 +441,7 @@ See [knex documentation](http://knexjs.org/#Builder-whereIn)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## orWhereIn()
 
@@ -451,7 +451,7 @@ See [knex documentation](http://knexjs.org/#Builder-whereIn)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## whereNotIn()
 
@@ -461,7 +461,7 @@ See [knex documentation](http://knexjs.org/#Builder-whereNotIn)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## orWhereNotIn()
 
@@ -471,7 +471,7 @@ See [knex documentation](http://knexjs.org/#Builder-whereNotIn)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## whereNull()
 
@@ -481,7 +481,7 @@ See [knex documentation](http://knexjs.org/#Builder-whereNull)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## orWhereNull()
 
@@ -491,7 +491,7 @@ See [knex documentation](http://knexjs.org/#Builder-whereNull)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## whereNotNull()
 
@@ -501,7 +501,7 @@ See [knex documentation](http://knexjs.org/#Builder-whereNotNull)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## orWhereNotNull()
 
@@ -511,7 +511,7 @@ See [knex documentation](http://knexjs.org/#Builder-whereNotNull)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## whereBetween()
 
@@ -521,7 +521,7 @@ See [knex documentation](http://knexjs.org/#Builder-whereBetween)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## whereNotBetween()
 
@@ -531,7 +531,7 @@ See [knex documentation](http://knexjs.org/#Builder-whereNotBetween)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## orWhereBetween()
 
@@ -541,7 +541,7 @@ See [knex documentation](http://knexjs.org/#Builder-whereBetween)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## orWhereNotBetween()
 
@@ -551,7 +551,7 @@ See [knex documentation](http://knexjs.org/#Builder-whereNotBetween)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## whereColumn()
 
@@ -561,7 +561,7 @@ See [knex documentation](http://knexjs.org/#Builder-whereColumn)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## andWhereColumn()
 
@@ -571,7 +571,7 @@ See [knex documentation](http://knexjs.org/#Builder-whereColumn)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## orWhereColumn()
 
@@ -581,7 +581,7 @@ See [knex documentation](http://knexjs.org/#Builder-whereColumn)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## whereNotColumn()
 
@@ -591,7 +591,7 @@ See [knex documentation](http://knexjs.org/#Builder-whereColumn)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## andWhereNotColumn()
 
@@ -601,7 +601,7 @@ See [knex documentation](http://knexjs.org/#Builder-whereColumn)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## orWhereNotColumn()
 
@@ -611,7 +611,7 @@ See [knex documentation](http://knexjs.org/#Builder-whereColumn)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## groupBy()
 
@@ -621,7 +621,7 @@ See [knex documentation](http://knexjs.org/#Builder-groupBy)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## groupByRaw()
 
@@ -631,7 +631,7 @@ See [knex documentation](http://knexjs.org/#Builder-groupByRaw)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## orderBy()
 
@@ -641,7 +641,7 @@ See [knex documentation](http://knexjs.org/#Builder-orderBy)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## orderByRaw()
 
@@ -651,7 +651,7 @@ See [knex documentation](http://knexjs.org/#Builder-orderByRaw)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## union()
 
@@ -661,7 +661,7 @@ See [knex documentation](http://knexjs.org/#Builder-union)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## unionAll()
 
@@ -671,7 +671,7 @@ See [knex documentation](http://knexjs.org/#Builder-unionAll)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## having()
 
@@ -681,7 +681,7 @@ See [knex documentation](http://knexjs.org/#Builder-having)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## havingRaw()
 
@@ -691,7 +691,7 @@ See [knex documentation](http://knexjs.org/#Builder-havingRaw)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## orHaving()
 
@@ -701,7 +701,7 @@ See [knex documentation](http://knexjs.org/#Builder-having)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## orHavingRaw()
 
@@ -711,7 +711,7 @@ See [knex documentation](http://knexjs.org/#Builder-havingRaw)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## offset()
 
@@ -721,7 +721,7 @@ See [knex documentation](http://knexjs.org/#Builder-offset)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## limit()
 
@@ -731,19 +731,19 @@ See [knex documentation](http://knexjs.org/#Builder-limit)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## count()
 
 See [knex documentation](http://knexjs.org/#Builder-count)
 
-Also see the [resultSize](/api/query-builder/other-methods.md#resultsize) method for a cleaner way to just get the number of rows a query would create.
+Also see the [resultSize](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/other-methods.md#resultsize) method for a cleaner way to just get the number of rows a query would create.
 
 ##### Return value
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## countDistinct()
 
@@ -753,7 +753,7 @@ See [knex documentation](http://knexjs.org/#Builder-count)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## min()
 
@@ -763,7 +763,7 @@ See [knex documentation](http://knexjs.org/#Builder-min)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## max()
 
@@ -773,7 +773,7 @@ See [knex documentation](http://knexjs.org/#Builder-max)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## sum()
 
@@ -783,7 +783,7 @@ See [knex documentation](http://knexjs.org/#Builder-sum)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## avg()
 
@@ -793,7 +793,7 @@ See [knex documentation](http://knexjs.org/#Builder-avg)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## avgDistinct()
 
@@ -803,7 +803,7 @@ See [knex documentation](http://knexjs.org/#Builder-avg)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## returning()
 
@@ -813,7 +813,7 @@ See [knex documentation](http://knexjs.org/#Builder-returning)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## columnInfo()
 
@@ -823,7 +823,7 @@ See [knex documentation](http://knexjs.org/#Builder-columnInfo)
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## whereComposite()
 
@@ -831,13 +831,13 @@ Type|Description
 queryBuilder = queryBuilder.whereComposite(columns, operator, values);
 ```
 
-[where](/api/query-builder/find-methods.html#where) for (possibly) composite keys.
+[where](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/find-methods.md#where) for (possibly) composite keys.
 
 ##### Return value
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ##### Examples
 
@@ -857,13 +857,13 @@ builder.whereComposite('id', 1);
 queryBuilder = queryBuilder.whereInComposite(columns, values);
 ```
 
-[whereIn](/api/query-builder/find-methods.html#wherein) for (possibly) composite keys.
+[whereIn](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/find-methods.md#wherein) for (possibly) composite keys.
 
 ##### Return value
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ##### Examples
 
@@ -898,14 +898,14 @@ Where left hand json field reference is a superset of the right hand json value 
 
 Argument|Type|Description
 --------|----|--------------------
-fieldExpression|[FieldExpression](/api/types/#type-fieldexpression)|Reference to column / json field, which is tested for being a superset
-jsonObjectOrFieldExpression|Object&nbsp;&#124;&nbsp;Array&nbsp;&#124;&nbsp;[FieldExpression](/api/types/#type-fieldexpression)|To which to compare
+fieldExpression|[FieldExpression](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#type-fieldexpression)|Reference to column / json field, which is tested for being a superset
+jsonObjectOrFieldExpression|Object&nbsp;&#124;&nbsp;Array&nbsp;&#124;&nbsp;[FieldExpression](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#type-fieldexpression)|To which to compare
 
 ##### Return value
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ##### Examples
 
@@ -958,15 +958,15 @@ Returns only the row `4` which has keys `a` and `b` and `a` != `b`, but it won't
 
 ## orWhereJsonSupersetOf()
 
-See [whereJsonSupersetOf](/api/query-builder/find-methods.html#wherejsonsupersetof)
+See [whereJsonSupersetOf](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/find-methods.md#wherejsonsupersetof)
 
 ## whereJsonNotSupersetOf()
 
-See [whereJsonSupersetOf](/api/query-builder/find-methods.html#wherejsonsupersetof)
+See [whereJsonSupersetOf](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/find-methods.md#wherejsonsupersetof)
 
 ## orWhereJsonNotSupersetOf()
 
-See [whereJsonSupersetOf](/api/query-builder/find-methods.html#wherejsonsupersetof)
+See [whereJsonSupersetOf](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/find-methods.md#wherejsonsupersetof)
 
 ## whereJsonSubsetOf()
 
@@ -981,32 +981,32 @@ Where left hand json field reference is a subset of the right hand json value or
 
 Object and array are always their own subsets.
 
-See [whereJsonSupersetOf](/api/query-builder/find-methods.html#wherejsonsupersetof)
+See [whereJsonSupersetOf](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/find-methods.md#wherejsonsupersetof)
 
 ##### Arguments
 
 Argument|Type|Description
 --------|----|--------------------
-fieldExpression|[FieldExpression](/api/types/#type-fieldexpression)|Reference to column / json field, which is tested for being a superset
-jsonObjectOrFieldExpression|Object&nbsp;&#124;&nbsp;Array&nbsp;&#124;&nbsp;[FieldExpression](/api/types/#type-fieldexpression)|To which to compare
+fieldExpression|[FieldExpression](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#type-fieldexpression)|Reference to column / json field, which is tested for being a superset
+jsonObjectOrFieldExpression|Object&nbsp;&#124;&nbsp;Array&nbsp;&#124;&nbsp;[FieldExpression](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#type-fieldexpression)|To which to compare
 
 ##### Return value
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## orWhereJsonSubsetOf()
 
-See [whereJsonSubsetOf](/api/query-builder/find-methods.html#wherejsonsubsetof)
+See [whereJsonSubsetOf](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/find-methods.md#wherejsonsubsetof)
 
 ## whereJsonNotSubsetOf()
 
-See [whereJsonSubsetOf](/api/query-builder/find-methods.html#wherejsonsubsetof)
+See [whereJsonSubsetOf](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/find-methods.md#wherejsonsubsetof)
 
 ## orWhereJsonNotSubsetOf()
 
-See [whereJsonSubsetOf](/api/query-builder/find-methods.html#wherejsonsubsetof)
+See [whereJsonSubsetOf](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/find-methods.md#wherejsonsubsetof)
 
 ## whereJsonIsArray()
 
@@ -1020,25 +1020,25 @@ Where json field reference is an array.
 
 Argument|Type|Description
 --------|----|--------------------
-fieldExpression|[FieldExpression](/api/types/#type-fieldexpression)|
+fieldExpression|[FieldExpression](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#type-fieldexpression)|
 
 ##### Return value
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## orWhereJsonIsArray()
 
-See [whereJsonIsArray](/api/query-builder/find-methods.html#wherejsonisarray)
+See [whereJsonIsArray](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/find-methods.md#wherejsonisarray)
 
 ## whereJsonNotArray()
 
-See [whereJsonIsArray](/api/query-builder/find-methods.html#wherejsonisarray)
+See [whereJsonIsArray](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/find-methods.md#wherejsonisarray)
 
 ## orWhereJsonNotArray()
 
-See [whereJsonIsArray](/api/query-builder/find-methods.html#wherejsonisarray)
+See [whereJsonIsArray](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/find-methods.md#wherejsonisarray)
 
 ## whereJsonIsObject()
 
@@ -1052,25 +1052,25 @@ Where json field reference is an object.
 
 Argument|Type|Description
 --------|----|--------------------
-fieldExpression|[FieldExpression](/api/types/#type-fieldexpression)|
+fieldExpression|[FieldExpression](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#type-fieldexpression)|
 
 ##### Return value
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## orWhereJsonIsObject()
 
-See [whereJsonIsObject](/api/query-builder/find-methods.html#wherejsonisobject)
+See [whereJsonIsObject](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/find-methods.md#wherejsonisobject)
 
 ## whereJsonNotObject()
 
-See [whereJsonIsObject](/api/query-builder/find-methods.html#wherejsonisobject)
+See [whereJsonIsObject](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/find-methods.md#wherejsonisobject)
 
 ## orWhereJsonNotObject()
 
-See [whereJsonIsObject](/api/query-builder/find-methods.html#wherejsonisobject)
+See [whereJsonIsObject](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/find-methods.md#wherejsonisobject)
 
 ## whereJsonHasAny()
 
@@ -1088,18 +1088,18 @@ This doesn't work for arrays. If you want to check if an array contains an item,
 
 Argument|Type|Description
 --------|----|--------------------
-fieldExpression|[FieldExpression](/api/types/#type-fieldexpression)|
+fieldExpression|[FieldExpression](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#type-fieldexpression)|
 keys|string&nbsp;&#124;&nbsp;string[]|Strings that are looked from object or array
 
 ##### Return value
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## orWhereJsonHasAny()
 
-See [whereJsonHasAny](/api/query-builder/find-methods.html#wherejsonhasany)
+See [whereJsonHasAny](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/find-methods.md#wherejsonhasany)
 
 ## whereJsonHasAll()
 
@@ -1117,15 +1117,15 @@ This doesn't work for arrays. If you want to check if an array contains an item,
 
 Argument|Type|Description
 --------|----|--------------------
-fieldExpression|[FieldExpression](/api/types/#type-fieldexpression)|
+fieldExpression|[FieldExpression](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#type-fieldexpression)|
 keys|string&nbsp;&#124;&nbsp;string[]|Strings that are looked from object or array
 
 ##### Return value
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|`this` query builder for chaining.
 
 ## orWhereJsonHasAll()
 
-See [whereJsonHasAll](/api/query-builder/find-methods.html#wherejsonhasall)
+See [whereJsonHasAll](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/find-methods.md#wherejsonhasall)

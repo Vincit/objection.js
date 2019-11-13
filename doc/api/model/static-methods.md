@@ -9,7 +9,7 @@ Creates a query builder for the model's table.
 
 All query builders are created using this function, including `$query`, `$relatedQuery` and `relatedQuery`. That means you can modify each query by overriding this method for your model class.
 
-See the [query examples](/guide/query-examples.html) section for more examples.
+See the [query examples](https://github.com/Vincit/objection.js/tree/v1/doc/guide/query-examples.md) section for more examples.
 
 #### Arguments
 
@@ -21,7 +21,7 @@ transactionOrKnex|object|Optional transaction or knex instance for the query. Th
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|The created query builder
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|The created query builder
 
 #### Examples
 
@@ -133,7 +133,7 @@ Creates a subquery for a relation.
 
 This query can only be used as a subquery and therefore there is no need to ever pass a transaction or a knex instance to it. It will always inherit its parent query's transaction because it is compiled and executed as a part of the parent query.
 
-See the examples below. There are also more examples in the [Relation Subqueries recipe](/recipes/relation-subqueries.html).
+See the examples below. There are also more examples in the [Relation Subqueries recipe](https://github.com/Vincit/objection.js/tree/v1/doc/recipes/relation-subqueries.md).
 
 ##### Arguments
 
@@ -145,7 +145,7 @@ relationName|string|The name of the relation to create subquery for.
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|The created query builder
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|The created query builder
 
 ##### Examples
 
@@ -198,7 +198,7 @@ Get/Set the knex instance for a model class.
 
 Subclasses inherit the connection. A system-wide knex instance can thus be set by calling `objection.Model.knex(knex)`. This works even after subclasses have been created.
 
-If you want to use multiple databases, you can instead pass the knex instance to each individual query or use the [bindKnex](/api/model/static-methods.html#static-bindknex) method.
+If you want to use multiple databases, you can instead pass the knex instance to each individual query or use the [bindKnex](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/static-methods.md#static-bindknex) method.
 
 ##### Examples
 
@@ -229,9 +229,9 @@ const BoundPerson = Person.bindKnex(transactionOrKnex);
 
 Creates an anonymous model subclass class that is bound to the given knex instance or transaction.
 
-This method can be used to bind a Model subclass to multiple databases for example in a multi-tenant system. See the [multi tenancy recipe](/recipes/multitenancy-using-multiple-databases.html) for more info.
+This method can be used to bind a Model subclass to multiple databases for example in a multi-tenant system. See the [multi tenancy recipe](https://github.com/Vincit/objection.js/tree/v1/doc/recipes/multitenancy-using-multiple-databases.md) for more info.
 
-Also check out the the [model binding pattern for transactions](/guide/transactions.html#binding-models-to-a-transaction) which internally uses `bindKnex`.
+Also check out the the [model binding pattern for transactions](https://github.com/Vincit/objection.js/tree/v1/doc/guide/transactions.md#binding-models-to-a-transaction) which internally uses `bindKnex`.
 
 ##### Arguments
 
@@ -285,7 +285,7 @@ console.log(models[0] instanceof BoundModel2); // --> true
 
 ## `static` bindTransaction()
 
-Alias for [bindKnex](/api/model/static-methods.html#static-bindknex).
+Alias for [bindKnex](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/static-methods.md#static-bindknex).
 
 ##### Examples
 
@@ -333,22 +333,22 @@ const person = Person.fromJson(json, opt);
 
 Creates a model instance from a POJO (Plain Old Javascript Object).
 
-The object is checked against [jsonSchema](/api/model/static-properties.html#static-jsonschema) if a schema is provided and an exception is thrown on failure.
+The object is checked against [jsonSchema](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/static-properties.md#static-jsonschema) if a schema is provided and an exception is thrown on failure.
 
-The `json` object is also passed through the [$parseJson](/api/model/instance-methods.html#parsejson) hook before the model instance is created. See [this section](/api/model/overview.html#model-data-lifecycle) for more info.
+The `json` object is also passed through the [$parseJson](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/instance-methods.md#parsejson) hook before the model instance is created. See [this section](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/overview.md#model-data-lifecycle) for more info.
 
 ##### Arguments
 
 Argument|Type|Description
 --------|----|-------------------
 json|Object|The JSON object from which to create the model.
-opt|[ModelOptions](/api/types/#type-modeloptions)|Update options.
+opt|[ModelOptions](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#type-modeloptions)|Update options.
 
 ##### Return value
 
 Type|Description
 ----|-----------------------------
-[Model](/api/model/)|The created model instance
+[Model](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/)|The created model instance
 
 ##### Examples
 
@@ -375,7 +375,7 @@ const person = Person.fromDatabaseJson(row);
 
 Creates a model instance from a JSON object send by the database driver.
 
-Unlike [fromJson](/api/model/static-methods.html#static-fromjson), this method doesn't validate the input. The input is expected to be in the database format as explained [here](/api/model/overview.html#model-data-lifecycle).
+Unlike [fromJson](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/static-methods.md#static-fromjson), this method doesn't validate the input. The input is expected to be in the database format as explained [here](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/overview.md#model-data-lifecycle).
 
 ##### Arguments
 
@@ -387,7 +387,7 @@ row|Object|A database row.
 
 Type|Description
 ----|-----------------------------
-[Model](/api/model/)|The created model instance
+[Model](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/)|The created model instance
 
 ## `static` modifierNotFound()
 
@@ -405,7 +405,7 @@ class BaseModel extends Model {
 ```
 
 Handles modifiers that are not recognized by the various mechanisms that can specify
-them, such as [modify](/api/query-builder/other-methods.html#modify) and [applyModifier](/api/query-builder/other-methods.html#applymodifier), as well as the use of modifiers in eager expressions (see [RelationExpression](/api/types/#type-relationexpression)) and in relations (see [RelationMapping](/api/types/#type-relationmapping)).
+them, such as [modify](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/other-methods.md#modify) and [applyModifier](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/other-methods.md#applymodifier), as well as the use of modifiers in eager expressions (see [RelationExpression](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#type-relationexpression)) and in relations (see [RelationMapping](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#type-relationmapping)).
 
 By default, the static `modifierNotFound()` hook throws a `ModifierNotFoundError` error. If a model class overrides the hook, it can decide to handle the modifer through the passed `builder` instance, or call the hook's definition in the super class to still throw the error.
 
@@ -413,7 +413,7 @@ By default, the static `modifierNotFound()` hook throws a `ModifierNotFoundError
 
 Argument|Type|Description
 --------|----|-------------------
-builder|[QueryBuilder](/api/query-builder/)|The query builder on which to apply the modifier.
+builder|[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|The query builder on which to apply the modifier.
 modifier|string|The name of the unknown modifier.
 
 ## `static` createValidator()
@@ -426,11 +426,11 @@ class BaseModel extends Model {
 }
 ```
 
-Creates an instance of a [Validator](/api/types/#class-validator) that is used to do all validation related stuff. This method is called only once per model class.
+Creates an instance of a [Validator](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#class-validator) that is used to do all validation related stuff. This method is called only once per model class.
 
-You can override this method to return an instance of your custom validator. The custom validator doesn't need to be based on the `jsonSchema`. It can be anything at all as long as it implements the [Validator](/api/types/#class-validator) interface.
+You can override this method to return an instance of your custom validator. The custom validator doesn't need to be based on the `jsonSchema`. It can be anything at all as long as it implements the [Validator](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#class-validator) interface.
 
-If you want to use the default json schema based [AjvValidator](/api/types/#class-ajvvalidator) but want to modify it, you can use the `objection.AjvValidator` constructor. See the default implementation example.
+If you want to use the default json schema based [AjvValidator](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#class-ajvvalidator) but want to modify it, you can use the `objection.AjvValidator` constructor. See the default implementation example.
 
 If you want to share the same validator instance between multiple models, that's completely fine too. Simply implement `createValidator` so that it always returns the same object instead of creating a new one.
 
@@ -480,20 +480,20 @@ class BaseModel extends Model {
 }
 ```
 
-Creates an error thrown by [throwIfNotFound](/api/query-builder/other-methods.html#throwifnotfound) method. You can override this
+Creates an error thrown by [throwIfNotFound](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/other-methods.md#throwifnotfound) method. You can override this
 to throw any error you want.
 
 ##### Arguments
 
 Argument|Type|Description
 --------|----|-------------------
-queryContext|Object|The context object of query that produced the empty result. See [context](/api/query-builder/other-methods.html#context).
+queryContext|Object|The context object of query that produced the empty result. See [context](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/other-methods.md#context).
 
 ##### Return value
 
 Type|Description
 ----|-----------------------------
-`Error`|The created error. [NotFoundError](/api/types/#class-notfounderror) by default.
+`Error`|The created error. [NotFoundError](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#class-notfounderror) by default.
 
 ##### Examples
 
@@ -523,7 +523,7 @@ Creates an error thrown when validation fails for a model. You can override this
 
 Type|Description
 ----|-----------------------------
-`Error`|The created error. [ValidationError](/api/types/#class-validationerror) by default.
+`Error`|The created error. [ValidationError](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#class-validationerror) by default.
 
 ## `static` loadRelated()
 
@@ -536,22 +536,22 @@ const queryBuilder = Person.loadRelated(
 );
 ```
 
-Load related models for a set of models using a [RelationExpression](/api/types/#type-relationexpression).
+Load related models for a set of models using a [RelationExpression](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#type-relationexpression).
 
 ##### Arguments
 
 Argument|Type|Description
 --------|----|-------------------
-models|Array&lt;[Model](/api/model/)&#124;Object&gt;|Model instances for which to fetch the relations. Can be an array of model instances, array of POJOs, a single model instance or a single POJO.
-expression|string&#124;[RelationExpression](/api/types/#type-relationexpression)|The relation expression
-modifiers|Object&lt;string,&nbsp;function([QueryBuilder](/api/query-builder/))&gt;|Optional modifiers
+models|Array&lt;[Model](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/)&#124;Object&gt;|Model instances for which to fetch the relations. Can be an array of model instances, array of POJOs, a single model instance or a single POJO.
+expression|string&#124;[RelationExpression](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#type-relationexpression)|The relation expression
+modifiers|Object&lt;string,&nbsp;function([QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/))&gt;|Optional modifiers
 transactionOrKnex|object|Optional transaction or knex instance for the query. This can be used to specify a transaction or even a different database.
 
 ##### Return value
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder/)|The created query builder
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/)|The created query builder
 
 ##### Examples
 
@@ -601,8 +601,8 @@ In the second example the traverser function is only called for `Person` instanc
 Argument|Type|Description
 --------|----|-------------------
 filterConstructor|function|If this optional constructor is given, the `traverser` is only called for models for which `model instanceof filterConstructor` returns true.
-models|[Model](/api/model/)&#124;[Model](/api/model/)[]|The model(s) whose relation trees to traverse.
-traverser|function([Model](/api/model/), string, string)|The traverser function that is called for each model. The first argument is the model itself. If the model is in a relation of some other model the second argument is the parent model and the third argument is the name of the relation.
+models|[Model](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/)&#124;[Model](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/)[]|The model(s) whose relation trees to traverse.
+traverser|function([Model](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/), string, string)|The traverser function that is called for each model. The first argument is the model itself. If the model is in a relation of some other model the second argument is the parent model and the third argument is the name of the relation.
 
 ##### Examples
 
@@ -642,7 +642,7 @@ await Person.traverseAsync(person, async (model, parentModel, relationName) => {
 const relations = Person.getRelations();
 ```
 
-Returns a [Relation](/api/types/#class-relation) object for each relation defined in [relationMappings](/api/model/static-properties.html#static-relationmappings).
+Returns a [Relation](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#class-relation) object for each relation defined in [relationMappings](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/static-properties.md#static-relationmappings).
 
 This method is mainly useful for plugin developers and for other generic usages.
 
@@ -650,7 +650,7 @@ This method is mainly useful for plugin developers and for other generic usages.
 
 Type|Description
 ----|-----------------------------
-Object&lt;string,&nbsp;[Relation](/api/types/#class-relation)&gt;|Object whose keys are relation names and values are [Relation](/api/types/#class-relation) instances.
+Object&lt;string,&nbsp;[Relation](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#class-relation)&gt;|Object whose keys are relation names and values are [Relation](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#class-relation) instances.
 
 ## `static` columnNameToPropertyName()
 
@@ -717,23 +717,23 @@ const metadata = await Person.fetchTableMetadata(opt);
 
 Fetches and caches the table metadata.
 
-Most of the time objection doesn't need this metadata, but some methods like [joinEager](/api/query-builder/eager-methods.html#joineager) do. This method is called by objection when the metadata is needed. The result is cached and after the first call the cached promise is returned and no queries are executed.
+Most of the time objection doesn't need this metadata, but some methods like [joinEager](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/eager-methods.md#joineager) do. This method is called by objection when the metadata is needed. The result is cached and after the first call the cached promise is returned and no queries are executed.
 
 Because objection uses this on demand, the first query that needs this information can have unpredicable performance. If that's a problem, you can call this method for each of your models during your app's startup.
 
-If you've implemented [tableMetadata](/api/model/static-methods.html#static-tablemetadata) method to return a custom metadata object, this method doesn't execute database queries, but returns `Promise.resolve(this.tableMetadata())` instead.
+If you've implemented [tableMetadata](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/static-methods.md#static-tablemetadata) method to return a custom metadata object, this method doesn't execute database queries, but returns `Promise.resolve(this.tableMetadata())` instead.
 
 ##### Arguments
 
 Argument|Type|Description
 --------|----|-------------------
-opt|[TableMetadataFetchOptions](/api/types/#type-tablemetadatafetchoptions)|Optional options
+opt|[TableMetadataFetchOptions](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#type-tablemetadatafetchoptions)|Optional options
 
 ##### Return value
 
 Type|Description
 ----|-----------------------------
-Promise&lt;[TableMetadata](/api/types/#type-tablemetadata)&gt;|The table metadata object
+Promise&lt;[TableMetadata](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#type-tablemetadata)&gt;|The table metadata object
 
 ## `static` tableMetadata()
 
@@ -744,21 +744,21 @@ const metadata = Person.tableMetadata(opt);
 Synchronously returns the table metadata object from the cache.
 
 You can override this method to return a custom object if you don't want objection to use
-[fetchTableMetadata](/api/model/static-methods.html#static-fetchtablemetadata).
+[fetchTableMetadata](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/static-methods.md#static-fetchtablemetadata).
 
-See [fetchTableMetadata](/api/model/static-methods.html#static-fetchtablemetadata) for more information.
+See [fetchTableMetadata](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/static-methods.md#static-fetchtablemetadata) for more information.
 
 ##### Arguments
 
 Argument|Type|Description
 --------|----|-------------------
-opt|[TableMetadataOptions](/api/types/#type-tablemetadataoptions)|Optional options
+opt|[TableMetadataOptions](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#type-tablemetadataoptions)|Optional options
 
 ##### Return value
 
 Type|Description
 ----|-----------------------------
-[TableMetadata](/api/types/#type-tablemetadata)|The table metadata object
+[TableMetadata](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#type-tablemetadata)|The table metadata object
 
 
 

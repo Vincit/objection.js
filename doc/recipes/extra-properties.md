@@ -26,7 +26,7 @@ exports.up = knex => {
 
 In this schema, `characterName` is the `extra` property. When we fetch movies for an actor, we want the movie objects to contain the `characterName` in addition to normal movie properties.
 
-You can define your [relationMapping](/api/model/static-properties.html#static-relationmappings) like this:
+You can define your [relationMapping](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/static-properties.md#static-relationmappings) like this:
 
 ```js
 class Actor extends Model {
@@ -90,4 +90,4 @@ await linda
   .where('movies.name', 'Curvature')
 ```
 
-`extra` properties also work with [eager](/api/query-builder/eager-methods.html#eager) [insertGraph](/api/query-builder/mutate-methods.html#insertgraph) and [upsertGraph](/api/query-builder/mutate-methods.html#upsertgraph).
+`extra` properties also work with [eager](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/eager-methods.md#eager) [insertGraph](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/mutate-methods.md#insertgraph) and [upsertGraph](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/mutate-methods.md#upsertgraph).

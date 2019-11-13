@@ -22,7 +22,7 @@ For a pull request to get merged it needs to have the following things:
 
 2. **Tests that verify the fix/feature.** It's possible to create a PR without tests and ask for someone else to write them but in that case it may take a long time or forever until someone finds time to do it. *Untested code will never get merged!*
 
-3. **For features you also need to write documentation.** See the [development setup](/guide/contributing.html#development-setup) section for instructions on how to write documentation.
+3. **For features you also need to write documentation.** See the [development setup](https://github.com/Vincit/objection.js/tree/v1/doc/guide/contributing.md#development-setup) section for instructions on how to write documentation.
 
 ## Development setup
 

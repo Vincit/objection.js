@@ -1,10 +1,10 @@
 # Raw queries
 
-To mix raw SQL with queries, use the [raw](/api/objection/#raw) function from the main module. [raw](/api/objection/#raw) works just like the [knex's raw method](http://knexjs.org/#Raw) but in addition, supports objection queries, [raw](/api/objection/#raw), [ref](/api/objection/#ref), [lit](/api/objection/#lit) and all other objection types. You can also use [knex.raw()](http://knexjs.org/#Raw).
+To mix raw SQL with queries, use the [raw](https://github.com/Vincit/objection.js/tree/v1/doc/api/objection/#raw) function from the main module. [raw](https://github.com/Vincit/objection.js/tree/v1/doc/api/objection/#raw) works just like the [knex's raw method](http://knexjs.org/#Raw) but in addition, supports objection queries, [raw](https://github.com/Vincit/objection.js/tree/v1/doc/api/objection/#raw), [ref](https://github.com/Vincit/objection.js/tree/v1/doc/api/objection/#ref), [lit](https://github.com/Vincit/objection.js/tree/v1/doc/api/objection/#lit) and all other objection types. You can also use [knex.raw()](http://knexjs.org/#Raw).
 
-[raw](/api/objection/#raw) is handy when you want to mix SQL in objection queries, but if you want to fire off a completely custom query, you need to use [knex.raw](http://knexjs.org/#Raw).
+[raw](https://github.com/Vincit/objection.js/tree/v1/doc/api/objection/#raw) is handy when you want to mix SQL in objection queries, but if you want to fire off a completely custom query, you need to use [knex.raw](http://knexjs.org/#Raw).
 
-There are also some helper methods such as [whereRaw](/api/query-builder/find-methods.html#whereraw) and [selectRaw](/api/query-builder/find-methods.html#selectraw) in the [QueryBuilder](/api/query-builder/).
+There are also some helper methods such as [whereRaw](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/find-methods.md#whereraw) and [selectRaw](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/find-methods.md#selectraw) in the [QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/).
 
 ## Examples
 
@@ -40,7 +40,7 @@ const childAgeSums = await Person
 console.log(childAgeSums[0].childAgeSum);
 ```
 
-Binding arguments can be other [raw](/api/objection/#raw) instances, [QueryBuilders](/api/query-builder/) or pretty much anything you can think of.
+Binding arguments can be other [raw](https://github.com/Vincit/objection.js/tree/v1/doc/api/objection/#raw) instances, [QueryBuilders](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/) or pretty much anything you can think of.
 
 ```js
 const { raw, ref } = require('objection');

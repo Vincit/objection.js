@@ -1,6 +1,6 @@
 # Precedence and parentheses
 
-You can add parentheses to queries by passing a function to any of the the [where*](/api/query-builder/find-methods.html#where) methods.
+You can add parentheses to queries by passing a function to any of the the [where*](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/find-methods.md#where) methods.
 
 ```js
 await Person

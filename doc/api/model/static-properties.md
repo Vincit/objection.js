@@ -18,19 +18,19 @@ Each model must set this.
 
 This property defines the relations to other models.
 
-relationMappings is an object (or a function that returns an object) whose keys are relation names and values are [RelationMapping](/api/types/#type-relationmapping) instances. The `join` property in addition to the relation type define how the models are related to one another. The `from` and `to` properties of the `join` object define the database columns through which the models are associated. Note that neither of these columns need to be primary keys. They can be any columns. In fact they can even be fields inside JSON columns (using the [ref](/api/objection/#ref) helper). In the case of ManyToManyRelation also the join table needs to be defined. This is done using the `through` object.
+relationMappings is an object (or a function that returns an object) whose keys are relation names and values are [RelationMapping](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#type-relationmapping) instances. The `join` property in addition to the relation type define how the models are related to one another. The `from` and `to` properties of the `join` object define the database columns through which the models are associated. Note that neither of these columns need to be primary keys. They can be any columns. In fact they can even be fields inside JSON columns (using the [ref](https://github.com/Vincit/objection.js/tree/v1/doc/api/objection/#ref) helper). In the case of ManyToManyRelation also the join table needs to be defined. This is done using the `through` object.
 
 The `modelClass` passed to the relation mappings is the class of the related model. It can be one of the following:
 
 1. A model class constructor
 2. An absolute path to a module that exports a model class
-3. A path relative to one of the paths in [modelPaths](/api/model/static-properties.html#static-modelpaths) array.
+3. A path relative to one of the paths in [modelPaths](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/static-properties.md#static-modelpaths) array.
 
 The file path versions are handy for avoiding require loops.
 
 Further reading:
- * [the relation guide](/guide/relations.html)
- * [RelationMapping](/api/types/#type-relationmapping)
+ * [the relation guide](https://github.com/Vincit/objection.js/tree/v1/doc/guide/relations.md)
+ * [RelationMapping](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#type-relationmapping)
 
 ##### Examples
 
@@ -136,9 +136,9 @@ Must follow [JSON Schema](http://json-schema.org) specification. If null no vali
 
 ##### Read more
 
-* [$validate](/api/model/instance-methods.html#validate)
-* [jsonAttributes](/api/model/static-properties.html#static-jsonattributes)
-* [custom validation recipe](/recipes/custom-validation.html)
+* [$validate](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/instance-methods.md#validate)
+* [jsonAttributes](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/static-properties.md#static-jsonattributes)
+* [custom validation recipe](https://github.com/Vincit/objection.js/tree/v1/doc/recipes/custom-validation.md)
 
 ##### Examples
 
@@ -194,7 +194,7 @@ class Person extends Model {
 }
 ```
 
-Getters and methods listed here are serialized with real properties when [toJSON](/api/model/instance-methods.html#tojson) is called. Virtual attribute methods and getters must be synchronous.
+Getters and methods listed here are serialized with real properties when [toJSON](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/instance-methods.md#tojson) is called. Virtual attribute methods and getters must be synchronous.
 
 The virtual values are not written to database. Only the "external" JSON format will contain them.
 
@@ -232,7 +232,7 @@ console.log(pojo.fullName) // --> 'Jennifer Aniston'
 console.log(pojo.isFemale) // --> true
 ```
 
-You can also pass options to [toJSON](/api/model/instance-methods.html#tojson) to only serialize a subset of virtual attributes. In fact, when the `virtuals` option is used, the attributes don't even need to be listed in `virtualAttributes`.
+You can also pass options to [toJSON](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/instance-methods.md#tojson) to only serialize a subset of virtual attributes. In fact, when the `virtuals` option is used, the attributes don't even need to be listed in `virtualAttributes`.
 
 ```js
 const pojo = person.toJSON({ virtuals: ['fullName'] })
@@ -240,7 +240,7 @@ const pojo = person.toJSON({ virtuals: ['fullName'] })
 
 ## `static` modifiers
 
-Reusable query building functions that can be used in any [eager query](/api/query-builder/eager-methods.html#eager), using [modify](/api/query-builder/other-methods.html#modify) method and in many other places.
+Reusable query building functions that can be used in any [eager query](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/eager-methods.md#eager), using [modify](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/other-methods.md#modify) method and in many other places.
 
 ```js
 class Movie extends Model {
@@ -276,7 +276,7 @@ Person
   .eager('[movies(goodMovies, orderByName).actors, pets(dogs)]')
 ```
 
-Modifiers can also be used through [modifyEager](/api/query-builder/other-methods.html#modifyeager):
+Modifiers can also be used through [modifyEager](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/other-methods.md#modifyeager):
 
 ```js
 Person
@@ -288,7 +288,7 @@ Person
 
 ## `static` namedFilters
 
-An alias for [modifiers](/api/model/static-properties.html#static-modifiers)
+An alias for [modifiers](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/static-properties.md#static-modifiers)
 
 ## `static` modelPaths
 
@@ -302,7 +302,7 @@ class Person extends Model {
 
 A list of paths from which to search for models for relations.
 
-A model class can be defined for a relation in [relationMappings](/api/model/static-properties.html#static-relationmappings) as
+A model class can be defined for a relation in [relationMappings](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/static-properties.md#static-relationmappings) as
 
 1. A model class constructor
 2. An absolute path to a module that exports a model class
@@ -368,7 +368,7 @@ Properties that should be saved to database as JSON strings.
 
 The properties listed here are serialized to JSON strings upon insertion/update to the database and parsed back to objects when models are read from the database. Combined with the postgresql's json or jsonb data type, this is a powerful way of representing documents as single database rows.
 
-If this property is left unset all properties declared as objects or arrays in the [jsonSchema](/api/model/static-properties.html#static-jsonschema) are implicitly added to this list.
+If this property is left unset all properties declared as objects or arrays in the [jsonSchema](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/static-properties.md#static-jsonschema) are implicitly added to this list.
 
 ## `static` cloneObjectAttributes
 
@@ -404,8 +404,8 @@ The mappers to use to convert column names to property names in code.
 
 Further reading:
 
- * [snakeCaseMappers](/api/objection/#snakecasemappers)
- * [snake_case to camelCase conversion recipe](/recipes/snake-case-to-camel-case-conversion.html)
+ * [snakeCaseMappers](https://github.com/Vincit/objection.js/tree/v1/doc/api/objection/#snakecasemappers)
+ * [snake_case to camelCase conversion recipe](https://github.com/Vincit/objection.js/tree/v1/doc/recipes/snake-case-to-camel-case-conversion.md)
 
 ##### Examples
 
@@ -488,7 +488,7 @@ class Person extends Model {
 }
 ```
 
-Name of the property used to store a reference to a [uidProp](/api/model/static-properties.html#static-uidprop)
+Name of the property used to store a reference to a [uidProp](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/static-properties.md#static-uidprop)
 
 NOTE: You cannot use any of the model's properties as `uidRefProp`. For example if your model has a property `ref`, you cannot set `uidRefProp = 'ref'`.
 
@@ -569,7 +569,7 @@ class Person extends Model {
 ```
 
 Sets the default options for eager loading algorithm. See the possible
-fields [here](/api/types/#type-eageroptions).
+fields [here](https://github.com/Vincit/objection.js/tree/v1/doc/api/types/#type-eageroptions).
 
 Defaults to `{minimize: false, separator: ':', aliases: {}}`.
 
@@ -583,7 +583,7 @@ class Animal extends Model {
 }
 ```
 
-If true, `limit(1)` is added to the query when [first()](/api/query-builder/instance-methods#first) is called. Defaults to `false` for legacy reasons.
+If true, `limit(1)` is added to the query when [first()](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/instance-methods#first) is called. Defaults to `false` for legacy reasons.
 
 ## `static` QueryBuilder
 
@@ -595,11 +595,11 @@ class Person extends Model {
 }
 ```
 
-[QueryBuilder](/api/query-builder/) subclass to use for all queries created for this model.
+[QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/) subclass to use for all queries created for this model.
 
-This constructor is used whenever a query builder is created using [query](/api/model/static-methods.html#static-query), [$query](/api/model/instance-methods.html#query), [$relatedQuery](/api/model/instance-methods.html#relatedquery) or any other method that creates a query. You can override this to use your own [QueryBuilder](/api/query-builder/) subclass.
+This constructor is used whenever a query builder is created using [query](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/static-methods.md#static-query), [$query](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/instance-methods.md#query), [$relatedQuery](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/instance-methods.md#relatedquery) or any other method that creates a query. You can override this to use your own [QueryBuilder](https://github.com/Vincit/objection.js/tree/v1/doc/api/query-builder/) subclass.
 
-[Usage example](/recipes/custom-query-builder.html).
+[Usage example](https://github.com/Vincit/objection.js/tree/v1/doc/recipes/custom-query-builder.md).
 
 ## `static` BelongsToOneRelation
 
@@ -614,7 +614,7 @@ class Person extends Model {
 }
 ```
 
-A relation type that can be used in [relationMappings](/api/model/static-properties.html#static-relationmappings) to create a belongs-to-one relationship. See [this section](/guide/relations.md) for more information about different relation types.
+A relation type that can be used in [relationMappings](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/static-properties.md#static-relationmappings) to create a belongs-to-one relationship. See [this section](https://github.com/Vincit/objection.js/tree/v1/doc/guide/relations.md) for more information about different relation types.
 
 ## `static` HasOneRelation
 
@@ -629,7 +629,7 @@ class Person extends Model {
 }
 ```
 
-A relation type that can be used in [relationMappings](/api/model/static-properties.html#static-relationmappings) to create a has-one relationship. See [this section](/guide/relations.md) for more information about different relation types.
+A relation type that can be used in [relationMappings](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/static-properties.md#static-relationmappings) to create a has-one relationship. See [this section](https://github.com/Vincit/objection.js/tree/v1/doc/guide/relations.md) for more information about different relation types.
 
 ## `static` HasManyRelation
 
@@ -644,7 +644,7 @@ class Person extends Model {
 }
 ```
 
-A relation type that can be used in [relationMappings](/api/model/static-properties.html#static-relationmappings) to create a has-may relationship. See [this section](/guide/relations.md) for more information about different relation types.
+A relation type that can be used in [relationMappings](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/static-properties.md#static-relationmappings) to create a has-may relationship. See [this section](https://github.com/Vincit/objection.js/tree/v1/doc/guide/relations.md) for more information about different relation types.
 
 ## `static` ManyToManyRelation
 
@@ -659,7 +659,7 @@ class Person extends Model {
 }
 ```
 
-A relation type that can be used in [relationMappings](/api/model/static-properties.html#static-relationmappings) to create a many-to-many relationship. See [this section](/guide/relations.md) for more information about different relation types.
+A relation type that can be used in [relationMappings](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/static-properties.md#static-relationmappings) to create a many-to-many relationship. See [this section](https://github.com/Vincit/objection.js/tree/v1/doc/guide/relations.md) for more information about different relation types.
 
 ## `static` HasOneThroughRelation
 
@@ -674,4 +674,4 @@ class Person extends Model {
 }
 ```
 
-A relation type that can be used in [relationMappings](/api/model/static-properties.html#static-relationmappings) to create a has-one-through relationship. See [this section](/guide/relations.md) for more information about different relation types.
+A relation type that can be used in [relationMappings](https://github.com/Vincit/objection.js/tree/v1/doc/api/model/static-properties.md#static-relationmappings) to create a has-one-through relationship. See [this section](https://github.com/Vincit/objection.js/tree/v1/doc/guide/relations.md) for more information about different relation types.
