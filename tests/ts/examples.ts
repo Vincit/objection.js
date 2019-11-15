@@ -81,10 +81,12 @@ class Person extends objection.Model {
 
   static async afterUpdate({
     asFindQuery,
-    result
+    result,
+    items
   }: StaticHookArguments<Person, number>): Promise<void> {
     takesPeople(await asFindQuery());
     takesNumber(result!);
+    takesPeople(items as Person[]);
   }
 
   examplePersonMethod = (arg: string) => 1;
