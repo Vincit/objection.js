@@ -1,4 +1,4 @@
-import { Model, JSONSchema, RelationMappings, Modifiers } from 'objection'
+import { Model, JSONSchema, Modifiers } from 'objection'
 import Movie from './Movie'
 import Animal from './Animal'
 
@@ -62,7 +62,7 @@ export default class Person extends Model {
 
   // This object defines the relations to other models. The relationMappings
   // property can be a thunk to prevent circular dependencies.
-  static relationMappings = (): RelationMappings => ({
+  static relationMappings = () => ({
     pets: {
       relation: Model.HasManyRelation,
       // The related model. This can be either a Model subclass constructor or an

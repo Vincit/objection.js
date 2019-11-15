@@ -1,4 +1,4 @@
-import { Model, JSONSchema, RelationMappings } from 'objection'
+import { Model, JSONSchema } from 'objection'
 import Person from './Person'
 
 export default class Movie extends Model {
@@ -25,7 +25,7 @@ export default class Movie extends Model {
 
   // This object defines the relations to other models. The relationMappings
   // property can be a thunk to prevent circular dependencies.
-  static relationMappings = (): RelationMappings => ({
+  static relationMappings = () => ({
     actors: {
       relation: Model.ManyToManyRelation,
 
