@@ -849,6 +849,8 @@ qb = qb.mergeContext({
   foo: 'bar'
 });
 
+qb = qb.clearContext();
+
 qb = qb.runBefore(qbcb);
 qb = qb.onBuild(qbcb);
 qb = qb.onBuildKnex((knexBuilder: knex.QueryBuilder, builder: objection.QueryBuilder<Person>) => {

@@ -38,14 +38,12 @@ Some query builder methods create more than one query. The query context is an o
 
 The context is also passed to [\$beforeInsert](/api/model/instance-methods.html#beforeinsert), [\$afterInsert](/api/model/instance-methods.html#afterinsert), [\$beforeUpdate](/api/model/instance-methods.html#beforeupdate), [\$afterUpdate](/api/model/instance-methods.html#afterupdate), [\$beforeDelete](/api/model/instance-methods.html#beforedelete), [\$afterDelete](/api/model/instance-methods.html#afterdelete) and [\$afterFind](/api/model/instance-methods.html#afterfind) calls that the query creates.
 
-In addition to properties added using this method (and [mergeContext](/api/query-builder/other-methods.html#mergecontext)) the query context object always has a `transaction` property that holds the active transaction. If there is no active transaction the `transaction` property contains the normal knex instance. In both cases the value can be passed anywhere where a transaction object can be passed so you never need to check for the existence of the `transaction` property.
+In addition to properties added using this method the query context object always has a `transaction` property that holds the active transaction. If there is no active transaction the `transaction` property contains the normal knex instance. In both cases the value can be passed anywhere where a transaction object can be passed so you never need to check for the existence of the `transaction` property.
+
+This method merges the given object with the current context. You can use `clearContext` to clear the context if needed.
 
 See the methods [runBefore](/api/query-builder/other-methods.html#runbefore), [onBuild](/api/query-builder/other-methods.html#onbuild) and [runAfter](/api/query-builder/other-methods.html#runafter)
 for more information about the hooks.
-
-::: tip
-Most of the time, you should be using [mergeContext](/api/query-builder/other-methods.html#mergecontext) instead of this method. This method replaces the whole context, while `mergeContext` merges the values with the current ones.
-:::
 
 ##### Arguments
 
@@ -99,27 +97,27 @@ Person.query()
   });
 ```
 
-## mergeContext()
+## clearContext()
 
 ```js
-queryBuilder = queryBuilder.mergeContext(queryContext);
+queryBuilder = queryBuilder.clearContext();
 ```
 
-Merges values into the query context.
-
-This method is like [context](/api/query-builder/other-methods.html#context) but instead of replacing the whole context this method merges the objects.
-
-##### Arguments
-
-| Argument     | Type   | Description                                 |
-| ------------ | ------ | ------------------------------------------- |
-| queryContext | Object | The object to merge into the query context. |
+Replaces the current context with an empty object.
 
 ##### Return value
 
 | Type                                | Description                        |
 | ----------------------------------- | ---------------------------------- |
 | [QueryBuilder](/api/query-builder/) | `this` query builder for chaining. |
+
+## mergeContext()
+
+::: warning
+Deprecated! Will be removed in version 3.0. Use [context](#context) instead.
+
+[v1 documentation](https://github.com/Vincit/objection.js/blob/v1/doc/api/query-builder/other-methods.md#mergecontext)
+:::
 
 ## tableNameFor()
 

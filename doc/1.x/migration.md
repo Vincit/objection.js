@@ -11,6 +11,7 @@ Here's a list of the breaking changes
 - [#ref references in insertGraph and upsertGraph now require the allowRefs: true option](#ref-references-in-insertgraph-and-upsertgraph-now-require-the-allowrefs-true-option)
 - [relate method now always returns the number of affected rows](#relate-method-now-always-returns-the-number-of-affected-rows)
 - [\$relatedQuery no longer mutates](#relatedquery-no-longer-mutates)
+- [context now acts like mergeContext](#context-now-acts-like-mergecontext)
 - [Rewritten typings](#rewritten-typings)
 
 In addition to these, **a lot** of methods were deprecated and replaced by a new method. The old methods still work, but they print a warning (once per process) when you use them. The warning message tells which method you should be using in the future and you can slowly replace the methods as you get annoyed by the warnings.
@@ -147,6 +148,10 @@ somePerson.pets = await somePerson.$relatedQuery('pets');
 ```
 
 You can also use the `Model.relatedInsertQueryMutates` and `Model.relatedFindQueryMutates` properties to revert back to 1.x behavior. Note that those properties are now deprecated and will be removed in 3.0.
+
+## context() now acts like mergeContext()
+
+The `context` method of `QueryBuilder` now merges the given object with the current object instead of replacing it. You can use `clearContext` to clear the context if you need the old behaviour.
 
 ## Rewritten typings
 

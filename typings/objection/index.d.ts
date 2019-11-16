@@ -836,6 +836,10 @@ declare namespace Objection {
     (): QueryContext;
   }
 
+  interface ClearContextMethod<QB extends AnyQueryBuilder> {
+    (): QB;
+  }
+
   interface ModifyMethod<QB extends AnyQueryBuilder> {
     (modifier: Modifier<QB> | Modifier<QB>[], ...args: any[]): QB;
   }
@@ -1124,6 +1128,8 @@ declare namespace Objection {
     modifyGraph: ModifyGraphMethod<this>;
 
     context: ContextMethod<this>;
+    clearContext: ClearContextMethod<this>;
+    // Deprecated
     mergeContext: ContextMethod<this>;
 
     modify: ModifyMethod<this>;

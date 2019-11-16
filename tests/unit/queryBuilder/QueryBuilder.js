@@ -2398,17 +2398,38 @@ describe('QueryBuilder', () => {
   });
 
   describe('context', () => {
-    it('context() should replace context', () => {
+    it('context() should merge context', () => {
       const builder = TestModel.query();
 
       builder.context({ a: 1 });
+
+      expect(builder.context()).to.eql({
+        a: 1
+      });
+
       builder.context({ b: 2 });
 
       expect(builder.context()).to.eql({
+        a: 1,
         b: 2
       });
 
       expect(builder.context().transaction === mockKnex).to.equal(true);
+    });
+
+    it('clearContext() should clear the context', () => {
+      const builder = TestModel.query();
+
+      builder.context({ a: 1 });
+
+      expect(builder.context()).to.eql({
+        a: 1
+      });
+
+      const builder2 = builder.clearContext();
+
+      expect(builder === builder2).to.equal(true);
+      expect(builder.context()).to.eql({});
     });
 
     it('`mergeContext` should merge context', () => {
