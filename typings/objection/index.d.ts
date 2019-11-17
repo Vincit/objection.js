@@ -483,13 +483,13 @@ declare namespace Objection {
     (alias: string, sql: string, bindings: any[]): QB;
   }
 
-  interface JoinRelationOptions {
+  interface JoinRelatedOptions {
     alias?: string | boolean;
     aliases?: Record<string, string>;
   }
 
-  interface JoinRelationMethod<QB extends AnyQueryBuilder> {
-    (expr: RelationExpression<ModelType<QB>>, opt?: JoinRelationOptions): QB;
+  interface JoinRelatedMethod<QB extends AnyQueryBuilder> {
+    (expr: RelationExpression<ModelType<QB>>, opt?: JoinRelatedOptions): QB;
   }
 
   interface JoinMethod<QB extends AnyQueryBuilder> {
@@ -967,14 +967,31 @@ declare namespace Objection {
     withRaw: WithRawMethod<this>;
     withWrapped: WithMethod<this>;
 
-    joinRelation: JoinRelationMethod<this>;
-    innerJoinRelation: JoinRelationMethod<this>;
-    outerJoinRelation: JoinRelationMethod<this>;
-    leftJoinRelation: JoinRelationMethod<this>;
-    leftOuterJoinRelation: JoinRelationMethod<this>;
-    rightJoinRelation: JoinRelationMethod<this>;
-    rightOuterJoinRelation: JoinRelationMethod<this>;
-    fullOuterJoinRelation: JoinRelationMethod<this>;
+    // Deprecated
+    joinRelation: JoinRelatedMethod<this>;
+    // Deprecated
+    innerJoinRelation: JoinRelatedMethod<this>;
+    // Deprecated
+    outerJoinRelation: JoinRelatedMethod<this>;
+    // Deprecated
+    leftJoinRelation: JoinRelatedMethod<this>;
+    // Deprecated
+    leftOuterJoinRelation: JoinRelatedMethod<this>;
+    // Deprecated
+    rightJoinRelation: JoinRelatedMethod<this>;
+    // Deprecated
+    rightOuterJoinRelation: JoinRelatedMethod<this>;
+    // Deprecated
+    fullOuterJoinRelation: JoinRelatedMethod<this>;
+
+    joinRelated: JoinRelatedMethod<this>;
+    innerJoinRelated: JoinRelatedMethod<this>;
+    outerJoinRelated: JoinRelatedMethod<this>;
+    leftJoinRelated: JoinRelatedMethod<this>;
+    leftOuterJoinRelated: JoinRelatedMethod<this>;
+    rightJoinRelated: JoinRelatedMethod<this>;
+    rightOuterJoinRelated: JoinRelatedMethod<this>;
+    fullOuterJoinRelated: JoinRelatedMethod<this>;
 
     join: JoinMethod<this>;
     joinRaw: JoinRawMethod<this>;

@@ -1,9 +1,9 @@
 # Join Methods
 
-## joinRelation()
+## joinRelated()
 
 ```js
-queryBuilder = queryBuilder.joinRelation(relationExpression, opt);
+queryBuilder = queryBuilder.joinRelated(relationExpression, opt);
 ```
 
 Joins a set of relations described by `relationExpression`. See the examples for more info.
@@ -27,7 +27,7 @@ Join one relation:
 
 ```js
 await Person.query()
-  .joinRelation('pets')
+  .joinRelated('pets')
   .where('pets.species', 'dog');
 ```
 
@@ -35,7 +35,7 @@ Give an alias for a single relation:
 
 ```js
 await Person.query()
-  .joinRelation('pets', { alias: 'p' })
+  .joinRelated('pets', { alias: 'p' })
   .where('p.species', 'dog');
 ```
 
@@ -43,7 +43,7 @@ Join two relations:
 
 ```js
 await Person.query()
-  .joinRelation('[pets, parent]')
+  .joinRelated('[pets, parent]')
   .where('pets.species', 'dog')
   .where('parent.name', 'Arnold');
 ```
@@ -52,7 +52,7 @@ You can also use the [object notation](/api/types/#relationexpression-object-not
 
 ```js
 await Person.query()
-  .joinRelation({
+  .joinRelated({
     pets: true,
     parent: true
   })
@@ -65,7 +65,7 @@ Join multiple nested relations. Note that when referring to nested relations `:`
 ```js
 await Person.query()
   .select('persons.id', 'parent:parent.name as grandParentName')
-  .joinRelation('[pets, parent.[pets, parent]]')
+  .joinRelated('[pets, parent.[pets, parent]]')
   .where('parent:pets.species', 'dog');
 ```
 
@@ -74,7 +74,7 @@ Give aliases for a bunch of relations:
 ```js
 await Person.query()
   .select('persons.id', 'pr:pr.name as grandParentName')
-  .joinRelation('[pets, parent.[pets, parent]]', {
+  .joinRelated('[pets, parent.[pets, parent]]', {
     aliases: {
       parent: 'pr',
       pets: 'pt'
@@ -88,37 +88,37 @@ You can also give aliases using the relation expression:
 ```js
 await Person.query()
   .select('persons.id', 'pr:pr.name as grandParentName')
-  .joinRelation('[pets as pt, parent as pr.[pets as pt, parent as pr]]')
+  .joinRelated('[pets as pt, parent as pr.[pets as pt, parent as pr]]')
   .where('pr:pt.species', 'dog');
 ```
 
-## innerJoinRelation()
+## innerJoinRelated()
 
-Alias for [joinRelation](/api/query-builder/join-methods.html#joinrelation).
+Alias for [joinRelated](/api/query-builder/join-methods.html#joinrelated).
 
-## outerJoinRelation()
+## outerJoinRelated()
 
-Outer join version of the [joinRelation](/api/query-builder/join-methods.html#joinrelation) method.
+Outer join version of the [joinRelated](/api/query-builder/join-methods.html#joinrelated) method.
 
-## leftJoinRelation()
+## leftJoinRelated()
 
-Left join version of the [joinRelation](/api/query-builder/join-methods.html#joinrelation) method.
+Left join version of the [joinRelated](/api/query-builder/join-methods.html#joinrelated) method.
 
-## leftOuterJoinRelation()
+## leftOuterJoinRelated()
 
-Left outer join version of the [joinRelation](/api/query-builder/join-methods.html#joinrelation) method.
+Left outer join version of the [joinRelated](/api/query-builder/join-methods.html#joinrelated) method.
 
-## rightJoinRelation()
+## rightJoinRelated()
 
-Right join version of the [joinRelation](/api/query-builder/join-methods.html#joinrelation) method.
+Right join version of the [joinRelated](/api/query-builder/join-methods.html#joinrelated) method.
 
-## rightOuterJoinRelation()
+## rightOuterJoinRelated()
 
-Left outer join version of the [joinRelation](/api/query-builder/join-methods.html#joinrelation) method.
+Left outer join version of the [joinRelated](/api/query-builder/join-methods.html#joinrelated) method.
 
-## fullOuterJoinRelation()
+## fullOuterJoinRelated()
 
-Full outer join version of the [joinRelation](/api/query-builder/join-methods.html#joinrelation) method.
+Full outer join version of the [joinRelated](/api/query-builder/join-methods.html#joinrelated) method.
 
 ## join()
 

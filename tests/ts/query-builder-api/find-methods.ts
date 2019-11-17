@@ -29,11 +29,11 @@ import { Person } from '../fixtures/person';
 
   await Person.query()
     .aliasFor('persons_movies', 'pm')
-    .joinRelation('movies')
+    .joinRelated('movies')
     .where('pm.someProp', 100);
   await Person.query()
     .aliasFor(Movie, 'm')
-    .joinRelation('movies')
+    .joinRelated('movies')
     .where('m.name', 'The Room');
 
   await Person.query().select('id', 'name');

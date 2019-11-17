@@ -221,12 +221,12 @@ module.exports = session => {
         });
       });
 
-      it('joinRelation in subquery', () => {
+      it('joinRelated in subquery', () => {
         const query = Model1.query().whereIn(
           'id',
           Model1.query()
             .select('Model1.id')
-            .joinRelation('model1Relation1')
+            .joinRelated('model1Relation1')
             .where('model1Relation1.id', 4)
         );
 
@@ -385,10 +385,10 @@ module.exports = session => {
       });
     });
 
-    it('joinRelation (BelongsToOneRelation)', () => {
+    it('joinRelated (BelongsToOneRelation)', () => {
       return Model1.query(session.knex)
         .select('Model1.id as id', 'model1Relation1.id as relId')
-        .innerJoinRelation('model1Relation1')
+        .innerJoinRelated('model1Relation1')
         .then(models => {
           expect(_.sortBy(models, 'id')).to.eql([
             { id: 1, relId: 2, $afterFindCalled: 1 },
@@ -399,10 +399,10 @@ module.exports = session => {
         });
     });
 
-    it('joinRelation (ManyToManyRelation)', () => {
+    it('joinRelated (ManyToManyRelation)', () => {
       return Model1.query(session.knex)
         .select('Model1.id as id', 'model1Relation3.id_col as relId')
-        .innerJoinRelation('model1Relation3')
+        .innerJoinRelated('model1Relation3')
         .then(models => {
           expect(_.sortBy(models, 'id')).to.eql([
             { id: 5, relId: 2, $afterFindCalled: 1 },
@@ -439,7 +439,7 @@ module.exports = session => {
         }).reflect(),
 
         Promise.try(() => {
-          return Model1.query().joinRelation('model1Relation1');
+          return Model1.query().joinRelated('model1Relation1');
         }).reflect(),
 
         Promise.try(() => {

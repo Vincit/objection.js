@@ -194,12 +194,12 @@ module.exports = UserGroupPermission;
 
 Here's how you can query your models:
 
-- `.*JoinRelation()`
+- `.*JoinRelated()`
 
 ```js
 UserGroupPermission.query()
   .select('first_name', 'last_name', 'label', 'extra_attribute')
-  .joinRelation('[user, permission]')
+  .joinRelated('[user, permission]')
   .where('group_id', 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx');
 /*
 {

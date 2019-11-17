@@ -193,11 +193,11 @@ module.exports = session => {
     });
 
     describe('aliases', () => {
-      it('should use alias in joinRelation', () => {
+      it('should use alias in joinRelated', () => {
         return Model1.query()
           .findById(1)
           .table('Model1 as someAlias')
-          .joinRelation('[model1Relation1, model1Relation2, model1Relation3]')
+          .joinRelated('[model1Relation1, model1Relation2, model1Relation3]')
           .then(models => {
             if (utils.isPostgres(session.knex)) {
               expect(queries[0].replace(/\s/g, '')).to.equal(
@@ -223,7 +223,7 @@ module.exports = session => {
             return model
               .$query()
               .alias('foo')
-              .joinRelation('model1Relation1.model1Relation1');
+              .joinRelated('model1Relation1.model1Relation1');
           })
           .then(model => {
             if (session.isPostgres()) {
@@ -376,11 +376,11 @@ module.exports = session => {
             .eagerAlgorithm(Model1.JoinEagerAlgorithm);
         });
 
-        it('swapping table into a view for a joinRelation query should work', () => {
+        it('swapping table into a view for a joinRelated query should work', () => {
           return Model1.query()
             .findById(1)
             .table('someView')
-            .joinRelation('[model1Relation1, model1Relation2, model1Relation3]')
+            .joinRelated('[model1Relation1, model1Relation2, model1Relation3]')
             .then(models => {
               if (utils.isPostgres(session.knex)) {
                 expect(queries[0].replace(/\s/g, '')).to.equal(

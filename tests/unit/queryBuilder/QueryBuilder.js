@@ -1412,7 +1412,7 @@ describe('QueryBuilder', () => {
     expect(builder._explicitRejectValue).to.equal(null);
   });
 
-  it('joinRelation should add join clause to correct place', done => {
+  it('joinRelated should add join clause to correct place', done => {
     class M1 extends Model {
       static get tableName() {
         return 'M1';
@@ -1442,7 +1442,7 @@ describe('QueryBuilder', () => {
     M2.knex(mockKnex);
 
     M2.query()
-      .joinRelation('m1', { alias: 'm' })
+      .joinRelated('m1', { alias: 'm' })
       .join('M1', 'M1.id', 'M2.m1Id')
       .then(() => {
         expect(executedQueries[0]).to.equal(

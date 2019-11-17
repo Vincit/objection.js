@@ -483,7 +483,7 @@ module.exports = session => {
         it('.distinct()', () => {
           return Model1.query()
             .distinct('Model1.id', 'Model1.model1Prop1')
-            .leftJoinRelation('model1Relation1', { alias: 'balls' })
+            .leftJoinRelated('model1Relation1', { alias: 'balls' })
             .where('Model1.model1Prop1', 'hello 1')
             .orderBy('Model1.model1Prop1')
             .page(0, 1)
@@ -1518,7 +1518,7 @@ module.exports = session => {
       });
     });
 
-    describe('joinRelation()', () => {
+    describe('joinRelated()', () => {
       before(() => {
         return session.populate([
           {
@@ -1591,7 +1591,7 @@ module.exports = session => {
         ]);
       });
 
-      ['joinRelation', 'innerJoinRelation'].forEach(joinMethod => {
+      ['joinRelated', 'innerJoinRelated'].forEach(joinMethod => {
         it(`should join a belongs to one relation using ${joinMethod}`, () => {
           return Model1.query()
             .select('Model1.*', 'model1Relation1.model1Prop1 as rel_model1Prop1')
@@ -1609,7 +1609,7 @@ module.exports = session => {
         });
       });
 
-      ['leftJoinRelation', 'leftOuterJoinRelation'].forEach(joinMethod => {
+      ['leftJoinRelated', 'leftOuterJoinRelated'].forEach(joinMethod => {
         it(`should join a belongs to one relation using ${joinMethod}`, () => {
           return Model1.query()
             .select('Model1.id', 'model1Relation1.model1Prop1 as rel_model1Prop1')
@@ -1630,11 +1630,11 @@ module.exports = session => {
         });
       });
 
-      it('should be able to use `joinRelation` in a sub query (1)', () => {
+      it('should be able to use `joinRelated` in a sub query (1)', () => {
         return Model1.query()
           .from(
             Model1.query()
-              .joinRelation('model1Relation2')
+              .joinRelated('model1Relation2')
               .select('Model1.id', 'model1Relation2.id_col as m2r2Id')
               .as('inner')
           )
@@ -1650,13 +1650,13 @@ module.exports = session => {
           });
       });
 
-      it('should be able to use `joinRelation` in a sub query (2)', () => {
+      it('should be able to use `joinRelated` in a sub query (2)', () => {
         return Model1.query()
           .from(
             raw(
               '?',
               Model1.query()
-                .joinRelation('model1Relation2')
+                .joinRelated('model1Relation2')
                 .select('Model1.id', 'model1Relation2.id_col as m2r2Id')
                 .as('inner')
             )
@@ -1676,7 +1676,7 @@ module.exports = session => {
       it('should join a has many relation (1)', () => {
         return Model1.query()
           .select('Model1.*', 'model1Relation2.id_col')
-          .joinRelation('model1Relation2')
+          .joinRelated('model1Relation2')
           .then(models => {
             models = _.sortBy(models, ['id', 'id_col']);
             expect(_.map(models, 'id')).to.eql([1, 1, 4, 7]);
@@ -1687,7 +1687,7 @@ module.exports = session => {
       it('should join a has many relation (2)', () => {
         return Model1.query()
           .select('Model1.*', 'model1Relation2.id_col')
-          .joinRelation('model1Relation2')
+          .joinRelated('model1Relation2')
           .where('model1Relation2.id_col', '<', 4)
           .then(models => {
             models = _.sortBy(models, ['id', 'id_col']);
@@ -1699,7 +1699,7 @@ module.exports = session => {
       it('should join a many to many relation (1)', () => {
         return Model2.query()
           .select('model2.*', 'model2Relation1.id')
-          .joinRelation('model2Relation1')
+          .joinRelated('model2Relation1')
           .then(models => {
             models = _.sortBy(models, ['idCol', 'id']);
             expect(_.map(models, 'idCol')).to.eql([1, 2, 2]);
@@ -1710,7 +1710,7 @@ module.exports = session => {
       it('should join a many to many relation (2)', () => {
         return Model2.query()
           .select('model2.*', 'model2Relation1.id')
-          .joinRelation('model2Relation1')
+          .joinRelated('model2Relation1')
           .whereBetween('model2Relation1.id', [5, 6])
           .then(models => {
             models = _.sortBy(models, ['idCol', 'id']);
@@ -1721,7 +1721,7 @@ module.exports = session => {
 
       it('should be able to specify innerJoin', () => {
         return Model1.query()
-          .innerJoinRelation('model1Relation1')
+          .innerJoinRelated('model1Relation1')
           .then(models => {
             expect(models.length).to.equal(4);
           });
@@ -1729,7 +1729,7 @@ module.exports = session => {
 
       it('should be able to specify leftJoin', () => {
         return Model1.query()
-          .leftJoinRelation('model1Relation1')
+          .leftJoinRelated('model1Relation1')
           .then(models => {
             expect(models.length).to.equal(8);
           });
@@ -1738,7 +1738,7 @@ module.exports = session => {
       it('should join an eager expression `a.a`', () => {
         return Model1.query()
           .select('Model1.id', 'Model1.model1Prop1')
-          .leftJoinRelation('model1Relation1.model1Relation1')
+          .leftJoinRelated('model1Relation1.model1Relation1')
           .where('model1Relation1:model1Relation1.model1Prop1', 'hello 4')
           .first()
           .then(model => {
@@ -1752,7 +1752,7 @@ module.exports = session => {
       it('should join an eager expression `a.b`', () => {
         return Model1.query()
           .select('Model1.id', 'Model1.model1Prop1')
-          .leftJoinRelation('model1Relation1.model1Relation2')
+          .leftJoinRelated('model1Relation1.model1Relation2')
           .where('model1Relation1:model1Relation2.model2_prop1', 'hejsan 4')
           .first()
           .then(model => {
@@ -1766,7 +1766,7 @@ module.exports = session => {
       it('aliases should work with eager expression `a.b`', () => {
         return Model1.query()
           .select('Model1.id', 'Model1.model1Prop1')
-          .leftJoinRelation('model1Relation1 as a . model1Relation2 as b')
+          .leftJoinRelated('model1Relation1 as a . model1Relation2 as b')
           .where('a:b.model2_prop1', 'hejsan 4')
           .first()
           .then(model => {
@@ -1780,7 +1780,7 @@ module.exports = session => {
       it('should join an eager expression `a.a.b`', () => {
         return Model1.query()
           .select('Model1.id', 'Model1.model1Prop1')
-          .leftJoinRelation('model1Relation1.model1Relation1.model1Relation2')
+          .leftJoinRelated('model1Relation1.model1Relation1.model1Relation2')
           .where('model1Relation1:model1Relation1:model1Relation2.model2_prop1', 'hejsan 4')
           .first()
           .then(model => {
@@ -1794,7 +1794,7 @@ module.exports = session => {
       it('should join an eager expression `[a, b]`', () => {
         return Model1.query()
           .select('Model1.id', 'Model1.model1Prop1', 'model1Relation2.model2_prop1 as model2Prop1')
-          .leftJoinRelation('[model1Relation1, model1Relation2]')
+          .leftJoinRelated('[model1Relation1, model1Relation2]')
           .where('model1Relation2.model2_prop1', 'hejsan 1')
           .first()
           .then(model => {
@@ -1813,7 +1813,7 @@ module.exports = session => {
             'model1Relation2:model2Relation1.model1Prop1 as foo',
             'model1Relation2.model2_prop1 as model2Prop1'
           )
-          .leftJoinRelation('[model1Relation1, model1Relation2.model2Relation1]')
+          .leftJoinRelated('[model1Relation1, model1Relation2.model2Relation1]')
           .where('model1Relation2:model2Relation1.model1Prop1', 'hello 6')
           .first()
           .then(model => {
@@ -1825,7 +1825,7 @@ module.exports = session => {
           });
       });
 
-      it('should be able to merge joinRelation calls', () => {
+      it('should be able to merge joinRelated calls', () => {
         return (
           Model1.query()
             .select(
@@ -1834,11 +1834,11 @@ module.exports = session => {
               'model1Relation2.id_col as m1r2Id',
               'model1Relation2:model2Relation1.id as m1r2M2r1Id'
             )
-            .joinRelation('model1Relation1')
+            .joinRelated('model1Relation1')
             // Join the same relation again for shits and giggles.
-            .joinRelation('model1Relation1')
-            .joinRelation('model1Relation2')
-            .joinRelation('model1Relation2.model2Relation1')
+            .joinRelated('model1Relation1')
+            .joinRelated('model1Relation2')
+            .joinRelated('model1Relation2.model2Relation1')
             .orderBy(['Model1.id', 'model1Relation2.id_col', 'model1Relation2:model2Relation1.id'])
             .then(models => {
               expect(models).to.eql([
@@ -1868,13 +1868,13 @@ module.exports = session => {
         );
       });
 
-      it('should be able to merge joinRelation calls with different aliases (1)', () => {
+      it('should be able to merge joinRelated calls with different aliases (1)', () => {
         return Model1.query()
           .select('Model1.id', 'm1r1.id as m1r1Id', 'm1r1_2.id as m1r1Id2')
-          .joinRelation('model1Relation1', {
+          .joinRelated('model1Relation1', {
             alias: 'm1r1'
           })
-          .joinRelation('model1Relation1', {
+          .joinRelated('model1Relation1', {
             alias: 'm1r1_2'
           })
           .orderBy('Model1.id')
@@ -1888,11 +1888,11 @@ module.exports = session => {
           });
       });
 
-      it('should be able to merge joinRelation calls with different aliases (2)', () => {
+      it('should be able to merge joinRelated calls with different aliases (2)', () => {
         return Model1.query()
           .select('Model1.id', 'm1r1.id as m1r1Id', 'm1r1_2.id as m1r1Id2')
-          .joinRelation('model1Relation1 as m1r1')
-          .joinRelation('model1Relation1 as m1r1_2')
+          .joinRelated('model1Relation1 as m1r1')
+          .joinRelated('model1Relation1 as m1r1_2')
           .orderBy('Model1.id')
           .then(models => {
             expect(models).to.eql([
@@ -1904,13 +1904,13 @@ module.exports = session => {
           });
       });
 
-      it('should be able to merge different joinRelation calls', () => {
+      it('should be able to merge different joinRelated calls', () => {
         return Model1.query()
           .select('Model1.id', 'm1r1.id as m1r1Id', 'model1Relation2.id_col as m1r2Id')
-          .joinRelation('model1Relation1', {
+          .joinRelated('model1Relation1', {
             alias: 'm1r1'
           })
-          .leftJoinRelation('model1Relation2')
+          .leftJoinRelated('model1Relation2')
           .orderBy(['Model1.id', 'model1Relation2.id_col'])
           .then(models => {
             expect(models).to.eql([
@@ -1923,15 +1923,15 @@ module.exports = session => {
           });
       });
 
-      it('should be able to merge joinRelation calls with different aliases (3)', () => {
+      it('should be able to merge joinRelated calls with different aliases (3)', () => {
         return Model1.query()
           .select('Model1.id', 'm1r1.id as m1r1Id', 'm1r1_2.id as m1r1Id2')
-          .joinRelation('model1Relation1', {
+          .joinRelated('model1Relation1', {
             aliases: {
               model1Relation1: 'm1r1'
             }
           })
-          .joinRelation('model1Relation1', {
+          .joinRelated('model1Relation1', {
             aliases: {
               model1Relation1: 'm1r1_2'
             }
@@ -1947,7 +1947,7 @@ module.exports = session => {
           });
       });
 
-      it('should be able to merge leftJoinRelation calls', () => {
+      it('should be able to merge leftJoinRelated calls', () => {
         return (
           Model1.query()
             .select(
@@ -1955,11 +1955,11 @@ module.exports = session => {
               'model1Relation2:model2Relation1.model1Prop1 as foo',
               'model1Relation2.model2_prop1 as model2Prop1'
             )
-            .leftJoinRelation('model1Relation1')
+            .leftJoinRelated('model1Relation1')
             // Join the same relation again for shits and giggles.
-            .leftJoinRelation('model1Relation1')
-            .leftJoinRelation('model1Relation2')
-            .leftJoinRelation('model1Relation2.model2Relation1')
+            .leftJoinRelated('model1Relation1')
+            .leftJoinRelated('model1Relation2')
+            .leftJoinRelated('model1Relation2.model2Relation1')
             .where('model1Relation2:model2Relation1.model1Prop1', 'hello 6')
             .first()
             .then(model => {
@@ -1980,7 +1980,7 @@ module.exports = session => {
             'm1r2:m2r1.model1Prop1 as foo',
             'm1r2.model2_prop1 as model2Prop1'
           ])
-          .leftJoinRelation('[model1Relation1.model1Relation1, model1Relation2.model2Relation1]', {
+          .leftJoinRelated('[model1Relation1.model1Relation1, model1Relation2.model2Relation1]', {
             aliases: {
               model1Relation1: 'm1r1',
               model1Relation2: 'm1r2',
@@ -2007,7 +2007,7 @@ module.exports = session => {
             'm1r2:m2r1.model1Prop1 as foo',
             'm1r2.model2_prop1 as model2Prop1'
           ])
-          .leftJoinRelation(
+          .leftJoinRelated(
             `[
             model1Relation1 as m1r1.[
               model1Relation1 as m1r1
@@ -2037,7 +2037,7 @@ module.exports = session => {
             'm1r2:m2r1.model1Prop1 as foo',
             'm1r2.model2_prop1 as model2Prop1'
           ])
-          .leftJoinRelation({
+          .leftJoinRelated({
             m1r1: {
               $relation: 'model1Relation1',
 
@@ -2069,7 +2069,7 @@ module.exports = session => {
       it('should disable alias with option alias = false', () => {
         return Model1.query()
           .select('model2.*', 'Model1.id')
-          .joinRelation('model1Relation2', { alias: false })
+          .joinRelated('model1Relation2', { alias: false })
           .where('model2.id_col', '<', 4)
           .then(models => {
             models = _.sortBy(models, ['id', 'id_col']);
@@ -2081,7 +2081,7 @@ module.exports = session => {
       it('should use relation name as alias with option alias = true', () => {
         return Model1.query()
           .select('Model1.*', 'model1Relation2.id_col')
-          .joinRelation('model1Relation2', { alias: true })
+          .joinRelated('model1Relation2', { alias: true })
           .where('model1Relation2.id_col', '<', 4)
           .then(models => {
             models = _.sortBy(models, ['id', 'id_col']);
@@ -2093,7 +2093,7 @@ module.exports = session => {
       it('should use custom alias with option alias = string', () => {
         return Model1.query()
           .select('Model1.*', 'fooBarBaz.id_col')
-          .joinRelation('model1Relation2', { alias: 'fooBarBaz' })
+          .joinRelated('model1Relation2', { alias: 'fooBarBaz' })
           .where('fooBarBaz.id_col', '<', 4)
           .then(models => {
             models = _.sortBy(models, ['id', 'id_col']);
@@ -2104,7 +2104,7 @@ module.exports = session => {
 
       it('should join eager expression a.b.c, select c.* and cast result to c', () => {
         return Model1.query()
-          .joinRelation('model1Relation2.model2Relation1.model1Relation1')
+          .joinRelated('model1Relation2.model2Relation1.model1Relation1')
           .select([
             'model1Relation2:model2Relation1:model1Relation1.id as id_col',
             'model1Relation2:model2Relation1.id as model1_id'
@@ -2124,7 +2124,7 @@ module.exports = session => {
 
       it('should join eager expression a.b.c, select columns with aliases and cast result to Model', () => {
         return Model1.query()
-          .joinRelation('model1Relation2.model2Relation1.model1Relation1')
+          .joinRelated('model1Relation2.model2Relation1.model1Relation1')
           .select([
             'model1Relation2:model2Relation1:model1Relation1.id as someId',
             'model1Relation2:model2Relation1.id as someOtherId'
@@ -2145,7 +2145,7 @@ module.exports = session => {
 
       it('should count related models', () => {
         return Model1.query()
-          .leftJoinRelation('model1Relation2')
+          .leftJoinRelated('model1Relation2')
           .select('Model1.id', 'Model1.model1Prop1')
           .count('Model1.id as relCount')
           .groupBy('Model1.id', 'Model1.model1Prop1')
@@ -2167,7 +2167,7 @@ module.exports = session => {
 
       it('should work with modifiers', () => {
         return Model2.query()
-          .joinRelation('model2Relation1(idGreaterThan)')
+          .joinRelated('model2Relation1(idGreaterThan)')
           .select('model2Relation1.id', 'model2.*')
           .mergeContext({
             filterArgs: [5]
@@ -2204,7 +2204,7 @@ module.exports = session => {
           }
 
           return TestModel1.query()
-            .joinRelation('model1Relation2(rawSelect)')
+            .joinRelated('model1Relation2(rawSelect)')
             .select('rawSelect')
             .findById(1)
             .where('model1Relation2.id_col', 2)

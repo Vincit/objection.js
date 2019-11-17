@@ -3,20 +3,20 @@ import { raw } from '../../..';
 
 (async () => {
   await Person.query()
-    .joinRelation('pets')
+    .joinRelated('pets')
     .where('pets.species', 'dog');
 
   await Person.query()
-    .joinRelation('pets', { alias: 'p' })
+    .joinRelated('pets', { alias: 'p' })
     .where('p.species', 'dog');
 
   await Person.query()
-    .joinRelation('[pets, parent]')
+    .joinRelated('[pets, parent]')
     .where('pets.species', 'dog')
     .where('parent.name', 'Arnold');
 
   await Person.query()
-    .joinRelation({
+    .joinRelated({
       pets: true,
       parent: true
     })
@@ -25,12 +25,12 @@ import { raw } from '../../..';
 
   await Person.query()
     .select('persons.id', 'parent:parent.name as grandParentName')
-    .joinRelation('[pets, parent.[pets, parent]]')
+    .joinRelated('[pets, parent.[pets, parent]]')
     .where('parent:pets.species', 'dog');
 
   await Person.query()
     .select('persons.id', 'pr:pr.name as grandParentName')
-    .joinRelation('[pets, parent.[pets, parent]]', {
+    .joinRelated('[pets, parent.[pets, parent]]', {
       aliases: {
         parent: 'pr',
         pets: 'pt'
@@ -40,16 +40,16 @@ import { raw } from '../../..';
 
   await Person.query()
     .select('persons.id', 'pr:pr.name as grandParentName')
-    .joinRelation('[pets as pt, parent as pr.[pets as pt, parent as pr]]')
+    .joinRelated('[pets as pt, parent as pr.[pets as pt, parent as pr]]')
     .where('pr:pt.species', 'dog');
 
-  await Person.query().innerJoinRelation('pets');
-  await Person.query().outerJoinRelation('pets');
-  await Person.query().leftJoinRelation('pets');
-  await Person.query().leftOuterJoinRelation('pets');
-  await Person.query().rightJoinRelation('pets');
-  await Person.query().rightOuterJoinRelation('pets');
-  await Person.query().fullOuterJoinRelation('pets');
+  await Person.query().innerJoinRelated('pets');
+  await Person.query().outerJoinRelated('pets');
+  await Person.query().leftJoinRelated('pets');
+  await Person.query().leftOuterJoinRelated('pets');
+  await Person.query().rightJoinRelated('pets');
+  await Person.query().rightOuterJoinRelated('pets');
+  await Person.query().fullOuterJoinRelated('pets');
   await Person.query().join(raw('pets'));
   await Person.query().joinRaw('pets');
   await Person.query().innerJoin(raw('pets'));

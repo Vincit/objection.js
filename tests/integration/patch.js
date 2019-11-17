@@ -1411,10 +1411,10 @@ module.exports = session => {
             });
         });
 
-        it('should be able to use `joinRelation`', () => {
+        it('should be able to use `joinRelated`', () => {
           return parent1
             .$relatedQuery('model2Relation1')
-            .innerJoinRelation('model1Relation1')
+            .innerJoinRelated('model1Relation1')
             .patch({ model1Prop1: 'updated text', model1Prop2: 123 })
             .then(numUpdated => {
               expect(numUpdated).to.equal(1);
@@ -2177,10 +2177,10 @@ module.exports = session => {
             });
         });
 
-        it('should be able to use `joinRelation`', () => {
+        it('should be able to use `joinRelated`', () => {
           return Model2.relatedQuery('model2Relation1')
             .for(1)
-            .innerJoinRelation('model1Relation1')
+            .innerJoinRelated('model1Relation1')
             .patch({ model1Prop1: 'updated text', model1Prop2: 123 })
             .then(numUpdated => {
               expect(numUpdated).to.equal(1);

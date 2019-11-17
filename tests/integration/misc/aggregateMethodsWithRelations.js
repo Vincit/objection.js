@@ -23,7 +23,7 @@ module.exports = session => {
       return session.models.Model1.query()
         .select('Model1.*')
         .count('model1Relation2.id_col as relCount')
-        .joinRelation('model1Relation2')
+        .joinRelated('model1Relation2')
         .groupBy('Model1.id')
         .orderBy('Model1.model1Prop1')
         .then(models => {

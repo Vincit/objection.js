@@ -84,7 +84,7 @@ module.exports = session => {
             onlyOldActors: builder =>
               builder
                 .select('Movie.name')
-                .joinRelation('actors')
+                .joinRelated('actors')
                 .where('actors.age', '>', 40)
           };
         }
@@ -140,7 +140,7 @@ module.exports = session => {
     it('test', () => {
       return Person.query(session.knex)
         .select('Person.name', 'movies.name as movieName')
-        .joinRelation('movies(onlyOldActors)')
+        .joinRelated('movies(onlyOldActors)')
         .then(results => {
           expect(results.length).to.equal(1);
           expect(results[0].movieName).to.equal('movie 2');

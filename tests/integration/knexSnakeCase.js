@@ -248,9 +248,9 @@ module.exports = session => {
         });
       }
 
-      it('joinRelation', () => {
+      it('joinRelated', () => {
         return Person.query(knex)
-          .joinRelation('parentPerson.parentPerson')
+          .joinRelated('parentPerson.parentPerson')
           .select('parentPerson:parentPerson.firstName as nestedRef')
           .then(result => {
             expect(result).to.containSubset([{ nestedRef: 'Matti' }]);

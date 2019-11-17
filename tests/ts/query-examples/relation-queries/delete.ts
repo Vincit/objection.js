@@ -11,7 +11,7 @@ import { Person } from '../../fixtures/person';
       'id',
       Person.query()
         .select('persons.id')
-        .joinRelation('pets')
+        .joinRelated('pets')
         .where('pets.name', 'Fluffy')
     );
 

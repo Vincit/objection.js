@@ -38,7 +38,7 @@ import { Person } from '../../fixtures/person';
 (async () => {
   const people = await Person.query()
     .select('parent:parent.name as grandParentName')
-    .joinRelation('parent.parent');
+    .joinRelated('parent.parent');
 })();
 
 (async () => {

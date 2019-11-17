@@ -291,7 +291,7 @@ async () => {
 // .query().castTo()
 async () => {
   const animals = await Person.query()
-    .joinRelation('children.children.pets')
+    .joinRelated('children.children.pets')
     .select('children:children:pets.*')
     .castTo(Animal);
 
@@ -511,8 +511,8 @@ qb = qb.withSchema('schema_name');
 qb = qb.distinct('column1', 'column2', 'column3');
 qb = qb.join('tablename', 'column1', '=', 'column2');
 qb = qb.outerJoin('tablename', 'column1', '=', 'column2');
-qb = qb.joinRelation('table');
-qb = qb.joinRelation('table', { alias: false });
+qb = qb.joinRelated('table');
+qb = qb.joinRelated('table', { alias: false });
 qb = qb.where(raw('random()', 1, '2'));
 qb = qb.where(raw('random()', 1, '2'), '=', Person.knex().raw('foo'));
 qb = qb.where(Person.raw('random()', 1, '2', raw('3')));

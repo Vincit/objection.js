@@ -443,7 +443,7 @@ module.exports = session => {
       it('many to many relation', () => {});
     });
 
-    describe('joinRelation', () => {
+    describe('joinRelated', () => {
       it('belongs to one relation', () => {});
 
       it('has many relation', () => {});

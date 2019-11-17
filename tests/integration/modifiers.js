@@ -201,11 +201,11 @@ module.exports = session => {
       expect(arnold.pets[0].name).to.equal('Stalin');
     });
 
-    it('joinRelation', async () => {
+    it('joinRelated', async () => {
       const result = await Person.query()
         .where('person.name', 'Arnold')
         .select('person.name', 'movies.name as movieName', 'pets.name as petName')
-        .joinRelation('[movies(goodMovies), pets(onlyDictators)]')
+        .joinRelated('[movies(goodMovies), pets(onlyDictators)]')
         .modifiers({
           goodMovies(query) {
             query.modify('atLeastStars', 3);

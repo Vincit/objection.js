@@ -165,12 +165,12 @@ Give an alias for any table in the query.
 ##### Examples
 
 ```js
-// This query uses joinRelation to join a many-to-many relation which also joins
+// This query uses joinRelated to join a many-to-many relation which also joins
 // the join table `persons_movies`. We specify that the `persons_movies` table
 // should be called `pm` instead of the default `movies_join`.
 await Person.query()
   .aliasFor('persons_movies', 'pm')
-  .joinRelation('movies')
+  .joinRelated('movies')
   .where('pm.someProp', 100);
 ```
 
@@ -179,7 +179,7 @@ Model class can be used instead of table name
 ```js
 await Person.query()
   .aliasFor(Movie, 'm')
-  .joinRelation('movies')
+  .joinRelated('movies')
   .where('m.name', 'The Room');
 ```
 
@@ -868,7 +868,14 @@ queryBuilder = queryBuilder.whereInComposite(columns, values);
 ##### Examples
 
 ```js
-builder.whereInComposite(['a', 'b'], [[1, 2], [3, 4], [1, 4]]);
+builder.whereInComposite(
+  ['a', 'b'],
+  [
+    [1, 2],
+    [3, 4],
+    [1, 4]
+  ]
+);
 ```
 
 ```js

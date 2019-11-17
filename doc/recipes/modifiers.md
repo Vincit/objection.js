@@ -64,13 +64,13 @@ const people = await Person.query()
   });
 ```
 
-## Usage in joinRelation
+## Usage in joinRelated
 
 ```js
-const women = await Person.query().joinRelation('children(defaultSelects)');
+const women = await Person.query().joinRelated('children(defaultSelects)');
 ```
 
-Query builder [modifiers](/api/query-builder/other-methods.md#modifiers) can also be used with `joinRelation` just like with `withGraphFetched` and `withGraphJoined`.
+Query builder [modifiers](/api/query-builder/other-methods.md#modifiers) can also be used with `joinRelated` just like with `withGraphFetched` and `withGraphJoined`.
 
 ## Other usages
 

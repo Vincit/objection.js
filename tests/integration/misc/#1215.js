@@ -2,7 +2,7 @@ const { Model } = require('../../../');
 const { expect } = require('chai');
 
 module.exports = session => {
-  describe(`joinRelation in filter in model relationMappings #1215`, () => {
+  describe(`joinRelated in filter in model relationMappings #1215`, () => {
     let knex = session.knex;
     let Person;
 
@@ -46,7 +46,7 @@ module.exports = session => {
               modelClass: Person,
               relation: Model.HasManyRelation,
               modify(builder) {
-                builder.leftJoinRelation('parent').select('persons.*', 'parent.name as parentName');
+                builder.leftJoinRelated('parent').select('persons.*', 'parent.name as parentName');
               },
               join: {
                 from: 'persons.id',
@@ -58,7 +58,7 @@ module.exports = session => {
               modelClass: Person,
               relation: Model.ManyToManyRelation,
               modify(builder) {
-                builder.leftJoinRelation('parent').select('persons.*', 'parent.name as parentName');
+                builder.leftJoinRelated('parent').select('persons.*', 'parent.name as parentName');
               },
               join: {
                 from: 'persons.id',
@@ -110,7 +110,7 @@ module.exports = session => {
       });
     });
 
-    it('should be able to use joinRelation in relationMapping modifier', () => {
+    it('should be able to use joinRelated in relationMapping modifier', () => {
       return Person.query()
         .first()
         .where('name', 'Matti')

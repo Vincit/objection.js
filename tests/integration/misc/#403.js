@@ -176,7 +176,7 @@ module.exports = session => {
 
       it('test 2', () => {
         return Page.query()
-          .joinRelation('parents.parents')
+          .joinRelated('parents.parents')
           .select(
             'parents:parents.page_id as id',
             ref('object_data:name')

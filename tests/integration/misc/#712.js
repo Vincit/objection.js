@@ -2,7 +2,7 @@ const { expect } = require('chai');
 const { Model } = require('../../../');
 
 module.exports = session => {
-  describe(`modifiers that have no where or select statements don't work with joinRelation #712`, () => {
+  describe(`modifiers that have no where or select statements don't work with joinRelated #712`, () => {
     let knex = session.knex;
     let Person;
 
@@ -76,7 +76,7 @@ module.exports = session => {
       return Person.query()
         .where('Person.id', 1)
         .select('Person.*', 'children.name as childName')
-        .joinRelation('children(notFirstChild)')
+        .joinRelated('children(notFirstChild)')
         .orderBy('childName')
         .then(people => {
           expect(people).to.have.length(1);

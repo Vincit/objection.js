@@ -1,11 +1,11 @@
 'use strict';
 
-const _ = require('lodash')
-  , Knex = require('knex')
-  , Promise = require('bluebird')
-  , knexMocker = require('../testUtils/mockKnex')
-  , mockMochaFactory = require('./mockMocha')
-  , Model = require('../').Model;
+const _ = require('lodash'),
+  Knex = require('knex'),
+  Promise = require('bluebird'),
+  knexMocker = require('../testUtils/mockKnex'),
+  mockMochaFactory = require('./mockMocha'),
+  Model = require('../').Model;
 
 if (typeof describe == 'undefined') {
   global.mockMocha = mockMochaFactory();
@@ -25,9 +25,9 @@ describe('Performance tests', () => {
   let Movie = null;
 
   before(() => {
-    let knex = Knex({client: 'pg'});
+    let knex = Knex({ client: 'pg' });
 
-    mockKnex = knexMocker(knex, function (mock, origImpl, args) {
+    mockKnex = knexMocker(knex, function(mock, origImpl, args) {
       mock.executedQueries.push(this.toString());
 
       let result = mock.nextResult();
@@ -47,9 +47,9 @@ describe('Performance tests', () => {
   before(() => {
     const BaseClass = Model;
 
-    Person = class Person extends BaseClass {}
-    Animal = class Animal extends BaseClass {}
-    Movie = class Movie extends BaseClass {}
+    Person = class Person extends BaseClass {};
+    Animal = class Animal extends BaseClass {};
+    Movie = class Movie extends BaseClass {};
   });
 
   before(() => {
@@ -60,18 +60,18 @@ describe('Performance tests', () => {
       required: ['firstName', 'lastName'],
 
       properties: {
-        id: {type: 'integer'},
-        parentId: {type: ['integer', 'null']},
-        firstName: {type: 'string', minLength: 1, maxLength: 255},
-        lastName: {type: 'string', minLength: 1, maxLength: 255},
-        age: {type: 'number'},
+        id: { type: 'integer' },
+        parentId: { type: ['integer', 'null'] },
+        firstName: { type: 'string', minLength: 1, maxLength: 255 },
+        lastName: { type: 'string', minLength: 1, maxLength: 255 },
+        age: { type: 'number' },
 
         address: {
           type: ['object', 'null'],
           properties: {
-            street: {type: 'string'},
-            city: {type: 'string'},
-            zipCode: {type: 'string'}
+            street: { type: 'string' },
+            city: { type: 'string' },
+            zipCode: { type: 'string' }
           }
         }
       }
@@ -119,10 +119,10 @@ describe('Performance tests', () => {
       required: ['name'],
 
       properties: {
-        id: {type: 'integer'},
-        ownerId: {type: ['integer', 'null']},
-        name: {type: 'string', minLength: 1, maxLength: 255},
-        species: {type: 'string', minLength: 1, maxLength: 255}
+        id: { type: 'integer' },
+        ownerId: { type: ['integer', 'null'] },
+        name: { type: 'string', minLength: 1, maxLength: 255 },
+        species: { type: 'string', minLength: 1, maxLength: 255 }
       }
     };
 
@@ -146,8 +146,8 @@ describe('Performance tests', () => {
       required: ['name'],
 
       properties: {
-        id: {type: 'integer'},
-        name: {type: 'string', minLength: 1, maxLength: 255}
+        id: { type: 'integer' },
+        name: { type: 'string', minLength: 1, maxLength: 255 }
       }
     };
 
@@ -184,7 +184,7 @@ describe('Performance tests', () => {
       runtimeGoal: 10000,
 
       test: () => {
-        _.each(data, function (data) {
+        _.each(data, function(data) {
           Person.fromJson(data);
         });
       }
@@ -223,12 +223,13 @@ describe('Performance tests', () => {
     });
 
     perfTest({
-      name: `120000 $toDatabaseJson calls for the dataset with $omitFromDatabaseJson (${120000 * 25} individual models)`,
+      name: `120000 $toDatabaseJson calls for the dataset with $omitFromDatabaseJson (${120000 *
+        25} individual models)`,
       runCount: 120000,
       runtimeGoal: 10000,
 
       beforeTest: () => {
-        return _.map(data, function (json) {
+        return _.map(data, function(json) {
           let person = Person.fromJson(json);
           person.$omitFromDatabaseJson(['address', 'age']);
           person.children.forEach(child => {
@@ -278,7 +279,7 @@ describe('Performance tests', () => {
         let a = 0;
         let m = 0;
 
-        Person.traverse(persons, function (model) {
+        Person.traverse(persons, function(model) {
           if (model instanceof Person) {
             ++p;
           } else if (model instanceof Movie) {
@@ -327,9 +328,11 @@ describe('Performance tests', () => {
       },
 
       test: Person => {
-        return Person.query().where('id', 10).then(models => {
-          return models;
-        });
+        return Person.query()
+          .where('id', 10)
+          .then(models => {
+            return models;
+          });
       }
     });
 
@@ -351,17 +354,19 @@ describe('Performance tests', () => {
 
       test: Person => {
         let idx = 0;
-        return Person
-          .query()
+        return Person.query()
           .select('Person.*', builder => {
-            builder.avg('id').from('Animal').as('avgId');
+            builder
+              .avg('id')
+              .from('Animal')
+              .as('avgId');
           })
           .where(builder => {
             builder.where('id', 1).orWhere(builder => {
               builder.where('id', 2).andWhere('firstName', 'Jennifer');
             });
           })
-          .joinRelation('pets')
+          .joinRelated('pets')
           .where('pets.species', 'dog')
           .runBefore(() => {
             ++idx;
@@ -423,9 +428,12 @@ describe('Performance tests', () => {
       },
 
       test: person => {
-        return person.$relatedQuery('movies').unrelate().then(result => {
-          return result;
-        });
+        return person
+          .$relatedQuery('movies')
+          .unrelate()
+          .then(result => {
+            return result;
+          });
       }
     });
 
@@ -445,13 +453,17 @@ describe('Performance tests', () => {
       },
 
       test: Person => {
-        return Person.query().insert([{
-          firstName: 'Person 1',
-          lastName: 'Person 1 Lastname',
-          age: 50
-        }]).then(models => {
-          return models;
-        });
+        return Person.query()
+          .insert([
+            {
+              firstName: 'Person 1',
+              lastName: 'Person 1 Lastname',
+              age: 50
+            }
+          ])
+          .then(models => {
+            return models;
+          });
       }
     });
 
@@ -474,45 +486,51 @@ describe('Performance tests', () => {
             return {
               id: parentId,
               firstName: 'Person' + parentId,
-              lastLame: 'Person' + parentId + " Lastname",
+              lastLame: 'Person' + parentId + ' Lastname',
               age: parentId
             };
           }),
 
           // Their children.
-          _.flatten(_.range(numPeople).map(parentId => {
-            return _.range(numChildren).map(childIdx => {
-              let childId = parentId * numChildren + childIdx;
+          _.flatten(
+            _.range(numPeople).map(parentId => {
+              return _.range(numChildren).map(childIdx => {
+                let childId = parentId * numChildren + childIdx;
 
-              return {
-                id: childId,
-                parentId: parentId,
-                firstName: 'Child' + childIdx,
-                lastLame: 'Child' + childIdx + " Lastname",
-                age: childIdx
-              };
-            });
-          })),
-
-          // Children's pets.
-          _.flatten(_.range(numPeople).map(parentId => {
-            return _.flatten(_.range(numChildren).map(childIdx => {
-              let childId = parentId * numChildren + childIdx;
-
-              return _.range(numPets).map(function (i) {
                 return {
-                  id: ++petId,
-                  name: 'Fluffy ' + childId,
-                  ownerId: childId,
-                  species: 'dogBreed ' + i
+                  id: childId,
+                  parentId: parentId,
+                  firstName: 'Child' + childIdx,
+                  lastLame: 'Child' + childIdx + ' Lastname',
+                  age: childIdx
                 };
               });
-            }));
-          }))
+            })
+          ),
+
+          // Children's pets.
+          _.flatten(
+            _.range(numPeople).map(parentId => {
+              return _.flatten(
+                _.range(numChildren).map(childIdx => {
+                  let childId = parentId * numChildren + childIdx;
+
+                  return _.range(numPets).map(function(i) {
+                    return {
+                      id: ++petId,
+                      name: 'Fluffy ' + childId,
+                      ownerId: childId,
+                      species: 'dogBreed ' + i
+                    };
+                  });
+                })
+              );
+            })
+          )
         ];
 
         mockKnex.nextResult = () => {
-          return results[(idx++) % results.length];
+          return results[idx++ % results.length];
         };
 
         return Person.bindKnex(mockKnex);
@@ -541,26 +559,30 @@ describe('Performance tests', () => {
           .map(() => ({
             id: ++id,
             firstName: 'Person' + id,
-            lastLame: 'Person' + id + " Lastname",
+            lastLame: 'Person' + id + ' Lastname',
             age: id
           }))
           .map(item => {
-            return _.range(numChildren).map(childIdx => Object.assign({}, item, {
-              'children:id': ++id,
-              'children:parentId': item.id,
-              'children:firstName': 'Child' + childIdx,
-              'children:lastLame': 'Child' + childIdx + " Lastname",
-              'children:age': childIdx
-            }));
+            return _.range(numChildren).map(childIdx =>
+              Object.assign({}, item, {
+                'children:id': ++id,
+                'children:parentId': item.id,
+                'children:firstName': 'Child' + childIdx,
+                'children:lastLame': 'Child' + childIdx + ' Lastname',
+                'children:age': childIdx
+              })
+            );
           })
           .flatten()
           .map(item => {
-            return _.range(numPets).map(i => Object.assign({}, item, {
-              'children:pets:id': ++id,
-              'children:pets:name': 'Fluffy ' + item['children:id'],
-              'children:pets:ownerId': item['children:id'],
-              'children:pets:species': 'dogBreed ' + i
-            }));
+            return _.range(numPets).map(i =>
+              Object.assign({}, item, {
+                'children:pets:id': ++id,
+                'children:pets:name': 'Fluffy ' + item['children:id'],
+                'children:pets:ownerId': item['children:id'],
+                'children:pets:species': 'dogBreed ' + i
+              })
+            );
           })
           .flatten()
           .value();
@@ -587,7 +609,7 @@ describe('Performance tests', () => {
         return BoundPerson;
       },
 
-      test: (Person) => {
+      test: Person => {
         return Person.query().joinEager('children.pets');
       }
     });
@@ -610,72 +632,102 @@ describe('Performance tests', () => {
       },
 
       test: Person => {
-        return Person.query().insertGraph([{
-          "#id": 'person1',
-          firstName: 'Person 1',
-          lastName: 'Person 1 Lastname',
-          age: 50,
+        return Person.query()
+          .insertGraph([
+            {
+              '#id': 'person1',
+              firstName: 'Person 1',
+              lastName: 'Person 1 Lastname',
+              age: 50,
 
-          children: [{
-            firstName: 'Child of #ref{person1.id}',
-            lastName: 'Child 1 Lastname',
-            age: 20
-          }, {
-            firstName: 'Child of #ref{person1.id}',
-            lastName: 'Child 2 Lastname',
-            age: 18
-          }],
+              children: [
+                {
+                  firstName: 'Child of #ref{person1.id}',
+                  lastName: 'Child 1 Lastname',
+                  age: 20
+                },
+                {
+                  firstName: 'Child of #ref{person1.id}',
+                  lastName: 'Child 2 Lastname',
+                  age: 18
+                }
+              ],
 
-          movies: [{
-            "#id": 'movie1',
-            name: 'Movie 1'
-          }, {
-            name: 'Movie 2'
-          }]
-        }, {
-          firstName: 'Person 1',
-          lastName: 'Person 1 Lastname',
-          age: 60,
+              movies: [
+                {
+                  '#id': 'movie1',
+                  name: 'Movie 1'
+                },
+                {
+                  name: 'Movie 2'
+                }
+              ]
+            },
+            {
+              firstName: 'Person 1',
+              lastName: 'Person 1 Lastname',
+              age: 60,
 
-          movies: [{
-            "#ref": 'movie1'
-          }]
-        }]).then(models => {
-          return models;
-        });
+              movies: [
+                {
+                  '#ref': 'movie1'
+                }
+              ]
+            }
+          ])
+          .then(models => {
+            return models;
+          });
       }
     });
   });
 
   function perfTest(opt) {
-    (opt.only ? it.only : opt.skip ? it.skip : it)(opt.name + ' [goal ' + opt.runtimeGoal + ' ms]', () => {
-      let beforeTest = opt.beforeTest || _.noop;
+    (opt.only ? it.only : opt.skip ? it.skip : it)(
+      opt.name + ' [goal ' + opt.runtimeGoal + ' ms]',
+      () => {
+        let beforeTest = opt.beforeTest || _.noop;
 
-      let t0;
-      let ctx = beforeTest();
-      // warm up.
-      return runTest(opt, ctx).then(() => {
-        ctx = beforeTest();
-        t0 = Date.now();
+        let t0;
+        let ctx = beforeTest();
+        // warm up.
+        return runTest(opt, ctx)
+          .then(() => {
+            ctx = beforeTest();
+            t0 = Date.now();
 
-        return runTest(opt, ctx);
-      }).then(() => {
-        let t1 = Date.now();
-        let runtime = t1 - t0;
+            return runTest(opt, ctx);
+          })
+          .then(() => {
+            let t1 = Date.now();
+            let runtime = t1 - t0;
 
-        if (runtime > opt.runtimeGoal) {
-          throw new Error('runtime ' + runtime + ' ms exceeds the runtimeGoal ' + opt.runtimeGoal + " ms");
-        }
+            if (runtime > opt.runtimeGoal) {
+              throw new Error(
+                'runtime ' + runtime + ' ms exceeds the runtimeGoal ' + opt.runtimeGoal + ' ms'
+              );
+            }
 
-        console.log('      runtime: ' + runtime + ' ms, ' + (runtime / opt.runCount).toFixed(3) + ' ms / run');
-      });
-    });
+            console.log(
+              '      runtime: ' +
+                runtime +
+                ' ms, ' +
+                (runtime / opt.runCount).toFixed(3) +
+                ' ms / run'
+            );
+          });
+      }
+    );
   }
 
   function runTest(opt, ctx) {
-    return Promise.map(_.range(opt.runCount), () => {
-      return opt.test(ctx);
-    }, {concurrency: 1});
+    return Promise.map(
+      _.range(opt.runCount),
+      () => {
+        return opt.test(ctx);
+      },
+      { concurrency: 1 }
+    );
   }
 });
 

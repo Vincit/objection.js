@@ -500,7 +500,7 @@ await Person.query()
     'id',
     Person.query()
       .select('persons.id')
-      .joinRelation('pets')
+      .joinRelated('pets')
       .where('pets.name', 'Fluffy')
   );
 

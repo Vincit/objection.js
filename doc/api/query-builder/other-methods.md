@@ -658,7 +658,7 @@ of `Person` instances.
 
 ```js
 const animals = await Person.query()
-  .joinRelation('children.children.pets')
+  .joinRelated('children.children.pets')
   .select('children:children:pets.*')
   .castTo(Animal);
 ```
@@ -669,7 +669,7 @@ If your result rows represent no actual model, you can use `objection.Model`
 const { Model } = require('objection');
 
 const models = await Person.query()
-  .joinRelation('children.pets')
+  .joinRelated('children.pets')
   .select([
     'children:pets.id as animalId',
     'children.firstName as childFirstName'

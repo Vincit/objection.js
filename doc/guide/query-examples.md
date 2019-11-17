@@ -109,12 +109,12 @@ and exists (
 order by "persons"."lastName" asc
 ```
 
-In addition to knex methods, the [QueryBuilder](/api/query-builder/) has a lot of helpers for dealing with relations like the [joinRelation](/api/query-builder/join-methods.html#joinrelation) method:
+In addition to knex methods, the [QueryBuilder](/api/query-builder/) has a lot of helpers for dealing with relations like the [joinRelated](/api/query-builder/join-methods.html#joinrelated) method:
 
 ```js
 const people = await Person.query()
   .select('parent:parent.name as grandParentName')
-  .joinRelation('parent.parent');
+  .joinRelated('parent.parent');
 
 console.log(people[0].grandParentName);
 ```
@@ -282,7 +282,7 @@ await Person.query()
     'id',
     Person.query()
       .select('persons.id')
-      .joinRelation('pets')
+      .joinRelated('pets')
       .where('pets.name', 'Fluffy')
   );
 ```
