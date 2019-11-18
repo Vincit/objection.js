@@ -193,20 +193,32 @@ await Model.query().insert({
 const { fn } = require('objection');
 ```
 
-Factory function that returns a [FunctionBuilder](/api/types/#class-functionbuilder) instance. [FunctionBuilder](/api/types/#class-functionbuilder) helps calling SQL functions. The `fn` function also has properties for most common functions:
+Factory function that returns a [FunctionBuilder](/api/types/#class-functionbuilder) instance. `fn` helps calling SQL functions. The signature is:
 
 ```js
-fn.now()
-fn.now(precision)
-fn.coalesce(a...args)
-fn.concat(...args)
-fn.sum(...args)
-fn.avg(...args)
-fn.min(...args)
-fn.max(...args)
-fn.count(...args)
-fn.upper(...args)
-fn.lower(...args)
+const functionBuilder = fn(functionName, ...args);
+```
+
+For example:
+
+```js
+fn('coalesce', ref('age'), 0);
+```
+
+The `fn` function also has shortcuts for most common functions:
+
+```js
+fn.now();
+fn.now(precision);
+fn.coalesce(...args);
+fn.concat(...args);
+fn.sum(...args);
+fn.avg(...args);
+fn.min(...args);
+fn.max(...args);
+fn.count(...args);
+fn.upper(...args);
+fn.lower(...args);
 ```
 
 All arguments are interpreted as values by default. Use `ref` to refer to columns. you can also pass `raw` instances, other `fn` instances, `QueryBuilders` knex builders, knex raw and anything else just like to any other objection method.
@@ -221,6 +233,12 @@ await Model.query().where(fn('coalesce', ref('age'), 0), '>', 30);
 
 // The same example using the fn.coalesce shortcut
 await Model.query().where(fn.coalesce(ref('age'), 0), '>', 30);
+```
+
+Note that it can often be cleaner to use `raw` or `whereRaw`:
+
+```js
+await Model.query().whereRaw('coalesce(age, 0) > ?', 30);
 ```
 
 ## mixin

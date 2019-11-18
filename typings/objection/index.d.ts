@@ -1538,7 +1538,7 @@ declare namespace Objection {
 
     static raw: RawFunction;
     static ref: ReferenceFunction;
-    static fn: knex.FunctionHelper;
+    static fn: FunctionFunction;
 
     static BelongsToOneRelation: RelationType;
     static HasOneRelation: RelationType;

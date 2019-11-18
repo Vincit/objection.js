@@ -12,6 +12,7 @@ Here's a list of the breaking changes
 - [relate method now always returns the number of affected rows](#relate-method-now-always-returns-the-number-of-affected-rows)
 - [\$relatedQuery no longer mutates](#relatedquery-no-longer-mutates)
 - [context now acts like mergeContext](#context-now-acts-like-mergecontext)
+- [Model.raw and Model.fn now return objection raw and fn](#model-raw-and-model-fn-now-return-objection-raw-and-fn)
 - [Rewritten typings](#rewritten-typings)
 
 In addition to these, **a lot** of methods were deprecated and replaced by a new method. The old methods still work, but they print a warning (once per process) when you use them. The warning message tells which method you should be using in the future and you can slowly replace the methods as you get annoyed by the warnings.
@@ -30,7 +31,7 @@ Before you were able to provide multiple modifiers or modifier names to `modify`
 Person.query().modify('foo', 'bar');
 ```
 
-Now only the first argument is used to specify modifiers and all the rest are arguments for the modifiers. The first argument can be an array, so simple wrap the modifiers in an array, if there are more than one of them:
+Now only the first argument is used to specify modifiers and all the rest are arguments for the modifiers. The first argument can be an array so you can simply wrap the modifiers in an array if there are more than one of them:
 
 ```js
 Person.query().modify(['foo', 'bar']);
@@ -38,7 +39,7 @@ Person.query().modify(['foo', 'bar']);
 
 ## Bluebird and lodash have been removed
 
-Before, all async objection operations returned a bluebird promise. Now the bluebird dependency has been dropped an the native `Promise` is used instead. This also means that all bluebird-specific methods
+Before, all async operations returned a bluebird promise. Now the bluebird dependency has been dropped and the native `Promise` is used instead. This also means that all bluebird-specific methods
 
 - `map`
 - `reduce`
@@ -58,13 +59,13 @@ Objection also used to export `Promise` and `lodash` properties like this:
 import { Promise, lodash } from 'objection';
 ```
 
-That is also not true anymore. Both of those exports have been removed.
+which is not true anymore. Both of those exports have been removed.
 
 ## Database errors now come from the db-errors library
 
-Before, when a database operation failed, objection simply passed through the native error thrown by the database client. No the errors are wrapped by the [db-errors](https://github.com/Vincit/db-errors) library.
+Before, when a database operation failed, objection simply passed through the native error thrown by the database client. In 2.0 the errors are wrapped using the [db-errors](https://github.com/Vincit/db-errors) library.
 
-The `db-errors` library errors expose a `nativeError` property. If you rely on the properties of the old errors, you can simple change code like this
+The `db-errors` library errors expose a `nativeError` property. If you rely on the properties of the old errors, you can simply change code like this
 
 ```js
 try {
@@ -90,7 +91,7 @@ try {
 }
 ```
 
-A preferred way to handle this would be to use the new `db-error` classes as described [here](http://localhost:8080/objection.js/recipes/error-handling.html#error-handling), but the fastest migration path is to do the above trick.
+A preferred way to handle this would be to use the new `db-error` classes as described [here](/recipes/error-handling.html#error-handling), but the fastest migration path is to do the above trick.
 
 ## #ref references in insertGraph and upsertGraph now require the allowRefs: true option
 
@@ -125,6 +126,8 @@ Even though there's very little chance this kind of attack could be carried out 
 
 `relate` used to return the inserted pivot table row in case of `ManyToManyRelation` and the number of updated rows in case of other relations. Now an integer indicating the number of affected rows is always returned.
 
+You need to go through your code and check how the return values of `relate` queries are used.
+
 ## \$relatedQuery no longer mutates
 
 With objection 1.x, doing this
@@ -139,9 +142,9 @@ addad a property `pets` for `somePerson` and saved the result there. This no lon
 await somePerson.$relatedQuery('pets').insert(pet);
 ```
 
-would previously add the `pet` to the `pets` array of `somePerson`. This also no longer happens.
+would previously add the inserted pet to the `pets` array of `somePerson`. This also no longer happens.
 
-You can use `withGraphFetched` and `fetchGraph` methods if you want to populate the relations. Also, nothing prevents you from simply doing this:
+You can use `withGraphFetched` and `fetchGraph` methods if you want to populate the relations. Also, nothing prevents you from doing this:
 
 ```js
 somePerson.pets = await somePerson.$relatedQuery('pets');
@@ -151,7 +154,11 @@ You can also use the `Model.relatedInsertQueryMutates` and `Model.relatedFindQue
 
 ## context() now acts like mergeContext()
 
-The `context` method of `QueryBuilder` now merges the given object with the current object instead of replacing it. You can use `clearContext` to clear the context if you need the old behaviour.
+The `context` method of `QueryBuilder` now merges the given object with the current context object instead of replacing it. You can use `clearContext` to clear the context if you need the old behaviour.
+
+## Model.raw and Model.fn now return objection raw and fn
+
+Previously `Model.raw` returned a knex raw builder and `Model.fn` returned a knex `FunctionHelper` instance. In 2.0 objection's [raw](/api/objection/#raw) and [fn](/api/objection/#fn) helpers are returned. To get a knex `raw` builder, you need to use `knex.raw` directly.
 
 ## Rewritten typings
 

@@ -1,7 +1,6 @@
 const _ = require('lodash');
-const knex = require('knex');
 const expect = require('expect.js');
-const { Model, QueryBuilder, ValidationError } = require('../../../');
+const { Model, QueryBuilder, ValidationError, raw, fn } = require('../../../');
 
 describe('Model', () => {
   describe('fromJson', () => {
@@ -2100,12 +2099,8 @@ describe('Model', () => {
     expect(model.toJSON({ shallow: true })).to.eql({ a: 1, b: 2 });
   });
 
-  it('raw method should be a shortcut to knex().raw', () => {
-    let Model = modelClass('Model');
-    Model.knex(knex({ client: 'pg' }));
-
-    let sql = Model.raw('SELECT * FROM "Model" where "id" = ?', [10]).toString();
-    expect(sql).to.eql('SELECT * FROM "Model" where "id" = 10');
+  it('Model.raw should return objection.raw', () => {
+    expect(modelClass('Model').raw).to.equal(raw);
   });
 
   it('ensureModel should return null for null input', () => {
@@ -2616,24 +2611,8 @@ describe('Model', () => {
     expect(model.$toJson().foo).to.equal('10');
   });
 
-  it('fn() should be a shortcut to knex.fn', () => {
-    let Model1 = modelClass('Model1');
-    Model1.knex({ fn: { a: 1 } });
-    expect(Model1.fn()).to.eql({ a: 1 });
-  });
-
-  it('fn should be a shortcut to knex.fn', () => {
-    const Model1 = modelClass('Model1');
-    Model1.knex({ fn: { a: 1 } });
-    expect(Model1.fn.a).to.equal(1);
-
-    const Model2 = modelClass('Model2');
-    Model2.knex(knex({ client: 'pg' }));
-
-    const expected = Model2.knex()
-      .fn.now()
-      .toString();
-    expect(Model2.fn.now().toString()).to.equal(expected);
+  it('Model.fn should return objection.fn', () => {
+    expect(modelClass('Model1').fn).to.equal(fn);
   });
 
   it('make sure JSON.stringify works with toJSON (#869)', () => {
