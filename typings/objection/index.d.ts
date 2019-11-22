@@ -1385,8 +1385,8 @@ declare namespace Objection {
   interface ColumnNamesMethod<QM extends Model, RM, RV> {
     (...columnNames: ColumnRef[]): QueryBuilder<QM, RM, RV>;
     (columnNames: ColumnRef[]): QueryBuilder<QM, RM, RV>;
-    <T>(value: Array<Partial<keyof T>>): QueryBuilder<QM, RM, RV>;
-    <T>(...columns: Array<Partial<keyof T>>): QueryBuilder<QM, RM, RV>;
+    <T>(...columnNames: Array<Partial<keyof T>>): QueryBuilder<QM, RM, RV>;
+    <T>(columnNames: Array<Partial<keyof T>>): QueryBuilder<QM, RM, RV>;
   }
 
   interface RawMethod<QM extends Model, RM, RV> {
