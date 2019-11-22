@@ -1242,6 +1242,8 @@ declare namespace Objection {
       column: ColumnRef,
       callback: (this: QueryBuilder<QM, QM[]>, queryBuilder: QueryBuilder<QM, QM[]>) => void
     ): QueryBuilder<QM, RM, RV>;
+    <T>(object: Partial<T>): QueryBuilder<QM, RM, RV>;
+    <T>(column: Partial<keyof T>, op: string, value: string): QueryBuilder<QM, RM, RV>;
   }
 
   interface FindOne<QM extends Model> {
@@ -1307,6 +1309,8 @@ declare namespace Objection {
   interface OrderBy<QM extends Model, RM, RV> {
     (column: ColumnRef, order?: string): QueryBuilder<QM, RM, RV>;
     (columns: ({ column: ColumnRef; order?: string } | string)[]): QueryBuilder<QM, RM, RV>;
+    <T>(column: keyof T, order?: 'asc' | 'desc'): QueryBuilder<QM, RM, RV>;
+    <T>(columns: (Array<{ column: keyof T; order?: 'asc' | 'desc' }>)): QueryBuilder<QM, RM, RV>;
   }
 
   type QBOrCallback<QM extends Model> =
@@ -1381,6 +1385,8 @@ declare namespace Objection {
   interface ColumnNamesMethod<QM extends Model, RM, RV> {
     (...columnNames: ColumnRef[]): QueryBuilder<QM, RM, RV>;
     (columnNames: ColumnRef[]): QueryBuilder<QM, RM, RV>;
+    <T>(value: Array<Partial<keyof T>>): QueryBuilder<QM, RM, RV>;
+    <T>(...columns: Array<Partial<keyof T>>): QueryBuilder<QM, RM, RV>;
   }
 
   interface RawMethod<QM extends Model, RM, RV> {
