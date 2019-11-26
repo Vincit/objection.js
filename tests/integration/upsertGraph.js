@@ -2989,6 +2989,241 @@ module.exports = session => {
               });
           });
         });
+
+        it('references to parent graph should produce an error in recursive upsert by default', done => {
+          const upsert = {
+            id: 2,
+            model1Prop1: 'updated root 2',
+
+            model1Relation1: {
+              '#id': 'inserted',
+              model1Prop1: 'foo'
+            },
+
+            // This will get related.
+            model1Relation3: [
+              {
+                idCol: 1,
+                model2Prop1: 'updated model2Prop1',
+
+                // This will also get related.
+                model2Relation2: {
+                  '#ref': 'inserted'
+                }
+              }
+            ]
+          };
+
+          const options = {
+            relate: true,
+            unrelate: true,
+            fetchStrategy
+          };
+
+          Model1.query(session.knex)
+            .upsertGraph(upsert, options)
+            .then(() => {
+              done(new Error('should not get here'));
+            })
+            .catch(err => {
+              expect(err.message).to.equal(
+                '#ref references are not allowed in a graph by default. see the allowRefs insert/upsert graph option'
+              );
+              done();
+            });
+        });
+
+        it('references to parent graph should work in recursive upsert', () => {
+          const upsert = {
+            id: 2,
+            model1Prop1: 'updated root 2',
+
+            model1Relation1: {
+              '#id': 'inserted',
+              model1Prop1: 'foo'
+            },
+
+            // This will get related.
+            model1Relation3: [
+              {
+                idCol: 1,
+                model2Prop1: 'updated model2Prop1',
+
+                // This will also get related.
+                model2Relation2: {
+                  '#ref': 'inserted'
+                }
+              }
+            ]
+          };
+
+          const options = {
+            relate: true,
+            unrelate: true,
+            allowRefs: true,
+            fetchStrategy
+          };
+
+          return Model1.query(session.knex)
+            .upsertGraph(upsert, options)
+            .then(result => {
+              chai.expect(result).to.containSubset({
+                id: 2,
+                model1Prop1: 'updated root 2',
+
+                model1Relation1: {
+                  model1Prop1: 'foo'
+                },
+
+                model1Relation3: [
+                  {
+                    idCol: 1,
+                    model2Prop1: 'updated model2Prop1',
+
+                    model2Relation2: {
+                      model1Prop1: 'foo'
+                    }
+                  }
+                ]
+              });
+
+              expect(result.model1Relation1.id).to.equal(
+                result.model1Relation3[0].model2Relation2.id
+              );
+
+              return Model1.query(session.knex)
+                .findById(2)
+                .withGraphFetched({
+                  model1Relation1: true,
+                  model1Relation3: {
+                    model2Relation2: true
+                  }
+                });
+            })
+            .then(result => {
+              chai.expect(result).to.containSubset({
+                id: 2,
+                model1Prop1: 'updated root 2',
+
+                model1Relation1: {
+                  model1Prop1: 'foo'
+                },
+
+                model1Relation3: [
+                  {
+                    idCol: 1,
+                    model2Prop1: 'updated model2Prop1',
+
+                    model2Relation2: {
+                      model1Prop1: 'foo'
+                    }
+                  }
+                ]
+              });
+
+              expect(result.model1Relation1.id).to.equal(
+                result.model1Relation3[0].model2Relation2.id
+              );
+            });
+        });
+
+        it('property references to parent graph should work in recursive upsert', () => {
+          const upsert = {
+            id: 2,
+            model1Prop1: 'updated root 2',
+
+            model1Relation1: {
+              '#id': 'inserted',
+              model1Prop1: 'foo',
+              model1Prop2: 101
+            },
+
+            // This will get related.
+            model1Relation3: [
+              {
+                idCol: 1,
+                model2Prop1: 'updated model2Prop1',
+
+                // This will get inserted.
+                model2Relation2: {
+                  model1Prop1: 'hello #ref{inserted.model1Prop1} #ref{inserted.model1Prop2}',
+                  model1Prop2: '#ref{inserted.model1Prop2}'
+                }
+              }
+            ]
+          };
+
+          const options = {
+            relate: true,
+            unrelate: true,
+            allowRefs: true,
+            fetchStrategy
+          };
+
+          return Model1.query(session.knex)
+            .upsertGraph(upsert, options)
+            .then(result => {
+              chai.expect(result).to.containSubset({
+                id: 2,
+                model1Prop1: 'updated root 2',
+
+                model1Relation1: {
+                  model1Prop1: 'foo'
+                },
+
+                model1Relation3: [
+                  {
+                    idCol: 1,
+                    model2Prop1: 'updated model2Prop1',
+
+                    model2Relation2: {
+                      model1Prop1: 'hello foo 101',
+                      model1Prop2: 101
+                    }
+                  }
+                ]
+              });
+
+              expect(result.model1Relation1.id).to.not.equal(
+                result.model1Relation3[0].model2Relation2.id
+              );
+
+              return Model1.query(session.knex)
+                .findById(2)
+                .withGraphFetched({
+                  model1Relation1: true,
+                  model1Relation3: {
+                    model2Relation2: true
+                  }
+                });
+            })
+            .then(result => {
+              chai.expect(result).to.containSubset({
+                id: 2,
+                model1Prop1: 'updated root 2',
+
+                model1Relation1: {
+                  model1Prop1: 'foo'
+                },
+
+                model1Relation3: [
+                  {
+                    idCol: 1,
+                    model2Prop1: 'updated model2Prop1',
+
+                    model2Relation2: {
+                      model1Prop1: 'hello foo 101',
+                      model1Prop2: 101
+                    }
+                  }
+                ]
+              });
+
+              expect(result.model1Relation1.id).to.not.equal(
+                result.model1Relation3[0].model2Relation2.id
+              );
+            });
+        });
       });
 
       describe('validation and transactions', () => {
