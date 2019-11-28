@@ -1893,6 +1893,103 @@ module.exports = session => {
           });
       });
 
+      it('should insert with an id instead of relating if `insertMissing` option is true and the item doesnt exist int the db', () => {
+        const upsert = {
+          id: 2,
+
+          // update idCol=1
+          // delete idCol=2
+          // and insert one new
+          model1Relation2: [
+            {
+              idCol: 1,
+              model2Prop1: 'updated hasMany 1',
+
+              // update id=4
+              // delete id=5
+              // and insert one new
+              model2Relation1: [
+                {
+                  // Has an id and exist in db --> relate
+                  id: 1
+                },
+                {
+                  // Has an id and exists in the relation --> update
+                  id: 4,
+                  model1Prop1: 'updated manyToMany 1'
+                },
+                {
+                  // Has an id and doesn't exist in db --> insert
+                  id: 1000,
+                  model1Prop1: 'inserted manyToMany'
+                }
+              ]
+            },
+            {
+              // Has an id and doesn't exist in db --> insert
+              idCol: 1000,
+              model2Prop1: 'inserted hasMany'
+            }
+          ]
+        };
+
+        const options = {
+          relate: true,
+          unrelate: true,
+          insertMissing: true,
+          fetchStrategy
+        };
+
+        return Model1.query(session.knex)
+          .upsertGraph(upsert, options)
+          .then(() => {
+            // Fetch the graph from the database.
+            return Model1.query(session.knex)
+              .findById(2)
+              .eager('model1Relation2(orderById).model2Relation1(orderById)');
+          })
+          .then(omitIrrelevantProps)
+          .then(result => {
+            expect(result).to.eql({
+              id: 2,
+              model1Id: 3,
+              model1Prop1: 'root 2',
+
+              model1Relation2: [
+                {
+                  idCol: 1,
+                  model1Id: 2,
+                  model2Prop1: 'updated hasMany 1',
+
+                  model2Relation1: [
+                    {
+                      id: 1,
+                      model1Id: null,
+                      model1Prop1: 'root 1'
+                    },
+                    {
+                      id: 4,
+                      model1Id: null,
+                      model1Prop1: 'updated manyToMany 1'
+                    },
+                    {
+                      id: 1000,
+                      model1Id: null,
+                      model1Prop1: 'inserted manyToMany'
+                    }
+                  ]
+                },
+                {
+                  idCol: 1000,
+                  model1Id: 2,
+                  model2Prop1: 'inserted hasMany',
+                  model2Relation1: []
+                }
+              ]
+            });
+          });
+      });
+
       it('should insert root model with an id instead of throwing an error if `insertMissing` option is true', () => {
         let upsert = {
           // This doesn't exist.

@@ -8,6 +8,8 @@
 
 - modifiers can now take arguments and are a lot more useful. See [this recipe](https://vincit.github.io/objection.js/recipes/modifiers.html) for more info.
 
+- `insertMissing` `upsertGraph` option now works as expected with `relate: true`: items that are not found in the database are inserted.
+
 ### Breaking changes
 
 See the [migration guide](/1.x/migration.md).
@@ -23,6 +25,8 @@ See the [migration guide](/1.x/migration.md).
 - `relate` now always returns the number of affected rows. Previously it returned the inserted pivot table row in case of `ManyToManyRelation`.
 
 - The default value for [relatedFindQueryMutates](/api/model/static-properties.html#static-relatedfindquerymutates) and [relatedInsertQueryMutates](https://vincit.github.io/objection.js/api/model/static-properties.html#static-relatedinsertquerymutates) is now false. It used to be true.
+
+- TODO: Model.raw no longer returns a knex raw instance, but objection.raw.
 
 ## 1.6.10
 

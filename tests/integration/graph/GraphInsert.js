@@ -5,6 +5,7 @@ const { Model, raw } = require('../../../');
 const { ModelGraph } = require('../../../lib/model/graph/ModelGraph');
 const { GraphInsert } = require('../../../lib/queryBuilder/graph/insert/GraphInsert');
 const { GraphOptions } = require('../../../lib/queryBuilder/graph/GraphOptions');
+const { GraphNodeDbExistence } = require('../../../lib/queryBuilder/graph/GraphNodeDbExistence');
 const { asArray } = require('../../../lib/utils/objectUtils');
 
 module.exports = session => {
@@ -1027,12 +1028,18 @@ module.exports = session => {
       rawGraphOptions = Object.assign({}, rawGraphOptions, { insertMissing: true });
       const graphOptions = new GraphOptions(rawGraphOptions);
       const graph = assignDbRefsAsRelateProps(ModelGraph.create(modelClass, models));
+      const nodeDbExistence = GraphNodeDbExistence.createEveryNodeExistsExistence();
 
       return GraphInsert.fetchCurrentGraph({ builder, graph, graphOptions })
         .then(currentGraph => {
           numExecutedQueries = 0;
 
-          const graphInsert = new GraphInsert({ graph, currentGraph, graphOptions });
+          const graphInsert = new GraphInsert({
+            graph,
+            currentGraph,
+            graphOptions,
+            nodeDbExistence
+          });
           const actions = graphInsert.createActions();
           let promise = Promise.resolve();
 
