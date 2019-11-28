@@ -683,9 +683,9 @@ declare namespace Objection {
   }
 
   interface Insert<QM extends Model> {
-    (modelsOrObjects?: Partial<QM>[]): QueryBuilder<QM, QM[]>;
-    (modelOrObject?: Partial<QM>): QueryBuilder<QM, QM>;
-    (): this;
+    (modelsOrObjects: Partial<QM>[]): QueryBuilder<QM, QM[]>;
+    (modelOrObject: Partial<QM>): QueryBuilder<QM, QM>;
+    (): QueryBuilder<QM, QM>;
   }
 
   interface InsertGraph<QM extends Model> {
