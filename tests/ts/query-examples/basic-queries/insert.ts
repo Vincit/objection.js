@@ -5,4 +5,8 @@ import { Person } from '../../fixtures/person';
     firstName: 'Jennifer',
     lastName: 'Lawrence'
   });
+
+  const personPromise: Promise<Person> = Person.fromJson({ firstName: 'Jennifer' })
+    .$query()
+    .insert();
 })();

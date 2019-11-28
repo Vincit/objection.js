@@ -582,6 +582,7 @@ declare namespace Objection {
   interface InsertMethod<QB extends AnyQueryBuilder> {
     (insert: PartialModelObject<ModelType<QB>>): SingleQueryBuilder<QB>;
     (insert: PartialModelObject<ModelType<QB>>[]): ArrayQueryBuilder<QB>;
+    (): SingleQueryBuilder<QB>;
   }
 
   interface RelateMethod<QB extends AnyQueryBuilder> {
