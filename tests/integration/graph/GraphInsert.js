@@ -756,7 +756,7 @@ module.exports = session => {
               ]
             },
 
-            queryOut: query => query.eager('relatives(orderById)').where('name', 'Brad'),
+            queryOut: query => query.eager('relatives(orderByName)').where('name', 'Brad'),
 
             graphOut: [
               {
