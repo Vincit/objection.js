@@ -11,7 +11,7 @@ Objection.js is built on an SQL query builder called [knex](http://knexjs.org). 
 What objection.js gives you:
 
 - **An easy declarative way of [defining models](/guide/models.html) and relationships between them**
-- **Simple and fun way to [fetch, insert, update and delete](/guide/query-examples.html#basic-queries) objects using the full power of SQL**
+- **Simple and fun way to [fetch, insert, update and delete](/guide/query-examples.html) objects using the full power of SQL**
 - **Powerful mechanisms for [eager loading](/guide/query-examples.html#eager-loading), [inserting](/guide/query-examples.html#graph-inserts) and [upserting](/guide/query-examples.html#graph-upserts) object graphs**
 - **Easy to use [transactions](/guide/transactions.html)**
 - **Official [TypeScript](https://github.com/Vincit/objection.js/blob/master/typings/objection/index.d.ts) support**

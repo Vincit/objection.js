@@ -13,6 +13,7 @@ Here's a list of the breaking changes
 - [\$relatedQuery no longer mutates](#relatedquery-no-longer-mutates)
 - [context now acts like mergeContext](#context-now-acts-like-mergecontext)
 - [Model.raw and Model.fn now return objection raw and fn](#model-raw-and-model-fn-now-return-objection-raw-and-fn)
+- [QueryBuilder.toString and QueryBuilder.toSql have been removed](#querybuilder-tostring-and-querybuilder-tosql-have-been-removed)
 - [Rewritten typings](#rewritten-typings)
 
 In addition to these, **a lot** of methods were deprecated and replaced by a new method. The old methods still work, but they print a warning (once per process) when you use them. The warning message tells which method you should be using in the future and you can slowly replace the methods as you get annoyed by the warnings.
@@ -159,6 +160,10 @@ The `context` method of `QueryBuilder` now merges the given object with the curr
 ## Model.raw and Model.fn now return objection raw and fn
 
 Previously `Model.raw` returned a knex raw builder and `Model.fn` returned a knex `FunctionHelper` instance. In 2.0 objection's [raw](/api/objection/#raw) and [fn](/api/objection/#fn) helpers are returned. To get a knex `raw` builder, you need to use `knex.raw` directly.
+
+## QueryBuilder.toString and QueryBuilder.toSql have been removed
+
+You can use `QueryBuilder.toKnexQuery().toSQL()` instead.
 
 ## Rewritten typings
 

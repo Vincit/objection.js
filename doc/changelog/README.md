@@ -26,6 +26,8 @@ See the [migration guide](/1.x/migration.md).
 
 - The default value for [relatedFindQueryMutates](/api/model/static-properties.html#static-relatedfindquerymutates) and [relatedInsertQueryMutates](https://vincit.github.io/objection.js/api/model/static-properties.html#static-relatedinsertquerymutates) is now false. It used to be true.
 
+- `QueryBuilder.toString()` and `QueryBuilder.toSql()` have been removed. You can use `QueryBuilder.toKnexQuery().toSQL()` instead.
+
 - TODO: Model.raw no longer returns a knex raw instance, but objection.raw.
 
 ## 1.6.10

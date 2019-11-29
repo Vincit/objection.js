@@ -15,6 +15,7 @@
 import * as ajv from 'ajv';
 import * as dbErrors from 'db-errors';
 import * as knex from 'knex';
+import Knex = require('knex');
 
 // Export the entire Objection namespace.
 export = Objection;
@@ -34,6 +35,7 @@ declare namespace Objection {
   const knexSnakeCaseMappers: KnexSnakeCaseMappersFactory;
 
   const transaction: transaction;
+  const initialize: initialize;
 
   const DBError: typeof dbErrors.DBError;
   const DataError: typeof dbErrors.DataError;
@@ -185,6 +187,13 @@ declare namespace Objection {
    * Removes `undefined` from a type.
    */
   type Defined<T> = Exclude<T, undefined>;
+
+  /**
+   * A Pojo version of model.
+   */
+  type ModelObject<T extends Model> = {
+    [K in NonFunctionPropertyNames<T>]: T[K];
+  };
 
   /**
    * Any object that has some of the properties of model class T match this type.
@@ -646,6 +655,10 @@ declare namespace Objection {
     (modelClass: typeof Model): string;
   }
 
+  interface ToKnexQueryMethod<QB extends AnyQueryBuilder> {
+    <T = ModelObject<QB['ModelType']>>(): Knex.QueryBuilder<T, T[]>;
+  }
+
   interface AliasForMethod<QB extends AnyQueryBuilder> {
     (modelClassOrTableName: string | ModelClass<any>, alias: string): QB;
   }
@@ -1093,8 +1106,7 @@ declare namespace Objection {
     modelClass: ModelClassMethod;
     tableNameFor: TableRefForMethod;
     tableRefFor: TableRefForMethod;
-    toSql: StringReturningMethod;
-    toString: StringReturningMethod;
+    toKnexQuery: ToKnexQueryMethod<this>;
     reject: OneArgMethod<any, this>;
     resolve: OneArgMethod<any, this>;
     transacting: OneArgMethod<TransactionOrKnex, this>;
@@ -1744,6 +1756,11 @@ declare namespace Objection {
     <ReturnValue>(knex: knex, callback: (trx: Transaction) => Promise<ReturnValue>): Promise<
       ReturnValue
     >;
+  }
+
+  interface initialize {
+    (knex: Knex, modelClasses: ModelClass<any>[]): Promise<void>;
+    (modelClasses: ModelClass<any>[]): Promise<void>;
   }
 
   /**

@@ -513,6 +513,7 @@ module.exports = session => {
           expect(
             BoundModel.query()
               .whereJsonIsArray('ModelJson.jsonArray')
+              .toKnexQuery()
               .toString()
           ).to.contain('"ModelJson"."jsonArray"');
         });
@@ -521,6 +522,7 @@ module.exports = session => {
           expect(
             BoundModel.query()
               .whereJsonIsArray('ModelJson.jsonArray:[50]')
+              .toKnexQuery()
               .toString()
           ).to.contain('"ModelJson"."jsonArray"');
         });

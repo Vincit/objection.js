@@ -19,6 +19,34 @@ const { Model } = require('objection');
 
 [The model class](/api/model/)
 
+## initialize
+
+```js
+const { initialize } = require('objection');
+```
+
+For some queries objection needs to perform asynchronous operations in preparation, like fetch table metadata from the db. Objection does these preparations on-demand the first time such query is executed. However, some methods like `toKnexQuery` need these preparations to have been made so that the query can be built synchronously. In these cases you can use `initialize` to "warm up" the models and do all needed async preparations needed. You only need to call this function once if you choose to use it.
+
+Calling this function is completely optional. If some method requires this to have been called, they will throw a clear error message asking you to do so. These cases are extremely rare, but this function is here for those cases.
+
+You can also call this function if you want to be in control of when these async preparation operations get executed. It can be helpful for example in tests.
+
+##### Examples
+
+```js
+const { initialize } = require('objection');
+
+await initialize(knex, [Person, Movie, Pet, SomeOtherModelClass]);
+```
+
+If knex has been installed for the `Model` globally, you can omit the first argument.
+
+```js
+const { initialize } = require('objection');
+
+await initialize([Person, Movie, Pet, SomeOtherModelClass]);
+```
+
 ## transaction
 
 ```js

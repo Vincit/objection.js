@@ -2,6 +2,8 @@
 
 ## debug()
 
+Chaining this method to any query will print all the executed SQL to console.
+
 See [knex documentation](http://knexjs.org/#Builder-debug)
 
 ##### Return value
@@ -9,6 +11,24 @@ See [knex documentation](http://knexjs.org/#Builder-debug)
 | Type                                | Description                        |
 | ----------------------------------- | ---------------------------------- |
 | [QueryBuilder](/api/query-builder/) | `this` query builder for chaining. |
+
+## toKnexQuery()
+
+```js
+knexQueryBuilder = queryBuilder.toKnexQuery();
+```
+
+Compiles the query into a knex query and returns the knex query builder instance.
+
+Some objection queries, like when `withGraphFetched` is used, actually execute multiple queries. In these cases, the query builer of the first query is returned
+
+In some rare cases the knex query cannot be built synchronously. In these cases you will get a clear error message. These cases can be handled by calling the optional [initialize](/api/objection/#initialize) method once before the failing `toKnexQuery` method is called.
+
+```js
+const { initialize } = require('objection');
+
+await initialize([Person, Pet, Movie, SomeOtherModelClass]);
+```
 
 ## for()
 

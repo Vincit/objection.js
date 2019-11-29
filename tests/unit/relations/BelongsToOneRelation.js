@@ -98,8 +98,8 @@ describe('BelongsToOneRelation', () => {
         expect(result).to.be.a(RelatedModel);
 
         expect(executedQueries).to.have.length(1);
-        expect(executedQueries[0]).to.equal(builder.toString());
-        expect(executedQueries[0]).to.equal(builder.toSql());
+        expect(executedQueries[0]).to.equal(builder.toKnexQuery().toString());
+        expect(executedQueries[0]).to.equal(builder.toKnexQuery().toString());
         expect(executedQueries[0]).to.equal(
           'select "RelatedModel".* from "RelatedModel" where "RelatedModel"."rid" in (1)'
         );
@@ -132,8 +132,8 @@ describe('BelongsToOneRelation', () => {
         expect(result[1]).to.be.a(RelatedModel);
 
         expect(executedQueries).to.have.length(1);
-        expect(executedQueries[0]).to.equal(builder.toString());
-        expect(executedQueries[0]).to.equal(builder.toSql());
+        expect(executedQueries[0]).to.equal(builder.toKnexQuery().toString());
+        expect(executedQueries[0]).to.equal(builder.toKnexQuery().toString());
         expect(executedQueries[0]).to.equal(
           'select "RelatedModel".* from "RelatedModel" where ("RelatedModel"."aid", "RelatedModel"."bid") in ((11, 22), (11, 33))'
         );
@@ -166,8 +166,8 @@ describe('BelongsToOneRelation', () => {
         expect(result[1]).to.be.a(RelatedModel);
 
         expect(executedQueries).to.have.length(1);
-        expect(executedQueries[0]).to.equal(builder.toString());
-        expect(executedQueries[0]).to.equal(builder.toSql());
+        expect(executedQueries[0]).to.equal(builder.toKnexQuery().toString());
+        expect(executedQueries[0]).to.equal(builder.toKnexQuery().toString());
         expect(executedQueries[0]).to.equal(
           'select "RelatedModel".* from "RelatedModel" where "RelatedModel"."rid" in (2, 3)'
         );
@@ -191,8 +191,8 @@ describe('BelongsToOneRelation', () => {
         expect(result).to.be.a(RelatedModel);
 
         expect(executedQueries).to.have.length(1);
-        expect(executedQueries[0]).to.equal(builder.toString());
-        expect(executedQueries[0]).to.equal(builder.toSql());
+        expect(executedQueries[0]).to.equal(builder.toKnexQuery().toString());
+        expect(executedQueries[0]).to.equal(builder.toKnexQuery().toString());
         expect(executedQueries[0]).to.equal(
           'select "RelatedModel"."rid", "name" from "RelatedModel" where "RelatedModel"."rid" in (2)'
         );
@@ -216,8 +216,8 @@ describe('BelongsToOneRelation', () => {
         expect(result).to.be.a(RelatedModel);
 
         expect(executedQueries).to.have.length(1);
-        expect(executedQueries[0]).to.equal(builder.toString());
-        expect(executedQueries[0]).to.equal(builder.toSql());
+        expect(executedQueries[0]).to.equal(builder.toKnexQuery().toString());
+        expect(executedQueries[0]).to.equal(builder.toKnexQuery().toString());
         expect(executedQueries[0]).to.equal(
           'select "RelatedModel".* from "RelatedModel" where "RelatedModel"."rid" in (1) and "filterCol" = 100'
         );
@@ -243,8 +243,8 @@ describe('BelongsToOneRelation', () => {
         expect(result).to.be.a(RelatedModel);
 
         expect(executedQueries).to.have.length(1);
-        expect(executedQueries[0]).to.equal(builder.toString());
-        expect(executedQueries[0]).to.equal(builder.toSql());
+        expect(executedQueries[0]).to.equal(builder.toKnexQuery().toString());
+        expect(executedQueries[0]).to.equal(builder.toKnexQuery().toString());
         expect(executedQueries[0]).to.equal(
           'select "RelatedModel".* from "RelatedModel" where "RelatedModel"."rid" in (1) and "name" = \'Jennifer\''
         );
@@ -268,8 +268,8 @@ describe('BelongsToOneRelation', () => {
         expect(result).to.be.a(RelatedModel);
 
         expect(executedQueries).to.have.length(1);
-        expect(executedQueries[0]).to.equal(builder.toString());
-        expect(executedQueries[0]).to.equal(builder.toSql());
+        expect(executedQueries[0]).to.equal(builder.toKnexQuery().toString());
+        expect(executedQueries[0]).to.equal(builder.toKnexQuery().toString());
         expect(executedQueries[0]).to.eql(
           'select "RelatedModel".* from "RelatedModel" where "RelatedModel"."rid" in (1) and "filteredProperty" = true'
         );
@@ -290,8 +290,8 @@ describe('BelongsToOneRelation', () => {
         })
         .insert(related);
 
-      let toString = builder.toString();
-      let toSql = builder.toSql();
+      let toString = builder.toKnexQuery().toString();
+      let toSql = builder.toKnexQuery().toString();
 
       return builder.then(result => {
         expect(executedQueries).to.have.length(2);
@@ -323,8 +323,8 @@ describe('BelongsToOneRelation', () => {
         })
         .insert(related);
 
-      let toString = builder.toString();
-      let toSql = builder.toSql();
+      let toString = builder.toKnexQuery().toString();
+      let toSql = builder.toKnexQuery().toString();
 
       return builder.then(result => {
         expect(executedQueries).to.have.length(2);
@@ -462,8 +462,8 @@ describe('BelongsToOneRelation', () => {
       return builder.then(numUpdates => {
         expect(numUpdates).to.equal(42);
         expect(executedQueries).to.have.length(1);
-        expect(executedQueries[0]).to.equal(builder.toString());
-        expect(executedQueries[0]).to.equal(builder.toSql());
+        expect(executedQueries[0]).to.equal(builder.toKnexQuery().toString());
+        expect(executedQueries[0]).to.equal(builder.toKnexQuery().toString());
         expect(executedQueries[0]).to.eql(
           'update "RelatedModel" set "a" = \'str1\' where "RelatedModel"."rid" in (2)'
         );
@@ -485,8 +485,8 @@ describe('BelongsToOneRelation', () => {
       return builder.then(numUpdates => {
         expect(numUpdates).to.equal(42);
         expect(executedQueries).to.have.length(1);
-        expect(executedQueries[0]).to.equal(builder.toString());
-        expect(executedQueries[0]).to.equal(builder.toSql());
+        expect(executedQueries[0]).to.equal(builder.toKnexQuery().toString());
+        expect(executedQueries[0]).to.equal(builder.toKnexQuery().toString());
         expect(executedQueries[0]).to.eql(
           'update "RelatedModel" set "a" = \'str1\', "aid" = 11, "bid" = 22 where ("RelatedModel"."aid", "RelatedModel"."bid") in ((11, 22))'
         );
@@ -549,8 +549,8 @@ describe('BelongsToOneRelation', () => {
       return builder.then(numUpdates => {
         expect(numUpdates).to.equal(42);
         expect(executedQueries).to.have.length(1);
-        expect(executedQueries[0]).to.equal(builder.toString());
-        expect(executedQueries[0]).to.equal(builder.toSql());
+        expect(executedQueries[0]).to.equal(builder.toKnexQuery().toString());
+        expect(executedQueries[0]).to.equal(builder.toKnexQuery().toString());
         expect(executedQueries[0]).to.eql(
           'update "RelatedModel" set "a" = \'str1\' where "RelatedModel"."rid" in (2)'
         );
@@ -715,8 +715,8 @@ describe('BelongsToOneRelation', () => {
         expect(executedQueries).to.have.length(1);
         expect(result).to.eql(123);
 
-        expect(executedQueries[0]).to.equal(builder.toString());
-        expect(executedQueries[0]).to.equal(builder.toSql());
+        expect(executedQueries[0]).to.equal(builder.toKnexQuery().toString());
+        expect(executedQueries[0]).to.equal(builder.toKnexQuery().toString());
         expect(executedQueries[0]).to.eql(
           'update "OwnerModel" set "relatedId" = 10 where "OwnerModel"."id" in (666)'
         );
@@ -737,8 +737,8 @@ describe('BelongsToOneRelation', () => {
         expect(executedQueries).to.have.length(1);
         expect(result).to.eql(123);
 
-        expect(executedQueries[0]).to.equal(builder.toString());
-        expect(executedQueries[0]).to.equal(builder.toSql());
+        expect(executedQueries[0]).to.equal(builder.toKnexQuery().toString());
+        expect(executedQueries[0]).to.equal(builder.toKnexQuery().toString());
         expect(executedQueries[0]).to.eql(
           'update "OwnerModel" set "relatedId" = 10 where "OwnerModel"."id" in (666)'
         );
@@ -759,8 +759,8 @@ describe('BelongsToOneRelation', () => {
         expect(executedQueries).to.have.length(1);
         expect(result).to.eql(123);
 
-        expect(executedQueries[0]).to.equal(builder.toString());
-        expect(executedQueries[0]).to.equal(builder.toSql());
+        expect(executedQueries[0]).to.equal(builder.toKnexQuery().toString());
+        expect(executedQueries[0]).to.equal(builder.toKnexQuery().toString());
         expect(executedQueries[0]).to.eql(
           'update "OwnerModel" set "relatedId" = 10 where "OwnerModel"."id" in (666)'
         );
@@ -781,8 +781,8 @@ describe('BelongsToOneRelation', () => {
         expect(executedQueries).to.have.length(1);
         expect(result).to.eql(123);
 
-        expect(executedQueries[0]).to.equal(builder.toString());
-        expect(executedQueries[0]).to.equal(builder.toSql());
+        expect(executedQueries[0]).to.equal(builder.toKnexQuery().toString());
+        expect(executedQueries[0]).to.equal(builder.toKnexQuery().toString());
         expect(executedQueries[0]).to.eql(
           'update "OwnerModel" set "relatedId" = 10 where "OwnerModel"."id" in (666)'
         );
@@ -803,8 +803,8 @@ describe('BelongsToOneRelation', () => {
         expect(executedQueries).to.have.length(1);
         expect(result).to.eql(123);
 
-        expect(executedQueries[0]).to.equal(builder.toString());
-        expect(executedQueries[0]).to.equal(builder.toSql());
+        expect(executedQueries[0]).to.equal(builder.toKnexQuery().toString());
+        expect(executedQueries[0]).to.equal(builder.toKnexQuery().toString());
         expect(executedQueries[0]).to.eql(
           'update "OwnerModel" set "relatedAId" = 10, "relatedBId" = 20 where "OwnerModel"."id" in (666)'
         );
@@ -825,8 +825,8 @@ describe('BelongsToOneRelation', () => {
         expect(executedQueries).to.have.length(1);
         expect(result).to.eql(123);
 
-        expect(executedQueries[0]).to.equal(builder.toString());
-        expect(executedQueries[0]).to.equal(builder.toSql());
+        expect(executedQueries[0]).to.equal(builder.toKnexQuery().toString());
+        expect(executedQueries[0]).to.equal(builder.toKnexQuery().toString());
         expect(executedQueries[0]).to.eql(
           'update "OwnerModel" set "relatedAId" = 10, "relatedBId" = 20 where "OwnerModel"."id" in (666)'
         );

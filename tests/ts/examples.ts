@@ -13,6 +13,7 @@ import {
   QueryBuilder,
   StaticHookArguments
 } from '../../';
+import Knex = require('knex');
 
 // This file exercises the Objection.js typings.
 
@@ -826,8 +827,7 @@ Person.query()
 // non-wrapped methods:
 
 const modelFromQuery = qb.modelClass();
-
-const sql: string = qb.toSql();
+const knexQuery = qb.toKnexQuery().toSQL();
 const tableName: string = qb.tableNameFor(Person);
 const tableRef: string = qb.tableRefFor(Person);
 

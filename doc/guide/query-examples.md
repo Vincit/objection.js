@@ -8,6 +8,8 @@ The `Person` model used in the examples is defined [here](/guide/models.html#exa
 
 All queries are started with one of the [Model](/api/model/) methods [query](/api/model/static-methods.html#static-query), [\$query](/api/model/instance-methods.html#query), [relatedQuery](/api/model/static-methods.html#static-relatedquery) or [\$relatedQuery](/api/model/instance-methods.html#relatedquery). All these methods return a [QueryBuilder](/api/query-builder/) instance that can be used just like a [knex QueryBuilder](http://knexjs.org/#Builder) but they also have a bunch of methods added by objection.
 
+Note that you can chain [debug()](/api/query-builder/other-methods.html#debug) to any query to get the executed SQL printed to console.
+
 ## Basic queries
 
 ### Find queries

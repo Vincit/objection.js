@@ -435,13 +435,14 @@ describe('QueryBuilder', () => {
     });
 
     it('should fail with invalid operator', () => {
-      expect(
+      expect(() => {
         QueryBuilder.forClass(TestModel)
           .where('SomeTable.someColumn', 'lol', ref('SomeOtherTable.someOtherColumn'))
-          .toString()
-      ).to.equal(
-        'This query cannot be built synchronously. Consider using debug() method instead.'
-      );
+          .toKnexQuery()
+          .toString();
+      }).to.throwException(err => {
+        expect(err.message).to.equal('The operator "lol" is not permitted');
+      });
     });
 
     it('orWhere(..., ref(...)) should create a where clause using column references instead of values', () => {
@@ -468,13 +469,14 @@ describe('QueryBuilder', () => {
     });
 
     it('should fail with invalid operator', () => {
-      expect(
+      expect(() => {
         QueryBuilder.forClass(TestModel)
           .whereComposite('SomeTable.someColumn', 'lol', 'SomeOtherTable.someOtherColumn')
-          .toString()
-      ).to.equal(
-        'This query cannot be built synchronously. Consider using debug() method instead.'
-      );
+          .toKnexQuery()
+          .toString();
+      }).to.throwException(err => {
+        expect(err.message).to.equal('The operator "lol" is not permitted');
+      });
     });
 
     it('operator should default to `=`', () => {
@@ -853,8 +855,7 @@ describe('QueryBuilder', () => {
     return query
       .then(() => {
         expect(executedQueries).to.have.length(1);
-        expect(query.toString()).to.equal(executedQueries[0]);
-        expect(query.toSql()).to.equal(executedQueries[0]);
+        expect(query.toKnexQuery().toString()).to.equal(executedQueries[0]);
         expect(executedQueries[0]).to.equal(
           'update "Model" set "a" = 1, "b" = 2 where "test" < 100'
         );
@@ -863,8 +864,7 @@ describe('QueryBuilder', () => {
       })
       .then(() => {
         expect(executedQueries).to.have.length(1);
-        expect(query.toString()).to.equal(executedQueries[0]);
-        expect(query.toSql()).to.equal(executedQueries[0]);
+        expect(query.toKnexQuery().toString()).to.equal(executedQueries[0]);
         expect(executedQueries[0]).to.equal(
           'update "Model" set "a" = 1, "b" = 2 where "test" < 100'
         );
@@ -873,8 +873,7 @@ describe('QueryBuilder', () => {
       })
       .then(() => {
         expect(executedQueries).to.have.length(1);
-        expect(query.toString()).to.equal(executedQueries[0]);
-        expect(query.toSql()).to.equal(executedQueries[0]);
+        expect(query.toKnexQuery().toString()).to.equal(executedQueries[0]);
         expect(executedQueries[0]).to.equal(
           'update "Model" set "a" = 1, "b" = 2 where "test" < 100'
         );
@@ -1555,11 +1554,13 @@ describe('QueryBuilder', () => {
     expect(
       UnboundModel.query(mockKnex)
         .increment('foo', 10)
+        .toKnexQuery()
         .toString()
     ).to.equal('update "Bar" set "foo" = "foo" + 10');
     expect(
       UnboundModel.query(mockKnex)
         .decrement('foo', 5)
+        .toKnexQuery()
         .toString()
     ).to.equal('update "Bar" set "foo" = "foo" - 5');
   });

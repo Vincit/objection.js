@@ -275,7 +275,7 @@ module.exports = session => {
               },
               runBefore: (data, builder) => {
                 if (builder.isExecutable()) {
-                  queries.push(builder.toSql());
+                  queries.push(builder.toKnexQuery().toString());
                 }
               }
             })
@@ -310,7 +310,7 @@ module.exports = session => {
               },
               runBefore: function() {
                 if (this.isExecutable()) {
-                  queries.push(this.toSql());
+                  queries.push(this.toKnexQuery().toString());
                 }
               }
             })
@@ -368,7 +368,7 @@ module.exports = session => {
               runBefore: [
                 function() {
                   if (this.isExecutable()) {
-                    queries.push(this.toSql());
+                    queries.push(this.toKnexQuery().toString());
                   }
                 }
               ],
@@ -475,7 +475,7 @@ module.exports = session => {
               },
               runBefore: function() {
                 if (this.isExecutable()) {
-                  queries.push(this.toSql());
+                  queries.push(this.toKnexQuery().toString());
                 }
               },
               runAfter: models => {
@@ -574,7 +574,7 @@ module.exports = session => {
           .context({
             runAfter: (res, builder) => {
               if (builder.isExecutable()) {
-                queries.push(builder.toSql());
+                queries.push(builder.toKnexQuery().toString());
               }
             }
           })
@@ -602,7 +602,7 @@ module.exports = session => {
           .context({
             runAfter: (res, builder) => {
               if (builder.isExecutable()) {
-                queries.push(builder.toSql());
+                queries.push(builder.toKnexQuery().toString());
               }
             }
           })
@@ -631,7 +631,7 @@ module.exports = session => {
           .context({
             runAfter: (res, builder) => {
               if (builder.isExecutable()) {
-                queries.push(builder.toSql());
+                queries.push(builder.toKnexQuery().toString());
               }
             }
           })
@@ -660,7 +660,7 @@ module.exports = session => {
           .context({
             runAfter: (res, builder) => {
               if (builder.isExecutable()) {
-                queries.push(builder.toSql());
+                queries.push(builder.toKnexQuery().toString());
               }
             }
           })
@@ -714,7 +714,7 @@ module.exports = session => {
                   },
                   runBefore: function() {
                     if (this.isExecutable()) {
-                      queries.push(this.toSql());
+                      queries.push(this.toKnexQuery().toString());
                     }
                   }
                 })
@@ -749,7 +749,7 @@ module.exports = session => {
                   },
                   runBefore: function() {
                     if (this.isExecutable()) {
-                      queries.push(this.toSql());
+                      queries.push(this.toKnexQuery().toString());
                     }
                   }
                 })
@@ -782,7 +782,7 @@ module.exports = session => {
                   },
                   runBefore: function() {
                     if (this.isExecutable()) {
-                      queries.push(this.toSql());
+                      queries.push(this.toKnexQuery().toString());
                     }
                   }
                 })
@@ -834,7 +834,7 @@ module.exports = session => {
                   },
                   runBefore: function() {
                     if (this.isExecutable()) {
-                      queries.push(this.toSql());
+                      queries.push(this.toKnexQuery().toString());
                     }
                   }
                 })
@@ -867,7 +867,7 @@ module.exports = session => {
                   },
                   runBefore: function() {
                     if (this.isExecutable()) {
-                      queries.push(this.toSql());
+                      queries.push(this.toKnexQuery().toString());
                     }
                   }
                 })
@@ -922,7 +922,7 @@ module.exports = session => {
                     }
                   },
                   runBefore: function() {
-                    queries.push(this.toSql());
+                    queries.push(this.toKnexQuery().toString());
                   }
                 })
                 .then(model => {
@@ -956,7 +956,7 @@ module.exports = session => {
                   },
                   runBefore: function() {
                     if (this.isExecutable()) {
-                      queries.push(this.toSql());
+                      queries.push(this.toKnexQuery().toString());
                     }
                   }
                 })
@@ -987,7 +987,7 @@ module.exports = session => {
                 .context({
                   runBefore: function() {
                     if (this.isExecutable()) {
-                      queries.push(this.toSql());
+                      queries.push(this.toKnexQuery().toString());
                     }
                   }
                 })
