@@ -2612,15 +2612,10 @@ module.exports = session => {
       it('should work with WhereInEagerAlgorithm', () => {
         return Model2.query()
           .whereIn('id_col', [100, 200])
+          .orderBy('id_col')
           .eagerAlgorithm(Model2.WhereInEagerAlgorithm)
-          .eager('model2Relation1(select)', {
+          .eager('model2Relation1(select, orderById)', {
             select: b => b.select('model1Prop1')
-          })
-          .then(result => {
-            return result.map(model => {
-              model.model2Relation1 = _.sortBy(model.model2Relation1, 'model1Prop1');
-              return model;
-            });
           })
           .then(models => {
             expect(models).to.eql([
@@ -2666,16 +2661,11 @@ module.exports = session => {
         return Model2.query()
           .whereIn('id_col', [100, 200])
           .eagerAlgorithm(Model2.JoinEagerAlgorithm)
+          .orderBy(['id_col', 'model2Relation1.model1Prop1'])
           .modifiers({
             select: b => b.select('model1Prop1')
           })
           .eager('model2Relation1(select)')
-          .then(result => {
-            return result.map(model => {
-              model.model2Relation1 = _.sortBy(model.model2Relation1, 'model1Prop1');
-              return model;
-            });
-          })
           .then(models => {
             expect(models).to.eql([
               {
