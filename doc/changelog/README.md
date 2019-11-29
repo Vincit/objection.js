@@ -4,31 +4,41 @@
 
 ### What's new
 
-- relatedQuery can now be used for more than just subqueries. See the examples [here](/guide/query-examples.html#relation-queries).
+- Cleaner and more consistent API. A lot of methods have been renamed, removed combined and cleaned up. Most of the old methods still exist, but print a deprecation warning when first used. Some examples:
+
+  - `eager` -> `withGraphFetched`
+  - `joinEager` -> `withGraphJoined`
+  - removed `eagerAlgorithm` (you must explicitly use either `withGraphFetched` or `withGraphJoined`)
+  - merged `allowEager`, `allowInsert` and `allowUpsert` into one method `allowGraph`
+  - `$loadRelated` -> `$fetchGraph`
+  - `joinRelation` -> `joinRelated`
+  - `$relatedQuery` no longer mutates the receiving model instances
+
+- New [static hook API](/guide/hooks.html#static-query-hooks). The old instance hooks are still around.
+
+- `relatedQuery` can now be used for more than just subqueries. See the examples [here](/guide/query-examples.html#relation-queries).
 
 - modifiers can now take arguments and are a lot more useful. See [this recipe](https://vincit.github.io/objection.js/recipes/modifiers.html) for more info.
 
+- Objection now uses the [db-errors](https://github.com/Vincit/db-errors/issu) library by default to wrap the database errors.
+
 - `insertMissing` `upsertGraph` option now works as expected with `relate: true`: items that are not found in the database are inserted.
+
+- Brand new typings written from scratch with many improvements and finally a support for [custom query builders](/recipes/custom-query-builder.html#custom-query-builder)
+
+- A bunch of improvements and bug fixes for `upsertGraph`, including a huge speedup in some cases due to less data fetching.
+
+- A brand new [fn](/api/objection/#fn) helper for calling SQL functions.
+
+- Objection now uses native promises instead of bluebird.
+
+- Objection is now leaner as we dropped a bunch of dependencies like `bluebird` and `lodash`.
+
+- In addition to all of this, a huge number of bugs has been squashed!
 
 ### Breaking changes
 
 See the [migration guide](/1.x/migration.md).
-
-- Objection now uses the native promise instead of bluebird which means that all bluebird specific methods like `map`, `reduce`, `reflect`, `bind`, `asCallback`, `nodeify`, `return` etc. have been removed from the `QueryBuilder`.
-
-- Database errors throw by objection are now wrapped using the [db-errors library](https://github.com/Vincit/db-errors). If you have code that uses the properties of the old native database errors, you can access the native error through `err.nativeError`.
-
-- Only the first argument of [modify](/api/query-builder/other-methods.html#modify) query builder method is interpreted as a modifier name. Rest of the arguments are passed as arguments to the modifier. The first argument can be an array of modifier names.
-
-- Using `#ref` in an `insertGraph` or an `upsertGraph` now needs the [allowGraph](/api/types/#type-insertgraphoptions) option to be true.
-
-- `relate` now always returns the number of affected rows. Previously it returned the inserted pivot table row in case of `ManyToManyRelation`.
-
-- The default value for [relatedFindQueryMutates](/api/model/static-properties.html#static-relatedfindquerymutates) and [relatedInsertQueryMutates](https://vincit.github.io/objection.js/api/model/static-properties.html#static-relatedinsertquerymutates) is now false. It used to be true.
-
-- `QueryBuilder.toString()` and `QueryBuilder.toSql()` have been removed. You can use `QueryBuilder.toKnexQuery().toSQL()` instead.
-
-- TODO: Model.raw no longer returns a knex raw instance, but objection.raw.
 
 ## 1.6.10
 
