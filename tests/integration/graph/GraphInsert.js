@@ -6,6 +6,7 @@ const { ModelGraph } = require('../../../lib/model/graph/ModelGraph');
 const { GraphInsert } = require('../../../lib/queryBuilder/graph/insert/GraphInsert');
 const { GraphOptions } = require('../../../lib/queryBuilder/graph/GraphOptions');
 const { GraphNodeDbExistence } = require('../../../lib/queryBuilder/graph/GraphNodeDbExistence');
+const { GraphFetcher } = require('../../../lib/queryBuilder/graph/GraphFetcher');
 const { asArray } = require('../../../lib/utils/objectUtils');
 
 module.exports = session => {
@@ -1030,7 +1031,7 @@ module.exports = session => {
       const graph = assignDbRefsAsRelateProps(ModelGraph.create(modelClass, models));
       const nodeDbExistence = GraphNodeDbExistence.createEveryNodeExistsExistence();
 
-      return GraphInsert.fetchCurrentGraph({ builder, graph, graphOptions })
+      return GraphFetcher.fetchCurrentGraph({ builder, graph, graphOptions })
         .then(currentGraph => {
           numExecutedQueries = 0;
 
