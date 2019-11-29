@@ -14,19 +14,18 @@
   "license": "MIT",
   "dependencies": {
     "axios": "^0.19.0",
-    "knex": "^0.19.1",
-    "koa": "^2.7.0",
+    "knex": "^0.20.3",
+    "koa": "^2.11.0",
     "koa-bodyparser": "^4.2.1",
     "koa-router": "^7.4.0",
-    "objection": "../../",
-    "sqlite3": "^4.0.4"
+    "objection": "2.0.0-rc.2",
+    "sqlite3": "^4.1.0"
   },
   "devDependencies": {
-    "@types/koa": "^2.0.48",
-    "@types/koa-bodyparser": "^4.2.2",
-    "@types/koa-router": "^7.0.40",
-    "chai": "^4.2.0",
-    "mocha": "^6.2.0",
-    "typescript": "3.5.3"
+    "@types/koa": "^2.11.0",
+    "@types/koa-bodyparser": "^4.3.0",
+    "@types/koa-router": "^7.0.42",
+    "ts-node": "^8.5.4",
+    "typescript": "3.7.2"
   }
 }
