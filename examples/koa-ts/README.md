@@ -1,4 +1,4 @@
-# Koa xample project
+# Koa typescript example project
 
 This is an example project that targets node 8.0.0 and up. The project is a simple Koa server with a REST API that demonstrates the basic functionalities of objection like models, queries, relations, eager loading and graph inserts.
 
