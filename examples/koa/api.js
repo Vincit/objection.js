@@ -253,7 +253,6 @@ module.exports = router => {
    */
   router.get('/movies/:id/actors', async ctx => {
     const actors = await Movie.relatedQuery('actors').for(ctx.params.id)
-
     ctx.body = actors
   })
 }

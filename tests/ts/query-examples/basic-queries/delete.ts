@@ -23,4 +23,8 @@ import { Person } from '../../fixtures/person';
   await Person.query()
     .delete()
     .whereExists(Person.relatedQuery('pets').where('pets.name', 'Fluffy'));
+
+  await Person.fromJson({ firstName: 'Jennifer' })
+    .$query()
+    .delete();
 })();

@@ -14,4 +14,12 @@ import { Person } from '../../fixtures/person';
   const updatedPerson = await Person.query().patchAndFetchById(246, {
     lastName: 'Updated'
   });
+
+  await Person.fromJson({ firstName: 'Jennifer' })
+    .$query()
+    .update();
+    
+  await Person.fromJson({ firstName: 'Jennifer' })
+    .$query()
+    .patch();
 })();

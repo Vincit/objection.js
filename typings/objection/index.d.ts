@@ -570,6 +570,7 @@ declare namespace Objection {
 
   interface UpdateMethod<QB extends AnyQueryBuilder> {
     (update: PartialModelObject<ModelType<QB>>): NumberQueryBuilder<QB>;
+    (): NumberQueryBuilder<QB>;
   }
 
   interface UpdateAndFetchMethod<QB extends AnyQueryBuilder> {
