@@ -1492,6 +1492,7 @@ declare namespace Objection {
   }
 
   export interface CreateValidationErrorArgs {
+    statusCode?: number
     message?: string;
     data?: ErrorHash | any;
     // This can be any string for custom errors. ValidationErrorType is there
