@@ -231,16 +231,6 @@ declare namespace Objection {
   };
 
   /**
-   * Extracts the model type from a query builder type QB.
-   */
-  type ModelType<QB extends AnyQueryBuilder> = QB['ModelType'];
-
-  /**
-   * Extracts the result type from a query builder type QB.
-   */
-  type ResultType<QB extends AnyQueryBuilder> = QB['ResultType'];
-
-  /**
    * Extracts the property names (excluding relations) of a model class.
    */
   type ModelProps<T extends Model> = Exclude<
@@ -274,6 +264,21 @@ declare namespace Objection {
   >;
 
   /**
+   * Gets the query builder type for a model type.
+   */
+  type QueryBuilderType<M extends Model> = M['QueryBuilderType'];
+
+  /**
+   * Gets the model type from a query builder type.
+   */
+  type ModelType<QB extends AnyQueryBuilder> = QB['ModelType'];
+
+  /**
+   * Gets the result type from a query builder type.
+   */
+  type ResultType<QB extends AnyQueryBuilder> = QB['ResultType'];
+
+  /**
    * Gets the single item query builder type for a query builder.
    */
   type SingleQueryBuilder<QB extends AnyQueryBuilder> = QB['SingleQueryBuilderType'];
@@ -294,7 +299,7 @@ declare namespace Objection {
   type PageQueryBuilder<QB extends AnyQueryBuilder> = QB['PageQueryBuilderType'];
 
   interface ForClassMethod {
-    <M extends Model>(modelClass: ModelClass<M>): M['QueryBuilderType'];
+    <M extends Model>(modelClass: ModelClass<M>): QueryBuilderType<M>;
   }
 
   /**
@@ -565,7 +570,7 @@ declare namespace Objection {
   }
 
   interface CastToMethod {
-    <M extends Model>(modelClass: ModelClass<M>): M['QueryBuilderType'];
+    <M extends Model>(modelClass: ModelClass<M>): QueryBuilderType<M>;
   }
 
   interface UpdateMethod<QB extends AnyQueryBuilder> {
@@ -713,11 +718,11 @@ declare namespace Objection {
   }
 
   interface OffsetMethod<QB extends AnyQueryBuilder> {
-    (offset: number): PageQueryBuilder<QB>;
+    (offset: number): QB;
   }
 
   interface LimitMethod<QB extends AnyQueryBuilder> {
-    (limit: number): PageQueryBuilder<QB>;
+    (limit: number): QB;
   }
 
   interface ResultSizeMethod {
@@ -842,7 +847,7 @@ declare namespace Objection {
   interface ModifyGraphMethod<QB extends AnyQueryBuilder> {
     <M extends Model>(
       expr: RelationExpression<ModelType<QB>>,
-      modifier: Modifier<M['QueryBuilderType']>
+      modifier: Modifier<QueryBuilderType<M>>
     ): QB;
   }
 
@@ -1199,35 +1204,35 @@ declare namespace Objection {
   }
 
   interface StaticQueryMethod {
-    <M extends Model>(this: ModelClass<M>, trxOrKnex?: TransactionOrKnex): M['QueryBuilderType'];
+    <M extends Model>(this: ModelClass<M>, trxOrKnex?: TransactionOrKnex): QueryBuilderType<M>;
   }
 
   interface QueryMethod {
     <M extends Model>(this: M, trxOrKnex?: TransactionOrKnex): SingleQueryBuilder<
-      M['QueryBuilderType']
+      QueryBuilderType<M>
     >;
   }
 
   type RelatedQueryBuilder<T> = T extends Model
-    ? SingleQueryBuilder<T['QueryBuilderType']>
+    ? SingleQueryBuilder<QueryBuilderType<T>>
     : T extends Array<infer I>
     ? I extends Model
-      ? I['QueryBuilderType']
+      ? QueryBuilderType<I>
       : never
     : never;
 
   type ArrayRelatedQueryBuilder<T> = T extends Model
-    ? T['QueryBuilderType']
+    ? QueryBuilderType<T>
     : T extends Array<infer I>
     ? I extends Model
-      ? I['QueryBuilderType']
+      ? QueryBuilderType<I>
       : never
     : never;
 
   interface RelatedQueryMethod<M extends Model> {
     <K extends keyof M>(relationName: K, trxOrKnex?: TransactionOrKnex): RelatedQueryBuilder<M[K]>;
 
-    <RM extends Model>(relationName: string, trxOrKnex?: TransactionOrKnex): RM['QueryBuilderType'];
+    <RM extends Model>(relationName: string, trxOrKnex?: TransactionOrKnex): QueryBuilderType<RM>;
   }
 
   interface StaticRelatedQueryMethod {
@@ -1237,21 +1242,21 @@ declare namespace Objection {
       trxOrKnex?: TransactionOrKnex
     ): ArrayRelatedQueryBuilder<M[K]>;
 
-    <RM extends Model>(relationName: string, trxOrKnex?: TransactionOrKnex): RM['QueryBuilderType'];
+    <RM extends Model>(relationName: string, trxOrKnex?: TransactionOrKnex): QueryBuilderType<RM>;
   }
 
   // Deprecated
   interface LoadRelatedMethod<M extends Model> {
     (
       expression: RelationExpression<M>,
-      modifiers?: Modifiers<M['QueryBuilderType']>,
+      modifiers?: Modifiers<QueryBuilderType<M>>,
       trxOrKnex?: TransactionOrKnex
-    ): SingleQueryBuilder<M['QueryBuilderType']>;
+    ): SingleQueryBuilder<QueryBuilderType<M>>;
   }
 
   interface FetchGraphMethod<M extends Model> {
     (expression: RelationExpression<M>, options?: FetchGraphOptions): SingleQueryBuilder<
-      M['QueryBuilderType']
+      QueryBuilderType<M>
     >;
   }
 
@@ -1265,17 +1270,17 @@ declare namespace Objection {
       this: ModelClass<M>,
       modelOrObject: PartialModelObject<M>,
       expression: RelationExpression<M>,
-      modifiers?: Modifiers<M['QueryBuilderType']>,
+      modifiers?: Modifiers<QueryBuilderType<M>>,
       trxOrKnex?: TransactionOrKnex
-    ): SingleQueryBuilder<M['QueryBuilderType']>;
+    ): SingleQueryBuilder<QueryBuilderType<M>>;
 
     <M extends Model>(
       this: ModelClass<M>,
       modelOrObject: PartialModelObject<M>[],
       expression: RelationExpression<M>,
-      modifiers?: Modifiers<M['QueryBuilderType']>,
+      modifiers?: Modifiers<QueryBuilderType<M>>,
       trxOrKnex?: TransactionOrKnex
-    ): M['QueryBuilderType'];
+    ): QueryBuilderType<M>;
   }
 
   interface StaticFetchGraphMethod {
@@ -1284,14 +1289,14 @@ declare namespace Objection {
       modelOrObject: PartialModelObject<M>,
       expression: RelationExpression<M>,
       options?: FetchGraphOptions
-    ): SingleQueryBuilder<M['QueryBuilderType']>;
+    ): SingleQueryBuilder<QueryBuilderType<M>>;
 
     <M extends Model>(
       this: ModelClass<M>,
       modelOrObject: PartialModelObject<M>[],
       expression: RelationExpression<M>,
       options?: FetchGraphOptions
-    ): M['QueryBuilderType'];
+    ): QueryBuilderType<M>;
   }
 
   interface TraverserFunction {
@@ -1313,7 +1318,7 @@ declare namespace Objection {
     (): any;
   }
 
-  type ArrayQueryBuilderThunk<M extends Model> = () => ArrayQueryBuilder<M['QueryBuilderType']>;
+  type ArrayQueryBuilderThunk<M extends Model> = () => ArrayQueryBuilder<QueryBuilderType<M>>;
   type CancelQueryThunk = (result: any) => void;
 
   export interface StaticHookArguments<M extends Model, R = any> {
@@ -1354,8 +1359,8 @@ declare namespace Objection {
     relation: RelationType;
     modelClass: ModelClassSpecifier;
     join: RelationJoin;
-    modify?: Modifier<M['QueryBuilderType']>;
-    filter?: Modifier<M['QueryBuilderType']>;
+    modify?: Modifier<QueryBuilderType<M>>;
+    filter?: Modifier<QueryBuilderType<M>>;
     beforeInsert?: RelationMappingHook<M>;
   }
 
@@ -1492,7 +1497,7 @@ declare namespace Objection {
   }
 
   export interface CreateValidationErrorArgs {
-    statusCode?: number
+    statusCode?: number;
     message?: string;
     data?: ErrorHash | any;
     // This can be any string for custom errors. ValidationErrorType is there

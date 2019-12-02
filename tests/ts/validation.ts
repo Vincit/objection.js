@@ -70,12 +70,12 @@ import { Person } from './fixtures/person';
       type: 'InvalidOneTimeCode',
       message: 'Wrong code',
       data: {
-        supplied: '1234',
-      },
+        supplied: '1234'
+      }
     });
   } catch (e) {
-    if(e instanceof ValidationError) {
-      if(e.type === 'InvalidOneTimeCode') {
+    if (e instanceof ValidationError) {
+      if (e.type === 'InvalidOneTimeCode') {
         console.log('one time code was invalid');
       }
     }

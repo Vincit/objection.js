@@ -18,7 +18,7 @@ import { Person } from '../../fixtures/person';
   await Person.fromJson({ firstName: 'Jennifer' })
     .$query()
     .update();
-    
+
   await Person.fromJson({ firstName: 'Jennifer' })
     .$query()
     .patch();
