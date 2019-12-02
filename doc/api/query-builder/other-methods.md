@@ -943,46 +943,6 @@ Executes the query and calls `bind(context)` for the returned promise.
 | --------- | ---------------------------------------------------------- |
 | `Promise` | Promise the will be resolved with the result of the query. |
 
-## asCallback()
-
-```js
-const promise = queryBuilder.asCallback(callback);
-```
-
-Executes the query and calls `asCallback(callback)` for the returned promise.
-
-##### Arguments
-
-| Argument | Type     | Default   | Description         |
-| -------- | -------- | --------- | ------------------- |
-| callback | function | undefined | Node style callback |
-
-##### Return value
-
-| Type      | Description                                                |
-| --------- | ---------------------------------------------------------- |
-| `Promise` | Promise the will be resolved with the result of the query. |
-
-## nodeify()
-
-```js
-const promise = queryBuilder.nodeify(callback);
-```
-
-Executes the query and calls `nodeify(callback)` for the returned promise.
-
-##### Arguments
-
-| Argument | Type     | Default   | Description         |
-| -------- | -------- | --------- | ------------------- |
-| callback | function | undefined | Node style callback |
-
-##### Return value
-
-| Type      | Description                                                |
-| --------- | ---------------------------------------------------------- |
-| `Promise` | Promise the will be resolved with the result of the query. |
-
 ## resultSize()
 
 ```js
