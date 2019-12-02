@@ -20,7 +20,7 @@
 
 - modifiers can now take arguments and are a lot more useful. See [this recipe](https://vincit.github.io/objection.js/recipes/modifiers.html) for more info.
 
-- Objection now uses the [db-errors](https://github.com/Vincit/db-errors/issues) library by default to wrap the database errors.
+- Objection now uses the [db-errors](https://github.com/Vincit/db-errors) library by default to wrap the database errors.
 
 - `insertMissing` `upsertGraph` option now works as expected with `relate: true`: items that are not found in the database are inserted.
 
