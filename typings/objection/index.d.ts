@@ -1529,6 +1529,10 @@ declare namespace Objection {
   }
 
   interface FromJsonMethod {
+    <M extends Model>(this: ModelClass<M>, json: object, opt?: ModelOptions): M;
+  }
+
+  interface FromDatabaseJsonMethod {
     <M extends Model>(this: ModelClass<M>, json: object): M;
   }
 
@@ -1585,7 +1589,7 @@ declare namespace Objection {
     static relationMappings: RelationMappings | RelationMappingsThunk;
 
     static fromJson: FromJsonMethod;
-    static fromDatabaseJson: FromJsonMethod;
+    static fromDatabaseJson: FromDatabaseJsonMethod;
 
     static createValidator(): Validator;
     static createValidationError(args: CreateValidationErrorArgs): Error;
