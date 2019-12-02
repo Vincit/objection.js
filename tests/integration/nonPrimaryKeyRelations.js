@@ -303,7 +303,7 @@ module.exports = session => {
       describe('many to many relation', () => {
         it('find', () => {
           return findArnold()
-            .then(arnold => arnold.$relatedQuery('movies'))
+            .then(arnold => arnold.$relatedQuery('movies').orderBy('name'))
             .then(movies =>
               expect(movies.map(it => it.name)).to.eql(['Terminator', 'Terminator 2'])
             );
