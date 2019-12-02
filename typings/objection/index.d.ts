@@ -346,8 +346,8 @@ declare namespace Objection {
     alias: boolean | string;
   }
 
-  interface JoinRelation {
-    <QM extends Model>(expr: RelationExpression, opt?: RelationOptions): QueryBuilder<QM, QM[]>;
+  interface JoinRelation<QB> {
+    (expr: RelationExpression, opt?: RelationOptions): QB;
   }
 
   type JsonObjectOrFieldExpression = object | object[] | FieldExpression;
@@ -780,14 +780,14 @@ declare namespace Objection {
     // TODO: fromJS does not exist in current knex documentation: http://knexjs.org/#Builder-fromJS
     withSchema(schemaName: string): this;
 
-    joinRelation: JoinRelation;
-    innerJoinRelation: JoinRelation;
-    outerJoinRelation: JoinRelation;
-    leftJoinRelation: JoinRelation;
-    leftOuterJoinRelation: JoinRelation;
-    rightJoinRelation: JoinRelation;
-    rightOuterJoinRelation: JoinRelation;
-    fullOuterJoinRelation: JoinRelation;
+    joinRelation: JoinRelation<this>;
+    innerJoinRelation: JoinRelation<this>;
+    outerJoinRelation: JoinRelation<this>;
+    leftJoinRelation: JoinRelation<this>;
+    leftOuterJoinRelation: JoinRelation<this>;
+    rightJoinRelation: JoinRelation<this>;
+    rightOuterJoinRelation: JoinRelation<this>;
+    fullOuterJoinRelation: JoinRelation<this>;
 
     // TODO: avgDistinct does not exist in current knex documentation: http://knexjs.org/#Builder-fromJS
     // TODO: modify does not exist in current knex documentation: http://knexjs.org/#Builder-modify

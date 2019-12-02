@@ -219,6 +219,14 @@ async () => {
     );
 };
 
+async () => {
+  const persons = await Person.query()
+    .joinRelation('children.children.pets')
+    .select('children:children:pets.*')
+
+  takesPeople(persons)
+}
+
 // .query().castTo()
 async () => {
   const animals = await Person.query()
