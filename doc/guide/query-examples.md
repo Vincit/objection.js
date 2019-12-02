@@ -351,7 +351,6 @@ const dogs = await person
   .where('species', 'dog')
   .orderBy('name');
 
-console.log(person.pets === dogs); // --> true
 console.log(dogs[0] instanceof Animal); // --> true
 ```
 
