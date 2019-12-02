@@ -1478,7 +1478,7 @@ declare namespace Objection {
     statusCode: number;
     message: string;
     data?: ErrorHash | any;
-    type: ValidationErrorType;
+    type: ValidationErrorType | string;
   }
 
   export interface ValidationErrorItem {

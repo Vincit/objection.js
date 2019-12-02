@@ -62,4 +62,22 @@ import { Person } from './fixtures/person';
       }
     }
   }
+
+  // gh-1582
+  try {
+    throw new ValidationError({
+      statusCode: 409,
+      type: 'InvalidOneTimeCode',
+      message: 'Wrong code',
+      data: {
+        supplied: '1234',
+      },
+    });
+  } catch (e) {
+    if(e instanceof ValidationError) {
+      if(e.type === 'InvalidOneTimeCode') {
+        console.log('one time code was invalid');
+      }
+    }
+  }
 })();
