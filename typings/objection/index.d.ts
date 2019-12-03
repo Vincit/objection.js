@@ -1505,6 +1505,14 @@ declare namespace Objection {
     type: ValidationErrorType | string;
   }
 
+  export class NotFoundError extends Error {
+    constructor(data?: any);
+
+    statusCode: number;
+    data?: any;
+    type: 'NotFound';
+  }
+
   export interface TableMetadata {
     columns: Array<string>;
   }

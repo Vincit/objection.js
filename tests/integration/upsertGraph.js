@@ -2086,6 +2086,7 @@ module.exports = session => {
           })
           .catch(err => {
             expect(err instanceof Model1.NotFoundError).to.equal(true);
+            expect(err.type).to.equal('NotFound');
             expect(err.message).to.equal(
               'model (id=1000) is not a child of model (id=2). If you want to relate it, use the relate option. If you want to insert it with an id, use the insertMissing option'
             );

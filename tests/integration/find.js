@@ -583,6 +583,7 @@ module.exports = session => {
             })
             .catch(err => {
               expect(err).to.be.a(Model1.NotFoundError);
+              expect(err.type).to.equal('NotFound');
               done();
             })
             .catch(done);
