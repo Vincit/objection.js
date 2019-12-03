@@ -492,11 +492,6 @@ declare namespace Objection {
     (alias: string, expr: CallbackVoid<QB> | AnyQueryBuilder | Raw): QB;
   }
 
-  interface WithRawMethod<QB extends AnyQueryBuilder> {
-    (alias: string, sql: string, ...bindings: any[]): QB;
-    (alias: string, sql: string, bindings: any[]): QB;
-  }
-
   interface JoinRelatedOptions {
     alias?: string | boolean;
     aliases?: Record<string, string>;
@@ -984,7 +979,6 @@ declare namespace Objection {
     intersect: SetOperations<this>;
 
     with: WithMethod<this>;
-    withRaw: WithRawMethod<this>;
     withWrapped: WithMethod<this>;
 
     // Deprecated

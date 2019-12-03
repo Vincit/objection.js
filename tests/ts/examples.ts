@@ -522,8 +522,6 @@ qb = qb.where(Person.ref('column1'), 1);
 qb = qb.alias('someAlias');
 qb = qb.with('alias', Movie.query());
 qb = qb.with('alias', qb => qb.from('someTable').select('id'));
-qb = qb.withRaw('alias', 'select * from table where id = ?', 1);
-qb = qb.withRaw('alias', 'select * from table where id = ?', [1]);
 qb = qb.whereColumn('firstName', 'lastName');
 qb = qb.groupBy('firstName');
 qb = qb.groupBy(['firstName', 'lastName']);
