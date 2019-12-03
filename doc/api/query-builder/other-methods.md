@@ -1056,33 +1056,11 @@ console.log(result.total); // --> 3341
 
 ## pluck()
 
-```js
-queryBuilder = queryBuilder.pluck(propertyName);
-```
+::: warning
+Deprecated! Will be removed in version 3.0.
 
-If the result is an array, plucks a property from each object.
-
-##### Arguments
-
-| Argument     | Type   | Description                       |
-| ------------ | ------ | --------------------------------- |
-| propertyName | string | The name of the property to pluck |
-
-##### Return value
-
-| Type                                | Description                       |
-| ----------------------------------- | --------------------------------- |
-| [QueryBuilder](/api/query-builder/) | `this` query builder for chaining |
-
-##### Examples
-
-```js
-const firstNames = await Person.query()
-  .where('age', '>', 20)
-  .pluck('firstName');
-
-console.log(typeof firstNames[0]); // --> string
-```
+[v1 documentation](https://github.com/Vincit/objection.js/blob/v1/doc/api/query-builder/other-methods.md#pluck)
+:::
 
 ## first()
 
@@ -1142,142 +1120,27 @@ try {
 
 ## traverse()
 
-```js
-queryBuilder = queryBuilder.traverse(modelClass, traverser);
-```
+::: warning
+Deprecated! Will be removed in version 3.0.
 
-Traverses through all models in the result, including the eagerly loaded relations.
-
-The optional first parameter can be a constructor. If given, the traverser function is only called for the models of that class.
-
-##### Arguments
-
-| Argument   | Type                                                         | Description                                                                                                                                                                                                                                 |
-| ---------- | ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| modelClass | [Model](/api/model/)                                         | The optional model class filter. If given, the traverser function is only called for models of this class.                                                                                                                                  |
-| traverser  | function([Model](/api/model/), [Model](/api/model/), string) | The traverser function that is called for each model. The first argument is the model itself. If the model is in a relation of some other model the second argument is the parent model and the third argument is the name of the relation. |
-
-##### Return value
-
-| Type                                | Description                       |
-| ----------------------------------- | --------------------------------- |
-| [QueryBuilder](/api/query-builder/) | `this` query builder for chaining |
-
-##### Examples
-
-```js
-const people = await Person.query()
-  .withGraphFetched('pets')
-  .traverse((model, parentModel, relationName) => {
-    delete model.id;
-  });
-
-console.log(people[0].id); // --> undefined
-console.log(people[0].pets[0].id); // --> undefined
-```
-
-```js
-const persons = await Person.query()
-  .withGraphFetched('pets')
-  .traverse(Animal, (animal, parentModel, relationName) => {
-    delete animal.id;
-  });
-
-console.log(persons[0].id); // --> 1
-console.log(persons[0].pets[0].id); // --> undefined
-```
+[v1 documentation](https://github.com/Vincit/objection.js/blob/v1/doc/api/query-builder/other-methods.md#traverse)
+:::
 
 ## pick()
 
-```js
-queryBuilder = queryBuilder.pick(modelClass, properties);
-```
+::: warning
+Deprecated! Will be removed in version 3.0.
 
-Pick properties from result models.
-
-The first example goes through all models (including relations) and discards all
-properties but `id` and `name`. The second example also traverses the whole model
-tree and discards all but `id` and `firstName` properties of all `Person`
-instances and `id` and `name` properties of all `Animal` instances.
-
-##### Arguments
-
-| Argument   | Type                 | Description                     |
-| ---------- | -------------------- | ------------------------------- |
-| modelClass | [Model](/api/model/) | The optional model class filter |
-| properties | string[]             | The properties to pick          |
-
-##### Return value
-
-| Type                                | Description                       |
-| ----------------------------------- | --------------------------------- |
-| [QueryBuilder](/api/query-builder/) | `this` query builder for chaining |
-
-##### Examples
-
-There are two ways to call this methods:
-
-```js
-Person
-  .query()
-  .withGraphFetched('pets').
-  .pick(['id', 'name']);
-```
-
-and
-
-```js
-Person.query()
-  .withGraphFetched('pets')
-  .pick(Person, ['id', 'firstName'])
-  .pick(Animal, ['id', 'name']);
-```
+[v1 documentation](https://github.com/Vincit/objection.js/blob/v1/doc/api/query-builder/other-methods.md#pick)
+:::
 
 ## omit()
 
-```js
-queryBuilder = queryBuilder.omit(modelClass, properties);
-```
+::: warning
+Deprecated! Will be removed in version 3.0.
 
-Omit properties of result models.
-
-The first example goes through all models (including relations) and omits the properties
-`parentId` and `ownerId`. The second example also traverses the whole model tree and
-omits the properties `parentId` and `age` from all `Person` instances and `ownerId`
-and `species` properties of all `Animal` instances.
-
-##### Arguments
-
-| Argument   | Type                 | Description                     |
-| ---------- | -------------------- | ------------------------------- |
-| modelClass | [Model](/api/model/) | The optional model class filter |
-| properties | string[]             | The properties to omit          |
-
-##### Return value
-
-| Type                                | Description                       |
-| ----------------------------------- | --------------------------------- |
-| [QueryBuilder](/api/query-builder/) | `this` query builder for chaining |
-
-##### Examples
-
-There are two ways to call this methods:
-
-```js
-Person
-  .query()
-  .withGraphFetched('pets').
-  .omit(['parentId', 'ownerId']);
-```
-
-and
-
-```js
-Person.query()
-  .withGraphFetched('pets')
-  .omit(Person, ['parentId', 'age'])
-  .omit(Animal, ['ownerId', 'species']);
-```
+[v1 documentation](https://github.com/Vincit/objection.js/blob/v1/doc/api/query-builder/other-methods.md#omit)
+:::
 
 ## timeout()
 
