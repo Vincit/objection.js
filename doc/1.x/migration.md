@@ -137,7 +137,7 @@ With objection 1.x, doing this
 await somePerson.$relatedQuery('pets');
 ```
 
-addad a property `pets` for `somePerson` and saved the result there. This no longer happens with objection 2. Also inserting a new item using
+added a property `pets` for `somePerson` and saved the result there. This no longer happens with objection 2. Also inserting a new item using
 
 ```js
 await somePerson.$relatedQuery('pets').insert(pet);
