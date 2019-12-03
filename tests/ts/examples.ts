@@ -176,6 +176,7 @@ function takesModelClass(m: objection.ModelClass<any>) {}
 const takesPerson = (person: Person) => {
   person.examplePersonMethod('');
 };
+const takesMaybeUndefined = (_: undefined) => 1;
 const takesMaybePerson = (_: Person | undefined) => 1;
 const takesPeople = (_: Person[]) => 1;
 const takesNumber = (_: number) => 1;
@@ -204,6 +205,7 @@ async () => {
   takesPeople(await Person.query().where('lastName', lastName));
   takesPeople(await Person.query().where({ lastName }));
   takesMaybePerson(await Person.query().findById(123));
+  takesMaybeUndefined(await Person.query().findById(123));
   takesMaybePerson(await Person.query().findById('uid'));
 };
 
