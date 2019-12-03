@@ -413,6 +413,20 @@ module.exports = session => {
               });
             });
         });
+
+        it('should not have the json reference property in the result object', async () => {
+          const item = await BoundModel.query().findById(1);
+          await item
+            .$query()
+            .patch({ 'jsonObject:attr': 'bar' })
+            .returning('*');
+          expect(item).to.eql({
+            id: 1,
+            name: 'test1',
+            jsonObject: { attr: 'bar' },
+            jsonArray: [1]
+          });
+        });
       });
     });
 
