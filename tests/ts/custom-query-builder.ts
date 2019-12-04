@@ -1,4 +1,4 @@
-import { Model, QueryBuilder, Page } from '../../';
+import { Model, QueryBuilder, Page, TransactionOrKnex } from '../../';
 
 class CustomQueryBuilder<M extends Model, R = M[]> extends QueryBuilder<M, R> {
   ArrayQueryBuilderType!: CustomQueryBuilder<M, M[]>;
@@ -9,10 +9,18 @@ class CustomQueryBuilder<M extends Model, R = M[]> extends QueryBuilder<M, R> {
   someCustomMethod(): this {
     return this;
   }
+
+  delete() {
+    return super.delete();
+  }
 }
 
 class BaseModel extends Model {
   QueryBuilderType!: CustomQueryBuilder<this>;
+
+  $query(trxOrKnex?: TransactionOrKnex) {
+    return super.$query(trxOrKnex);
+  }
 }
 
 class Animal extends BaseModel {

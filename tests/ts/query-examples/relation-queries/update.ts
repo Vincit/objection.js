@@ -13,8 +13,8 @@ import { Person } from '../../fixtures/person';
     oldLastName: ref('lastName')
   });
 
-  // await Person.query().update({
-  //   lastName: ref('someJsonColumn:mother.lastName').castText(),
-  //   'detailsJsonColumn:address.street': 'Elm street'
-  // });
+  await Person.query().update({
+    lastName: ref('someJsonColumn:mother.lastName').castText(),
+    'detailsJsonColumn:address.street': 'Elm street'
+  } as any);
 })();

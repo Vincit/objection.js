@@ -544,84 +544,13 @@ declare namespace Objection {
 
   interface OrderByRawMethod<QB extends AnyQueryBuilder> extends RawInterface<QB> {}
 
-  interface FindByIdMethod<QB extends AnyQueryBuilder> {
-    (id: MaybeCompositeId): SingleQueryBuilder<QB>;
-  }
-
-  interface FindByIdsMethod<QB extends AnyQueryBuilder> {
-    (ids: MaybeCompositeId[]): QB;
-  }
-
-  interface FindOneMethod<QB extends AnyQueryBuilder> extends WhereMethod<SingleQueryBuilder<QB>> {}
-
   interface FirstMethod {
     <QB extends AnyQueryBuilder>(this: QB): QB extends ArrayQueryBuilder<QB>
       ? SingleQueryBuilder<QB>
       : QB;
   }
 
-  interface ExecuteMethod<R> {
-    (): Promise<R>;
-  }
-
-  interface CastToMethod {
-    <M extends Model>(modelClass: ModelClass<M>): QueryBuilderType<M>;
-  }
-
-  interface UpdateMethod<QB extends AnyQueryBuilder> {
-    (update: PartialModelObject<ModelType<QB>>): NumberQueryBuilder<QB>;
-    (): NumberQueryBuilder<QB>;
-  }
-
-  interface UpdateAndFetchMethod<QB extends AnyQueryBuilder> {
-    (update: PartialModelObject<ModelType<QB>>): SingleQueryBuilder<QB>;
-  }
-
-  interface UpdateAndFetchByIdMethod<QB extends AnyQueryBuilder> {
-    (id: MaybeCompositeId, update: PartialModelObject<ModelType<QB>>): SingleQueryBuilder<QB>;
-  }
-
-  interface DeleteMethod<QB extends AnyQueryBuilder> {
-    (): NumberQueryBuilder<QB>;
-  }
-
-  interface DeleteByIdMethod<QB extends AnyQueryBuilder> {
-    (id: MaybeCompositeId): NumberQueryBuilder<QB>;
-  }
-
-  interface InsertMethod<QB extends AnyQueryBuilder> {
-    (insert: PartialModelObject<ModelType<QB>>): SingleQueryBuilder<QB>;
-    (insert: PartialModelObject<ModelType<QB>>[]): ArrayQueryBuilder<QB>;
-    (): SingleQueryBuilder<QB>;
-  }
-
-  interface RelateMethod<QB extends AnyQueryBuilder> {
-    (
-      ids:
-        | MaybeCompositeId
-        | MaybeCompositeId[]
-        | PartialModelObject<ModelType<QB>>
-        | PartialModelObject<ModelType<QB>>[]
-    ): NumberQueryBuilder<QB>;
-  }
-
-  interface UnrelateMethod<QB extends AnyQueryBuilder> {
-    (): NumberQueryBuilder<QB>;
-  }
-
   type ForIdValue = MaybeCompositeId | AnyQueryBuilder;
-
-  interface ForMethod<QB extends AnyQueryBuilder> {
-    (ids: ForIdValue | ForIdValue[]): QB;
-  }
-
-  interface WithGraphFetchedMethod<QB extends AnyQueryBuilder> {
-    (expr: RelationExpression<ModelType<QB>>, options?: GraphOptions): QB;
-  }
-
-  interface WithGraphJoinedMethod<QB extends AnyQueryBuilder> {
-    (expr: RelationExpression<ModelType<QB>>, options?: GraphOptions): QB;
-  }
 
   // Deprecated
   interface EagerMethod<QB extends AnyQueryBuilder> {
@@ -656,10 +585,6 @@ declare namespace Objection {
     (modelClass: typeof Model): string;
   }
 
-  interface ToKnexQueryMethod<QB extends AnyQueryBuilder> {
-    <T = ModelObject<QB['ModelType']>>(): Knex.QueryBuilder<T, T[]>;
-  }
-
   interface AliasForMethod<QB extends AnyQueryBuilder> {
     (modelClassOrTableName: string | ModelClass<any>, alias: string): QB;
   }
@@ -686,42 +611,9 @@ declare namespace Objection {
     (ms: number, options?: TimeoutOptions): QB;
   }
 
-  // Deprecated
-  interface PickMethod<QB extends AnyQueryBuilder> {
-    (modelClass: typeof Model, properties: string[]): QB;
-    (properties: string[]): QB;
-  }
-
-  // Deprecated
-  interface OmitMethod<QB extends AnyQueryBuilder> {
-    (modelClass: typeof Model, properties: string[]): QB;
-    (properties: string[]): QB;
-  }
-
   export interface Page<M extends Model> {
     total: number;
     results: M[];
-  }
-
-  interface PageMethod<QB extends AnyQueryBuilder> {
-    (page: number, pageSize: number): PageQueryBuilder<QB>;
-  }
-
-  interface RangeMethod<QB extends AnyQueryBuilder> {
-    (): PageQueryBuilder<QB>;
-    (start: number, end: number): PageQueryBuilder<QB>;
-  }
-
-  interface OffsetMethod<QB extends AnyQueryBuilder> {
-    (offset: number): QB;
-  }
-
-  interface LimitMethod<QB extends AnyQueryBuilder> {
-    (limit: number): QB;
-  }
-
-  interface ResultSizeMethod {
-    (): Promise<number>;
   }
 
   interface RunBeforeCallback<QB extends AnyQueryBuilder> {
@@ -765,16 +657,16 @@ declare namespace Objection {
     allowRefs?: boolean;
   }
 
-  interface InsertGraphMethod {
+  interface InsertGraphMethod<M extends Model> {
     <QB extends AnyQueryBuilder>(
       this: QB,
-      graph: PartialModelGraph<ModelType<QB>>,
+      graph: PartialModelGraph<M>,
       options?: InsertGraphOptions
     ): SingleQueryBuilder<QB>;
 
     <QB extends AnyQueryBuilder>(
       this: QB,
-      graph: PartialModelGraph<ModelType<QB>>[],
+      graph: PartialModelGraph<M>[],
       options?: InsertGraphOptions
     ): ArrayQueryBuilder<QB>;
   }
@@ -792,16 +684,16 @@ declare namespace Objection {
     allowRefs?: boolean;
   }
 
-  interface UpsertGraphMethod {
+  interface UpsertGraphMethod<M extends Model> {
     <QB extends AnyQueryBuilder>(
       this: QB,
-      graph: PartialModelGraph<ModelType<QB>>[],
+      graph: PartialModelGraph<M>[],
       options?: UpsertGraphOptions
     ): ArrayQueryBuilder<QB>;
 
     <QB extends AnyQueryBuilder>(
       this: QB,
-      graph: PartialModelGraph<ModelType<QB>>,
+      graph: PartialModelGraph<M>,
       options?: UpsertGraphOptions
     ): SingleQueryBuilder<QB>;
   }
@@ -1028,11 +920,6 @@ declare namespace Objection {
     avgDistinct: AggregateMethod<this>;
     increment: IncrementDecrementMethod<this>;
     decrement: IncrementDecrementMethod<this>;
-
-    findById: FindByIdMethod<this>;
-    findByIds: FindByIdsMethod<this>;
-    findOne: WhereMethod<SingleQueryBuilder<this>>;
-
     first: FirstMethod;
 
     orderBy: OrderByMethod<this>;
@@ -1041,30 +928,50 @@ declare namespace Objection {
     groupBy: GroupByMethod<this>;
     groupByRaw: RawInterface<this>;
 
-    execute: ExecuteMethod<R>;
-    castTo: CastToMethod;
+    findById(id: MaybeCompositeId): SingleQueryBuilder<this>;
+    findByIds(ids: MaybeCompositeId[]): this;
+    findOne: WhereMethod<SingleQueryBuilder<this>>;
 
-    update: UpdateMethod<this>;
-    updateAndFetch: UpdateAndFetchMethod<this>;
-    updateAndFetchById: UpdateAndFetchByIdMethod<this>;
+    execute(): Promise<R>;
+    castTo<MC extends Model>(modelClass: ModelClass<MC>): QueryBuilderType<MC>;
 
-    patch: UpdateMethod<this>;
-    patchAndFetch: UpdateAndFetchMethod<this>;
-    patchAndFetchById: UpdateAndFetchByIdMethod<this>;
+    update(update: PartialModelObject<M>): NumberQueryBuilder<this>;
+    update(): NumberQueryBuilder<this>;
+    updateAndFetch(update: PartialModelObject<M>): SingleQueryBuilder<this>;
+    updateAndFetchById(
+      id: MaybeCompositeId,
+      update: PartialModelObject<M>
+    ): SingleQueryBuilder<this>;
 
-    del: DeleteMethod<this>;
-    delete: DeleteMethod<this>;
-    deleteById: DeleteByIdMethod<this>;
+    patch(update: PartialModelObject<M>): NumberQueryBuilder<this>;
+    patch(): NumberQueryBuilder<this>;
+    patchAndFetch(update: PartialModelObject<M>): SingleQueryBuilder<this>;
+    patchAndFetchById(
+      id: MaybeCompositeId,
+      update: PartialModelObject<M>
+    ): SingleQueryBuilder<this>;
 
-    insert: InsertMethod<this>;
-    insertAndFetch: InsertMethod<this>;
+    del(): NumberQueryBuilder<this>;
+    delete(): NumberQueryBuilder<this>;
+    deleteById(id: MaybeCompositeId): NumberQueryBuilder<this>;
 
-    relate: RelateMethod<this>;
-    unrelate: UnrelateMethod<this>;
-    for: ForMethod<this>;
+    insert(insert: PartialModelObject<M>): SingleQueryBuilder<this>;
+    insert(insert: PartialModelObject<M>[]): ArrayQueryBuilder<this>;
+    insert(): SingleQueryBuilder<this>;
 
-    withGraphFetched: WithGraphFetchedMethod<this>;
-    withGraphJoined: WithGraphJoinedMethod<this>;
+    insertAndFetch(insert: PartialModelObject<M>): SingleQueryBuilder<this>;
+    insertAndFetch(insert: PartialModelObject<M>[]): ArrayQueryBuilder<this>;
+    insertAndFetch(): SingleQueryBuilder<this>;
+
+    relate(
+      ids: MaybeCompositeId | MaybeCompositeId[] | PartialModelObject<M> | PartialModelObject<M>[]
+    ): NumberQueryBuilder<this>;
+
+    unrelate(): NumberQueryBuilder<this>;
+    for(ids: ForIdValue | ForIdValue[]): this;
+
+    withGraphFetched(expr: RelationExpression<M>, options?: GraphOptions): this;
+    withGraphJoined(expr: RelationExpression<M>, options?: GraphOptions): this;
 
     truncate(): Promise<void>;
 
@@ -1106,29 +1013,37 @@ declare namespace Objection {
     modelClass: ModelClassMethod;
     tableNameFor: TableRefForMethod;
     tableRefFor: TableRefForMethod;
-    toKnexQuery: ToKnexQueryMethod<this>;
     reject: OneArgMethod<any, this>;
     resolve: OneArgMethod<any, this>;
     transacting: OneArgMethod<TransactionOrKnex, this>;
     connection: OneArgMethod<TransactionOrKnex, this>;
     timeout: TimeoutMethod<this>;
-    clone: IdentityMethod<this>;
     columnInfo: ColumnInfoMethod<this>;
 
-    // Deprecated
-    pluck: OneArgMethod<string, this>;
-    // Deprecated
-    pick: PickMethod<this>;
-    // Deprecated
-    omit: OmitMethod<this>;
-    // Deprecated
-    traverse: TraverseMethod<this>;
+    toKnexQuery<T = ModelObject<M>>(): Knex.QueryBuilder<T, T[]>;
+    clone(): this;
 
-    page: PageMethod<this>;
-    range: RangeMethod<this>;
-    offset: OffsetMethod<this>;
-    limit: LimitMethod<this>;
-    resultSize: ResultSizeMethod;
+    // Deprecated
+    pluck(property: string): this;
+    // Deprecated
+    pick(modelClass: typeof Model, properties: string[]): this;
+    // Deprecated
+    pick(properties: string[]): this;
+    // Deprecated
+    omit(modelClass: typeof Model, properties: string[]): this;
+    // Deprecated
+    omit(properties: string[]): this;
+    // Deprecated
+    traverse(filterConstructor: typeof Model, traverser: TraverserFunction): R;
+    // Deprecated
+    traverse(traverser: TraverserFunction): R;
+
+    page(page: number, pageSize: number): PageQueryBuilder<this>;
+    range(): PageQueryBuilder<this>;
+    range(start: number, end: number): PageQueryBuilder<this>;
+    offset(offset: number): this;
+    limit(limit: number): this;
+    resultSize(): Promise<number>;
 
     runBefore: RunBeforeMethod<this>;
     runAfter: RunAfterMethod<this>;
@@ -1137,13 +1052,13 @@ declare namespace Objection {
     onBuildKnex: OnBuildKnexMethod<this>;
     onError: OnErrorMethod<this>;
 
-    insertGraph: InsertGraphMethod;
-    insertGraphAndFetch: InsertGraphMethod;
-    insertWithRelated: InsertGraphMethod;
-    insertWithRelatedAndFetch: InsertGraphMethod;
+    insertGraph: InsertGraphMethod<M>;
+    insertGraphAndFetch: InsertGraphMethod<M>;
+    insertWithRelated: InsertGraphMethod<M>;
+    insertWithRelatedAndFetch: InsertGraphMethod<M>;
 
-    upsertGraph: UpsertGraphMethod;
-    upsertGraphAndFetch: UpsertGraphMethod;
+    upsertGraph: UpsertGraphMethod<M>;
+    upsertGraphAndFetch: UpsertGraphMethod<M>;
 
     graphExpressionObject: GraphExpressionObjectMethod<this>;
 
@@ -1197,16 +1112,6 @@ declare namespace Objection {
     PageQueryBuilderType: QueryBuilder<M, Page<M>>;
   }
 
-  interface StaticQueryMethod {
-    <M extends Model>(this: ModelClass<M>, trxOrKnex?: TransactionOrKnex): QueryBuilderType<M>;
-  }
-
-  interface QueryMethod {
-    <M extends Model>(this: M, trxOrKnex?: TransactionOrKnex): SingleQueryBuilder<
-      QueryBuilderType<M>
-    >;
-  }
-
   type RelatedQueryBuilder<T> = T extends Model
     ? SingleQueryBuilder<QueryBuilderType<T>>
     : T extends Array<infer I>
@@ -1222,22 +1127,6 @@ declare namespace Objection {
       ? QueryBuilderType<I>
       : never
     : never;
-
-  interface RelatedQueryMethod<M extends Model> {
-    <K extends keyof M>(relationName: K, trxOrKnex?: TransactionOrKnex): RelatedQueryBuilder<M[K]>;
-
-    <RM extends Model>(relationName: string, trxOrKnex?: TransactionOrKnex): QueryBuilderType<RM>;
-  }
-
-  interface StaticRelatedQueryMethod {
-    <M extends Model, K extends keyof M>(
-      this: ModelClass<M>,
-      relationName: K,
-      trxOrKnex?: TransactionOrKnex
-    ): ArrayRelatedQueryBuilder<M[K]>;
-
-    <RM extends Model>(relationName: string, trxOrKnex?: TransactionOrKnex): QueryBuilderType<RM>;
-  }
 
   // Deprecated
   interface LoadRelatedMethod<M extends Model> {
@@ -1258,53 +1147,8 @@ declare namespace Objection {
     transaction?: TransactionOrKnex;
   }
 
-  // Deprecated
-  interface StaticLoadRelatedMethod {
-    <M extends Model>(
-      this: ModelClass<M>,
-      modelOrObject: PartialModelObject<M>,
-      expression: RelationExpression<M>,
-      modifiers?: Modifiers<QueryBuilderType<M>>,
-      trxOrKnex?: TransactionOrKnex
-    ): SingleQueryBuilder<QueryBuilderType<M>>;
-
-    <M extends Model>(
-      this: ModelClass<M>,
-      modelOrObject: PartialModelObject<M>[],
-      expression: RelationExpression<M>,
-      modifiers?: Modifiers<QueryBuilderType<M>>,
-      trxOrKnex?: TransactionOrKnex
-    ): QueryBuilderType<M>;
-  }
-
-  interface StaticFetchGraphMethod {
-    <M extends Model>(
-      this: ModelClass<M>,
-      modelOrObject: PartialModelObject<M>,
-      expression: RelationExpression<M>,
-      options?: FetchGraphOptions
-    ): SingleQueryBuilder<QueryBuilderType<M>>;
-
-    <M extends Model>(
-      this: ModelClass<M>,
-      modelOrObject: PartialModelObject<M>[],
-      expression: RelationExpression<M>,
-      options?: FetchGraphOptions
-    ): QueryBuilderType<M>;
-  }
-
   interface TraverserFunction {
     (model: Model, parentModel: Model, relationName: string): void;
-  }
-
-  interface StaticTraverseMethod {
-    (filterConstructor: typeof Model, models: Model | Model[], traverser: TraverserFunction): void;
-    (models: Model | Model[], traverser: TraverserFunction): void;
-  }
-
-  interface TraverseMethod<R> {
-    (filterConstructor: typeof Model, traverser: TraverserFunction): R;
-    (traverser: TraverserFunction): R;
   }
 
   interface IdMethod {
@@ -1325,10 +1169,6 @@ declare namespace Objection {
     items: Model[];
     inputItems: M[];
     result?: R;
-  }
-
-  export interface StaticModelHookMethod {
-    (args: StaticHookArguments<any>): any;
   }
 
   export type Transaction = knex.Transaction;
@@ -1521,21 +1361,8 @@ declare namespace Objection {
     table?: string;
   }
 
-  interface TransactionMethod {
-    <T>(callback: (trx: Transaction) => Promise<T>): Promise<T>;
-    <T>(trxOrKnex: TransactionOrKnex, callback: (trx: Transaction) => Promise<T>): Promise<T>;
-  }
-
   interface BindKnexMethod {
     <M>(this: M, trxOrKnex: TransactionOrKnex): M;
-  }
-
-  interface FromJsonMethod {
-    <M extends Model>(this: ModelClass<M>, json: object, opt?: ModelOptions): M;
-  }
-
-  interface FromDatabaseJsonMethod {
-    <M extends Model>(this: ModelClass<M>, json: object): M;
   }
 
   export interface Constructor<T> {
@@ -1548,6 +1375,7 @@ declare namespace Objection {
     static tableName: string;
     static idColumn: string | string[];
     static jsonSchema: JSONSchema;
+    static relationMappings: RelationMappings | RelationMappingsThunk;
     static modelPaths: string[];
     static jsonAttributes: string[];
     static virtualAttributes: string[];
@@ -1559,6 +1387,7 @@ declare namespace Objection {
     static relatedFindQueryMutates: boolean;
     static relatedInsertQueryMutates: boolean;
     static modifiers: Modifiers;
+    static columnNameMappers: ColumnNameMappers;
 
     static QueryBuilder: typeof QueryBuilder;
 
@@ -1585,13 +1414,24 @@ declare namespace Objection {
     // Deprecated
     static JoinEagerAlgorithm: EagerAlgorithm;
 
-    static query: StaticQueryMethod;
-    static relatedQuery: StaticRelatedQueryMethod;
-    static columnNameMappers: ColumnNameMappers;
-    static relationMappings: RelationMappings | RelationMappingsThunk;
+    static query<M extends Model>(
+      this: ModelClass<M>,
+      trxOrKnex?: TransactionOrKnex
+    ): QueryBuilderType<M>;
 
-    static fromJson: FromJsonMethod;
-    static fromDatabaseJson: FromDatabaseJsonMethod;
+    static relatedQuery<M extends Model, K extends keyof M>(
+      this: ModelClass<M>,
+      relationName: K,
+      trxOrKnex?: TransactionOrKnex
+    ): ArrayRelatedQueryBuilder<M[K]>;
+
+    static relatedQuery<RM extends Model>(
+      relationName: string,
+      trxOrKnex?: TransactionOrKnex
+    ): QueryBuilderType<RM>;
+
+    static fromJson<M extends Model>(this: ModelClass<M>, json: object, opt?: ModelOptions): M;
+    static fromDatabaseJson<M extends Model>(this: ModelClass<M>, json: object): M;
 
     static createValidator(): Validator;
     static createValidationError(args: CreateValidationErrorArgs): Error;
@@ -1603,31 +1443,79 @@ declare namespace Objection {
     static knex(knex?: knex): knex;
     static knexQuery(): knex.QueryBuilder;
     static startTransaction(knexOrTransaction?: TransactionOrKnex): Transaction;
-    static transaction: TransactionMethod;
+
+    static transaction<T>(callback: (trx: Transaction) => Promise<T>): Promise<T>;
+    static transaction<T>(
+      trxOrKnex: TransactionOrKnex,
+      callback: (trx: Transaction) => Promise<T>
+    ): Promise<T>;
 
     static bindKnex: BindKnexMethod;
     static bindTransaction: BindKnexMethod;
 
     // Deprecated
-    static loadRelated: StaticLoadRelatedMethod;
-    static fetchGraph: StaticFetchGraphMethod;
+    static loadRelated<M extends Model>(
+      this: ModelClass<M>,
+      modelOrObject: PartialModelObject<M>,
+      expression: RelationExpression<M>,
+      modifiers?: Modifiers<QueryBuilderType<M>>,
+      trxOrKnex?: TransactionOrKnex
+    ): SingleQueryBuilder<QueryBuilderType<M>>;
+
+    // Deprecated
+    static loadRelated<M extends Model>(
+      this: ModelClass<M>,
+      modelOrObject: PartialModelObject<M>[],
+      expression: RelationExpression<M>,
+      modifiers?: Modifiers<QueryBuilderType<M>>,
+      trxOrKnex?: TransactionOrKnex
+    ): QueryBuilderType<M>;
+
+    static fetchGraph<M extends Model>(
+      this: ModelClass<M>,
+      modelOrObject: PartialModelObject<M>,
+      expression: RelationExpression<M>,
+      options?: FetchGraphOptions
+    ): SingleQueryBuilder<QueryBuilderType<M>>;
+
+    static fetchGraph<M extends Model>(
+      this: ModelClass<M>,
+      modelOrObject: PartialModelObject<M>[],
+      expression: RelationExpression<M>,
+      options?: FetchGraphOptions
+    ): QueryBuilderType<M>;
 
     static getRelations(): Relations;
     static getRelation(name: string): Relation;
 
-    static traverse: StaticTraverseMethod;
+    static traverse(models: Model | Model[], traverser: TraverserFunction): void;
+    static traverse(
+      filterConstructor: typeof Model,
+      models: Model | Model[],
+      traverser: TraverserFunction
+    ): void;
 
-    static beforeFind: StaticModelHookMethod;
-    static afterFind: StaticModelHookMethod;
-    static beforeInsert: StaticModelHookMethod;
-    static afterInsert: StaticModelHookMethod;
-    static beforeUpdate: StaticModelHookMethod;
-    static afterUpdate: StaticModelHookMethod;
-    static beforeDelete: StaticModelHookMethod;
-    static afterDelete: StaticModelHookMethod;
+    static beforeFind(args: StaticHookArguments<any>): any;
+    static afterFind(args: StaticHookArguments<any>): any;
+    static beforeInsert(args: StaticHookArguments<any>): any;
+    static afterInsert(args: StaticHookArguments<any>): any;
+    static beforeUpdate(args: StaticHookArguments<any>): any;
+    static afterUpdate(args: StaticHookArguments<any>): any;
+    static beforeDelete(args: StaticHookArguments<any>): any;
+    static afterDelete(args: StaticHookArguments<any>): any;
 
-    $query: QueryMethod;
-    $relatedQuery: RelatedQueryMethod<this>;
+    $relatedQuery<K extends keyof this>(
+      relationName: K,
+      trxOrKnex?: TransactionOrKnex
+    ): RelatedQueryBuilder<this[K]>;
+
+    $relatedQuery<RM extends Model>(
+      relationName: string,
+      trxOrKnex?: TransactionOrKnex
+    ): QueryBuilderType<RM>;
+
+    $query(trxOrKnex?: TransactionOrKnex): SingleQueryBuilder<QueryBuilderType<this>>;
+
     $id: IdMethod;
     // Deprecated
     $loadRelated: LoadRelatedMethod<this>;
@@ -1672,7 +1560,8 @@ declare namespace Objection {
     $omit(keys: string | string[] | { [key: string]: boolean }): this;
     $pick(keys: string | string[] | { [key: string]: boolean }): this;
     $clone(opt?: CloneOptions): this;
-    $traverse: TraverseMethod<void>;
+    $traverse(filterConstructor: typeof Model, traverser: TraverserFunction): this;
+    $traverse(traverser: TraverserFunction): this;
 
     $knex(): knex;
     $transaction(): knex;

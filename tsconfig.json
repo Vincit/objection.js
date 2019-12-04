@@ -7,6 +7,7 @@
     "noEmit": true,
     "noImplicitReturns": true,
     "noImplicitUseStrict": false,
+    "noImplicitAny": true,
     "strict": true,
     "target": "es6"
   },

@@ -7,4 +7,12 @@ import { Person } from '../../fixtures/person';
     .$relatedQuery('pets')
     .where('species', 'dog')
     .orderBy('name');
+
+  console.log(pets[0].name);
+
+  const pets2 = await Person.relatedQuery('pets').for([1, 2, 3]);
+  console.log(pets2[0].species);
+
+  const movies = await Person.relatedQuery('movies').for(1);
+  console.log(movies[0].title);
 })();
