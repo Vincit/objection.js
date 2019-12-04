@@ -399,18 +399,18 @@ declare namespace Objection {
     (col1: ColumnRef, col2: ColumnRef): QB;
   }
 
-  interface WhereJson<QB extends AnyQueryBuilder> {
+  interface WhereJsonMethod<QB extends AnyQueryBuilder> {
     (
       fieldExpression: FieldExpression,
       jsonObjectOrFieldExpression: JsonObjectOrFieldExpression
     ): QB;
   }
 
-  interface WhereFieldExpression<QB extends AnyQueryBuilder> {
+  interface WhereFieldExpressionMethod<QB extends AnyQueryBuilder> {
     (fieldExpression: FieldExpression): QB;
   }
 
-  interface WhereJsonExpression<QB extends AnyQueryBuilder> {
+  interface WhereJsonExpressionMethod<QB extends AnyQueryBuilder> {
     (fieldExpression: FieldExpression, keys: string | string[]): QB;
   }
 
@@ -444,7 +444,7 @@ declare namespace Objection {
     (callbacksOrBuilders: QBOrCallback<QB>[], wrap?: boolean): QB;
   }
 
-  interface SetOperations<QB extends AnyQueryBuilder> extends BaseSetOperations<QB> {
+  interface SetOperationsMethod<QB extends AnyQueryBuilder> extends BaseSetOperations<QB> {
     (...callbacksOrBuilders: QBOrCallback<QB>[]): QB;
   }
 
@@ -554,7 +554,7 @@ declare namespace Objection {
 
   interface FindOneMethod<QB extends AnyQueryBuilder> extends WhereMethod<SingleQueryBuilder<QB>> {}
 
-  interface FirstMethod<QB extends AnyQueryBuilder> {
+  interface FirstMethod {
     <QB extends AnyQueryBuilder>(this: QB): QB extends ArrayQueryBuilder<QB>
       ? SingleQueryBuilder<QB>
       : QB;
@@ -928,26 +928,26 @@ declare namespace Objection {
     orWhereNotColumn: WhereColumnMethod<this>;
     andWhereNotColumn: WhereColumnMethod<this>;
 
-    whereJsonSupersetOf: WhereJson<this>;
-    orWhereJsonSupersetOf: WhereJson<this>;
-    whereJsonNotSupersetOf: WhereJson<this>;
-    orWhereJsonNotSupersetOf: WhereJson<this>;
-    whereJsonSubsetOf: WhereJson<this>;
-    orWhereJsonSubsetOf: WhereJson<this>;
-    whereJsonNotSubsetOf: WhereJson<this>;
-    orWhereJsonNotSubsetOf: WhereJson<this>;
-    whereJsonIsArray: WhereFieldExpression<this>;
-    orWhereJsonIsArray: WhereFieldExpression<this>;
-    whereJsonNotArray: WhereFieldExpression<this>;
-    orWhereJsonNotArray: WhereFieldExpression<this>;
-    whereJsonIsObject: WhereFieldExpression<this>;
-    orWhereJsonIsObject: WhereFieldExpression<this>;
-    whereJsonNotObject: WhereFieldExpression<this>;
-    orWhereJsonNotObject: WhereFieldExpression<this>;
-    whereJsonHasAny: WhereJsonExpression<this>;
-    orWhereJsonHasAny: WhereJsonExpression<this>;
-    whereJsonHasAll: WhereJsonExpression<this>;
-    orWhereJsonHasAll: WhereJsonExpression<this>;
+    whereJsonSupersetOf: WhereJsonMethod<this>;
+    orWhereJsonSupersetOf: WhereJsonMethod<this>;
+    whereJsonNotSupersetOf: WhereJsonMethod<this>;
+    orWhereJsonNotSupersetOf: WhereJsonMethod<this>;
+    whereJsonSubsetOf: WhereJsonMethod<this>;
+    orWhereJsonSubsetOf: WhereJsonMethod<this>;
+    whereJsonNotSubsetOf: WhereJsonMethod<this>;
+    orWhereJsonNotSubsetOf: WhereJsonMethod<this>;
+    whereJsonIsArray: WhereFieldExpressionMethod<this>;
+    orWhereJsonIsArray: WhereFieldExpressionMethod<this>;
+    whereJsonNotArray: WhereFieldExpressionMethod<this>;
+    orWhereJsonNotArray: WhereFieldExpressionMethod<this>;
+    whereJsonIsObject: WhereFieldExpressionMethod<this>;
+    orWhereJsonIsObject: WhereFieldExpressionMethod<this>;
+    whereJsonNotObject: WhereFieldExpressionMethod<this>;
+    orWhereJsonNotObject: WhereFieldExpressionMethod<this>;
+    whereJsonHasAny: WhereJsonExpressionMethod<this>;
+    orWhereJsonHasAny: WhereJsonExpressionMethod<this>;
+    whereJsonHasAll: WhereJsonExpressionMethod<this>;
+    orWhereJsonHasAll: WhereJsonExpressionMethod<this>;
 
     having: WhereMethod<this>;
     andHaving: WhereMethod<this>;
@@ -976,7 +976,7 @@ declare namespace Objection {
 
     union: UnionMethod<this>;
     unionAll: UnionMethod<this>;
-    intersect: SetOperations<this>;
+    intersect: SetOperationsMethod<this>;
 
     with: WithMethod<this>;
     withWrapped: WithMethod<this>;
@@ -1031,9 +1031,9 @@ declare namespace Objection {
 
     findById: FindByIdMethod<this>;
     findByIds: FindByIdsMethod<this>;
-    findOne: FindOneMethod<this>;
+    findOne: WhereMethod<SingleQueryBuilder<this>>;
 
-    first: FirstMethod<this>;
+    first: FirstMethod;
 
     orderBy: OrderByMethod<this>;
     orderByRaw: OrderByRawMethod<this>;
@@ -1327,7 +1327,7 @@ declare namespace Objection {
     result?: R;
   }
 
-  export interface StaticModelHook {
+  export interface StaticModelHookMethod {
     (args: StaticHookArguments<any>): any;
   }
 
@@ -1617,14 +1617,14 @@ declare namespace Objection {
 
     static traverse: StaticTraverseMethod;
 
-    static beforeFind: StaticModelHook;
-    static afterFind: StaticModelHook;
-    static beforeInsert: StaticModelHook;
-    static afterInsert: StaticModelHook;
-    static beforeUpdate: StaticModelHook;
-    static afterUpdate: StaticModelHook;
-    static beforeDelete: StaticModelHook;
-    static afterDelete: StaticModelHook;
+    static beforeFind: StaticModelHookMethod;
+    static afterFind: StaticModelHookMethod;
+    static beforeInsert: StaticModelHookMethod;
+    static afterInsert: StaticModelHookMethod;
+    static beforeUpdate: StaticModelHookMethod;
+    static afterUpdate: StaticModelHookMethod;
+    static beforeDelete: StaticModelHookMethod;
+    static afterDelete: StaticModelHookMethod;
 
     $query: QueryMethod;
     $relatedQuery: RelatedQueryMethod<this>;
