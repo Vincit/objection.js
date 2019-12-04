@@ -18,7 +18,7 @@
     "koa": "^2.11.0",
     "koa-bodyparser": "^4.2.1",
     "koa-router": "^7.4.0",
-    "objection": "2.0.0-rc.2",
+    "objection": "2.0.3",
     "sqlite3": "^4.1.0"
   }
 }
