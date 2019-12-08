@@ -93,9 +93,10 @@ This page contains the documentation of all other types and classes than [Model]
 
 ## `type` FetchGraphOptions
 
-| Property    | Type                | Description                                                                                                                  |
-| ----------- | ------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| transaction | knex<br>Transaction | Optional transaction or knex instance for the query. This can be used to specify a transaction or even a different database. |
+| Property     | Type                | Description                                                                                                                  |
+| ------------ | ------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| transaction  | knex<br>Transaction | Optional transaction or knex instance for the query. This can be used to specify a transaction or even a different database. |
+|  skipFetched | boolean             | If true, only fetch relations that don't yet exist in the object.                                                            |
 
 ## `type` TableMetadataFetchOptions
 

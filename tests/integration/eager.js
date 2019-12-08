@@ -1289,6 +1289,248 @@ module.exports = session => {
       });
     });
 
+    describe('skipFetched option', () => {
+      let TestModel;
+      let queries;
+
+      beforeEach(() => {
+        queries = [];
+
+        // Create a dummy mock so that we can bind Model1 to it.
+        TestModel = Model1.bindKnex(
+          mockKnexFactory(session.knex, function(mock, oldImpl, args) {
+            queries.push(this.toSQL());
+            return oldImpl.apply(this, args);
+          })
+        );
+      });
+
+      it('should not fetch an existing relation when `skipFetched` option is true', async () => {
+        const models = await TestModel.query().withGraphFetched('model1Relation1');
+
+        queries = [];
+        const result = await TestModel.fetchGraph(models, 'model1Relation1', { skipFetched: true });
+
+        expect(queries).to.have.length(0);
+        expect(models).to.eql(result);
+      });
+
+      it('should fetch an existing relation when `skipFetched` option is true if not all needed relation props exist', async () => {
+        const model = await TestModel.query()
+          .withGraphFetched('model1Relation1')
+          .findById(1);
+
+        // Deleting this will cause `fetchGraph` to reload model.model1Relation1
+        // because it needs it to have the `model1Id` present for the next level
+        // of fetching.
+        delete model.model1Relation1.model1Id;
+
+        queries = [];
+        await model.$fetchGraph('model1Relation1.model1Relation1', { skipFetched: true });
+
+        expect(queries).to.have.length(2);
+        expect(model).to.eql({
+          id: 1,
+          model1Id: 2,
+          model1Prop1: 'hello 1',
+          model1Prop2: null,
+          $afterFindCalled: 1,
+          model1Relation1: {
+            id: 2,
+            model1Id: 3,
+            model1Prop1: 'hello 2',
+            model1Prop2: null,
+            $afterFindCalled: 1,
+            model1Relation1: {
+              id: 3,
+              model1Id: 4,
+              model1Prop1: 'hello 3',
+              $afterFindCalled: 1,
+              model1Prop2: null
+            }
+          }
+        });
+      });
+
+      it('should fetch an existing relation when `skipFetched` option is true if not all needed relation props exist (2)', async () => {
+        const model = await TestModel.query()
+          .withGraphFetched('model1Relation1')
+          .findById(1);
+
+        // Deleting this will cause `fetchGraph` to reload model.model1Relation1
+        // because it needs it to have the `id` present for the next level
+        // of fetching.
+        delete model.model1Relation1.id;
+
+        queries = [];
+        await model.$fetchGraph('model1Relation1.model1Relation2', { skipFetched: true });
+
+        expect(queries).to.have.length(2);
+      });
+
+      it('should fetch other relations when `skipFetched` option is true', async () => {
+        const models = await TestModel.query()
+          .withGraphFetched('model1Relation1')
+          .where('id', 1);
+
+        queries = [];
+        const result = await TestModel.fetchGraph(
+          models,
+          '[model1Relation1.model1Relation1, model1Relation2(orderById)]',
+          { skipFetched: true }
+        );
+
+        expect(queries).to.have.length(2);
+        expect(result).to.eql([
+          {
+            id: 1,
+            model1Id: 2,
+            model1Prop1: 'hello 1',
+            model1Prop2: null,
+            $afterFindCalled: 1,
+            model1Relation1: {
+              id: 2,
+              model1Id: 3,
+              model1Prop1: 'hello 2',
+              model1Prop2: null,
+              $afterFindCalled: 1,
+              model1Relation1: {
+                id: 3,
+                model1Id: 4,
+                model1Prop1: 'hello 3',
+                $afterFindCalled: 1,
+                model1Prop2: null
+              }
+            },
+            model1Relation2: [
+              {
+                idCol: 1,
+                model1Id: 1,
+                model2Prop1: 'hejsan 1',
+                $afterFindCalled: 1,
+                model2Prop2: null
+              },
+              {
+                idCol: 2,
+                model1Id: 1,
+                model2Prop1: 'hejsan 2',
+                $afterFindCalled: 1,
+                model2Prop2: null
+              }
+            ]
+          }
+        ]);
+      });
+
+      it('should work with nested relations', async () => {
+        const models = await TestModel.query()
+          .withGraphFetched('model1Relation1.model1Relation1')
+          .where('id', 1);
+
+        queries = [];
+        const result = await TestModel.fetchGraph(
+          models,
+          '[model1Relation1.model1Relation1, model1Relation2(orderById)]',
+          { skipFetched: true }
+        );
+
+        expect(queries).to.have.length(1);
+        expect(result).to.eql([
+          {
+            id: 1,
+            model1Id: 2,
+            model1Prop1: 'hello 1',
+            model1Prop2: null,
+            $afterFindCalled: 1,
+            model1Relation1: {
+              id: 2,
+              model1Id: 3,
+              model1Prop1: 'hello 2',
+              model1Prop2: null,
+              $afterFindCalled: 1,
+              model1Relation1: {
+                id: 3,
+                model1Id: 4,
+                model1Prop1: 'hello 3',
+                $afterFindCalled: 1,
+                model1Prop2: null
+              }
+            },
+            model1Relation2: [
+              {
+                idCol: 1,
+                model1Id: 1,
+                model2Prop1: 'hejsan 1',
+                $afterFindCalled: 1,
+                model2Prop2: null
+              },
+              {
+                idCol: 2,
+                model1Id: 1,
+                model2Prop1: 'hejsan 2',
+                $afterFindCalled: 1,
+                model2Prop2: null
+              }
+            ]
+          }
+        ]);
+      });
+
+      it('should work with nested and parallel relations', async () => {
+        const models = await TestModel.query()
+          .withGraphFetched('[model1Relation1.model1Relation1, model1Relation2]')
+          .where('id', 1);
+
+        queries = [];
+        const result = await TestModel.fetchGraph(
+          models,
+          '[model1Relation1.model1Relation1, model1Relation2]',
+          { skipFetched: true }
+        );
+
+        expect(queries).to.have.length(0);
+        expect(result).to.eql([
+          {
+            id: 1,
+            model1Id: 2,
+            model1Prop1: 'hello 1',
+            model1Prop2: null,
+            $afterFindCalled: 1,
+            model1Relation1: {
+              id: 2,
+              model1Id: 3,
+              model1Prop1: 'hello 2',
+              model1Prop2: null,
+              $afterFindCalled: 1,
+              model1Relation1: {
+                id: 3,
+                model1Id: 4,
+                model1Prop1: 'hello 3',
+                $afterFindCalled: 1,
+                model1Prop2: null
+              }
+            },
+            model1Relation2: [
+              {
+                idCol: 1,
+                model1Id: 1,
+                model2Prop1: 'hejsan 1',
+                $afterFindCalled: 1,
+                model2Prop2: null
+              },
+              {
+                idCol: 2,
+                model1Id: 1,
+                model2Prop1: 'hejsan 2',
+                $afterFindCalled: 1,
+                model2Prop2: null
+              }
+            ]
+          }
+        ]);
+      });
+    });
+
     describe('JoinEagerAlgorithm', () => {
       it('select should work', () => {
         return Model1.query()

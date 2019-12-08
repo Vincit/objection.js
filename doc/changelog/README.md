@@ -1,5 +1,19 @@
 # Changelog
 
+## 2.0.4
+
+### What's new
+
+- New `skipFetched` option for `fetchGraph` and `$fetchGraph`
+
+## 2.0.3
+
+### What's new
+
+- Fixes [#1585](https://github.com/Vincit/objection.js/issues/1585)
+- Fixes [#1361](https://github.com/Vincit/objection.js/issues/1361)
+- Fixes [#1488](https://github.com/Vincit/objection.js/issues/1488)
+
 ## 2.0.0
 
 ### What's new

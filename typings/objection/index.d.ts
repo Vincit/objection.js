@@ -264,6 +264,31 @@ declare namespace Objection {
   >;
 
   /**
+   * Given a model property type, returns a query builer type of
+   * correct kind if the property is a model or a model array.
+   */
+  type RelatedQueryBuilder<T> = T extends Model
+    ? SingleQueryBuilder<QueryBuilderType<T>>
+    : T extends Array<infer I>
+    ? I extends Model
+      ? QueryBuilderType<I>
+      : never
+    : never;
+
+  /**
+   * Just like RelatedQueryBuilder but always returns an array
+   * query builder even if the property type is a model and not
+   * an array of models.
+   */
+  type ArrayRelatedQueryBuilder<T> = T extends Model
+    ? QueryBuilderType<T>
+    : T extends Array<infer I>
+    ? I extends Model
+      ? QueryBuilderType<I>
+      : never
+    : never;
+
+  /**
    * Gets the query builder type for a model type.
    */
   type QueryBuilderType<M extends Model> = M['QueryBuilderType'];
@@ -1112,48 +1137,13 @@ declare namespace Objection {
     PageQueryBuilderType: QueryBuilder<M, Page<M>>;
   }
 
-  type RelatedQueryBuilder<T> = T extends Model
-    ? SingleQueryBuilder<QueryBuilderType<T>>
-    : T extends Array<infer I>
-    ? I extends Model
-      ? QueryBuilderType<I>
-      : never
-    : never;
-
-  type ArrayRelatedQueryBuilder<T> = T extends Model
-    ? QueryBuilderType<T>
-    : T extends Array<infer I>
-    ? I extends Model
-      ? QueryBuilderType<I>
-      : never
-    : never;
-
-  // Deprecated
-  interface LoadRelatedMethod<M extends Model> {
-    (
-      expression: RelationExpression<M>,
-      modifiers?: Modifiers<QueryBuilderType<M>>,
-      trxOrKnex?: TransactionOrKnex
-    ): SingleQueryBuilder<QueryBuilderType<M>>;
-  }
-
-  interface FetchGraphMethod<M extends Model> {
-    (expression: RelationExpression<M>, options?: FetchGraphOptions): SingleQueryBuilder<
-      QueryBuilderType<M>
-    >;
-  }
-
   interface FetchGraphOptions {
     transaction?: TransactionOrKnex;
+    skipFetched?: boolean;
   }
 
   interface TraverserFunction {
     (model: Model, parentModel: Model, relationName: string): void;
-  }
-
-  interface IdMethod {
-    (id: any): void;
-    (): any;
   }
 
   type ArrayQueryBuilderThunk<M extends Model> = () => ArrayQueryBuilder<QueryBuilderType<M>>;
@@ -1361,10 +1351,6 @@ declare namespace Objection {
     table?: string;
   }
 
-  interface BindKnexMethod {
-    <M>(this: M, trxOrKnex: TransactionOrKnex): M;
-  }
-
   export interface Constructor<T> {
     new (): T;
   }
@@ -1372,6 +1358,8 @@ declare namespace Objection {
   export interface ModelClass<M> extends Constructor<M> {}
 
   export class Model {
+    static QueryBuilder: typeof QueryBuilder;
+
     static tableName: string;
     static idColumn: string | string[];
     static jsonSchema: JSONSchema;
@@ -1388,8 +1376,6 @@ declare namespace Objection {
     static relatedInsertQueryMutates: boolean;
     static modifiers: Modifiers;
     static columnNameMappers: ColumnNameMappers;
-
-    static QueryBuilder: typeof QueryBuilder;
 
     static raw: RawFunction;
     static ref: ReferenceFunction;
@@ -1450,8 +1436,8 @@ declare namespace Objection {
       callback: (trx: Transaction) => Promise<T>
     ): Promise<T>;
 
-    static bindKnex: BindKnexMethod;
-    static bindTransaction: BindKnexMethod;
+    static bindKnex<M>(this: M, trxOrKnex: TransactionOrKnex): M;
+    static bindTransaction<M>(this: M, trxOrKnex: TransactionOrKnex): M;
 
     // Deprecated
     static loadRelated<M extends Model>(
@@ -1516,10 +1502,20 @@ declare namespace Objection {
 
     $query(trxOrKnex?: TransactionOrKnex): SingleQueryBuilder<QueryBuilderType<this>>;
 
-    $id: IdMethod;
+    $id(id: any): void;
+    $id(): any;
+
     // Deprecated
-    $loadRelated: LoadRelatedMethod<this>;
-    $fetchGraph: FetchGraphMethod<this>;
+    $loadRelated(
+      expression: RelationExpression<this>,
+      modifiers?: Modifiers<QueryBuilderType<this>>,
+      trxOrKnex?: TransactionOrKnex
+    ): SingleQueryBuilder<QueryBuilderType<this>>;
+
+    $fetchGraph(
+      expression: RelationExpression<this>,
+      options?: FetchGraphOptions
+    ): SingleQueryBuilder<QueryBuilderType<this>>;
 
     $formatDatabaseJson(json: Pojo): Pojo;
     $parseDatabaseJson(json: Pojo): Pojo;

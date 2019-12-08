@@ -15,4 +15,7 @@ import { Person } from '../../fixtures/person';
 
   const movies = await Person.relatedQuery('movies').for(1);
   console.log(movies[0].title);
+
+  const mom = await Person.relatedQuery('mom').for(1);
+  console.log(mom[0].firstName);
 })();
