@@ -1478,7 +1478,7 @@ module.exports = session => {
 
       it('should work with nested and parallel relations', async () => {
         const models = await TestModel.query()
-          .withGraphFetched('[model1Relation1.model1Relation1, model1Relation2]')
+          .withGraphFetched('[model1Relation1.model1Relation1, model1Relation2(orderById)]')
           .where('id', 1);
 
         queries = [];
