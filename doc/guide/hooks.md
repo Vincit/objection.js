@@ -4,6 +4,7 @@ Hooks are model methods that allow you too hook into different stages of objecti
 
 1. [instance query hooks](#instance-query-hooks)
 2. [static query hooks](#static-query-hooks)
+3. [model data lifecycle hooks](#model-data-lifecycle-hooks)
 
 Each hook type serve a different purpose. We'll go through the different types in the following chapters.
 
@@ -264,4 +265,77 @@ class Person extends SomePlugin(Model) {
 }
 ```
 
+:::
+
+## Model data lifecycle hooks
+
+For the purposes of this explanation, let’s define three data layouts:
+
+1. `database`: The data layout returned by the database.
+2. `internal`: The data layout of a model instance.
+3. `external`: The data layout after calling model.toJSON().
+
+Whenever data is converted from one layout to another a data lifecycle hook is called:
+
+1. `database` -> [\$parseDatabaseJson](/api/model/instance-methods.html#parsedatabasejson) -> `internal`
+2. `internal` -> [\$formatDatabaseJson](/api/model/instance-methods.html#formatdatabasejson) -> `database`
+3. `external` -> [\$parseJson](/api/model/instance-methods.html#parsejson) -> `internal`
+4. `internal` -> [\$formatJson](/api/model/instance-methods.html#formatjson) -> `external`
+
+So for example when the results of a query are read from the database the data goes through the [\$parseDatabaseJson](/api/model/instance-methods.html#parsedatabasejson) method. When data is written to database it goes through the [\$formatDatabaseJson](/api/model/instance-methods.html#formatdatabasejson) method.
+
+Similarly when you give data for a query (for example [`query().insert(req.body)`](/api/query-builder/mutate-methods.html#insert)) or create a model explicitly using [`Model.fromJson(obj)`](/api/model/static-methods.html#static-fromjson) the [\$parseJson](/api/model/instance-methods.html#parsejson) method is invoked. When you call [`model.toJSON()`](/api/model/instance-methods.html#tojson) or [`model.$toJson()`](/api/model/instance-methods.html#tojson) the [\$formatJson](/api/model/instance-methods.html#formatjson) is called.
+
+Note: Most libraries like [express](http://expressjs.com/en/index.html) and [koa](https://koajs.com/) automatically call the [toJSON](/api/model/instance-methods.html#tojson) method when you pass the model instance to methods like `response.json(model)`. You rarely need to call [toJSON()](/api/model/instance-methods.html#tojson) or [\$toJson()](/api/model/instance-methods.html#tojson) explicitly. This is because `JSON.stringify` calls the `toJSON` method and basically all libraries that create JSON strings use `JSON.stringify` under the hood.
+
+Data lifecycle hooks are always synchronous. They cannot be `async` or return promises.
+
+Fore example, here's a hook that converts date strings to `moment` instances when read from the database, and back to date strings when written to database:
+
+```js
+// We use a hardcoded list here. Note that you can store these fields
+// for example as a static array in the model and access it through
+// this.constructor in the hooks, or read the values from `jsonSchema`
+// if you use it.
+const dateColumns = ['dateOfBirth', 'dateOfDeath'];
+
+class Person extends Model {
+  $parseDatabaseJson(json) {
+    // Remember to call the super implementation.
+    json = super.$parseDatabaseJson(json);
+
+    for (const dateColumn of dateColumns) {
+      // Remember to always check if the json object has the particular
+      // field. It may not exist if the user has used `select('id')`
+      // or any other select that excludes the field.
+      if (json[dateColumn] !== undefined) {
+        json[dateColumn] = moment(json[dateColumn]);
+      }
+    }
+
+    return json;
+  }
+
+  $formatDatabaseJson(json) {
+    for (const dateColumn of dateColumns) {
+      // Remember to always check if the json object has the particular field.
+      // It may not exist if the user updates or inserts a partial object.
+      if (json[dateColumn] !== undefined && moment.isMoment(json[dateColumn])) {
+        json[dateColumn] = json[dateColumn].toISOString();
+      }
+    }
+
+    // Remember to call the super implementation.
+    return super.$formatDatabaseJson(json);
+  }
+}
+```
+
+::: warning
+Be sure to read the special requirements for the data lifecycle hooks in their documentation.
+
+[\$parseDatabaseJson](/api/model/instance-methods.html#parsedatabasejson)<br>
+[\$formatDatabaseJson](/api/model/instance-methods.html#formatdatabasejson)<br>
+[\$parseJson](/api/model/instance-methods.html#parsejson)<br>
+[\$formatJson](/api/model/instance-methods.html#formatjson)
 :::
