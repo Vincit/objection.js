@@ -18,7 +18,7 @@ Here's a list of the breaking changes
 
 In addition to these, **a lot** of methods were deprecated and replaced by a new method. The old methods still work, but they print a warning (once per process) when you use them. The warning message tells which method you should be using in the future and you can slowly replace the methods as you get annoyed by the warnings.
 
-Most of the methods have simply been renamed, but in some cases the replacing methods works a little differently. Make sure to read the documentation of the new method.
+Most of the methods have simply been renamed, but in some cases the replacing methods work a little differently. Make sure to read the documentation of the new method.
 
 ## Node 6 and 7 are no longer supported
 
@@ -26,7 +26,7 @@ Objection now needs at least node 8 to work.
 
 ## `modify` method signature change
 
-Before you were able to provide multiple modifiers or modifier names to `modify` by providing multiple arguments like this:
+Before, you were able to provide multiple modifiers or modifier names to `modify` by providing multiple arguments like this:
 
 ```js
 Person.query().modify('foo', 'bar');
