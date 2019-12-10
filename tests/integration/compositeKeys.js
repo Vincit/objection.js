@@ -2,11 +2,22 @@ const _ = require('lodash');
 const { Model } = require('../../');
 const expect = require('expect.js');
 const Promise = require('bluebird');
+const mockKnexFactory = require('../../testUtils/mockKnex');
 
 module.exports = session => {
   describe('Composite keys', () => {
+    let mockKnex;
+    let queries;
+
     let A;
     let B;
+
+    before(() => {
+      mockKnex = mockKnexFactory(session.knex, function(mock, oldImpl, args) {
+        queries.push(this.toSQL());
+        return oldImpl.apply(this, args);
+      });
+    });
 
     before(() => {
       return session.knex.schema
@@ -113,8 +124,12 @@ module.exports = session => {
         }
       }
 
-      A = ModelA.bindKnex(session.knex);
-      B = ModelB.bindKnex(session.knex);
+      A = ModelA.bindKnex(mockKnex);
+      B = ModelB.bindKnex(mockKnex);
+    });
+
+    beforeEach(() => {
+      queries = [];
     });
 
     describe('insert', () => {
@@ -324,6 +339,30 @@ module.exports = session => {
           session.knex('B').delete(),
           session.knex('A_B').delete()
         ]);
+      });
+
+      it('should work when updating the root', async () => {
+        queries = [];
+
+        const result = await A.query().upsertGraph({
+          id1: 1,
+          id2: '1',
+          aval: 'updated'
+        });
+
+        expect(result.aval).to.equal('updated');
+        expect(queries.length).to.equal(2);
+        expect(queries[0].bindings).to.eql([1, '1']);
+
+        if (session.isPostgres()) {
+          expect(queries[0].sql).to.equal(
+            'select "A"."id1", "A"."id2", "A"."aval" from "A" where ("A"."id1", "A"."id2") in ((?, ?))'
+          );
+        }
+
+        const fromDb = await A.query().findById([1, '1']);
+
+        expect(fromDb.aval).to.equal('updated');
       });
 
       it('should work when `insertMissing` option is true', () => {
