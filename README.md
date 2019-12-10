@@ -12,7 +12,7 @@ What objection.js gives you:
 
 - **An easy declarative way of [defining models](https://vincit.github.io/objection.js/guide/models.html) and relationships between them**
 - **Simple and fun way to [fetch, insert, update and delete](https://vincit.github.io/objection.js/guide/query-examples.html) objects using the full power of SQL**
-- **Powerful mechanisms for [eager loading](https://vincit.github.io/objection.js/guide/query-examples.html#eager-loading), [inserting](/guide/query-examples.html#graph-inserts) and [upserting](https://vincit.github.io/objection.js/guide/query-examples.html#graph-upserts) object graphs**
+- **Powerful mechanisms for [eager loading](https://vincit.github.io/objection.js/guide/query-examples.html#eager-loading), [inserting](https://vincit.github.io/objection.js/guide/query-examples.html#graph-inserts) and [upserting](https://vincit.github.io/objection.js/guide/query-examples.html#graph-upserts) object graphs**
 - **Easy to use [transactions](https://vincit.github.io/objection.js/guide/transactions.html)**
 - **Official [TypeScript](https://github.com/Vincit/objection.js/blob/master/typings/objection/index.d.ts) support**
 - **Optional [JSON schema](https://vincit.github.io/objection.js/guide/validation.html) validation**
