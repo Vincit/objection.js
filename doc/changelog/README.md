@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.5
+
+- Fix `upsertGraph` bug where composite keys were not selected correctly. See the fix [here](https://github.com/Vincit/objection.js/commit/0e58cf010348efc33e5459c055eea141f62f7561).
+
 ## 2.0.4
 
 ### What's new
