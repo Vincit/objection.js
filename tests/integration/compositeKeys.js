@@ -333,6 +333,10 @@ module.exports = session => {
         });
       });
 
+      beforeEach(() => {
+        queries = [];
+      });
+
       afterEach(() => {
         return Promise.all([
           session.knex('A').delete(),
@@ -341,9 +345,20 @@ module.exports = session => {
         ]);
       });
 
-      it('should work when updating the root', async () => {
-        queries = [];
+      it('should work when inserting a missing root', async () => {
+        await A.query().upsertGraph(
+          {
+            id1: 1000,
+            id2: "doesn't exist in the db"
+          },
+          { insertMissing: true }
+        );
 
+        expect(queries.length).to.equal(2);
+        expect(await A.query().findById([1000, "doesn't exist in the db"])).not.equal(undefined);
+      });
+
+      it('should work when updating the root', async () => {
         const result = await A.query().upsertGraph({
           id1: 1,
           id2: '1',
@@ -361,7 +376,6 @@ module.exports = session => {
         }
 
         const fromDb = await A.query().findById([1, '1']);
-
         expect(fromDb.aval).to.equal('updated');
       });
 

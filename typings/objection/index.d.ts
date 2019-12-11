@@ -43,6 +43,7 @@ declare namespace Objection {
   const UniqueViolationError: typeof dbErrors.UniqueViolationError;
   const ConstraintViolationError: typeof dbErrors.ConstraintViolationError;
   const ForeignKeyViolationError: typeof dbErrors.ForeignKeyViolationError;
+  const NotNullViolationError: typeof dbErrors.NotNullViolationError;
 
   export interface RawBuilder extends Aliasable {}
 
