@@ -6,11 +6,16 @@ You can use [github issues](https://github.com/Vincit/objection.js/issues) to re
 
 When creating an issue there are couple of things you need to remember:
 
-1. **Update to the latest version of objection if possible and see if the problem remains.** If updating is not an option you can still request critical bug fixes for older versions.
+1. **Update to the latest version of objection if possible and see if the problem remains.**
+   If updating is not an option you can still request critical bug fixes for older versions.
 
-2. **Describe your problem.** What is happening and what you expect to happen.
+2. **Describe your problem.**
+   Answer the following questions: Which objection version are you using? What are you doing? What code are you running? What is happening? What are you expecting to happen instead? If you provide code examples (please do!), **use the actual code you are running**. People often leave out details or use made up examples because they think they are only leaving out irrelevant stuff. If you do that, you have already made an assumption about what the problem is and it's usually something else. Also provide all possible stack traces and error messages.
 
-3. **Provide enough information about the problem for others to reproduce it.** The fastest way to get your bug fixed or problem solved is to create a simple standalone app or a test case that demonstrates your problem. There's a file called [reproduction-template.js](https://github.com/Vincit/objection.js/blob/master/reproduction-template.js) you can use as a starting point for your reproduction. If that's too much work then at least provide the code that fails with enough context and any possible stack traces. Please bear in mind that objection has hundreds of tests and if you run into a problem, say with `insert` function, it doesn't mean that `insert` is completely broken, but some small part of it you are using is. That's why enough context is necessary. It's not enough to say, "insert fails". You need to provide the code that fails and usually the models that are used too. And don't write made up code! When you do, you only write the parts you think are relevant and usually leave out the useful information. Use the actual code that you have tested to fail.
+3. **If possible, provide an actual reproduction**
+   The fastest way to get your bug fixed or problem solved is to create a simple standalone app or a test case that demonstrates your problem. There's a file called [reproduction-template.js](https://github.com/Vincit/objection.js/blob/master/reproduction-template.js) you can use as a starting point for your reproduction.
+
+Please bear in mind that objection has thousands of tests and if you run into a problem, say with `insert` method, it doesn't mean that `insert` is completely broken, but some small part of it you are using is. That's why enough context is necessary. It's not enough to say, "insert fails". You need to provide the code that fails and usually the models that are used too. And let's say this again: **don't provide made up code examples!** When you do, you only write the parts you think are relevant and usually leave out the useful information. Use the actual code that you have tested to fail.
 
 ## Pull requests
 
@@ -34,13 +39,15 @@ For a pull request to get merged it needs to have the following things:
 git clone git@github.com:<your-account>/objection.js.git objection
 ```
 
-3. **Run `docker-compose up` in the repo root**
+3. **Run `npm install` at the root of the repo**
 
-4. **Create test users and databases by running `node setup-test-db` in the repo root**
+4. **Run `docker-compose up` at the root of the repo**
 
-5. **Run `npm test` in objection's root to see if everything works.**
+5. **Create test users and databases by running `node setup-test-db` at the root of the repo**
 
-6. **Run `npm run docs:dev` and goto http://localhost:8080 to see the generated documentation site when you change the markdown files in the `doc` folder.**
+6. **Run `npm test` in objection's root to see if everything works.**
+
+7. **Run `npm run docs:dev` and goto http://localhost:8080 to see the generated documentation site when you change the markdown files in the `doc` folder.**
 
 You can run the tests on a subset of databases by setting the `DATABASES` env variable
 
@@ -49,6 +56,6 @@ You can run the tests on a subset of databases by setting the `DATABASES` env va
 DATABASES=sqlite3 npm test
 ```
 
-Code and tests need to be written in ES2015 subset supported by node 6.0.0. The best way to make sure of this is to develop with the correct node version. [nvm](https://github.com/creationix/nvm) is a great tool for swapping between node versions.
+Code and tests need to be written in ES2015 subset supported by node 8.0.0. The best way to make sure of this is to develop with the correct node version. [nvm](https://github.com/creationix/nvm) is a great tool for swapping between node versions.
 
 [prettier](https://prettier.io/) is used to format the code. Remember to run `npm run prettier` before committing code.
