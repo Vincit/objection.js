@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Ternary relationships | Objection.js</title>
+    <meta name="description" content="An SQL friendly ORM for node.js">
+    
+    
+    <link rel="preload" href="/objection.js/assets/css/0.styles.14bd6d1b.css" as="style"><link rel="preload" href="/objection.js/assets/js/app.b8ed4648.js" as="script"><link rel="preload" href="/objection.js/assets/js/6.3e9cf472.js" as="script"><link rel="preload" href="/objection.js/assets/js/7.e000594e.js" as="script"><link rel="preload" href="/objection.js/assets/js/55.fef7e5c9.js" as="script"><link rel="prefetch" href="/objection.js/assets/js/1.8511230f.js"><link rel="prefetch" href="/objection.js/assets/js/10.c4a641a4.js"><link rel="prefetch" href="/objection.js/assets/js/11.19289596.js"><link rel="prefetch" href="/objection.js/assets/js/12.2314eacc.js"><link rel="prefetch" href="/objection.js/assets/js/13.2f56853f.js"><link rel="prefetch" href="/objection.js/assets/js/14.fea4755c.js"><link rel="prefetch" href="/objection.js/assets/js/15.9c3acc2d.js"><link rel="prefetch" href="/objection.js/assets/js/16.a6a2bce4.js"><link rel="prefetch" href="/objection.js/assets/js/17.7957a58c.js"><link rel="prefetch" href="/objection.js/assets/js/18.853c6730.js"><link rel="prefetch" href="/objection.js/assets/js/19.18460d84.js"><link rel="prefetch" href="/objection.js/assets/js/2.27e39952.js"><link rel="prefetch" href="/objection.js/assets/js/20.dcce9c31.js"><link rel="prefetch" href="/objection.js/assets/js/21.636b98cd.js"><link rel="prefetch" href="/objection.js/assets/js/22.de9861cc.js"><link rel="prefetch" href="/objection.js/assets/js/23.ce534ccd.js"><link rel="prefetch" href="/objection.js/assets/js/24.38455624.js"><link rel="prefetch" href="/objection.js/assets/js/25.82911696.js"><link rel="prefetch" href="/objection.js/assets/js/26.0ddd0415.js"><link rel="prefetch" href="/objection.js/assets/js/27.0c5928d7.js"><link rel="prefetch" href="/objection.js/assets/js/28.9f32c83b.js"><link rel="prefetch" href="/objection.js/assets/js/29.2fe12e88.js"><link rel="prefetch" href="/objection.js/assets/js/3.c013bb8d.js"><link rel="prefetch" href="/objection.js/assets/js/30.18464004.js"><link rel="prefetch" href="/objection.js/assets/js/31.5213f375.js"><link rel="prefetch" href="/objection.js/assets/js/32.330c16cb.js"><link rel="prefetch" href="/objection.js/assets/js/33.9848b0e7.js"><link rel="prefetch" href="/objection.js/assets/js/34.8161f894.js"><link rel="prefetch" href="/objection.js/assets/js/35.f56032d5.js"><link rel="prefetch" href="/objection.js/assets/js/36.974800a7.js"><link rel="prefetch" href="/objection.js/assets/js/37.5cc9c6c2.js"><link rel="prefetch" href="/objection.js/assets/js/38.3d275016.js"><link rel="prefetch" href="/objection.js/assets/js/39.a16c6799.js"><link rel="prefetch" href="/objection.js/assets/js/40.6b48af84.js"><link rel="prefetch" href="/objection.js/assets/js/41.d9b33e2c.js"><link rel="prefetch" href="/objection.js/assets/js/42.7d9506eb.js"><link rel="prefetch" href="/objection.js/assets/js/43.07cdfb26.js"><link rel="prefetch" href="/objection.js/assets/js/44.78c1f3e9.js"><link rel="prefetch" href="/objection.js/assets/js/45.500f273d.js"><link rel="prefetch" href="/objection.js/assets/js/46.842228ab.js"><link rel="prefetch" href="/objection.js/assets/js/47.1c7ee45c.js"><link rel="prefetch" href="/objection.js/assets/js/48.ec28ef41.js"><link rel="prefetch" href="/objection.js/assets/js/49.e9ff4004.js"><link rel="prefetch" href="/objection.js/assets/js/50.6519e057.js"><link rel="prefetch" href="/objection.js/assets/js/51.7ca0c296.js"><link rel="prefetch" href="/objection.js/assets/js/52.c52c9e74.js"><link rel="prefetch" href="/objection.js/assets/js/53.778ad407.js"><link rel="prefetch" href="/objection.js/assets/js/54.401df378.js"><link rel="prefetch" href="/objection.js/assets/js/56.a0c72363.js"><link rel="prefetch" href="/objection.js/assets/js/57.f4dcd123.js"><link rel="prefetch" href="/objection.js/assets/js/8.8580a3aa.js"><link rel="prefetch" href="/objection.js/assets/js/9.ddf8edc6.js"><link rel="prefetch" href="/objection.js/assets/js/vendors~docsearch.d4696827.js">
+    <link rel="stylesheet" href="/objection.js/assets/css/0.styles.14bd6d1b.css">
+  </head>
+  <body>
+    <div id="app" data-server-rendered="true"><div class="theme-container"><header class="navbar"><div class="sidebar-button"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" viewBox="0 0 448 512" class="icon"><path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path></svg></div> <a href="/objection.js/" class="home-link router-link-active"><!----> <span class="site-name">Objection.js</span></a> <div class="links"><form id="search-form" role="search" class="algolia-search-wrapper search-box"><input id="algolia-search-input" class="search-query"></form> <nav class="nav-links can-hide"><div class="nav-item"><a href="/objection.js/guide/" class="nav-link">Guide</a></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="API Reference" class="dropdown-title"><span class="title">API Reference</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/objection.js/api/objection/" class="nav-link">Main Module</a></li><li class="dropdown-item"><!----> <a href="/objection.js/api/query-builder/" class="nav-link">Query Builder</a></li><li class="dropdown-item"><!----> <a href="/objection.js/api/model/" class="nav-link">Model</a></li><li class="dropdown-item"><!----> <a href="/objection.js/api/types/" class="nav-link">Types</a></li></ul></div></div><div class="nav-item"><a href="/objection.js/recipes/" class="nav-link router-link-active">Recipe Book</a></div><div class="nav-item"><a href="/objection.js/changelog/" class="nav-link">Changelog</a></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="v1.x" class="dropdown-title"><span class="title">v1.x</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/objection.js/1.x/migration.html" class="nav-link">Migration to 2.0</a></li><li class="dropdown-item"><!----> <a href="https://github.com/Vincit/objection.js/tree/v1/doc" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  v1.x documentation
+  <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></li></ul></div></div><div class="nav-item"><a href="https://github.com/vincit/objection.js" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  ⭐ Star
+  <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></div> <a href="https://github.com/vincit/objection.js" target="_blank" rel="noopener noreferrer" class="repo-link">
+    GitHub
+    <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></nav></div></header> <div class="sidebar-mask"></div> <aside class="sidebar"><nav class="nav-links"><div class="nav-item"><a href="/objection.js/guide/" class="nav-link">Guide</a></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="API Reference" class="dropdown-title"><span class="title">API Reference</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/objection.js/api/objection/" class="nav-link">Main Module</a></li><li class="dropdown-item"><!----> <a href="/objection.js/api/query-builder/" class="nav-link">Query Builder</a></li><li class="dropdown-item"><!----> <a href="/objection.js/api/model/" class="nav-link">Model</a></li><li class="dropdown-item"><!----> <a href="/objection.js/api/types/" class="nav-link">Types</a></li></ul></div></div><div class="nav-item"><a href="/objection.js/recipes/" class="nav-link router-link-active">Recipe Book</a></div><div class="nav-item"><a href="/objection.js/changelog/" class="nav-link">Changelog</a></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="v1.x" class="dropdown-title"><span class="title">v1.x</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/objection.js/1.x/migration.html" class="nav-link">Migration to 2.0</a></li><li class="dropdown-item"><!----> <a href="https://github.com/Vincit/objection.js/tree/v1/doc" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  v1.x documentation
+  <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></li></ul></div></div><div class="nav-item"><a href="https://github.com/vincit/objection.js" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  ⭐ Star
+  <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></div> <a href="https://github.com/vincit/objection.js" target="_blank" rel="noopener noreferrer" class="repo-link">
+    GitHub
+    <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></nav>  <ul class="sidebar-links"><li><section class="sidebar-group depth-0"><p class="sidebar-heading open"><span>Recipes</span> <!----></p> <ul class="sidebar-links sidebar-group-items"><li><a href="/objection.js/recipes/raw-queries.html" class="sidebar-link">Raw queries</a></li><li><a href="/objection.js/recipes/precedence-and-parentheses.html" class="sidebar-link">Precedence and parentheses</a></li><li><a href="/objection.js/recipes/subqueries.html" class="sidebar-link">Subqueries</a></li><li><a href="/objection.js/recipes/relation-subqueries.html" class="sidebar-link">Relation subqueries</a></li><li><a href="/objection.js/recipes/joins.html" class="sidebar-link">Joins</a></li><li><a href="/objection.js/recipes/modifiers.html" class="sidebar-link">Modifiers</a></li><li><a href="/objection.js/recipes/composite-keys.html" class="sidebar-link">Composite keys</a></li><li><a href="/objection.js/recipes/polymorphic-associations.html" class="sidebar-link">Polymorphic associations</a></li><li><a href="/objection.js/recipes/json-queries.html" class="sidebar-link">JSON queries</a></li><li><a href="/objection.js/recipes/custom-id-column.html" class="sidebar-link">Custom id column</a></li><li><a href="/objection.js/recipes/extra-properties.html" class="sidebar-link">Join table extra properties</a></li><li><a href="/objection.js/recipes/custom-validation.html" class="sidebar-link">Custom validation</a></li><li><a href="/objection.js/recipes/snake-case-to-camel-case-conversion.html" class="sidebar-link">Snake case to camel case conversion</a></li><li><a href="/objection.js/recipes/paging.html" class="sidebar-link">Paging</a></li><li><a href="/objection.js/recipes/returning-tricks.html" class="sidebar-link">PostgreSQL &quot;returning&quot; tricks</a></li><li><a href="/objection.js/recipes/timestamps.html" class="sidebar-link">Timestamps</a></li><li><a href="/objection.js/recipes/custom-query-builder.html" class="sidebar-link">Custom query builder (extending the query builder)</a></li><li><a href="/objection.js/recipes/multitenancy-using-multiple-databases.html" class="sidebar-link">Multitenancy using multiple databases</a></li><li><a href="/objection.js/recipes/default-values.html" class="sidebar-link">Default values</a></li><li><a href="/objection.js/recipes/error-handling.html" class="sidebar-link">Error handling</a></li><li><a href="/objection.js/recipes/ternary-relationships.html" class="active sidebar-link">Ternary relationships</a></li><li><a href="/objection.js/recipes/indexing-postgresql-jsonb-columns.html" class="sidebar-link">Indexing PostgreSQL JSONB columns</a></li></ul></section></li></ul> </aside> <main class="page"> <div class="theme-default-content content__default"><h1 id="ternary-relationships"><a href="#ternary-relationships" class="header-anchor">#</a> Ternary relationships</h1> <p>Assume we have the following Models:</p> <ol><li>user <code>(id, first_name, last_name)</code></li> <li>group <code>(id, name)</code></li> <li>permission <code>(id, label)</code></li> <li>user_group_permission <code>(user_id, group_id, permission_id, extra_attribute)</code></li></ol> <p>Here's how you could create your models:</p> <div class="language-js extra-class"><pre class="language-js"><code><span class="token comment">// User.js</span>
+<span class="token keyword">const</span> <span class="token punctuation">{</span> Model <span class="token punctuation">}</span> <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'objection'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">class</span> <span class="token class-name">User</span> <span class="token keyword">extends</span> <span class="token class-name">Model</span> <span class="token punctuation">{</span>
+  <span class="token keyword">static</span> <span class="token keyword">get</span> <span class="token function">tableName</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">return</span> <span class="token string">'user'</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token keyword">static</span> <span class="token keyword">get</span> <span class="token function">relationMappings</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">return</span> <span class="token punctuation">{</span>
+      groups<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+        relation<span class="token punctuation">:</span> Model<span class="token punctuation">.</span>ManyToManyRelation<span class="token punctuation">,</span>
+        modelClass<span class="token punctuation">:</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'./Group'</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        join<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+          <span class="token keyword">from</span><span class="token punctuation">:</span> <span class="token string">'user.id'</span><span class="token punctuation">,</span>
+          through<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+            <span class="token keyword">from</span><span class="token punctuation">:</span> <span class="token string">'user_group_permission.user_id'</span><span class="token punctuation">,</span>
+            extra<span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token string">'extra_attribute'</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+            to<span class="token punctuation">:</span> <span class="token string">'user_group_permission.group_id'</span>
+          <span class="token punctuation">}</span><span class="token punctuation">,</span>
+          to<span class="token punctuation">:</span> <span class="token string">'group.id'</span>
+        <span class="token punctuation">}</span>
+      <span class="token punctuation">}</span><span class="token punctuation">,</span>
+
+      permissions<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+        relation<span class="token punctuation">:</span> Model<span class="token punctuation">.</span>ManyToManyRelation<span class="token punctuation">,</span>
+        modelClass<span class="token punctuation">:</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'./Permission'</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        join<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+          <span class="token keyword">from</span><span class="token punctuation">:</span> <span class="token string">'user.id'</span><span class="token punctuation">,</span>
+          through<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+            <span class="token keyword">from</span><span class="token punctuation">:</span> <span class="token string">'user_group_permission.user_id'</span><span class="token punctuation">,</span>
+            extra<span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token string">'extra_attribute'</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+            to<span class="token punctuation">:</span> <span class="token string">'user_group_permission.permission_id'</span>
+          <span class="token punctuation">}</span><span class="token punctuation">,</span>
+          to<span class="token punctuation">:</span> <span class="token string">'permission.id'</span>
+        <span class="token punctuation">}</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+module<span class="token punctuation">.</span>exports <span class="token operator">=</span> User<span class="token punctuation">;</span>
+</code></pre></div><div class="language-js extra-class"><pre class="language-js"><code><span class="token comment">// Group.js</span>
+<span class="token keyword">const</span> <span class="token punctuation">{</span> Model <span class="token punctuation">}</span> <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'objection'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">class</span> <span class="token class-name">Group</span> <span class="token keyword">extends</span> <span class="token class-name">Model</span> <span class="token punctuation">{</span>
+  <span class="token keyword">static</span> <span class="token keyword">get</span> <span class="token function">tableName</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">return</span> <span class="token string">'group'</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token keyword">static</span> <span class="token keyword">get</span> <span class="token function">relationMappings</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">return</span> <span class="token punctuation">{</span>
+      users<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+        relation<span class="token punctuation">:</span> Model<span class="token punctuation">.</span>ManyToManyRelation<span class="token punctuation">,</span>
+        modelClass<span class="token punctuation">:</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'./User'</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        join<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+          <span class="token keyword">from</span><span class="token punctuation">:</span> <span class="token string">'group.id'</span><span class="token punctuation">,</span>
+          through<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+            <span class="token keyword">from</span><span class="token punctuation">:</span> <span class="token string">'user_group_permission.group_id'</span><span class="token punctuation">,</span>
+            extra<span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token string">'extra_attribute'</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+            to<span class="token punctuation">:</span> <span class="token string">'user_group_permission.user_id'</span>
+          <span class="token punctuation">}</span><span class="token punctuation">,</span>
+          to<span class="token punctuation">:</span> <span class="token string">'user.id'</span>
+        <span class="token punctuation">}</span>
+      <span class="token punctuation">}</span><span class="token punctuation">,</span>
+
+      permissions<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+        relation<span class="token punctuation">:</span> Model<span class="token punctuation">.</span>ManyToManyRelation<span class="token punctuation">,</span>
+        modelClass<span class="token punctuation">:</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'./Permission'</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        join<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+          <span class="token keyword">from</span><span class="token punctuation">:</span> <span class="token string">'group.id'</span><span class="token punctuation">,</span>
+          through<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+            <span class="token keyword">from</span><span class="token punctuation">:</span> <span class="token string">'user_group_permission.group_id'</span><span class="token punctuation">,</span>
+            extra<span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token string">'extra_attribute'</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+            to<span class="token punctuation">:</span> <span class="token string">'user_group_permission.permission_id'</span>
+          <span class="token punctuation">}</span><span class="token punctuation">,</span>
+          to<span class="token punctuation">:</span> <span class="token string">'permission.id'</span>
+        <span class="token punctuation">}</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+module<span class="token punctuation">.</span>exports <span class="token operator">=</span> Group<span class="token punctuation">;</span>
+</code></pre></div><div class="language-js extra-class"><pre class="language-js"><code><span class="token comment">// Permission.js</span>
+<span class="token keyword">const</span> <span class="token punctuation">{</span> Model <span class="token punctuation">}</span> <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'objection'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">class</span> <span class="token class-name">Permission</span> <span class="token keyword">extends</span> <span class="token class-name">Model</span> <span class="token punctuation">{</span>
+  <span class="token keyword">static</span> <span class="token keyword">get</span> <span class="token function">tableName</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">return</span> <span class="token string">'permission'</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token keyword">static</span> <span class="token keyword">get</span> <span class="token function">relationMappings</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">return</span> <span class="token punctuation">{</span>
+      users<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+        relation<span class="token punctuation">:</span> Model<span class="token punctuation">.</span>ManyToManyRelation<span class="token punctuation">,</span>
+        modelClass<span class="token punctuation">:</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'./User'</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        join<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+          <span class="token keyword">from</span><span class="token punctuation">:</span> <span class="token string">'permission.id'</span><span class="token punctuation">,</span>
+          through<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+            <span class="token keyword">from</span><span class="token punctuation">:</span> <span class="token string">'user_group_permission.permission_id'</span><span class="token punctuation">,</span>
+            extra<span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token string">'extra_attribute'</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+            to<span class="token punctuation">:</span> <span class="token string">'user_group_permission.user_id'</span>
+          <span class="token punctuation">}</span><span class="token punctuation">,</span>
+          to<span class="token punctuation">:</span> <span class="token string">'user.id'</span>
+        <span class="token punctuation">}</span>
+      <span class="token punctuation">}</span><span class="token punctuation">,</span>
+
+      groups<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+        relation<span class="token punctuation">:</span> Model<span class="token punctuation">.</span>ManyToManyRelation<span class="token punctuation">,</span>
+        modelClass<span class="token punctuation">:</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'./Group'</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        join<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+          <span class="token keyword">from</span><span class="token punctuation">:</span> <span class="token string">'permission.id'</span><span class="token punctuation">,</span>
+          through<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+            <span class="token keyword">from</span><span class="token punctuation">:</span> <span class="token string">'user_group_permission.permission_id'</span><span class="token punctuation">,</span>
+            extra<span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token string">'extra_attribute'</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+            to<span class="token punctuation">:</span> <span class="token string">'user_group_permission.group_id'</span>
+          <span class="token punctuation">}</span><span class="token punctuation">,</span>
+          to<span class="token punctuation">:</span> <span class="token string">'group.id'</span>
+        <span class="token punctuation">}</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+module<span class="token punctuation">.</span>exports <span class="token operator">=</span> Permission<span class="token punctuation">;</span>
+</code></pre></div><div class="language-js extra-class"><pre class="language-js"><code><span class="token comment">// UserGroupPermission.js</span>
+<span class="token keyword">const</span> <span class="token punctuation">{</span> Model <span class="token punctuation">}</span> <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'objection'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">class</span> <span class="token class-name">UserGroupPermission</span> <span class="token keyword">extends</span> <span class="token class-name">Model</span> <span class="token punctuation">{</span>
+  <span class="token keyword">static</span> <span class="token keyword">get</span> <span class="token function">tableName</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">return</span> <span class="token string">'user_group_permission'</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token keyword">static</span> <span class="token keyword">get</span> <span class="token function">idColumn</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">return</span> <span class="token punctuation">[</span><span class="token string">'user_id'</span><span class="token punctuation">,</span> <span class="token string">'group_id'</span><span class="token punctuation">,</span> <span class="token string">'permission_id'</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token keyword">static</span> <span class="token keyword">get</span> <span class="token function">relationMappings</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">return</span> <span class="token punctuation">{</span>
+      user<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+        relation<span class="token punctuation">:</span> Model<span class="token punctuation">.</span>BelongsToOneRelation<span class="token punctuation">,</span>
+        modelClass<span class="token punctuation">:</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'./User'</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        join<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+          <span class="token keyword">from</span><span class="token punctuation">:</span> <span class="token string">'user_group_permission.user_id'</span><span class="token punctuation">,</span>
+          to<span class="token punctuation">:</span> <span class="token string">'user.id'</span>
+        <span class="token punctuation">}</span>
+      <span class="token punctuation">}</span><span class="token punctuation">,</span>
+
+      group<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+        relation<span class="token punctuation">:</span> Model<span class="token punctuation">.</span>BelongsToOneRelation<span class="token punctuation">,</span>
+        modelClass<span class="token punctuation">:</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'./Group'</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        join<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+          <span class="token keyword">from</span><span class="token punctuation">:</span> <span class="token string">'user_group_permission.group_id'</span><span class="token punctuation">,</span>
+          to<span class="token punctuation">:</span> <span class="token string">'group.id'</span>
+        <span class="token punctuation">}</span>
+      <span class="token punctuation">}</span><span class="token punctuation">,</span>
+
+      permission<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+        relation<span class="token punctuation">:</span> Model<span class="token punctuation">.</span>BelongsToOneRelation<span class="token punctuation">,</span>
+        modelClass<span class="token punctuation">:</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'./Permission'</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        join<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+          <span class="token keyword">from</span><span class="token punctuation">:</span> <span class="token string">'user_group_permission.permission_id'</span><span class="token punctuation">,</span>
+          to<span class="token punctuation">:</span> <span class="token string">'permission.id'</span>
+        <span class="token punctuation">}</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+module<span class="token punctuation">.</span>exports <span class="token operator">=</span> UserGroupPermission<span class="token punctuation">;</span>
+</code></pre></div><p>Here's how you can query your models:</p> <ul><li><code>.*JoinRelated()</code></li></ul> <div class="language-js extra-class"><pre class="language-js"><code>UserGroupPermission<span class="token punctuation">.</span><span class="token function">query</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+  <span class="token punctuation">.</span><span class="token function">select</span><span class="token punctuation">(</span><span class="token string">'first_name'</span><span class="token punctuation">,</span> <span class="token string">'last_name'</span><span class="token punctuation">,</span> <span class="token string">'label'</span><span class="token punctuation">,</span> <span class="token string">'extra_attribute'</span><span class="token punctuation">)</span>
+  <span class="token punctuation">.</span><span class="token function">joinRelated</span><span class="token punctuation">(</span><span class="token string">'[user, permission]'</span><span class="token punctuation">)</span>
+  <span class="token punctuation">.</span><span class="token function">where</span><span class="token punctuation">(</span><span class="token string">'group_id'</span><span class="token punctuation">,</span> <span class="token string">'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment">/*
+{
+  first_name: ... ,
+  last_name: ... ,
+  label: ... ,
+  extra_attribute: ...
+}
+*/</span>
+</code></pre></div><ul><li><code>.withGraphFetched()</code></li></ul> <div class="language-js extra-class"><pre class="language-js"><code>UserGroupPermission<span class="token punctuation">.</span><span class="token function">query</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+  <span class="token punctuation">.</span><span class="token function">withGraphFetched</span><span class="token punctuation">(</span><span class="token string">'[user, permission]'</span><span class="token punctuation">)</span>
+  <span class="token punctuation">.</span><span class="token function">where</span><span class="token punctuation">(</span><span class="token string">'group_id'</span><span class="token punctuation">,</span> <span class="token string">'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment">/*
+{
+  user: {
+    first_name: ... ,
+    last_name: ...
+  },
+  group: {
+    name: ...
+  },
+  permission: {
+    label: ...
+  },
+  extra_attribute: ...
+}
+*/</span>
+</code></pre></div><p>Read more about ternary relationships on <a href="https://github.com/Vincit/objection.js/issues/179" target="_blank" rel="noopener noreferrer">this issue<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a>.</p></div> <footer class="page-edit"><!----> <!----></footer> <div class="page-nav"><p class="inner"><span class="prev">
+      ←
+      <a href="/objection.js/recipes/error-handling.html" class="prev">Error handling</a></span> <span class="next"><a href="/objection.js/recipes/indexing-postgresql-jsonb-columns.html">Indexing PostgreSQL JSONB columns</a>
+      →
+    </span></p></div> </main></div><div class="global-ui"></div></div>
+    <script src="/objection.js/assets/js/app.b8ed4648.js" defer></script><script src="/objection.js/assets/js/6.3e9cf472.js" defer></script><script src="/objection.js/assets/js/7.e000594e.js" defer></script><script src="/objection.js/assets/js/55.fef7e5c9.js" defer></script>
+  </body>
+</html>
