@@ -6,7 +6,7 @@ The plugin adds a `session` method for `QueryBuilder` and extends a model
 so that it sets `modifiedAt`, `modifiedBy`, `createdAt` and `createdBy` properties
 automatically based on the given session.
 
-This example is exactly the same as the [plugin](https://github.com/Vincit/objection.js/tree/master/examples/plugin) 
+This example is exactly the same as the [plugin](https://github.com/Vincit/objection.js/tree/master/examples/plugin)
 example but this one accepts options. The only difference is that the main module is a factory method that accepts options
 and returns a mixin.
 
@@ -32,18 +32,19 @@ module.exports = Person;
 ```js
 // expressjs route.
 router.post('/persons', (req, res) => {
-  return Person
-    .query()
-    // The following method was added by our plugin.
-    .session(req.session)
-    .insert(req.body)
-    .then(person => {
-      // Our plugin set the following property.
-      console.log(person.createdAt);
-      // This wasn't set because of the `setCreatedBy: false` option.
-      console.log(person.createdBy); // -->  undefined
+  return (
+    Person.query()
+      // The following method was added by our plugin.
+      .session(req.session)
+      .insert(req.body)
+      .then(person => {
+        // Our plugin set the following property.
+        console.log(person.createdAt);
+        // This wasn't set because of the `setCreatedBy: false` option.
+        console.log(person.createdBy); // -->  undefined
 
-      res.send(person);
-    });
+        res.send(person);
+      })
+  );
 });
 ```

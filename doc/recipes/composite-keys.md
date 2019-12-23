@@ -73,6 +73,9 @@ await Person.query().whereComposite(['foo', 'bar'], [1, 'barValue']);
 ```js
 await Person.query().whereInComposite(
   ['foo', 'bar'],
-  [[1, 'barValue1'], [2, 'barValue2']]
+  [
+    [1, 'barValue1'],
+    [2, 'barValue2']
+  ]
 );
 ```

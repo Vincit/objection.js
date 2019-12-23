@@ -95,7 +95,12 @@ module.exports = {
         {
           title: 'Model API Reference',
           collapsable: false,
-          children: ['overview', 'static-properties', 'static-methods', 'instance-methods']
+          children: [
+            'overview',
+            'static-properties',
+            'static-methods',
+            'instance-methods'
+          ]
         }
       ],
 
