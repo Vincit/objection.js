@@ -1387,6 +1387,30 @@ module.exports = session => {
             expect(result[0].id).to.equal(3);
           });
 
+          it('find using single model instance', async () => {
+            const model = Model1.fromJson({ id: 1, model1Id: 3 });
+
+            const result = await Model1.relatedQuery('model1Relation1')
+              .for(model)
+              .orderBy('id');
+
+            expect(result.length).to.equal(1);
+            expect(result[0].id).to.equal(3);
+          });
+
+          it('find using multiple model instances', async () => {
+            const model1 = Model1.fromJson({ id: 1, model1Id: 3 });
+            const model2 = Model1.fromJson({ id: 2, model1Id: 4 });
+
+            const result = await Model1.relatedQuery('model1Relation1')
+              .for([model1, model2])
+              .orderBy('id');
+
+            expect(result.length).to.equal(2);
+            expect(result[0].id).to.equal(3);
+            expect(result[1].id).to.equal(4);
+          });
+
           it('find using multiple ids', async () => {
             const result = await Model1.relatedQuery('model1Relation1')
               .for([1, 2])
