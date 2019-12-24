@@ -25,7 +25,7 @@ The first argument is a callback that gets called with the transaction object as
 
 The transaction is committed if the promise returned from the callback is resolved successfully. If the returned Promise is rejected or an error is thrown inside the callback the transaction is rolled back.
 
-The above example works if you have installed a knex instance globally using the `Model.knex()` method. If you haven't, you can pass the knex instance as the first argument to the `trnasaction` method
+The above example works if you have installed a knex instance globally using the `Model.knex()` method. If you haven't, you can pass the knex instance as the first argument to the `transaction` method
 
 ```js
 const returnValue = await Person.transaction(knex, async trx => { ... })
@@ -46,10 +46,10 @@ An alternative way to start a transaction is to use the [Model.startTransaction(
 ```js
 const { transaction } = require('objection');
 
-const trx = await Person.startTransction();
+const trx = await Person.startTransaction();
 
 try {
-  // If you created the transaction using `Model.startTransction`, you need
+  // If you created the transaction using `Model.startTransaction`, you need
   // commit or rollback the transaction manually.
   await trx.commit();
 } catch (err) {
@@ -69,7 +69,7 @@ After you have created a transaction, you need to tell objection which queries s
 
 ### Passing around a transaction object
 
-The most straight forwared way to use a transaction is to explicitly give it to each query you start. [query](/api/model/static-methods.html#static-query), [\$query](/api/model/instance-methods.html#query) and [\$relatedQuery](/api/model/instance-methods.html#relatedquery) accept a transaction as their last argument.
+The most straight forward way to use a transaction is to explicitly give it to each query you start. [query](/api/model/static-methods.html#static-query), [\$query](/api/model/instance-methods.html#query) and [\$relatedQuery](/api/model/instance-methods.html#relatedquery) accept a transaction as their last argument.
 
 ```js
 try {
