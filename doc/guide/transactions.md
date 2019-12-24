@@ -69,7 +69,7 @@ After you have created a transaction, you need to tell objection which queries s
 
 ### Passing around a transaction object
 
-The most straight forward way to use a transaction is to explicitly give it to each query you start. [query](/api/model/static-methods.html#static-query), [\$query](/api/model/instance-methods.html#query) and [\$relatedQuery](/api/model/instance-methods.html#relatedquery) accept a transaction as their last argument.
+The most straightforward way to use a transaction is to explicitly give it to each query you start. [query](/api/model/static-methods.html#static-query), [\$query](/api/model/instance-methods.html#query) and [\$relatedQuery](/api/model/instance-methods.html#relatedquery) accept a transaction as their last argument.
 
 ```js
 try {
