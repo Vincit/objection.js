@@ -62,12 +62,12 @@ class Person extends objection.Model {
 
   static columnNameMappers = objection.snakeCaseMappers();
 
-  static jsonSchema: JSONSchema = {
+  static jsonSchema = {
     type: 'object',
 
     properties: {
       firstName: {
-        type: 'string'
+        type: 'string',
       }
     }
   };

@@ -1352,9 +1352,7 @@ declare namespace Objection {
     new (): T;
   }
 
-  export interface ModelConstructor<M extends Model> extends Constructor<M> {
-
-  }
+  export interface ModelConstructor<M extends Model> extends Constructor<M> {}
 
   export interface ModelClass<M extends Model> extends ModelConstructor<M> {
     QueryBuilder: typeof QueryBuilder;
@@ -1812,7 +1810,9 @@ declare namespace Objection {
     | 'boolean'
     | 'object'
     | 'array'
-    | 'null';
+    | 'null'
+    | string;
+
   export type JSONSchemaType = JSONSchemaArray[] | boolean | number | null | object | string;
 
   // Workaround for infinite type recursion
