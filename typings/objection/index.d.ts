@@ -95,12 +95,8 @@ declare namespace Objection {
   }
 
   export interface MixinFunction {
-    // Using ModelClass<M> causes TS 2.5 to render ModelClass<any> rather
-    // than an identity function type. <M extends typeof Model> retains the
-    // model subclass type in the return value, without requiring the user
-    // to type the Mixin call.
-    <MC extends ModelClass<any>>(modelClass: MC, ...plugins: Plugin[]): MC;
-    <MC extends ModelClass<any>>(modelClass: MC, plugins: Plugin[]): MC;
+    <MC extends AnyModelConstructor>(modelClass: MC, ...plugins: Plugin[]): MC;
+    <MC extends AnyModelConstructor>(modelClass: MC, plugins: Plugin[]): MC;
   }
 
   interface Aliasable {
@@ -159,7 +155,7 @@ declare namespace Objection {
 
   type Identity<T> = (value: T) => T;
   type AnyQueryBuilder = QueryBuilder<any, any>;
-  type AnyModelClass = ModelClass<any>;
+  type AnyModelConstructor = ModelConstructor<Model>;
   type ModifierFunction<QB extends AnyQueryBuilder> = (qb: QB, ...args: any[]) => void;
   type Modifier<QB extends AnyQueryBuilder = AnyQueryBuilder> =
     | ModifierFunction<QB>
@@ -325,7 +321,7 @@ declare namespace Objection {
   type PageQueryBuilder<QB extends AnyQueryBuilder> = QB['PageQueryBuilderType'];
 
   interface ForClassMethod {
-    <M extends Model>(modelClass: ModelClass<M>): QueryBuilderType<M>;
+    <M extends Model>(modelClass: ModelConstructor<M>): QueryBuilderType<M>;
   }
 
   /**
@@ -612,11 +608,11 @@ declare namespace Objection {
   }
 
   interface AliasForMethod<QB extends AnyQueryBuilder> {
-    (modelClassOrTableName: string | ModelClass<any>, alias: string): QB;
+    (modelClassOrTableName: string | AnyModelConstructor, alias: string): QB;
   }
 
-  interface ModelClassMethod {
-    (): typeof Model;
+  interface ModelClassMethod<M extends Model> {
+    (): ModelClass<M>;
   }
 
   interface ReturningMethod {
@@ -959,7 +955,7 @@ declare namespace Objection {
     findOne: WhereMethod<SingleQueryBuilder<this>>;
 
     execute(): Promise<R>;
-    castTo<MC extends Model>(modelClass: ModelClass<MC>): QueryBuilderType<MC>;
+    castTo<MC extends Model>(modelClass: ModelConstructor<MC>): QueryBuilderType<MC>;
 
     update(update: PartialModelObject<M>): NumberQueryBuilder<this>;
     update(): NumberQueryBuilder<this>;
@@ -1036,7 +1032,7 @@ declare namespace Objection {
     alias: OneArgMethod<string, this>;
     aliasFor: AliasForMethod<this>;
     withSchema: OneArgMethod<string, this>;
-    modelClass: ModelClassMethod;
+    modelClass: ModelClassMethod<M>;
     tableNameFor: TableRefForMethod;
     tableRefFor: TableRefForMethod;
     reject: OneArgMethod<any, this>;
@@ -1171,8 +1167,8 @@ declare namespace Objection {
 
   export type RelationMappingsThunk = () => RelationMappings;
 
-  type ModelClassFactory = () => AnyModelClass;
-  type ModelClassSpecifier = ModelClassFactory | AnyModelClass | string;
+  type ModelClassFactory = () => AnyModelConstructor;
+  type ModelClassSpecifier = ModelClassFactory | AnyModelConstructor | string;
   type RelationMappingHook<M extends Model> = (
     model: M,
     context: QueryContext
@@ -1356,7 +1352,135 @@ declare namespace Objection {
     new (): T;
   }
 
-  export interface ModelClass<M> extends Constructor<M> {}
+  export interface ModelConstructor<M extends Model> extends Constructor<M> {
+
+  }
+
+  export interface ModelClass<M extends Model> extends ModelConstructor<M> {
+    QueryBuilder: typeof QueryBuilder;
+
+    tableName: string;
+    idColumn: string | string[];
+    jsonSchema: JSONSchema;
+    relationMappings: RelationMappings | RelationMappingsThunk;
+    modelPaths: string[];
+    jsonAttributes: string[];
+    virtualAttributes: string[];
+    uidProp: string;
+    uidRefProp: string;
+    dbRefProp: string;
+    propRefRegex: RegExp;
+    pickJsonSchemaProperties: boolean;
+    relatedFindQueryMutates: boolean;
+    relatedInsertQueryMutates: boolean;
+    modifiers: Modifiers;
+    columnNameMappers: ColumnNameMappers;
+
+    raw: RawFunction;
+    ref: ReferenceFunction;
+    fn: FunctionFunction;
+
+    BelongsToOneRelation: RelationType;
+    HasOneRelation: RelationType;
+    HasManyRelation: RelationType;
+    ManyToManyRelation: RelationType;
+    HasOneThroughRelation: RelationType;
+
+    defaultGraphOptions?: GraphOptions;
+    // Deprecated
+    defaultEagerAlgorithm?: EagerAlgorithm;
+    // Deprecated
+    defaultEagerOptions?: EagerOptions;
+
+    // Deprecated
+    WhereInEagerAlgorithm: EagerAlgorithm;
+    // Deprecated
+    NaiveEagerAlgorithm: EagerAlgorithm;
+    // Deprecated
+    JoinEagerAlgorithm: EagerAlgorithm;
+
+    query(this: Constructor<M>, trxOrKnex?: TransactionOrKnex): QueryBuilderType<M>;
+
+    relatedQuery<K extends keyof M>(
+      relationName: K,
+      trxOrKnex?: TransactionOrKnex
+    ): ArrayRelatedQueryBuilder<M[K]>;
+
+    relatedQuery<RM extends Model>(
+      relationName: string,
+      trxOrKnex?: TransactionOrKnex
+    ): QueryBuilderType<RM>;
+
+    fromJson(json: object, opt?: ModelOptions): M;
+    fromDatabaseJson(json: object): M;
+
+    createValidator(): Validator;
+    createValidationError(args: CreateValidationErrorArgs): Error;
+    createNotFoundError(): Error;
+
+    tableMetadata(opt?: TableMetadataOptions): TableMetadata;
+    fetchTableMetadata(opt?: FetchTableMetadataOptions): Promise<TableMetadata>;
+
+    knex(knex?: knex): knex;
+    knexQuery(): knex.QueryBuilder;
+    startTransaction(knexOrTransaction?: TransactionOrKnex): Transaction;
+
+    transaction<T>(callback: (trx: Transaction) => Promise<T>): Promise<T>;
+    transaction<T>(
+      trxOrKnex: TransactionOrKnex,
+      callback: (trx: Transaction) => Promise<T>
+    ): Promise<T>;
+
+    bindKnex(trxOrKnex: TransactionOrKnex): this;
+    bindTransaction(trxOrKnex: TransactionOrKnex): this;
+
+    // Deprecated
+    loadRelated(
+      modelOrObject: PartialModelObject<M>,
+      expression: RelationExpression<M>,
+      modifiers?: Modifiers<QueryBuilderType<M>>,
+      trxOrKnex?: TransactionOrKnex
+    ): SingleQueryBuilder<QueryBuilderType<M>>;
+
+    // Deprecated
+    loadRelated(
+      modelOrObject: PartialModelObject<M>[],
+      expression: RelationExpression<M>,
+      modifiers?: Modifiers<QueryBuilderType<M>>,
+      trxOrKnex?: TransactionOrKnex
+    ): QueryBuilderType<M>;
+
+    fetchGraph(
+      modelOrObject: PartialModelObject<M>,
+      expression: RelationExpression<M>,
+      options?: FetchGraphOptions
+    ): SingleQueryBuilder<QueryBuilderType<M>>;
+
+    fetchGraph(
+      modelOrObject: PartialModelObject<M>[],
+      expression: RelationExpression<M>,
+      options?: FetchGraphOptions
+    ): QueryBuilderType<M>;
+
+    getRelations(): Relations;
+    getRelation(name: string): Relation;
+
+    traverse(models: Model | Model[], traverser: TraverserFunction): void;
+    traverse(
+      filterConstructor: ModelConstructor<Model>,
+      models: Model | Model[],
+      traverser: TraverserFunction
+    ): void;
+
+    beforeFind(args: StaticHookArguments<any>): any;
+    afterFind(args: StaticHookArguments<any>): any;
+    beforeInsert(args: StaticHookArguments<any>): any;
+    afterInsert(args: StaticHookArguments<any>): any;
+    beforeUpdate(args: StaticHookArguments<any>): any;
+    afterUpdate(args: StaticHookArguments<any>): any;
+    beforeDelete(args: StaticHookArguments<any>): any;
+    afterDelete(args: StaticHookArguments<any>): any;
+  }
 
   export class Model {
     static QueryBuilder: typeof QueryBuilder;
@@ -1402,12 +1526,12 @@ declare namespace Objection {
     static JoinEagerAlgorithm: EagerAlgorithm;
 
     static query<M extends Model>(
-      this: ModelClass<M>,
+      this: Constructor<M>,
       trxOrKnex?: TransactionOrKnex
     ): QueryBuilderType<M>;
 
     static relatedQuery<M extends Model, K extends keyof M>(
-      this: ModelClass<M>,
+      this: Constructor<M>,
       relationName: K,
       trxOrKnex?: TransactionOrKnex
     ): ArrayRelatedQueryBuilder<M[K]>;
@@ -1417,8 +1541,8 @@ declare namespace Objection {
       trxOrKnex?: TransactionOrKnex
     ): QueryBuilderType<RM>;
 
-    static fromJson<M extends Model>(this: ModelClass<M>, json: object, opt?: ModelOptions): M;
-    static fromDatabaseJson<M extends Model>(this: ModelClass<M>, json: object): M;
+    static fromJson<M extends Model>(this: Constructor<M>, json: object, opt?: ModelOptions): M;
+    static fromDatabaseJson<M extends Model>(this: Constructor<M>, json: object): M;
 
     static createValidator(): Validator;
     static createValidationError(args: CreateValidationErrorArgs): Error;
@@ -1442,7 +1566,7 @@ declare namespace Objection {
 
     // Deprecated
     static loadRelated<M extends Model>(
-      this: ModelClass<M>,
+      this: Constructor<M>,
       modelOrObject: PartialModelObject<M>,
       expression: RelationExpression<M>,
       modifiers?: Modifiers<QueryBuilderType<M>>,
@@ -1451,7 +1575,7 @@ declare namespace Objection {
 
     // Deprecated
     static loadRelated<M extends Model>(
-      this: ModelClass<M>,
+      this: Constructor<M>,
       modelOrObject: PartialModelObject<M>[],
       expression: RelationExpression<M>,
       modifiers?: Modifiers<QueryBuilderType<M>>,
@@ -1459,14 +1583,14 @@ declare namespace Objection {
     ): QueryBuilderType<M>;
 
     static fetchGraph<M extends Model>(
-      this: ModelClass<M>,
+      this: Constructor<M>,
       modelOrObject: PartialModelObject<M>,
       expression: RelationExpression<M>,
       options?: FetchGraphOptions
     ): SingleQueryBuilder<QueryBuilderType<M>>;
 
     static fetchGraph<M extends Model>(
-      this: ModelClass<M>,
+      this: Constructor<M>,
       modelOrObject: PartialModelObject<M>[],
       expression: RelationExpression<M>,
       options?: FetchGraphOptions
@@ -1575,14 +1699,14 @@ declare namespace Objection {
    * @tutorial https://vincit.github.io/objection.js/guide/transactions.html#creating-a-transaction
    */
   export interface transaction {
-    start(knexOrModel: knex | ModelClass<any>): Promise<Transaction>;
+    start(knexOrModel: knex | AnyModelConstructor): Promise<Transaction>;
 
-    <MC1 extends ModelClass<any>, ReturnValue>(
+    <MC1 extends AnyModelConstructor, ReturnValue>(
       modelClass1: MC1,
       callback: (boundModelClass: MC1, trx?: Transaction) => Promise<ReturnValue>
     ): Promise<ReturnValue>;
 
-    <MC1 extends ModelClass<any>, MC2 extends ModelClass<any>, ReturnValue>(
+    <MC1 extends AnyModelConstructor, MC2 extends AnyModelConstructor, ReturnValue>(
       modelClass1: MC1,
       modelClass2: MC2,
       callback: (
@@ -1593,9 +1717,9 @@ declare namespace Objection {
     ): Promise<ReturnValue>;
 
     <
-      MC1 extends ModelClass<any>,
-      MC2 extends ModelClass<any>,
-      MC3 extends ModelClass<any>,
+      MC1 extends AnyModelConstructor,
+      MC2 extends AnyModelConstructor,
+      MC3 extends AnyModelConstructor,
       ReturnValue
     >(
       modelClass1: MC1,
@@ -1610,10 +1734,10 @@ declare namespace Objection {
     ): Promise<ReturnValue>;
 
     <
-      MC1 extends ModelClass<any>,
-      MC2 extends ModelClass<any>,
-      MC3 extends ModelClass<any>,
-      MC4 extends ModelClass<any>,
+      MC1 extends AnyModelConstructor,
+      MC2 extends AnyModelConstructor,
+      MC3 extends AnyModelConstructor,
+      MC4 extends AnyModelConstructor,
       ReturnValue
     >(
       modelClass1: MC1,
@@ -1630,11 +1754,11 @@ declare namespace Objection {
     ): Promise<ReturnValue>;
 
     <
-      MC1 extends ModelClass<any>,
-      MC2 extends ModelClass<any>,
-      MC3 extends ModelClass<any>,
-      MC4 extends ModelClass<any>,
-      MC5 extends ModelClass<any>,
+      MC1 extends AnyModelConstructor,
+      MC2 extends AnyModelConstructor,
+      MC3 extends AnyModelConstructor,
+      MC4 extends AnyModelConstructor,
+      MC5 extends AnyModelConstructor,
       ReturnValue
     >(
       modelClass1: MC1,
@@ -1658,8 +1782,8 @@ declare namespace Objection {
   }
 
   interface initialize {
-    (knex: Knex, modelClasses: ModelClass<any>[]): Promise<void>;
-    (modelClasses: ModelClass<any>[]): Promise<void>;
+    (knex: Knex, modelClasses: AnyModelConstructor[]): Promise<void>;
+    (modelClasses: AnyModelConstructor[]): Promise<void>;
   }
 
   /**
