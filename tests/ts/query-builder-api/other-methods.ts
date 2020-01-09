@@ -115,7 +115,6 @@ import { Model, transaction } from '../../../typings/objection';
   const modelClass = builder.modelClass();
 
   builder.toString();
-  builder.toSql();
 
   Person.query()
     .skipUndefined()

@@ -1,4 +1,4 @@
-import { Model, JSONSchema, Modifiers } from 'objection'
+import { Model, Modifiers } from 'objection'
 import Movie from './Movie'
 import Animal from './Animal'
 
@@ -19,7 +19,7 @@ export default class Person extends Model {
   // Optional JSON schema. This is not the database schema! Nothing is generated
   // based on this. This is only used for validation. Whenever a model instance
   // is created it is checked against this schema. http://json-schema.org/.
-  static jsonSchema: JSONSchema = {
+  static jsonSchema = {
     type: 'object',
     required: ['firstName', 'lastName'],
 
