@@ -1434,7 +1434,7 @@ declare namespace Objection {
 
     knex(knex?: knex): knex;
     knexQuery(): knex.QueryBuilder;
-    startTransaction(knexOrTransaction?: TransactionOrKnex): Transaction;
+    startTransaction(knexOrTransaction?: TransactionOrKnex): Promise<Transaction>;
 
     transaction<T>(callback: (trx: Transaction) => Promise<T>): Promise<T>;
     transaction<T>(
@@ -1564,7 +1564,7 @@ declare namespace Objection {
 
     static knex(knex?: knex): knex;
     static knexQuery(): knex.QueryBuilder;
-    static startTransaction(knexOrTransaction?: TransactionOrKnex): Transaction;
+    static startTransaction(knexOrTransaction?: TransactionOrKnex): Promise<Transaction>;
 
     static transaction<T>(callback: (trx: Transaction) => Promise<T>): Promise<T>;
     static transaction<T>(

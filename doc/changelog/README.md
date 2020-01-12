@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.1.2
+
+### What's new
+
+- Fix `startTransaction` typings.
+
 ## 2.1.1
 
 ### What's new
