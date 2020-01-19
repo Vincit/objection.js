@@ -20,7 +20,7 @@ import { Person } from '../../fixtures/person';
     .delete()
     .whereExists(Person.relatedQuery('pets').where('pets.name', 'Fluffy'));
 
-  const person = await Person.query().findById(1);
+  const person = (await Person.query().findById(1))!;
 
   // Delete all pets but cats and dogs of a person.
   await person

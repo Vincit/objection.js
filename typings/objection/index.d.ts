@@ -306,6 +306,11 @@ declare namespace Objection {
   type SingleQueryBuilder<QB extends AnyQueryBuilder> = QB['SingleQueryBuilderType'];
 
   /**
+   * Gets the single or undefined item query builder type for a query builder.
+   */
+  type MaybeSingleQueryBuilder<QB extends AnyQueryBuilder> = QB['MaybeSingleQueryBuilderType'];
+
+  /**
    * Gets the multi-item query builder type for a query builder.
    */
   type ArrayQueryBuilder<QB extends AnyQueryBuilder> = QB['ArrayQueryBuilderType'];
@@ -568,7 +573,7 @@ declare namespace Objection {
 
   interface FirstMethod {
     <QB extends AnyQueryBuilder>(this: QB): QB extends ArrayQueryBuilder<QB>
-      ? SingleQueryBuilder<QB>
+      ? MaybeSingleQueryBuilder<QB>
       : QB;
   }
 
@@ -959,9 +964,9 @@ declare namespace Objection {
     groupBy: GroupByMethod<this>;
     groupByRaw: RawInterface<this>;
 
-    findById(id: MaybeCompositeId): SingleQueryBuilder<this>;
+    findById(id: MaybeCompositeId): MaybeSingleQueryBuilder<this>;
     findByIds(ids: MaybeCompositeId[]): this;
-    findOne: WhereMethod<SingleQueryBuilder<this>>;
+    findOne: WhereMethod<MaybeSingleQueryBuilder<this>>;
 
     execute(): Promise<R>;
     castTo<MC extends Model>(modelClass: ModelConstructor<MC>): QueryBuilderType<MC>;
@@ -1032,7 +1037,9 @@ declare namespace Objection {
     // Deprecated
     allowUpsert: AllowGraphMethod<this>;
 
-    throwIfNotFound: IdentityMethod<this>;
+    throwIfNotFound: () => R extends Model | undefined
+      ? SingleQueryBuilder<QueryBuilder<M, M>>
+      : this;
     returning: ReturningMethod;
     forUpdate: IdentityMethod<this>;
     forShare: IdentityMethod<this>;
@@ -1143,6 +1150,7 @@ declare namespace Objection {
 
     ArrayQueryBuilderType: QueryBuilder<M, M[]>;
     SingleQueryBuilderType: QueryBuilder<M, M>;
+    MaybeSingleQueryBuilderType: QueryBuilder<M, M | undefined>;
     NumberQueryBuilderType: QueryBuilder<M, number>;
     PageQueryBuilderType: QueryBuilder<M, Page<M>>;
   }

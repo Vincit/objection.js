@@ -79,7 +79,7 @@ import { Person } from '../fixtures/person';
   await Person.query().patchAndFetchById(134, { age: 24 });
 
   let jennifer = await Person.query().findOne({ firstName: 'Jennifer' });
-  let updatedJennifer = await jennifer.$query().patchAndFetch({ age: 24 });
+  let updatedJennifer = await jennifer!.$query().patchAndFetch({ age: 24 });
 
   await Person.query()
     .update({ firstName: 'Jennifer', lastName: 'Lawrence', age: 24 })
@@ -103,7 +103,7 @@ import { Person } from '../fixtures/person';
   });
 
   jennifer = await Person.query().findOne({ firstName: 'Jennifer' });
-  updatedJennifer = await jennifer.$query().updateAndFetch({ age: 24 });
+  updatedJennifer = await jennifer!.$query().updateAndFetch({ age: 24 });
 
   await Person.query()
     .delete()
@@ -123,7 +123,7 @@ import { Person } from '../fixtures/person';
     .delete()
     .whereExists(Person.relatedQuery('pets').where('pets.name', 'Fluffy'));
 
-  let person = await Person.query().findById(1);
+  let person = (await Person.query().findById(1))!;
 
   await person
     .$relatedQuery('pets')
@@ -137,7 +137,7 @@ import { Person } from '../fixtures/person';
 
   let actor = await Person.query().findById(100);
   let movie = await Movie.query().findById(200);
-  await actor.$relatedQuery('movies').relate(movie);
+  await actor!.$relatedQuery('movies').relate(movie!);
 
   await Person.relatedQuery('movies')
     .for(100)
@@ -171,7 +171,7 @@ import { Person } from '../fixtures/person';
     });
 
   actor = await Person.query().findById(100);
-  await actor
+  await actor!
     .$relatedQuery('movies')
     .unrelate()
     .where('name', 'like', 'Terminator%');
@@ -191,7 +191,7 @@ import { Person } from '../fixtures/person';
     .unrelate()
     .where('name', 'like', 'Terminator%');
 
-  person = await Person.query().findById(123);
+  person = (await Person.query().findById(123))!;
 
   const numUnrelatedRows = await person
     .$relatedQuery('movies')

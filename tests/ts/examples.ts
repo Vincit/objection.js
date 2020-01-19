@@ -67,7 +67,7 @@ class Person extends objection.Model {
 
     properties: {
       firstName: {
-        type: 'string',
+        type: 'string'
       }
     }
   };
@@ -173,6 +173,14 @@ function takesModelSubclass<M extends objection.Model>(m: M) {}
 function takesModel(m: objection.Model) {}
 function takesModelClass(m: objection.ModelClass<any>) {}
 
+// Borrowed from https://github.com/TypeStrong/ts-expect/blob/39f04b5/src/index.ts
+type TypeEqual<T, U> = Exclude<T, U> extends never
+  ? Exclude<U, T> extends never
+    ? true
+    : false
+  : false;
+const expectsTrue = <T extends true>() => 1;
+
 const takesPerson = (person: Person) => {
   person.examplePersonMethod('');
 };
@@ -203,7 +211,14 @@ takesPersonQueryBuilder(Person.query());
 async () => {
   takesPeople(await Person.query().where('lastName', lastName));
   takesPeople(await Person.query().where({ lastName }));
-  takesMaybePerson(await Person.query().findById(123));
+  let person = await Person.query().findById(123);
+  takesMaybePerson(person);
+  expectsTrue<TypeEqual<Person | undefined, typeof person>>();
+  person = await Person.query().findOne({
+    id: 123
+  });
+  takesMaybePerson(person);
+  expectsTrue<TypeEqual<Person | undefined, typeof person>>();
   takesMaybePerson(await Person.query().findById('uid'));
 };
 
@@ -494,7 +509,7 @@ async () => {
 // (fewer characters than having each line `const qbNNN: QueryBuilder =`):
 
 const maybePerson: Promise<Person | undefined> = qb.findById(1);
-const maybePerson2: Promise<Person> = qb.findById([1, 2, 3]);
+const maybePerson2: Promise<Person | undefined> = qb.findById([1, 2, 3]);
 
 // query builder knex-wrapping methods:
 
@@ -861,12 +876,12 @@ qb = qb.reject('fail');
 qb = qb.resolve('success');
 
 const trxRes1: Promise<Person> = Person.transaction(async trx => {
-  const person = await Person.query(trx).findById(1);
+  const person = (await Person.query(trx).findById(1))!;
   return person;
 });
 
 const trxRes2: Promise<Person[]> = Person.transaction(Person.knex(), async trx => {
-  const person = await Person.query(trx).findById(1);
+  const person = (await Person.query(trx).findById(1))!;
   return [person];
 });
 
@@ -1119,7 +1134,7 @@ const deleteByIDThrow: Promise<number> = qb.deleteById(32).throwIfNotFound();
 const whereFirst: Promise<Person | undefined> = qb.where({ firstName: 'Mo' }).first();
 const firstWhere: Promise<Person | undefined> = qb.first().where({ firstName: 'Mo' });
 const updateFirst: Promise<number> = qb.update({}).first();
-const updateReturningFirst: Promise<Person> = qb
+const updateReturningFirst: Promise<Person | undefined> = qb
   .update({})
   .returning('*')
   .first();

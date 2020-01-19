@@ -15,5 +15,5 @@ import { Person } from './fixtures/person';
   const jenniferFromDb = await Person.query().findById(jennifer.id);
 
   console.log(jennifer.address.city); // --> Tampere
-  console.log(jenniferFromDb.address.city); // --> Tampere
+  console.log(jenniferFromDb!.address.city); // --> Tampere
 })();

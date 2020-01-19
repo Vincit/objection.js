@@ -3,6 +3,7 @@ import { Model, QueryBuilder, Page, TransactionOrKnex } from '../../';
 class CustomQueryBuilder<M extends Model, R = M[]> extends QueryBuilder<M, R> {
   ArrayQueryBuilderType!: CustomQueryBuilder<M, M[]>;
   SingleQueryBuilderType!: CustomQueryBuilder<M, M>;
+  MaybeSingleQueryBuilderType!: CustomQueryBuilder<M, M | undefined>;
   NumberQueryBuilderType!: CustomQueryBuilder<M, number>;
   PageQueryBuilderType!: CustomQueryBuilder<M, Page<M>>;
 
@@ -51,7 +52,7 @@ const people: Promise<Person[]> = Person.query()
       .someCustomMethod()
   );
 
-const pets: Promise<Animal> = new Person()
+const pets: Promise<Animal | undefined> = new Person()
   .$relatedQuery('pets')
   .someCustomMethod()
   .where('id', 1)

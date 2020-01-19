@@ -83,6 +83,7 @@ class MyQueryBuilder<M extends Model, R = M[]> extends QueryBuilder<M, R> {
   // name of the query builder class.
   ArrayQueryBuilderType!: MyQueryBuilder<M, M[]>;
   SingleQueryBuilderType!: MyQueryBuilder<M, M>;
+  MaybeSingleQueryBuilderType!: MyQueryBuilder<M, M | undefined>;
   NumberQueryBuilderType!: MyQueryBuilder<M, number>;
   PageQueryBuilderType!: MyQueryBuilder<M, Page<M>>;
 
