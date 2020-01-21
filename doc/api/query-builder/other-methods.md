@@ -741,7 +741,7 @@ const sql = queryBuilder.toSql();
 
 An alias for `toString()`.
 
-Note: The behavior of Objection's `toSql()` is different from Knex's `toSql()` (see above). This method may be deprecated soon.
+Note: The behavior of Objection's `toSql()` is different from Knex's `toString()` (see above). This method may be deprecated soon.
 
 ##### Return value
 
