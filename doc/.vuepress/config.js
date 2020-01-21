@@ -46,16 +46,15 @@ module.exports = {
       },
 
       {
-        text: 'Changelog',
-        link: '/changelog/'
-      },
-
-      {
-        text: 'v1.x',
+        text: 'Release Notes',
         items: [
           {
+            text: 'Changelog',
+            link: '/release-notes/changelog.md'
+          },
+          {
             text: 'Migration to 2.0',
-            link: '/1.x/migration.md'
+            link: '/release-notes/migration.md'
           },
           {
             text: 'v1.x documentation',
