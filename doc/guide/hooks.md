@@ -209,7 +209,7 @@ const jennifer = await Person.query().insert({ firstName: 'Jennifer' });
 
 await jennifer.$query().patch({ lastName: 'Aniston' });
 // items:      [{ id: 1, firstName: 'Jennifer' }]
-// inputItems: [{ lastName: 'Jennifer' }]
+// inputItems: [{ lastName: 'Aniston' }]
 // relation:   none
 
 await jennifer.$relatedQuery('movies').insert({ name: "We're the Millers" });
