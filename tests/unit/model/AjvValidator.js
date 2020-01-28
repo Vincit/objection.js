@@ -46,7 +46,24 @@ describe('AjvValidator', () => {
             }
           }
         }
-      }
+      },
+      definitions: {
+        TestRef1: {
+          type: 'object',
+          properties: {
+            aRequiredProp1: { type: 'string' }
+          },
+          required: ['aRequiredProp1']
+        },
+        TestRef2: {
+          type: 'object',
+          properties: {
+            aRequiredProp2: { type: 'string' }
+          },
+          required: ['aRequiredProp2']
+        }
+      },
+      anyOf: [{ $ref: '#/definitions/TestRef1' }, { $ref: '#/definitions/TestRef2' }]
     };
 
     const originalSchema = cloneDeep(schema);
@@ -77,6 +94,20 @@ describe('AjvValidator', () => {
                   }
                 }
               }
+            }
+          }
+        },
+        definitions: {
+          TestRef1: {
+            type: 'object',
+            properties: {
+              aRequiredProp1: { type: 'string' }
+            }
+          },
+          TestRef2: {
+            type: 'object',
+            properties: {
+              aRequiredProp2: { type: 'string' }
             }
           }
         }
