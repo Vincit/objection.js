@@ -63,7 +63,12 @@ describe('AjvValidator', () => {
           required: ['aRequiredProp2']
         }
       },
-      anyOf: [{ $ref: '#/definitions/TestRef1' }, { $ref: '#/definitions/TestRef2' }]
+      anyOf: [{ $ref: '#/definitions/TestRef1' }, { $ref: '#/definitions/TestRef2' }],
+      oneOf: [{}],
+      allOf: [{}],
+      not: true,
+      then: true,
+      else: true
     };
 
     const originalSchema = cloneDeep(schema);
