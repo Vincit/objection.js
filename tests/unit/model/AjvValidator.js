@@ -35,7 +35,9 @@ describe('AjvValidator', () => {
                 meta3: { type: 'object' }
               }
             }
+          }
         }
+      }
     };
 
     it('should remove required fields recursively', () => {
@@ -57,12 +59,14 @@ describe('AjvValidator', () => {
                   meta3: { type: 'object' }
                 }
               }
+            }
           }
+        }
       };
-    
+
       const validator = new AjvValidator({ onCreateAjv: () => {} });
       const validators = validator.getValidator(modelClass('test', schema), schema, true);
-      
+
       expect(validators.schema).to.eql(expectSchema);
     });
   });
