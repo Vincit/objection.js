@@ -67,7 +67,7 @@ class Person extends objection.Model {
 
     properties: {
       firstName: {
-        type: 'string',
+        type: 'string'
       }
     }
   };
