@@ -1,4 +1,5 @@
 const { AjvValidator, Model } = require('../../../');
+const { cloneDeep } = require('../../../lib/utils/objectUtils');
 const expect = require('expect.js');
 
 function modelClass(tableName, schema) {
@@ -16,23 +17,31 @@ describe('AjvValidator', () => {
   describe('patch validator', () => {
     const schema = {
       type: 'object',
-      additionalProperties: false,
       required: ['id'],
       properties: {
         id: { type: 'integer' },
         meta: {
           type: 'object',
-          additionalProperties: false,
           required: ['id2'],
           properties: {
             id2: { type: 'integer' },
             meta2: {
               type: 'object',
-              additionalProperties: false,
               required: ['id3'],
               properties: {
                 id3: { type: 'integer' },
-                meta3: { type: 'object' }
+                meta3: { type: 'object' },
+                arr1: { type: 'array', items: { type: 'string' } },
+                arr2: {
+                  type: 'array',
+                  items: {
+                    type: 'object',
+                    required: ['id4'],
+                    properties: {
+                      id4: { type: 'integer' }
+                    }
+                  }
+                }
               }
             }
           }
@@ -40,23 +49,32 @@ describe('AjvValidator', () => {
       }
     };
 
+    const originalSchema = cloneDeep(schema);
+
     it('should remove required fields recursively', () => {
-      const expectSchema = {
+      const expectSchemaNoRequired = {
         type: 'object',
-        additionalProperties: false,
         properties: {
           id: { type: 'integer' },
           meta: {
             type: 'object',
-            additionalProperties: false,
             properties: {
               id2: { type: 'integer' },
               meta2: {
                 type: 'object',
-                additionalProperties: false,
                 properties: {
                   id3: { type: 'integer' },
-                  meta3: { type: 'object' }
+                  meta3: { type: 'object' },
+                  arr1: { type: 'array', items: { type: 'string' } },
+                  arr2: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        id4: { type: 'integer' }
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -65,9 +83,15 @@ describe('AjvValidator', () => {
       };
 
       const validator = new AjvValidator({ onCreateAjv: () => {} });
-      const validators = validator.getValidator(modelClass('test', schema), schema, true);
+      const validatorNoRequired = validator.getValidator(modelClass('test', schema), schema, true);
+      const validatorWithRequired = validator.getValidator(
+        modelClass('test', schema),
+        schema,
+        false
+      );
 
-      expect(validators.schema).to.eql(expectSchema);
+      expect(validatorWithRequired.schema).to.eql(originalSchema);
+      expect(validatorNoRequired.schema).to.eql(expectSchemaNoRequired);
     });
   });
 });
