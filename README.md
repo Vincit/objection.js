@@ -20,6 +20,11 @@ What objection.js gives you:
 
 What objection.js **doesn't** give you:
 
+- **A fully object oriented view of your database**
+  With objection you don't work with entities. You work with queries. Objection doesn't try to wrap every concept with an 
+  object oriented equivalent. The best attempt to do that (IMO) is Hibernate, which is excellent, but it has 800k lines
+  of code and a lot more concepts to learn than SQL itself. The point is, writing a good traditional ORM is borderline
+  impossible. Objection attempts to provide a completely different way of working with SQL.
 - **A custom query DSL. SQL is used as a query language.**
   This doesn't mean you have to write SQL strings though. A query builder based on [knex](http://knexjs.org) is
   used to build the SQL. However, if the query builder fails you for some reason, raw SQL strings can be easily
