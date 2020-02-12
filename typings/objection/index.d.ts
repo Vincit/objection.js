@@ -1285,6 +1285,7 @@ declare namespace Objection {
   export interface SnakeCaseMappersOptions {
     upperCase?: boolean;
     underscoreBeforeDigits?: boolean;
+    underscoreBetweenUppercaseLetters?: boolean;
   }
 
   export interface ColumnNameMappers {
