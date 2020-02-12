@@ -141,6 +141,35 @@ describe('utils', () => {
       testUnderscoreBeforeNumbers('fooBar:spamBaz:troloLolo', 'foo_bar:spam_baz:trolo_lolo');
       testUnderscoreBeforeNumbers('fooBar.spamBaz.troloLolo', 'foo_bar.spam_baz.trolo_lolo');
 
+      testUnderscoreBetweenUppercaseLetters('*', '*');
+
+      testUnderscoreBetweenUppercaseLetters('foo', 'foo');
+      testUnderscoreBetweenUppercaseLetters('fooBar', 'foo_bar');
+      testUnderscoreBetweenUppercaseLetters('foo1Bar2', 'foo1_bar2');
+      testUnderscoreBetweenUppercaseLetters('fooBAR', 'foo_b_a_r');
+      testUnderscoreBetweenUppercaseLetters('fooBaR', 'foo_ba_r');
+
+      testUnderscoreBetweenUppercaseLetters('föö', 'föö');
+      testUnderscoreBetweenUppercaseLetters('fööBär', 'föö_bär');
+      testUnderscoreBetweenUppercaseLetters('föö1Bär2', 'föö1_bär2');
+      testUnderscoreBetweenUppercaseLetters('föö09Bär90', 'föö09_bär90');
+      testUnderscoreBetweenUppercaseLetters('fööBÄR', 'föö_b_ä_r');
+      testUnderscoreBetweenUppercaseLetters('fööBäR', 'föö_bä_r');
+
+      testUnderscoreBetweenUppercaseLetters('foo1bar2', 'foo1bar2');
+      testUnderscoreBetweenUppercaseLetters('Foo', 'foo', 'foo');
+      testUnderscoreBetweenUppercaseLetters('FooBar', 'foo_bar', 'fooBar');
+      testUnderscoreBetweenUppercaseLetters('märkäLänttiÄäliö', 'märkä_läntti_ääliö');
+
+      testUnderscoreBetweenUppercaseLetters(
+        'fooBar:spamBaz:troloLolo',
+        'foo_bar:spam_baz:trolo_lolo'
+      );
+      testUnderscoreBetweenUppercaseLetters(
+        'fooBar.spamBaz.troloLolo',
+        'foo_bar.spam_baz.trolo_lolo'
+      );
+
       function test(camel, snake, backToCamel) {
         backToCamel = backToCamel || camel;
 
@@ -156,6 +185,16 @@ describe('utils', () => {
       function testUnderscoreBeforeNumbers(camel, snake, backToCamel) {
         backToCamel = backToCamel || camel;
         const opt = { underscoreBeforeDigits: true };
+
+        it(`${camel} --> ${snake} --> ${backToCamel}`, () => {
+          expect(snakeCase(camel, opt)).to.equal(snake);
+          expect(camelCase(snakeCase(camel, opt), opt)).to.equal(backToCamel);
+        });
+      }
+
+      function testUnderscoreBetweenUppercaseLetters(camel, snake, backToCamel) {
+        backToCamel = backToCamel || camel;
+        const opt = { underscoreBetweenUppercaseLetters: true };
 
         it(`${camel} --> ${snake} --> ${backToCamel}`, () => {
           expect(snakeCase(camel, opt)).to.equal(snake);
