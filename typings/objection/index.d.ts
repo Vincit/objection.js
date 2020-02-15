@@ -608,7 +608,7 @@ declare namespace Objection {
   }
 
   interface ColumnInfoMethod<QB extends AnyQueryBuilder> {
-    (): Promise<knex.ColumnInfo>;
+    (): CatchablePromiseLike<knex.ColumnInfo>;
   }
 
   interface TableRefForMethod {
@@ -795,8 +795,23 @@ declare namespace Objection {
     [key: string]: any;
   }
 
-  export class QueryBuilder<M extends Model, R = M[]> extends Promise<R> {
+  export interface CatchablePromiseLike<R> extends PromiseLike<R> {
+    catch<FR = never>(
+      onrejected?: ((reason: any) => FR | PromiseLike<FR>) | undefined | null
+    ): Promise<R | FR>;
+  }
+
+  export class QueryBuilder<M extends Model, R = M[]> implements CatchablePromiseLike<R> {
     static forClass: ForClassMethod;
+
+    then<R1 = R, R2 = never>(
+      onfulfilled?: ((value: R) => R1 | PromiseLike<R1>) | undefined | null,
+      onrejected?: ((reason: any) => R2 | PromiseLike<R2>) | undefined | null
+    ): Promise<R1 | R2>;
+
+    catch<FR = never>(
+      onrejected?: ((reason: any) => FR | PromiseLike<FR>) | undefined | null
+    ): Promise<R | FR>;
 
     select: SelectMethod<this>;
     columns: SelectMethod<this>;
@@ -963,7 +978,7 @@ declare namespace Objection {
     findByIds(ids: MaybeCompositeId[]): this;
     findOne: WhereMethod<SingleQueryBuilder<this>>;
 
-    execute(): Promise<R>;
+    execute(): CatchablePromiseLike<R>;
     castTo<MC extends Model>(modelClass: ModelConstructor<MC>): QueryBuilderType<MC>;
 
     update(update: PartialModelObject<M>): NumberQueryBuilder<this>;
@@ -1004,7 +1019,7 @@ declare namespace Objection {
     withGraphFetched(expr: RelationExpression<M>, options?: GraphOptions): this;
     withGraphJoined(expr: RelationExpression<M>, options?: GraphOptions): this;
 
-    truncate(): Promise<void>;
+    truncate(): CatchablePromiseLike<void>;
 
     // Deprecated
     eager: EagerMethod<this>;
@@ -1074,7 +1089,7 @@ declare namespace Objection {
     range(start: number, end: number): PageQueryBuilder<this>;
     offset(offset: number): this;
     limit(limit: number): this;
-    resultSize(): Promise<number>;
+    resultSize(): CatchablePromiseLike<number>;
 
     runBefore: RunBeforeMethod<this>;
     runAfter: RunAfterMethod<this>;

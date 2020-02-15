@@ -67,7 +67,7 @@ class Person extends objection.Model {
 
     properties: {
       firstName: {
-        type: 'string',
+        type: 'string'
       }
     }
   };
@@ -96,15 +96,15 @@ class Person extends objection.Model {
     return 100;
   }
 
-  petsWithId(petId: number): Promise<Animal[]> {
+  async petsWithId(petId: number): Promise<Animal[]> {
     return this.$relatedQuery('pets').where('id', petId);
   }
 
-  commentsWithId(commentId: number): Promise<Comment[]> {
+  async commentsWithId(commentId: number): Promise<Comment[]> {
     return this.$relatedQuery('comments').where('id', commentId);
   }
 
-  fetchMom(): Promise<Person | undefined> {
+  async fetchMom(): Promise<Person | undefined> {
     return this.$relatedQuery('mom');
   }
 
@@ -112,7 +112,7 @@ class Person extends objection.Model {
     console.log(queryContext.someCustomValue);
   }
 
-  $formatDatabaseJson(json: objection.Pojo) {
+  async $formatDatabaseJson(json: objection.Pojo) {
     // Test that any property can be accessed and set.
     json.bar = json.foo;
     return json;
@@ -185,7 +185,7 @@ async function takesPersonClass(PersonClass: typeof Person) {
   takesMaybePerson(await PersonClass.query().findById(123));
 }
 
-function takesPersonQueryBuilder(qb: objection.QueryBuilder<Person>): Promise<Person[]> {
+async function takesPersonQueryBuilder(qb: objection.QueryBuilder<Person>): Promise<Person[]> {
   return qb.execute();
 }
 
@@ -321,7 +321,7 @@ class Movie extends objection.Model {
   // prettier-ignore
   director!: Person;
 
-  fetchDirector(): Promise<Person> {
+  async fetchDirector(): Promise<Person> {
     return this.$relatedQuery('director');
   }
 
@@ -371,8 +371,8 @@ async () => {
   takesMaybePerson(await new Movie().$relatedQuery('director').where('age', '>', 32));
 };
 
-const relatedPersons: Promise<Person[]> = new Person().$relatedQuery('children');
-const relatedMovies: Promise<Person[]> = new Movie().$relatedQuery('actors');
+const relatedPersons: PromiseLike<Person[]> = new Person().$relatedQuery('children');
+const relatedMovies: PromiseLike<Person[]> = new Movie().$relatedQuery('actors');
 
 class Animal extends objection.Model {
   // prettier-ignore
@@ -441,8 +441,8 @@ const appendRelatedPerson: Person = examplePerson.$appendRelated('pets', [
 const personQB: objection.QueryBuilder<Person, Person> = Person.loadRelated(new Person(), 'movies');
 const peopleQB: objection.QueryBuilder<Person> = Person.loadRelated([new Person()], 'movies');
 
-const person: Promise<Person> = personQB;
-const people: Promise<Person[]> = peopleQB;
+const person: PromiseLike<Person> = personQB;
+const people: PromiseLike<Person[]> = peopleQB;
 
 class Actor {
   canAct?: boolean;
@@ -450,24 +450,24 @@ class Actor {
 
 // Optional<Person> typing for findById():
 
-function byId(id: number): Promise<Person | undefined> {
+async function byId(id: number): Promise<Person | undefined> {
   return Person.query().findById(id);
 }
 
 // Person[] typing for findByIds():
 
-function byIds(ids: number[] | number[][]): Promise<Person[]> {
+async function byIds(ids: number[] | number[][]): Promise<Person[]> {
   return Person.query().findByIds(ids);
 }
 
 // Person[] typing for where():
 
-function whereSpecies(species: string): Promise<Animal[]> {
+async function whereSpecies(species: string): Promise<Animal[]> {
   return Animal.query().where('species', species);
 }
 
 const pqb: objection.QueryBuilder<Person> = objection.QueryBuilder.forClass(Person);
-const personPromise: Promise<Person | undefined> = pqb.findById(1);
+const personPromise: PromiseLike<Person | undefined> = pqb.findById(1);
 
 // QueryBuilder.findById accepts single and array values:
 
@@ -493,8 +493,8 @@ async () => {
 // is done to verify that the return value is assignable to a QueryBuilder
 // (fewer characters than having each line `const qbNNN: QueryBuilder =`):
 
-const maybePerson: Promise<Person | undefined> = qb.findById(1);
-const maybePerson2: Promise<Person> = qb.findById([1, 2, 3]);
+const maybePerson: PromiseLike<Person | undefined> = qb.findById(1);
+const maybePerson2: PromiseLike<Person> = qb.findById([1, 2, 3]);
 
 // query builder knex-wrapping methods:
 
@@ -542,30 +542,33 @@ qb = qb.whereInComposite(['id1', 'id2'], Person.query().select('firstName', 'las
 
 // Query builder hooks. runBefore() and runAfter() don't immediately affect the result.
 
-const runBeforePerson: Promise<Person> = qb
+const runBeforePerson: PromiseLike<Person> = qb
   .first()
   .throwIfNotFound()
   .runBefore(async (result: any, builder: objection.QueryBuilder<Person, Person>) => 88);
 
-const runBeforePersons: Promise<Person[]> = qb.runBefore(
+const runBeforePersons: PromiseLike<Person[]> = qb.runBefore(
   async (result: any, builder: objection.QueryBuilder<Person>) => 88
 );
 
-const runAfterPerson: Promise<Person> = qb
+const runAfterPerson: PromiseLike<Person> = qb
   .first()
   .throwIfNotFound()
   .runAfter(async (result: any, builder: objection.QueryBuilder<Person, Person>) => 88);
 
-const runAfterPersons: Promise<Person[]> = qb.runAfter(
+const runAfterPersons: PromiseLike<Person[]> = qb.runAfter(
   async (result: any, builder: objection.QueryBuilder<Person>) => 88
 );
 
 // signature-changing QueryBuilder methods:
 
-const rowInserted: Promise<Person> = qb.insert({ firstName: 'bob' });
-const rowsInserted: Promise<Person[]> = qb.insert([{ firstName: 'alice' }, { firstName: 'bob' }]);
-const rowsInsertedWithRelated: Promise<Person> = qb.insertWithRelated({});
-const rowsInsertGraph1: Promise<Person> = qb.insertGraph({
+const rowInserted: PromiseLike<Person> = qb.insert({ firstName: 'bob' });
+const rowsInserted: PromiseLike<Person[]> = qb.insert([
+  { firstName: 'alice' },
+  { firstName: 'bob' }
+]);
+const rowsInsertedWithRelated: PromiseLike<Person> = qb.insertWithRelated({});
+const rowsInsertGraph1: PromiseLike<Person> = qb.insertGraph({
   '#id': 'root',
   firstName: 'Name',
 
@@ -600,7 +603,7 @@ const rowsInsertGraph1: Promise<Person> = qb.insertGraph({
     }
   ]
 });
-const rowsInsertGraph2: Promise<Person[]> = qb.insertGraph([
+const rowsInsertGraph2: PromiseLike<Person[]> = qb.insertGraph([
   {
     '#id': 'person',
     firstName: 'Name',
@@ -620,60 +623,62 @@ const rowsInsertGraph2: Promise<Person[]> = qb.insertGraph([
     ]
   }
 ]);
-const rowsInsertGraph3: Promise<Person> = qb.insertGraph({}, { relate: true });
-const rowsUpdated: Promise<number> = qb.update({});
-const rowsPatched: Promise<number> = qb.patch({});
-const rowsDeleted: Promise<number> = qb.delete();
-const rowsDeletedById: Promise<number> = qb.deleteById(123);
-const rowsDeletedByIds: Promise<number> = qb.deleteById([123, 456]);
+const rowsInsertGraph3: PromiseLike<Person> = qb.insertGraph({}, { relate: true });
+const rowsUpdated: PromiseLike<number> = qb.update({});
+const rowsPatched: PromiseLike<number> = qb.patch({});
+const rowsDeleted: PromiseLike<number> = qb.delete();
+const rowsDeletedById: PromiseLike<number> = qb.deleteById(123);
+const rowsDeletedByIds: PromiseLike<number> = qb.deleteById([123, 456]);
 
-const rowsUpdatedWithData: Promise<number>[] = [
+const rowsUpdatedWithData: PromiseLike<number>[] = [
   qb.update({ firstName: 'name' }),
   qb.update({ firstName: ref('last_name') }),
   qb.update({ firstName: raw('"name"') }),
   qb.update({ firstName: qb.select('lastname') })
 ];
 
-const rowsPatchedWithData: Promise<number>[] = [
+const rowsPatchedWithData: PromiseLike<number>[] = [
   qb.patch({ firstName: 'name' }),
   qb.patch({ firstName: ref('last_name') }),
   qb.patch({ firstName: raw('"name"') }),
   qb.patch({ firstName: qb.select('lastname') })
 ];
 
-const insertedModel: Promise<Person> = Person.query().insertAndFetch({});
-const insertedModels1: Promise<Person[]> = Person.query().insertGraphAndFetch([
+const insertedModel: PromiseLike<Person> = Person.query().insertAndFetch({});
+const insertedModels1: PromiseLike<Person[]> = Person.query().insertGraphAndFetch([
   new Person(),
   new Person()
 ]);
-const insertedModels2: Promise<Person[]> = Person.query().insertGraphAndFetch(
+const insertedModels2: PromiseLike<Person[]> = Person.query().insertGraphAndFetch(
   [new Person(), new Person()],
   {
     relate: true
   }
 );
 
-const upsertModel1: Promise<Person> = Person.query().upsertGraph({});
-const upsertModel2: Promise<Person> = Person.query().upsertGraph({}, { relate: true });
-const upsertModels1: Promise<Person[]> = Person.query().upsertGraph([]);
-const upsertModels2: Promise<Person[]> = Person.query().upsertGraph([], {
+const upsertModel1: PromiseLike<Person> = Person.query().upsertGraph({});
+const upsertModel2: PromiseLike<Person> = Person.query().upsertGraph({}, { relate: true });
+const upsertModels1: PromiseLike<Person[]> = Person.query().upsertGraph([]);
+const upsertModels2: PromiseLike<Person[]> = Person.query().upsertGraph([], {
   unrelate: true
 });
 
-const insertedGraphAndFetchOne: Promise<Person> = Person.query().insertGraphAndFetch(new Person());
-const insertedGraphAndFetchSome: Promise<Person[]> = Person.query().insertGraphAndFetch([
+const insertedGraphAndFetchOne: PromiseLike<Person> = Person.query().insertGraphAndFetch(
+  new Person()
+);
+const insertedGraphAndFetchSome: PromiseLike<Person[]> = Person.query().insertGraphAndFetch([
   new Person(),
   new Person()
 ]);
-const insertedRelatedAndFetch: Promise<Person> = Person.query().insertWithRelatedAndFetch(
+const insertedRelatedAndFetch: PromiseLike<Person> = Person.query().insertWithRelatedAndFetch(
   new Person()
 );
-const updatedModel: Promise<Person> = Person.query().updateAndFetch({});
-const updatedModelById: Promise<Person> = Person.query().updateAndFetchById(123, {});
-const patchedModel: Promise<Person> = Person.query().patchAndFetch({});
-const patchedModelById: Promise<Person> = Person.query().patchAndFetchById(123, {});
+const updatedModel: PromiseLike<Person> = Person.query().updateAndFetch({});
+const updatedModelById: PromiseLike<Person> = Person.query().updateAndFetchById(123, {});
+const patchedModel: PromiseLike<Person> = Person.query().patchAndFetch({});
+const patchedModelById: PromiseLike<Person> = Person.query().patchAndFetchById(123, {});
 
-const updatedModels: Promise<Person>[] = [
+const updatedModels: PromiseLike<Person>[] = [
   qb.updateAndFetch({ firstName: 'name' }),
   qb.updateAndFetch({ firstName: ref('last_name') }),
   qb.updateAndFetch({ firstName: raw('"name"') }),
@@ -685,7 +690,7 @@ const updatedModels: Promise<Person>[] = [
   qb.updateAndFetchById(123, { firstName: qb.select('lastname') })
 ];
 
-const patchedModels: Promise<Person>[] = [
+const patchedModels: PromiseLike<Person>[] = [
   qb.patchAndFetch({ firstName: 'name' }),
   qb.patchAndFetch({ firstName: ref('last_name') }),
   qb.patchAndFetch({ firstName: raw('"name"') }),
@@ -697,14 +702,14 @@ const patchedModels: Promise<Person>[] = [
   qb.patchAndFetchById(123, { firstName: qb.select('lastname') })
 ];
 
-const rowsEager: Promise<Person[]> = Person.query()
+const rowsEager: PromiseLike<Person[]> = Person.query()
   .eagerAlgorithm(Person.NaiveEagerAlgorithm)
   .eagerAlgorithm(Person.JoinEagerAlgorithm)
   .eagerAlgorithm(Person.WhereInEagerAlgorithm)
   .eagerOptions({ joinOperation: 'innerJoin' })
   .eager('foo.bar');
 
-const rowsEager2: Promise<Person[]> = Person.query().eager({
+const rowsEager2: PromiseLike<Person[]> = Person.query().eager({
   pets: {
     owner: {
       movies: {
@@ -714,13 +719,13 @@ const rowsEager2: Promise<Person[]> = Person.query().eager({
   }
 });
 
-const rowsEager3: Promise<Person[]> = Person.query().withGraphFetched({
+const rowsEager3: PromiseLike<Person[]> = Person.query().withGraphFetched({
   foo: {
     bar: true
   }
 });
 
-const children: Promise<Person[]> = Person.query()
+const children: PromiseLike<Person[]> = Person.query()
   .skipUndefined()
   .allowEager('[pets, parent, children.[pets, movies.actors], movies.actors.pets]')
   .allowEager({ pets: true })
@@ -728,35 +733,35 @@ const children: Promise<Person[]> = Person.query()
   .eager('children')
   .where('age', '>=', 42);
 
-const childrenAndPets: Promise<Person[]> = Person.query()
+const childrenAndPets: PromiseLike<Person[]> = Person.query()
   .eager('children')
   .where('age', '>=', 42)
   .modifyEager('[pets, children.pets]', qb => qb.orderBy('name'))
   .modifyEager('[pets, children.pets]', 'orderByName')
   .modifyEager('[pets, children.pets]', ['orderByName', 'orderBySomethingElse']);
 
-const childrenAndPets2: Promise<Person[]> = Person.query()
+const childrenAndPets2: PromiseLike<Person[]> = Person.query()
   .withGraphFetched('children')
   .where('age', '>=', 42)
   .modifyEager('[pets, children.pets]', qb => qb.orderBy('name'))
   .modifyEager('[pets, children.pets]', 'orderByName')
   .modifyEager('[pets, children.pets]', ['orderByName', 'orderBySomethingElse']);
 
-const childrenAndPets3: Promise<Person[]> = Person.query()
+const childrenAndPets3: PromiseLike<Person[]> = Person.query()
   .withGraphJoined('children')
   .where('age', '>=', 42)
   .modifyEager('[pets, children.pets]', qb => qb.orderBy('name'))
   .modifyEager('[pets, children.pets]', 'orderByName')
   .modifyEager('[pets, children.pets]', ['orderByName', 'orderBySomethingElse']);
 
-const rowsPage: Promise<{
+const rowsPage: PromiseLike<{
   total: number;
   results: Person[];
 }> = Person.query().page(1, 10);
 
-const rowsRange: Promise<objection.Page<Person>> = Person.query().range(1, 10);
+const rowsRange: PromiseLike<objection.Page<Person>> = Person.query().range(1, 10);
 
-const rowsPageRunAfter: Promise<objection.Page<Person>> = Person.query()
+const rowsPageRunAfter: PromiseLike<objection.Page<Person>> = Person.query()
   .page(1, 10)
   .runAfter(
     async (
@@ -766,30 +771,30 @@ const rowsPageRunAfter: Promise<objection.Page<Person>> = Person.query()
   );
 
 // `retuning` should change the return value from number to T[]
-const rowsUpdateReturning: Promise<Person[]> = Person.query()
+const rowsUpdateReturning: PromiseLike<Person[]> = Person.query()
   .update({})
   .returning('*');
 
-const rowPatchReturningFirst: Promise<Person | undefined> = Person.query()
+const rowPatchReturningFirst: PromiseLike<Person | undefined> = Person.query()
   .patch({})
   .returning('*')
   .first();
 
 // `retuning` should change the return value from number to T[]
-const rowsDeleteReturning: Promise<Person[]> = Person.query()
+const rowsDeleteReturning: PromiseLike<Person[]> = Person.query()
   .delete()
   .returning('*');
 
-const rowsDeleteReturningFirst: Promise<Person | undefined> = Person.query()
+const rowsDeleteReturningFirst: PromiseLike<Person | undefined> = Person.query()
   .delete()
   .returning('*')
   .first();
 
-const rowInsertReturning: Promise<Person | undefined> = Person.query()
+const rowInsertReturning: PromiseLike<Person | undefined> = Person.query()
   .insert({})
   .returning('*');
 
-const rowsInsertReturning: Promise<Person[]> = Person.query()
+const rowsInsertReturning: PromiseLike<Person[]> = Person.query()
   .insert([{ firstName: 'Jack' }])
   .returning('*');
 
@@ -797,23 +802,23 @@ const rowsInsertReturning: Promise<Person[]> = Person.query()
 // as a promise directly, regardless of query builder return type:
 
 const maybePersonQb = Person.query().findById(1);
-let maybePersonPromise: Promise<Person | undefined> = maybePersonQb;
+let maybePersonPromise: PromiseLike<Person | undefined> = maybePersonQb;
 maybePersonPromise = maybePersonQb.execute();
 
 const peopleQb = Person.query();
-let peoplePromise: Promise<Person[]> = peopleQb;
+let peoplePromise: PromiseLike<Person[]> = peopleQb;
 peoplePromise = peopleQb.execute();
 
 const insertQb = Person.query().insert({});
-let insertPromise: Promise<Person> = insertQb;
+let insertPromise: PromiseLike<Person> = insertQb;
 insertPromise = insertQb.execute();
 
 const deleteQb = Person.query().delete();
-let deletePromise: Promise<number> = deleteQb;
+let deletePromise: PromiseLike<number> = deleteQb;
 deletePromise = deleteQb.execute();
 
 const pageQb = Person.query().page(1, 10);
-let pagePromise: Promise<objection.Page<Person>> = pageQb;
+let pagePromise: PromiseLike<objection.Page<Person>> = pageQb;
 pagePromise = pageQb.execute();
 
 Person.query()
@@ -980,21 +985,26 @@ Person.query().where(builder => {
   builder.whereBetween('age', [30, 40]).orWhereIn('lastName', whereSubQuery);
 });
 
-const relQueryResult1: Promise<Animal[]> = Person.relatedQuery('pets').for(1);
-const relQueryResult2: Promise<Animal[]> = Person.relatedQuery('pets').for([1, 2]);
-const relQueryResult3: Promise<Animal[]> = Person.relatedQuery('pets').for('something');
-const relQueryResult4: Promise<Animal[]> = Person.relatedQuery('pets').for(['something', 'eles']);
-const relQueryResult5: Promise<Animal[]> = Person.relatedQuery('pets').for([
+const relQueryResult1: PromiseLike<Animal[]> = Person.relatedQuery('pets').for(1);
+const relQueryResult2: PromiseLike<Animal[]> = Person.relatedQuery('pets').for([1, 2]);
+const relQueryResult3: PromiseLike<Animal[]> = Person.relatedQuery('pets').for('something');
+const relQueryResult4: PromiseLike<Animal[]> = Person.relatedQuery('pets').for([
+  'something',
+  'eles'
+]);
+const relQueryResult5: PromiseLike<Animal[]> = Person.relatedQuery('pets').for([
   [1, 2],
   [3, 4]
 ]);
-const relQueryResult6: Promise<Animal[]> = Person.relatedQuery('pets').for(
+const relQueryResult6: PromiseLike<Animal[]> = Person.relatedQuery('pets').for(
   Movie.query().select('id')
 );
-const relQueryResult7: Promise<Movie[]> = Person.relatedQuery('movies').for(1);
-const relQueryResult8: Promise<Person[]> = Person.relatedQuery('mom').for(1);
-const relQueryResult9: Promise<Person[]> = Person.relatedQuery('children').for(1);
-const relQueryResult10: Promise<Movie[]> = Person.relatedQuery<Movie>('nonExistentRelation').for(1);
+const relQueryResult7: PromiseLike<Movie[]> = Person.relatedQuery('movies').for(1);
+const relQueryResult8: PromiseLike<Person[]> = Person.relatedQuery('mom').for(1);
+const relQueryResult9: PromiseLike<Person[]> = Person.relatedQuery('children').for(1);
+const relQueryResult10: PromiseLike<Movie[]> = Person.relatedQuery<Movie>(
+  'nonExistentRelation'
+).for(1);
 
 /**
  * http://knexjs.org/#Builder-count
@@ -1039,117 +1049,117 @@ Person.query().where('firstName', lit('Jennifer').castText());
 
 qb = Person.query();
 
-const findByIdSelect: Promise<Person | undefined> = qb.findById(32).select('firstName');
-const findByIdSelectThrow: Promise<Person> = qb
+const findByIdSelect: PromiseLike<Person | undefined> = qb.findById(32).select('firstName');
+const findByIdSelectThrow: PromiseLike<Person> = qb
   .findById(32)
   .select('firstName')
   .throwIfNotFound();
-const findByIdJoin: Promise<Person | undefined> = qb
+const findByIdJoin: PromiseLike<Person | undefined> = qb
   .findById(32)
   .join('tablename', 'column1', '=', 'column2');
-const findByIdJoinThrow: Promise<Person> = qb
+const findByIdJoinThrow: PromiseLike<Person> = qb
   .findById(32)
   .join('tablename', 'column1', '=', 'column2')
   .throwIfNotFound();
-const findByIdJoinRaw: Promise<Person | undefined> = qb.findById(32).joinRaw('raw sql');
-const findByIdJoinRawThrow: Promise<Person> = qb
+const findByIdJoinRaw: PromiseLike<Person | undefined> = qb.findById(32).joinRaw('raw sql');
+const findByIdJoinRawThrow: PromiseLike<Person> = qb
   .findById(32)
   .joinRaw('raw sql')
   .throwIfNotFound();
-const findOneWhere: Promise<Person | undefined> = qb
+const findOneWhere: PromiseLike<Person | undefined> = qb
   .findOne({ firstName: 'Mo' })
   .where('lastName', 'like', 'Mac%');
-const findOneWhereThrow: Promise<Person> = qb
+const findOneWhereThrow: PromiseLike<Person> = qb
   .findOne({ firstName: 'Mo' })
   .where('lastName', 'like', 'Mac%')
   .throwIfNotFound();
-const findOneSelect: Promise<Person | undefined> = qb
+const findOneSelect: PromiseLike<Person | undefined> = qb
   .findOne({ firstName: 'Mo' })
   .select('firstName');
-const findOneSelectThrow: Promise<Person> = qb
+const findOneSelectThrow: PromiseLike<Person> = qb
   .findOne({ firstName: 'Mo' })
   .select('firstName')
   .throwIfNotFound();
-const findOneWhereIn: Promise<Person | undefined> = qb
+const findOneWhereIn: PromiseLike<Person | undefined> = qb
   .findOne({ firstName: 'Mo' })
   .whereIn('status', ['active', 'pending']);
-const findOneWhereInThrow: Promise<Person> = qb
+const findOneWhereInThrow: PromiseLike<Person> = qb
   .findOne({ firstName: 'Mo' })
   .whereIn('status', ['active', 'pending'])
   .throwIfNotFound();
-const findOneWhereJson: Promise<Person | undefined> = qb
+const findOneWhereJson: PromiseLike<Person | undefined> = qb
   .findOne({ firstName: 'Mo' })
   .whereJsonSupersetOf('x:y', 'abc');
-const findOneWhereJsonThrow: Promise<Person> = qb
+const findOneWhereJsonThrow: PromiseLike<Person> = qb
   .findOne({ firstName: 'Mo' })
   .whereJsonSupersetOf('x:y', 'abc')
   .throwIfNotFound();
-const findOneWhereJsonIsArray: Promise<Person | undefined> = qb
+const findOneWhereJsonIsArray: PromiseLike<Person | undefined> = qb
   .findOne({ firstName: 'Mo' })
   .whereJsonIsArray('x:y');
-const findOneWhereJsonIsArrayThrow: Promise<Person> = qb
+const findOneWhereJsonIsArrayThrow: PromiseLike<Person> = qb
   .findOne({ firstName: 'Mo' })
   .whereJsonIsArray('x:y')
   .throwIfNotFound();
-const patchWhere: Promise<number> = qb.patch({ firstName: 'Mo' }).where('id', 32);
-const patchWhereIn: Promise<number> = qb.patch({ firstName: 'Mo' }).whereIn('id', [1, 2, 3]);
-const patchWhereJson: Promise<number> = qb
+const patchWhere: PromiseLike<number> = qb.patch({ firstName: 'Mo' }).where('id', 32);
+const patchWhereIn: PromiseLike<number> = qb.patch({ firstName: 'Mo' }).whereIn('id', [1, 2, 3]);
+const patchWhereJson: PromiseLike<number> = qb
   .patch({ firstName: 'Mo' })
   .whereJsonSupersetOf('x:y', 'abc');
-const patchWhereJsonIsArray: Promise<number> = qb
+const patchWhereJsonIsArray: PromiseLike<number> = qb
   .patch({ firstName: 'Mo' })
   .whereJsonIsArray('x:y');
-const patchThrow: Promise<number> = qb.patch({ firstName: 'Mo' }).throwIfNotFound();
-const updateWhere: Promise<number> = qb.update({ firstName: 'Mo' }).where('id', 32);
-const updateWhereIn: Promise<number> = qb.update({ firstName: 'Mo' }).whereIn('id', [1, 2, 3]);
-const updateWhereJson: Promise<number> = qb
+const patchThrow: PromiseLike<number> = qb.patch({ firstName: 'Mo' }).throwIfNotFound();
+const updateWhere: PromiseLike<number> = qb.update({ firstName: 'Mo' }).where('id', 32);
+const updateWhereIn: PromiseLike<number> = qb.update({ firstName: 'Mo' }).whereIn('id', [1, 2, 3]);
+const updateWhereJson: PromiseLike<number> = qb
   .update({ firstName: 'Mo' })
   .whereJsonSupersetOf('x:y', 'abc');
-const updateWhereJsonIsArray: Promise<number> = qb
+const updateWhereJsonIsArray: PromiseLike<number> = qb
   .update({ firstName: 'Mo' })
   .whereJsonIsArray('x:y');
-const updateThrow: Promise<number> = qb.update({ firstName: 'Mo' }).throwIfNotFound();
-const deleteWhere: Promise<number> = qb.delete().where('lastName', 'like', 'Mac%');
-const deleteWhereIn: Promise<number> = qb.delete().whereIn('id', [1, 2, 3]);
-const deleteThrow: Promise<number> = qb.delete().throwIfNotFound();
-const deleteByIDThrow: Promise<number> = qb.deleteById(32).throwIfNotFound();
+const updateThrow: PromiseLike<number> = qb.update({ firstName: 'Mo' }).throwIfNotFound();
+const deleteWhere: PromiseLike<number> = qb.delete().where('lastName', 'like', 'Mac%');
+const deleteWhereIn: PromiseLike<number> = qb.delete().whereIn('id', [1, 2, 3]);
+const deleteThrow: PromiseLike<number> = qb.delete().throwIfNotFound();
+const deleteByIDThrow: PromiseLike<number> = qb.deleteById(32).throwIfNotFound();
 
 // The location of `first` doesn't matter.
 
-const whereFirst: Promise<Person | undefined> = qb.where({ firstName: 'Mo' }).first();
-const firstWhere: Promise<Person | undefined> = qb.first().where({ firstName: 'Mo' });
-const updateFirst: Promise<number> = qb.update({}).first();
-const updateReturningFirst: Promise<Person> = qb
+const whereFirst: PromiseLike<Person | undefined> = qb.where({ firstName: 'Mo' }).first();
+const firstWhere: PromiseLike<Person | undefined> = qb.first().where({ firstName: 'Mo' });
+const updateFirst: PromiseLike<number> = qb.update({}).first();
+const updateReturningFirst: PromiseLike<Person> = qb
   .update({})
   .returning('*')
   .first();
 
 // Returning restores the result to Model or Model[].
 
-const whereInsertRet: Promise<Person> = qb
+const whereInsertRet: PromiseLike<Person> = qb
   .where({ lastName: 'MacMoo' })
   .insert({ firstName: 'Mo' })
   .returning('dbGeneratedColumn');
-const whereMultiInsertRet: Promise<Person[]> = qb
+const whereMultiInsertRet: PromiseLike<Person[]> = qb
   .where({ lastName: 'MacMoo' })
   .insert([{ firstName: 'Mo' }, { firstName: 'Bob' }])
   .returning('dbGeneratedColumn');
-const whereUpdateRet: Promise<Person[]> = qb
+const whereUpdateRet: PromiseLike<Person[]> = qb
   .where({ lastName: 'MacMoo' })
   .update({ firstName: 'Bob' })
   .returning('dbGeneratedColumn');
-const wherePatchRet: Promise<Person[]> = qb
+const wherePatchRet: PromiseLike<Person[]> = qb
   .where({ lastName: 'MacMoo' })
   .patch({ firstName: 'Mo' })
   .returning('age');
-const whereDelRetFirstWhere: Promise<Person | undefined> = qb
+const whereDelRetFirstWhere: PromiseLike<Person | undefined> = qb
   .delete()
   .returning('lastName')
   .first()
   .where({ firstName: 'Mo' });
 
-const orderByColumn: Promise<Person[]> = qb.orderBy('firstName', 'asc');
-const orderByColumns: Promise<Person[]> = qb.orderBy([
+const orderByColumn: PromiseLike<Person[]> = qb.orderBy('firstName', 'asc');
+const orderByColumns: PromiseLike<Person[]> = qb.orderBy([
   'email',
   { column: 'firstName', order: 'asc' },
   { column: 'lastName' }
@@ -1179,7 +1189,7 @@ async function checkQueryEquivalence() {
 // .query, .$query, and .$relatedQuery can take a Knex instance to support
 // multitenancy
 
-const peep123: Promise<Person | undefined> = BoundPerson.query(k).findById(123);
+const peep123: PromiseLike<Person | undefined> = BoundPerson.query(k).findById(123);
 
 new Person().$query(k).execute();
 new Person().$relatedQuery('pets', k).execute();

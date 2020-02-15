@@ -34,7 +34,7 @@ class Person extends BaseModel {
   pets!: Animal[];
 }
 
-const people: Promise<Person[]> = Person.query()
+const people: PromiseLike<Person[]> = Person.query()
   .someCustomMethod()
   .where('firstName', 'lol')
   .someCustomMethod()
@@ -51,18 +51,18 @@ const people: Promise<Person[]> = Person.query()
       .someCustomMethod()
   );
 
-const pets: Promise<Animal> = new Person()
+const pets: PromiseLike<Animal> = new Person()
   .$relatedQuery('pets')
   .someCustomMethod()
   .where('id', 1)
   .first()
   .someCustomMethod();
 
-const numUpdated: Promise<number> = Person.query()
+const numUpdated: PromiseLike<number> = Person.query()
   .someCustomMethod()
   .patch({ firstName: 'test' })
   .someCustomMethod();
 
-const allPets: Promise<Animal[]> = Person.relatedQuery('pets')
+const allPets: PromiseLike<Animal[]> = Person.relatedQuery('pets')
   .for(Person.query().select('id'))
   .someCustomMethod();
