@@ -25,6 +25,8 @@ exports.down = knex => {
 
 **knexSnakeCaseMappers:**
 
+See [here](/api/objection/#knexsnakecasemappers) for the full list of options that can be passed to `knexSnakeCaseMappers`.
+
 ```js
 const Knex = require('knex');
 const { Model, knexSnakeCaseMappers } = require('objection');
@@ -77,6 +79,8 @@ await Person.query().where('firstName', 'Jennifer');
 ```
 
 **snakeCaseMappers:**
+
+See [here](/api/objection/#snakecasemappers) for the full list of options that can be passed to `snakeCaseMappers`.
 
 ```js
 const { Model, snakeCaseMappers } = require('objection');

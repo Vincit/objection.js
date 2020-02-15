@@ -323,9 +323,11 @@ const { snakeCaseMappers } = require('objection');
 
 Function for adding snake_case to camelCase conversion to objection models. Better documented [here](/recipes/snake-case-to-camel-case-conversion.html). The `snakeCaseMappers` function accepts an options object. The available options are:
 
-| Option    | Type    | Description                                          |
-| --------- | ------- | ---------------------------------------------------- |
-| upperCase | boolean | Set to `true` if your columns are UPPER_SNAKE_CASED. |
+| Option                            | Type    | Default | Description                                                                                                                                             |
+| --------------------------------- | ------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| upperCase                         | boolean | `false` | Set to `true` if your columns are UPPER_SNAKE_CASED.                                                                                                    |
+| underscoreBeforeDigits            | boolean | `false` | When `true`, will place an underscore before digits (`foo1Bar2` becomes `foo_1_bar_2`). When `false`, `foo1Bar2` becomes `foo1_bar2`.                   |
+| underscoreBetweenUppercaseLetters | boolean | `false` | When `true`, will place underscores between consecutive uppercase letters (`fooBAR` becomes `foo_b_a_r`). When `false`, `fooBAR` will become `foo_bar`. |
 
 ##### Examples
 
@@ -359,9 +361,11 @@ const { knexSnakeCaseMappers } = require('objection');
 
 Function for adding a snake_case to camelCase conversion to `knex`. Better documented [here](/recipes/snake-case-to-camel-case-conversion.html). The `knexSnakeCaseMappers` function accepts an options object. The available options are:
 
-| Option    | Type    | Description                                          |
-| --------- | ------- | ---------------------------------------------------- |
-| upperCase | boolean | Set to `true` if your columns are UPPER_SNAKE_CASED. |
+| Option                            | Type    | Default | Description                                                                                                                                             |
+| --------------------------------- | ------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| upperCase                         | boolean | `false` | Set to `true` if your columns are UPPER_SNAKE_CASED.                                                                                                    |
+| underscoreBeforeDigits            | boolean | `false` | When `true`, will place an underscore before digits (`foo1Bar2` becomes `foo_1_bar_2`). When `false`, `foo1Bar2` becomes `foo1_bar2`.                   |
+| underscoreBetweenUppercaseLetters | boolean | `false` | When `true`, will place underscores between consecutive uppercase letters (`fooBAR` becomes `foo_b_a_r`). When `false`, `fooBAR` will become `foo_bar`. |
 
 ##### Examples
 
