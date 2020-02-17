@@ -323,6 +323,24 @@ describe('Model', () => {
       }).to.not.throwException(err => console.log(err));
     });
 
+    it('should skip requirement validation if options.patch == true (oneOf -> not -> required)', () => {
+      Model1.jsonSchema = {
+        oneOf: [
+          {
+            not: { required: ['a'] }
+          }
+        ],
+        properties: {
+          a: { type: 'string' },
+          b: { type: 'string' }
+        }
+      };
+
+      expect(() => {
+        Model1.fromJson({ b: 'str' }, { patch: true });
+      }).to.not.throwException(err => console.log(err));
+    });
+
     it('should skip requirement validation if options.patch == true (anyOf)', () => {
       Model1.jsonSchema = {
         anyOf: [
