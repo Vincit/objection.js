@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.1.3
+
+### What's new
+
+- Add `underscoreBetweenUppercaseLetters` option for snake case mappers. [#1676](https://github.com/Vincit/objection.js/issues/1676)
+
 ## 2.1.2
 
 ### What's new
