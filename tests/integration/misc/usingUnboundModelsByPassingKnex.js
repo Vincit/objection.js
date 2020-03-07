@@ -1,6 +1,7 @@
 const _ = require('lodash');
 const expect = require('expect.js');
 const Promise = require('bluebird');
+const { createRejectionReflection } = require('../../../testUtils/testUtils');
 
 module.exports = session => {
   describe('using unbound models by passing a knex to query', () => {
@@ -419,7 +420,7 @@ module.exports = session => {
             .eager(
               '[model1Relation1, model1Relation2.model2Relation1.[model1Relation1, model1Relation2]]'
             );
-        }).reflect(),
+        }).catch(err => createRejectionReflection(err)),
 
         Promise.try(() => {
           return Model1.query()
@@ -428,19 +429,19 @@ module.exports = session => {
             .eager(
               '[model1Relation1, model1Relation2.model2Relation1.[model1Relation1, model1Relation2]]'
             );
-        }).reflect(),
+        }).catch(err => createRejectionReflection(err)),
 
         Promise.try(() => {
           return Model1.query();
-        }).reflect(),
+        }).catch(err => createRejectionReflection(err)),
 
         Promise.try(() => {
           return Model1.query().where('id', 1);
-        }).reflect(),
+        }).catch(err => createRejectionReflection(err)),
 
         Promise.try(() => {
           return Model1.query().joinRelated('model1Relation1');
-        }).reflect(),
+        }).catch(err => createRejectionReflection(err)),
 
         Promise.try(() => {
           return Model1.query(session.knex)
@@ -448,7 +449,7 @@ module.exports = session => {
             .then(model => {
               return model.$relatedQuery('model1Relation1');
             });
-        }).reflect(),
+        }).catch(err => createRejectionReflection(err)),
 
         Promise.try(() => {
           return Model1.query(session.knex)
@@ -456,7 +457,7 @@ module.exports = session => {
             .then(model => {
               return model.$relatedQuery('model1Relation1Inverse');
             });
-        }).reflect(),
+        }).catch(err => createRejectionReflection(err)),
 
         Promise.try(() => {
           return Model1.query(session.knex)
@@ -464,7 +465,7 @@ module.exports = session => {
             .then(model => {
               return model.$relatedQuery('model1Relation2');
             });
-        }).reflect(),
+        }).catch(err => createRejectionReflection(err)),
 
         Promise.try(() => {
           return Model2.query(session.knex)
@@ -472,7 +473,7 @@ module.exports = session => {
             .then(model => {
               return model.$relatedQuery('model2Relation1');
             });
-        }).reflect(),
+        }).catch(err => createRejectionReflection(err)),
 
         Promise.try(() => {
           return Model1.query(session.knex)
@@ -480,7 +481,7 @@ module.exports = session => {
             .then(model => {
               return model.$query();
             });
-        }).reflect()
+        }).catch(err => createRejectionReflection(err))
       ]).then(results => {
         results.forEach(result => {
           expect(result.isRejected()).to.equal(true);
