@@ -218,7 +218,7 @@ describe('utils', () => {
           maxRunning = Math.max(maxRunning, running);
 
           return Promise.delay(Math.round(Math.random() * 10))
-            .return(2 * item)
+            .then(() => 2 * item)
             .then(result => {
               --running;
               return result;
@@ -276,7 +276,7 @@ describe('utils', () => {
             expect(running).to.be.lessThan(concurrency + 1);
 
             return Promise.delay(Math.round(Math.random() * 10))
-              .return(2 * item)
+              .then(() => 2 * item)
               .then(result => {
                 --running;
                 return result;

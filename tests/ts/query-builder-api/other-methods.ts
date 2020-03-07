@@ -142,7 +142,6 @@ import { Model, transaction } from '../../../typings/objection';
     console.log(error);
   });
 
-  // builder.return()
   // builder.bind()
   // builder.asCallback();
   // builder. nodeify()

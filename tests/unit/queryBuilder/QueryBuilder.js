@@ -666,7 +666,7 @@ describe('QueryBuilder', () => {
       })
       .runBefore(() => {
         expect(mockKnexQueryResults[0]).to.equal(1);
-        return Bluebird.delay(1).return(++mockKnexQueryResults[0]);
+        return Bluebird.delay(1).then(() => ++mockKnexQueryResults[0]);
       })
       .runBefore(() => {
         expect(mockKnexQueryResults[0]).to.equal(2);

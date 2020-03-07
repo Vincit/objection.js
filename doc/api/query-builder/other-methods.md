@@ -903,26 +903,6 @@ Executes the query and calls `catch(errorHandler)` for the returned promise.
 | --------- | ---------------------------------------------------------- |
 | `Promise` | Promise the will be resolved with the result of the query. |
 
-## return()
-
-```js
-const promise = queryBuilder.return(returnValue);
-```
-
-Executes the query and calls `return(returnValue)` for the returned promise.
-
-##### Arguments
-
-| Argument    | Type | Default   | Description  |
-| ----------- | ---- | --------- | ------------ |
-| returnValue |      | undefined | Return value |
-
-##### Return value
-
-| Type      | Description                                                |
-| --------- | ---------------------------------------------------------- |
-| `Promise` | Promise the will be resolved with the result of the query. |
-
 ## bind()
 
 ```js
