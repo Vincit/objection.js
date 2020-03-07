@@ -2,6 +2,7 @@ const expect = require('expect.js');
 const chai = require('chai');
 const Promise = require('bluebird');
 const { raw, transaction, ValidationError } = require('../../');
+const { createRejectionReflection } = require('../../testUtils/testUtils');
 const { FetchStrategy } = require('../../lib/queryBuilder/graph/GraphOptions');
 const mockKnexFactory = require('../../testUtils/mockKnex');
 
@@ -3809,7 +3810,7 @@ module.exports = session => {
           delete Model1.$$validator;
         });
 
-        it('should fail to do an incomplete upsert', () => {
+        it('should fail to do an incomplete upsert', async () => {
           const fails = [
             {
               id: 2,
@@ -3856,7 +3857,7 @@ module.exports = session => {
           return Promise.map(fails, fail => {
             return transaction(session.knex, trx =>
               Model1.query(trx).upsertGraph(fail, { update: true, fetchStrategy })
-            ).reflect();
+            ).catch(err => createRejectionReflection(err));
           })
             .then(results => {
               // Check that all transactions have failed because of a validation error.
