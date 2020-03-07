@@ -158,11 +158,11 @@ module.exports = session => {
         ]);
       })
         .then(() => {
-          return [
+          return Promise.all([
             session.knex('Model1').orderBy('model1Prop1'),
             session.knex('model2'),
             session.knex('Model1Model2')
-          ];
+          ]);
         })
         .then(([rows1, rows2, rows3]) => {
           expect(rows1).to.have.length(3);
@@ -198,11 +198,11 @@ module.exports = session => {
           ]);
         })
         .then(() => {
-          return [
+          return Promise.all([
             session.knex('Model1').orderBy('model1Prop1'),
             session.knex('model2'),
             session.knex('Model1Model2')
-          ];
+          ]);
         })
         .then(([rows1, rows2, rows3]) => {
           expect(rows1).to.have.length(3);
@@ -387,7 +387,11 @@ module.exports = session => {
         .catch(err => {
           expect(err.message).to.equal('whoops');
 
-          return [session.knex('Model1'), session.knex('model2'), session.knex('Model1Model2')];
+          return Promise.all([
+            session.knex('Model1'),
+            session.knex('model2'),
+            session.knex('Model1Model2')
+          ]);
         })
         .then(([rows1, rows2, rows3]) => {
           expect(rows1).to.have.length(0);
@@ -449,7 +453,11 @@ module.exports = session => {
         .catch(err => {
           expect(err.message).to.equal('whoops');
 
-          return [session.knex('Model1'), session.knex('model2'), session.knex('Model1Model2')];
+          return Promise.all([
+            session.knex('Model1'),
+            session.knex('model2'),
+            session.knex('Model1Model2')
+          ]);
         })
         .then(([rows1, rows2, rows3]) => {
           expect(rows1).to.have.length(0);
@@ -504,7 +512,11 @@ module.exports = session => {
         .catch(err => {
           expect(err.message).to.equal('whoops');
 
-          return [session.knex('Model1'), session.knex('model2'), session.knex('Model1Model2')];
+          return Promise.all([
+            session.knex('Model1'),
+            session.knex('model2'),
+            session.knex('Model1Model2')
+          ]);
         })
         .then(([rows1, rows2, rows3]) => {
           expect(rows1).to.have.length(0);
@@ -544,7 +556,11 @@ module.exports = session => {
         .catch(err => {
           expect(err.message).to.equal('whoops');
 
-          return [session.knex('Model1'), session.knex('model2'), session.knex('Model1Model2')];
+          return Promise.all([
+            session.knex('Model1'),
+            session.knex('model2'),
+            session.knex('Model1Model2')
+          ]);
         })
         .then(([rows1, rows2, rows3]) => {
           expect(rows1).to.have.length(0);
