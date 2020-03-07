@@ -3502,7 +3502,7 @@ module.exports = session => {
           return Promise.map(fails, fail => {
             return transaction(session.knex, trx =>
               Model1.query(trx).upsertGraph(fail, { fetchStrategy })
-            ).reflect();
+            ).catch(err => createRejectionReflection(err));
           })
             .then(results => {
               // Check that all transactions have failed because of a validation error.
