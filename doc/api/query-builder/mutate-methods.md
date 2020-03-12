@@ -274,7 +274,7 @@ console.log(updatedPerson.firstName);
 ## patchAndFetch()
 
 ```js
-queryBuilder = queryBuilder.patchAndFetchById(id, modelOrObject);
+queryBuilder = queryBuilder.patchAndFetch(modelOrObject);
 ```
 
 Just like [patchAndFetchById](/api/query-builder/mutate-methods.html#patchandfetchbyid) but can be used in an instance [\$query](/api/model/instance-methods.html#query) without the need to specify the id.
