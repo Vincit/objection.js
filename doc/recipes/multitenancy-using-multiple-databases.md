@@ -2,7 +2,7 @@
 
 By default, the examples guide you to setup the database connection by calling [Model.knex(knex)](/api/model/static-methods.html#static-knex). This doesn't fly if you want to select the database based on the request as it sets the connection globally. There are (at least) two patterns for dealing with this kind of setup:
 
-_NOTE:_ The following patterns don't work if you have a large amount of tenanats since we need to create a knex instance for each of them. In those cases you probably shouldn't be creating a separate database for each tenant anyway.
+_NOTE:_ The following patterns don't work if you have a large amount of tenants since we need to create a knex instance for each of them. In those cases you probably shouldn't be creating a separate database for each tenant anyway.
 
 ## Model binding pattern
 

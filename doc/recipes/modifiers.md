@@ -46,7 +46,7 @@ const people = await Person.query().withGraphFetched(
 );
 ```
 
-Note that you can only use modifiers registered for the relation's model class. In the previous example `children` is of class `Person`, so you can use `defaultSelects` that was registerd for the `Person` model. In the following example, `filterDogs` must have been specified in `Pet` model's `modifiers` object.
+Note that you can only use modifiers registered for the relation's model class. In the previous example `children` is of class `Person`, so you can use `defaultSelects` that was registered for the `Person` model. In the following example, `filterDogs` must have been specified in `Pet` model's `modifiers` object.
 
 ```js
 const people = await Person.query().withGraphFetched(
