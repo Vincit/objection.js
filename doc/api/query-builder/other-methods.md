@@ -193,7 +193,7 @@ Skips the database query and "fakes" an error result.
 
 | Argument | Type | Description          |
 | -------- | ---- | -------------------- |
-| reson    |      | The rejection reason |
+| reason   |      | The rejection reason |
 
 ##### Return value
 
@@ -637,17 +637,17 @@ Registers an error handler. Just like `catch` but doesn't execute the query.
 const query = Person.query();
 
 query
- .onError(async (error, queryBuilder) => {
-   // Handle `SomeError` but let other errors go through.
-   if (error instanceof SomeError) {
-     // This will cause the query to be resolved with an object
-     // instead of throwing an error.
-     return {error: 'some error occurred'};
-   } else {
-     return Promise.reject(error);
-   }
- })
- .where('age', > 30);
+  .onError(async (error, queryBuilder) => {
+    // Handle `SomeError` but let other errors go through.
+    if (error instanceof SomeError) {
+      // This will cause the query to be resolved with an object
+      // instead of throwing an error.
+      return { error: 'some error occurred' };
+    } else {
+      return Promise.reject(error);
+    }
+  })
+  .where('age', '>', 30);
 ```
 
 ## castTo()
@@ -896,26 +896,6 @@ Executes the query and calls `catch(errorHandler)` for the returned promise.
 | Argument     | Type     | Default  | Description   |
 | ------------ | -------- | -------- | ------------- |
 | errorHandler | function | identity | Error handler |
-
-##### Return value
-
-| Type      | Description                                                |
-| --------- | ---------------------------------------------------------- |
-| `Promise` | Promise the will be resolved with the result of the query. |
-
-## return()
-
-```js
-const promise = queryBuilder.return(returnValue);
-```
-
-Executes the query and calls `return(returnValue)` for the returned promise.
-
-##### Arguments
-
-| Argument    | Type | Default   | Description  |
-| ----------- | ---- | --------- | ------------ |
-| returnValue |      | undefined | Return value |
 
 ##### Return value
 

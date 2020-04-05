@@ -132,7 +132,7 @@ module.exports = session => {
         return Model1.query()
           .insertGraph(insertion, { allowRefs: true })
           .then(inserted => {
-            return check(inserted, true).return(inserted);
+            return check(inserted, true).then(() => inserted);
           })
           .then(inserted => {
             expect(inserted).to.not.have.property('model1Prop2');
@@ -150,7 +150,7 @@ module.exports = session => {
         return Model1.query()
           .insertWithRelated(insertion, { allowRefs: true })
           .then(inserted => {
-            return check(inserted, true).return(inserted);
+            return check(inserted, true).then(() => inserted);
           })
           .then(inserted => {
             expect(inserted).to.not.have.property('model1Prop2');
@@ -198,7 +198,7 @@ module.exports = session => {
           return Model1.query()
             .insertGraph(insertion, { allowRefs: true })
             .then(inserted => {
-              return check(inserted, true).return(inserted);
+              return check(inserted, true).then(() => inserted);
             })
             .then(inserted => {
               expect(inserted).to.not.have.property('model1Prop2');
@@ -395,7 +395,7 @@ module.exports = session => {
           return Model1.query()
             .insertGraph(insertion, { allowRefs: true })
             .then(inserted => {
-              return check(inserted, true).return(inserted);
+              return check(inserted, true).then(() => inserted);
             })
             .then(inserted => {
               expect(inserted).to.not.have.property('model1Prop2');
@@ -582,7 +582,7 @@ module.exports = session => {
             .insertGraph(insertion, { allowRefs: true })
             .returning('*')
             .then(inserted => {
-              return check(inserted, true).return(inserted);
+              return check(inserted, true).then(() => inserted);
             })
             .then(inserted => {
               expect(inserted).to.have.property('model1Prop2');
@@ -611,7 +611,7 @@ module.exports = session => {
         return Model1.query()
           .insertGraphAndFetch(insertion, { allowRefs: true })
           .then(inserted => {
-            return check(inserted).return(inserted);
+            return check(inserted).then(() => inserted);
           })
           .then(inserted => {
             return Model1.query()
@@ -679,7 +679,7 @@ module.exports = session => {
           .insertGraph(insertion, { allowRefs: true })
           .allowInsert(eagerExpr)
           .then(inserted => {
-            return check(inserted, true).return(inserted);
+            return check(inserted, true).then(() => inserted);
           });
       });
 
@@ -710,7 +710,7 @@ module.exports = session => {
           .$query()
           .insertGraph(undefined, { allowRefs: true })
           .then(inserted => {
-            return check(inserted, true).return(inserted);
+            return check(inserted, true).then(() => inserted);
           })
           .then(inserted => {
             return Model1.query()

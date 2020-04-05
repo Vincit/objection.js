@@ -20,6 +20,11 @@ What objection.js gives you:
 
 What objection.js **doesn't** give you:
 
+- **A fully object oriented view of your database**
+  With objection you don't work with entities. You work with queries. Objection doesn't try to wrap every concept with an 
+  object oriented equivalent. The best attempt to do that (IMO) is Hibernate, which is excellent, but it has 800k lines
+  of code and a lot more concepts to learn than SQL itself. The point is, writing a good traditional ORM is borderline
+  impossible. Objection attempts to provide a completely different way of working with SQL.
 - **A custom query DSL. SQL is used as a query language.**
   This doesn't mean you have to write SQL strings though. A query builder based on [knex](http://knexjs.org) is
   used to build the SQL. However, if the query builder fails you for some reason, raw SQL strings can be easily
@@ -39,7 +44,7 @@ Shortcuts:
 - [Who uses objection.js](https://github.com/Vincit/objection.js/issues/1069)
 - [API reference](https://vincit.github.io/objection.js/api/query-builder/)
 - [Example projects](https://github.com/Vincit/objection.js/tree/master/examples)
-- [Changelog](https://vincit.github.io/objection.js/changelog/)
-- [v1 -> v2 migration guide](https://vincit.github.io/objection.js/1.x/migration.html)
+- [Changelog](https://vincit.github.io/objection.js/release-notes/changelog.html)
+- [v1 -> v2 migration guide](https://vincit.github.io/objection.js/release-notes/migration.html)
 - [Contribution guide](https://vincit.github.io/objection.js/guide/contributing.html)
 - [Plugins](https://vincit.github.io/objection.js/guide/plugins.html)

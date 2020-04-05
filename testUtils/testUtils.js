@@ -23,7 +23,12 @@ function expectPartialEqual(result, partial) {
     result.forEach((value, idx) => {
       expectPartialEqual(result[idx], partial[idx]);
     });
-  } else if (_.isObject(result) && !Array.isArray(partial) && _.isObject(partial) && !Array.isArray(result)) {
+  } else if (
+    _.isObject(result) &&
+    !Array.isArray(partial) &&
+    _.isObject(partial) &&
+    !Array.isArray(result)
+  ) {
     var partialKeys = _.keys(partial);
     expect(_.pick(result, partialKeys)).to.eql(partial);
   } else {
@@ -31,6 +36,15 @@ function expectPartialEqual(result, partial) {
   }
 }
 
+function createRejectionReflection(err) {
+  return {
+    isRejected: () => true,
+    isFulfilled: () => false,
+    reason: () => err
+  };
+}
+
 module.exports = {
-  expectPartialEqual: expectPartialEqual
+  expectPartialEqual,
+  createRejectionReflection
 };

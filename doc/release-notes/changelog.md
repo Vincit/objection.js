@@ -1,5 +1,33 @@
 # Changelog
 
+## 2.1.3
+
+### What's new
+
+- Add `underscoreBetweenUppercaseLetters` option for snake case mappers. [#1676](https://github.com/Vincit/objection.js/issues/1676)
+
+## 2.1.2
+
+### What's new
+
+- Fix `startTransaction` typings.
+
+## 2.1.1
+
+### What's new
+
+- Fixes [#1489](https://github.com/Vincit/objection.js/issues/1489)
+
+## 2.1.0
+
+### What's new
+
+- Fixes [#1638](https://github.com/Vincit/objection.js/issues/1638)
+- Fixes [#1636](https://github.com/Vincit/objection.js/issues/1636)
+- Fixes [#1615](https://github.com/Vincit/objection.js/issues/1615)
+
+# Changelog
+
 ## 2.0.10
 
 ### What's new

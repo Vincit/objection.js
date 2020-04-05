@@ -3,7 +3,7 @@ const utils = require('../../lib/utils/knexUtils');
 const expect = require('expect.js');
 const Promise = require('bluebird');
 
-const { TimeoutError } = require('bluebird');
+const { KnexTimeoutError } = require('knex');
 const { raw, ref, lit, val, fn, Model, QueryBuilderOperation } = require('../..');
 
 module.exports = session => {
@@ -1107,7 +1107,7 @@ module.exports = session => {
         }
 
         if (session.isPostgres()) {
-          it('timeout should throw a TimeOutError', done => {
+          it('timeout should throw a KnexTimeoutError', done => {
             const knexQuery = Model1.query()
               .timeout(50)
               .toKnexQuery();
@@ -1122,7 +1122,7 @@ module.exports = session => {
             knexQuery
               .then(() => done(new Error('should not get here')))
               .catch(err => {
-                expect(err).to.be.a(TimeoutError);
+                expect(err).to.be.a(KnexTimeoutError);
                 done();
               })
               .catch(done);
