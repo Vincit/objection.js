@@ -288,37 +288,37 @@ declare namespace Objection {
   /**
    * Gets the query builder type for a model type.
    */
-  type QueryBuilderType<M extends Model> = M['QueryBuilderType'];
+  type QueryBuilderType<T extends { QueryBuilderType: any }> = T['QueryBuilderType'];
 
   /**
    * Gets the model type from a query builder type.
    */
-  type ModelType<QB extends AnyQueryBuilder> = QB['ModelType'];
+  type ModelType<T extends { ModelType: any }> = T['ModelType'];
 
   /**
    * Gets the result type from a query builder type.
    */
-  type ResultType<QB extends AnyQueryBuilder> = QB['ResultType'];
+  type ResultType<T extends { ResultType: any }> = T['ResultType'];
 
   /**
    * Gets the single item query builder type for a query builder.
    */
-  type SingleQueryBuilder<QB extends AnyQueryBuilder> = QB['SingleQueryBuilderType'];
+  type SingleQueryBuilder<T extends { SingleQueryBuilderType: any }> = T['SingleQueryBuilderType'];
 
   /**
    * Gets the multi-item query builder type for a query builder.
    */
-  type ArrayQueryBuilder<QB extends AnyQueryBuilder> = QB['ArrayQueryBuilderType'];
+  type ArrayQueryBuilder<T extends { ArrayQueryBuilderType: any }> = T['ArrayQueryBuilderType'];
 
   /**
    * Gets the number query builder type for a query builder.
    */
-  type NumberQueryBuilder<QB extends AnyQueryBuilder> = QB['NumberQueryBuilderType'];
+  type NumberQueryBuilder<T extends { NumberQueryBuilderType: any }> = T['NumberQueryBuilderType'];
 
   /**
    * Gets the page query builder type for a query builder.
    */
-  type PageQueryBuilder<QB extends AnyQueryBuilder> = QB['PageQueryBuilderType'];
+  type PageQueryBuilder<T extends { PageQueryBuilderType: any }> = T['PageQueryBuilderType'];
 
   interface ForClassMethod {
     <M extends Model>(modelClass: ModelConstructor<M>): QueryBuilderType<M>;
