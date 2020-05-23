@@ -902,6 +902,7 @@ declare namespace Objection {
     intersect: SetOperationsMethod<this>;
 
     with: WithMethod<this>;
+    withRecursive: WithMethod<this>;
     withWrapped: WithMethod<this>;
 
     // Deprecated
