@@ -1,5 +1,5 @@
 const _ = require('lodash');
-const knexMethods = require('knex/lib/query/methods').concat('queryBuilder');
+const knexMethods = require('knex/lib/query/methods').concat('queryBuilder', 'raw');
 
 /**
  * @param {function} knex
@@ -12,7 +12,7 @@ const knexMethods = require('knex/lib/query/methods').concat('queryBuilder');
  *    Mocked knex.
  */
 module.exports = function mockKnex(knex, mockExecutor) {
-  const mock = (table) => {
+  const mock = table => {
     return mock.queryBuilder().table(table);
   };
 
@@ -20,7 +20,7 @@ module.exports = function mockKnex(knex, mockExecutor) {
   knexMethods.forEach(methodName => {
     mock[methodName] = (...args) => {
       return wrapBuilder(knex[methodName](...args));
-    }
+    };
   });
 
   const keys = _.uniqBy([...Object.keys(knex), 'client']);
@@ -55,7 +55,7 @@ module.exports = function mockKnex(knex, mockExecutor) {
   function wrapBuilder(builder) {
     const oldImpl = builder.then;
 
-    builder.then = function (...args) {
+    builder.then = function(...args) {
       return mockExecutor.call(this, mock, oldImpl, args);
     };
 
