@@ -990,12 +990,18 @@ console.log(firstPerson.age);
 ## throwIfNotFound()
 
 ```js
-queryBuilder = queryBuilder.throwIfNotFound();
+queryBuilder = queryBuilder.throwIfNotFound(data);
 ```
 
 Causes a [Model.NotFoundError](/api/types/#class-notfounderror) to be thrown if the query result is empty.
 
 You can replace `Model.NotFoundError` with your own error by implementing the static [Model.createNotFoundError(ctx)](/api/model/static-methods.html#static-createnotfounderror) method.
+
+##### Arguments
+
+| Argument | Type   | Description                      |
+| -------- | ------ | -------------------------------- |
+| data     | object | optional object with custom data |
 
 ##### Return value
 
@@ -1010,7 +1016,7 @@ try {
   await Language.query()
     .where('name', 'Java')
     .andWhere('isModern', true)
-    .throwIfNotFound();
+    .throwIfNotFound({ message: `Custom message returned` });
 } catch (err) {
   // No results found.
   console.log(err instanceof Language.NotFoundError); // --> true
