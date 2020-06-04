@@ -610,7 +610,7 @@ module.exports = session => {
             });
         });
 
-        it('.throwIfNotFound() with empty result', done => {
+        it('custom .throwIfNotFound() with empty result', done => {
           Model1.query()
             .where('model1Prop1', 'There is no value like me')
             .throwIfNotFound()
@@ -620,6 +620,21 @@ module.exports = session => {
             .catch(err => {
               expect(err).to.be.a(Model1.NotFoundError);
               expect(err.type).to.equal('NotFound');
+              done();
+            })
+            .catch(done);
+        });
+
+        it('custom .throwIfNotFound() with message', done => {
+          Model1.query()
+            .where('model1Prop1', 'There is no value like me')
+            .throwIfNotFound({ message: 'customMessage' })
+            .then(() => {
+              done(new Error('should not get here'));
+            })
+            .catch(err => {
+              expect(err).to.be.a(Model1.NotFoundError);
+              expect(err.data.message).to.equal('customMessage');
               done();
             })
             .catch(done);
