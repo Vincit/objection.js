@@ -303,6 +303,16 @@ See [knex documentation](http://knexjs.org/#Builder-distinct)
 | ----------------------------------- | ---------------------------------- |
 | [QueryBuilder](/api/query-builder/) | `this` query builder for chaining. |
 
+## distinctOn()
+
+See [knex documentation](http://knexjs.org/#Builder-distinctOn)
+
+##### Return value
+
+| Type                                | Description                        |
+| ----------------------------------- | ---------------------------------- |
+| [QueryBuilder](/api/query-builder/) | `this` query builder for chaining. |
+
 ## where()
 
 See [knex documentation](http://knexjs.org/#Builder-where)

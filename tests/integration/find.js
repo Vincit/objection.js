@@ -492,6 +492,42 @@ module.exports = session => {
             });
         });
 
+        if (session.isPostgres()) {
+          it('.distinctOn()', async () => {
+            await session.populate([]);
+            await Model1.query().insertGraph(
+              [
+                {
+                  id: 1,
+                  model1Prop1: 'hello 1',
+                  model1Relation1: {
+                    '#id': 'rel1',
+                    id: 3,
+                    model1Prop1: 'rel 1'
+                  }
+                },
+                {
+                  id: 2,
+                  model1Prop1: 'hello 2',
+                  model1Relation1: {
+                    '#ref': 'rel1'
+                  }
+                }
+              ],
+              { allowRefs: true }
+            );
+
+            return Model1.query()
+              .distinctOn('model1Relation1.id')
+              .select('model1Relation1.*')
+              .joinRelated('model1Relation1')
+              .then(res => {
+                expect(res).to.have.length(1);
+                expect(res[0].id).to.equal(3);
+              });
+          });
+        }
+
         it('.count()', () => {
           return Model2.query()
             .count()

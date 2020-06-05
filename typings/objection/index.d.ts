@@ -802,6 +802,7 @@ declare namespace Objection {
     columns: SelectMethod<this>;
     column: SelectMethod<this>;
     distinct: SelectMethod<this>;
+    distinctOn: SelectMethod<this>;
     as: AsMethod<this>;
 
     from: FromMethod<this>;
