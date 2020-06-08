@@ -875,24 +875,29 @@ declare namespace Objection {
     having: WhereMethod<this>;
     andHaving: WhereMethod<this>;
     orHaving: WhereMethod<this>;
-    havingRaw: WhereMethod<this>;
-    orHavingRaw: WhereMethod<this>;
-    havingIn: WhereMethod<this>;
-    orHavingIn: WhereMethod<this>;
-    havingNotIn: WhereMethod<this>;
-    orHavingNotIn: WhereMethod<this>;
-    havingNull: WhereMethod<this>;
-    orHavingNull: WhereMethod<this>;
-    havingNotNull: WhereMethod<this>;
-    orHavingNotNull: WhereMethod<this>;
-    havingExists: WhereMethod<this>;
-    orHavingExists: WhereMethod<this>;
-    havingNotExists: WhereMethod<this>;
-    orHavingNotExists: WhereMethod<this>;
-    havingBetween: WhereMethod<this>;
-    orHavingBetween: WhereMethod<this>;
-    havingNotBetween: WhereMethod<this>;
-    orHavingNotBetween: WhereMethod<this>;
+
+    havingRaw: WhereRawMethod<this>;
+    orHavingRaw: WhereRawMethod<this>;
+
+    havingIn: WhereInMethod<this>;
+    orHavingIn: WhereInMethod<this>;
+    havingNotIn: WhereInMethod<this>;
+    orHavingNotIn: WhereInMethod<this>;
+
+    havingNull: WhereNullMethod<this>;
+    orHavingNull: WhereNullMethod<this>;
+    havingNotNull: WhereNullMethod<this>;
+    orHavingNotNull: WhereNullMethod<this>;
+
+    havingExists: WhereExistsMethod<this>;
+    orHavingExists: WhereExistsMethod<this>;
+    havingNotExists: WhereExistsMethod<this>;
+    orHavingNotExists: WhereExistsMethod<this>;
+
+    havingBetween: WhereBetweenMethod<this>;
+    orHavingBetween: WhereBetweenMethod<this>;
+    havingNotBetween: WhereBetweenMethod<this>;
+    orHavingNotBetween: WhereBetweenMethod<this>;
 
     whereComposite: WhereCompositeMethod<this>;
     whereInComposite: WhereInCompositeMethod<this>;
