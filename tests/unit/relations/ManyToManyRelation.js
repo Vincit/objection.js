@@ -209,6 +209,71 @@ describe('ManyToManyRelation', () => {
     expect(relation.joinTableRelatedProp.cols).to.eql(['relatedA', 'relatedB']);
   });
 
+  it('should accept an array in through.extra', () => {
+    let relation = new ManyToManyRelation('testRelation', OwnerModel);
+
+    relation.setMapping({
+      relation: ManyToManyRelation,
+      modelClass: RelatedModel,
+      join: {
+        from: 'OwnerModel.id',
+        through: {
+          from: 'JoinModel.ownerId',
+          to: 'JoinModel.relatedId',
+          extra: ['extra1', 'extra2']
+        },
+        to: 'RelatedModel.ownerId'
+      }
+    });
+
+    expect(relation.joinTableExtras[0].joinTableCol).to.equal('extra1');
+    expect(relation.joinTableExtras[1].joinTableCol).to.equal('extra2');
+  });
+
+  it('should accept a string in through.extra', () => {
+    let relation = new ManyToManyRelation('testRelation', OwnerModel);
+
+    relation.setMapping({
+      relation: ManyToManyRelation,
+      modelClass: RelatedModel,
+      join: {
+        from: 'OwnerModel.id',
+        through: {
+          from: 'JoinModel.ownerId',
+          to: 'JoinModel.relatedId',
+          extra: 'extra1'
+        },
+        to: 'RelatedModel.ownerId'
+      }
+    });
+
+    expect(relation.joinTableExtras[0].joinTableCol).to.equal('extra1');
+  });
+
+  it('should accept an object in through.extra', () => {
+    let relation = new ManyToManyRelation('testRelation', OwnerModel);
+
+    relation.setMapping({
+      relation: ManyToManyRelation,
+      modelClass: RelatedModel,
+      join: {
+        from: 'OwnerModel.id',
+        through: {
+          from: 'JoinModel.ownerId',
+          to: 'JoinModel.relatedId',
+          extra: {
+            extra1: 'extraColumn'
+          }
+        },
+        to: 'RelatedModel.ownerId'
+      }
+    });
+
+    expect(relation.joinTableExtras[0].joinTableCol).to.equal('extraColumn');
+    expect(relation.joinTableExtras[0].joinTableProp).to.equal('extraColumn');
+    expect(relation.joinTableExtras[0].aliasCol).to.equal('extra1');
+  });
+
   it('should fail if join.through.modelClass is not a subclass of Model', () => {
     let relation = new ManyToManyRelation('testRelation', OwnerModel);
 
