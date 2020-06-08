@@ -223,7 +223,7 @@ module.exports = session => {
         it('find', () => {
           return findArnold()
             .then(arnold => arnold.$relatedQuery('pets'))
-            .then(pets => expect(pets.map(it => it.name)).to.eql(['Freud', 'Stalin']));
+            .then(pets => expect(pets.map(it => it.name).sort()).to.eql(['Freud', 'Stalin']));
         });
 
         it('update', () => {
