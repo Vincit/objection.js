@@ -2,7 +2,7 @@
 
 All instance methods start with the character `$` to prevent them from colliding with the database column names.
 
-## \$query()
+## $query()
 
 ```js
 const queryBuilder = person.$query(transactionOrKnex);
@@ -62,7 +62,7 @@ await person.$query().delete();
 console.log('person deleted');
 ```
 
-## \$relatedQuery()
+## $relatedQuery()
 
 ```js
 const builder = person.$relatedQuery(relationName, transactionOrKnex);
@@ -189,7 +189,7 @@ await jennifer
 console.log('jennifer just got all her dogs vaccinated');
 ```
 
-## \$beforeInsert()
+## $beforeInsert()
 
 ```js
 class Person extends Model {
@@ -236,7 +236,7 @@ class Person extends Model {
 }
 ```
 
-## \$afterInsert()
+## $afterInsert()
 
 ```js
 class Person extends Model {
@@ -280,7 +280,7 @@ class Person extends Model {
 }
 ```
 
-## \$beforeUpdate()
+## $beforeUpdate()
 
 ```js
 class Person extends Model {
@@ -345,7 +345,7 @@ Person.query()
   .where('foo', 'bar');
 ```
 
-## \$afterUpdate()
+## $afterUpdate()
 
 ```js
 class Person extends Model {
@@ -408,7 +408,7 @@ Person.query()
   .where('foo', 'bar');
 ```
 
-## \$beforeDelete()
+## $beforeDelete()
 
 ```js
 class Person extends Model {
@@ -456,7 +456,7 @@ class Person extends Model {
 }
 ```
 
-## \$afterDelete()
+## $afterDelete()
 
 ```js
 class Person extends Model {
@@ -504,7 +504,7 @@ class Person extends Model {
 }
 ```
 
-## \$afterGet()
+## $afterGet()
 
 ::: warning
 Deprecated! Will be removed in version 3.0. Use [\$afterFind](#afterfind) instead.
@@ -512,7 +512,7 @@ Deprecated! Will be removed in version 3.0. Use [\$afterFind](#afterfind) instea
 [v1 documentation](https://github.com/Vincit/objection.js/blob/v1/doc/api/model/instance-methods.md#afterget)
 :::
 
-## \$afterFind()
+## $afterFind()
 
 ```js
 class Person extends Model {
@@ -556,7 +556,7 @@ class Person extends Model {
 }
 ```
 
-## \$clone()
+## $clone()
 
 ```js
 const clone = modelInstance.$clone(options);
@@ -616,11 +616,11 @@ const shallowObj = modelInstance.toJSON({ shallow: true, virtuals: false });
 const onlySomeVirtuals = modelInstance.toJSON({ virtuals: ['fullName'] });
 ```
 
-## \$toJson()
+## $toJson()
 
 Alias for [toJSON](/api/model/instance-methods.html#tojson)
 
-## \$toDatabaseJson()
+## $toDatabaseJson()
 
 ```js
 const row = modelInstance.$toDatabaseJson();
@@ -638,7 +638,7 @@ See [this section](/api/model/overview.html#model-data-lifecycle) for more infor
 | ------ | ------------- |
 | Object | Database row. |
 
-## \$parseDatabaseJson()
+## $parseDatabaseJson()
 
 ```js
 class Person extends Model {
@@ -673,7 +673,7 @@ There are a couple of requirements for the implementation:
 | ------ | -------------------------------- |
 | Object | The JSON POJO in internal format |
 
-## \$formatDatabaseJson()
+## $formatDatabaseJson()
 
 ```js
 class Person extends Model {
@@ -708,7 +708,7 @@ There are a couple of requirements for the implementation:
 | ------ | -------------------------------- |
 | Object | The JSON POJO in database format |
 
-## \$parseJson()
+## $parseJson()
 
 ```js
 class Person extends Model {
@@ -744,7 +744,7 @@ There are a couple of requirements for the implementation:
 | ------ | -------------------------------- |
 | Object | The JSON POJO in internal format |
 
-## \$formatJson()
+## $formatJson()
 
 ```js
 class Person extends Model {
@@ -779,7 +779,7 @@ There are a couple of requirements for the implementation:
 | ------ | -------------------------------- |
 | Object | The JSON POJO in external format |
 
-## \$setJson()
+## $setJson()
 
 ```js
 modelInstance.$setJson(json, opt);
@@ -802,7 +802,7 @@ Validates the JSON before setting values.
 | -------------------- | ------------------- |
 | [Model](/api/model/) | `this` for chaining |
 
-## \$setDatabaseJson()
+## $setDatabaseJson()
 
 ```js
 modelInstance.$setDatabaseJson(json);
@@ -822,7 +822,7 @@ Sets the values from a JSON object in database format.
 | -------------------- | ------------------- |
 | [Model](/api/model/) | `this` for chaining |
 
-## \$set()
+## $set()
 
 ```js
 modelInstance.$set(json);
@@ -844,7 +844,7 @@ Unlike [\$setJson](/api/model/instance-methods.html#setjson), this doesn't call 
 | -------------------- | ------------------- |
 | [Model](/api/model/) | `this` for chaining |
 
-## \$setRelated()
+## $setRelated()
 
 ```js
 modelInstance.$setRelated(relation, relatedModels);
@@ -877,7 +877,7 @@ person.$setRelated('children', children);
 console.log(person.children[0]);
 ```
 
-## \$appendRelated()
+## $appendRelated()
 
 ```js
 modelInstance.$appendRelated(relation, relatedModels);
@@ -913,7 +913,7 @@ child1 = person.children[person.children.length - 1];
 child2 = person.children[person.children.length - 2];
 ```
 
-## \$loadRelated()
+## $loadRelated()
 
 ::: warning
 Deprecated! Will be removed in version 3.0. Use [\$fetchGraph](#fetchgraph) instead.
@@ -921,7 +921,7 @@ Deprecated! Will be removed in version 3.0. Use [\$fetchGraph](#fetchgraph) inst
 [v1 documentation](https://github.com/Vincit/objection.js/blob/v1/doc/api/model/instance-methods.md#loadrelated)
 :::
 
-## \$fetchGraph()
+## $fetchGraph()
 
 ```js
 const builder = person.$fetchGraph(expression, options);
@@ -929,7 +929,7 @@ const builder = person.$fetchGraph(expression, options);
 
 Shortcut for [Person.fetchGraph(person, options)](/api/model/static-methods.html#static-fetchgraph)
 
-## \$traverse()
+## $traverse()
 
 ```js
 person.$traverse(filterConstructor, callback);
@@ -937,7 +937,7 @@ person.$traverse(filterConstructor, callback);
 
 Shortcut for [Model.traverse(filterConstructor, this, callback)](/api/model/static-methods.html#static-traverse).
 
-## \$traverseAsync()
+## $traverseAsync()
 
 ```js
 person.$traverseAsync(filterConstructor, callback);
@@ -945,7 +945,7 @@ person.$traverseAsync(filterConstructor, callback);
 
 Shortcut for [Model.traverseAsync(filterConstructor, this, callback)](/api/model/static-methods.html#static-traverseasync).
 
-## \$knex()
+## $knex()
 
 ```js
 const knex = person.$knex();
@@ -953,7 +953,7 @@ const knex = person.$knex();
 
 Shortcut for [Person.knex()](/api/model/static-methods.html#static-knex).
 
-## \$transaction()
+## $transaction()
 
 ```js
 const knex = person.$transaction();
@@ -961,7 +961,7 @@ const knex = person.$transaction();
 
 Shortcut for [Person.knex()](/api/model/static-methods.html#static-knex).
 
-## \$id()
+## $id()
 
 ```js
 console.log(model.$id()); // -> 100
@@ -985,7 +985,7 @@ console.log(model.$id()); // -> [100, 20, 30]
 model.$id([100, 20, 30]);
 ```
 
-## \$beforeValidate()
+## $beforeValidate()
 
 ```js
 class Person extends Model {
@@ -1015,7 +1015,7 @@ You can add any additional validation to this method. If validation fails, simpl
 | ------ | ------------------------------------------------ |
 | Object | The modified jsonSchema or the input jsonSchema. |
 
-## \$afterValidate()
+## $afterValidate()
 
 ```js
 class Person extends Model {
@@ -1036,7 +1036,7 @@ You can do further validation here and throw an error if something goes wrong.
 | json     | Object                                       | The JSON object to be validated |
 | opt      | [ModelOptions](/api/types/type-modeloptions) | Optional options                |
 
-## \$validate()
+## $validate()
 
 ```js
 modelInstance.$validate();
@@ -1053,7 +1053,7 @@ called explicitly when needed.
 | ---------------------------------------------------- | -------------------- |
 | [ValidationError](/api/types/#class-validationerror) | If validation fails. |
 
-## \$omit()
+## $omit()
 
 ```js
 modelInstance.$omit(keys);
@@ -1104,7 +1104,7 @@ const json = person
 console.log(_.has(json, 'lastName')); // --> false
 ```
 
-## \$pick()
+## $pick()
 
 ```js
 modelInstance.$pick(keys);

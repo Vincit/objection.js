@@ -16,7 +16,7 @@
     "perf": "mocha --slow 60000 --timeout 60000 --reporter spec --recursive perf",
     "perf-debug": "mocha --slow 60000 --timeout 60000 --reporter spec --inspect-brk perf",
     "perf-opt": "mocha --slow 60000 --timeout 60000 --reporter spec --recursive perf --trace_opt --trace_deopt",
-    "prettier": "prettier --write \"{examples,lib,tests,typings,doc}/**/*.{js,ts,md}\"",
+    "prettier": "prettier --write \"{examples,lib,tests,typings,doc}/**/*.{js,ts}\"",
     "eslint": "eslint --format codeframe \"examples/**/*.js\" \"lib/**/*.js\" \"tests/**/*.js\"",
     "docs:dev": "vuepress dev doc",
     "docs:build": "vuepress build doc"
@@ -115,7 +115,7 @@
       "eslint --fix",
       "git add"
     ],
-    "*.{md,yml,ts}": [
+    "*.{yml,ts}": [
       "prettier --write",
       "git add"
     ]
