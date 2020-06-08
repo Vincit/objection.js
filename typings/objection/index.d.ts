@@ -188,7 +188,7 @@ declare namespace Objection {
    * A Pojo version of model.
    */
   type ModelObject<T extends Model> = {
-    [K in NonFunctionPropertyNames<T>]: T[K];
+    [K in Exclude<NonFunctionPropertyNames<T>, 'QueryBuilderType'>]: T[K];
   };
 
   /**
@@ -1679,8 +1679,8 @@ declare namespace Objection {
     $afterDelete(queryContext: QueryContext): Promise<any> | void;
 
     $toDatabaseJson(): Pojo;
-    $toJson(opt?: ToJsonOptions): Pojo;
-    toJSON(opt?: ToJsonOptions): Pojo;
+    $toJson(opt?: ToJsonOptions): ModelObject<this>;
+    toJSON(opt?: ToJsonOptions): ModelObject<this>;
 
     $setJson(json: object, opt?: ModelOptions): this;
     $setDatabaseJson(json: object): this;
