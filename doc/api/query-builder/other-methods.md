@@ -711,44 +711,6 @@ Gets the Model subclass this builder is bound to.
 | -------------------- | ------------------------------------------- |
 | [Model](/api/model/) | The Model subclass this builder is bound to |
 
-## toString()
-
-```js
-const sql = queryBuilder.toString();
-```
-
-Returns the SQL string suitable for logging input **but not for execution**, via Knex's `toString()`. This method should not be used to create queries for database execution because it makes no guarantees about escaping bindings properly.
-
-Note: In the current release, if the query builder attempts to execute multiple queries or throw any exception whatsoever, **no error will throw** and instead the following string is returned:
-
-```
-This query cannot be built synchronously. Consider using debug() method instead.
-```
-
-Later versions of Objection may introduce a native way to retrieve an executable SQL statement, or handle this behavior differently.
-
-##### Return value
-
-| Type   | Description                                                                                                                                            |
-| ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| string | The SQL this query builder will build, or `This query cannot be built synchronously. Consider using debug() method instead.` if an exception is thrown |
-
-## toSql()
-
-```js
-const sql = queryBuilder.toSql();
-```
-
-An alias for `toString()`.
-
-Note: The behavior of Objection's `toSql()` is different from Knex's `toSql()` (see above). This method may be deprecated soon.
-
-##### Return value
-
-| Type   | Description                                                                                                                                            |
-| ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| string | The SQL this query builder will build, or `This query cannot be built synchronously. Consider using debug() method instead.` if an exception is thrown |
-
 ## skipUndefined()
 
 ```js
