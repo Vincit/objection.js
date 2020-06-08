@@ -4,20 +4,52 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Query examples | Objection.js</title>
+    <meta name="generator" content="VuePress 1.5.0">
+    
     <meta name="description" content="An SQL friendly ORM for node.js">
-    
-    
-    <link rel="preload" href="/objection.js/assets/css/0.styles.c9862de9.css" as="style"><link rel="preload" href="/objection.js/assets/js/app.5ed08341.js" as="script"><link rel="preload" href="/objection.js/assets/js/6.4413d797.js" as="script"><link rel="preload" href="/objection.js/assets/js/7.e45d78f3.js" as="script"><link rel="preload" href="/objection.js/assets/js/30.19b07b69.js" as="script"><link rel="prefetch" href="/objection.js/assets/js/1.11ca3811.js"><link rel="prefetch" href="/objection.js/assets/js/10.d7e6713b.js"><link rel="prefetch" href="/objection.js/assets/js/11.9be5a1cb.js"><link rel="prefetch" href="/objection.js/assets/js/12.3c2fa524.js"><link rel="prefetch" href="/objection.js/assets/js/13.810e0a40.js"><link rel="prefetch" href="/objection.js/assets/js/14.521da4d3.js"><link rel="prefetch" href="/objection.js/assets/js/15.d5ff9ab5.js"><link rel="prefetch" href="/objection.js/assets/js/16.aa062bcd.js"><link rel="prefetch" href="/objection.js/assets/js/17.49ae5a6c.js"><link rel="prefetch" href="/objection.js/assets/js/18.6486d837.js"><link rel="prefetch" href="/objection.js/assets/js/19.04292ca1.js"><link rel="prefetch" href="/objection.js/assets/js/2.568fdd1f.js"><link rel="prefetch" href="/objection.js/assets/js/20.c3d5a4fd.js"><link rel="prefetch" href="/objection.js/assets/js/21.853d9d60.js"><link rel="prefetch" href="/objection.js/assets/js/22.a70b9967.js"><link rel="prefetch" href="/objection.js/assets/js/23.2801c4e0.js"><link rel="prefetch" href="/objection.js/assets/js/24.42c94808.js"><link rel="prefetch" href="/objection.js/assets/js/25.a31b68eb.js"><link rel="prefetch" href="/objection.js/assets/js/26.dc222954.js"><link rel="prefetch" href="/objection.js/assets/js/27.447b8cba.js"><link rel="prefetch" href="/objection.js/assets/js/28.7b699e83.js"><link rel="prefetch" href="/objection.js/assets/js/29.239fe93f.js"><link rel="prefetch" href="/objection.js/assets/js/3.db0e3213.js"><link rel="prefetch" href="/objection.js/assets/js/31.1efd4fcf.js"><link rel="prefetch" href="/objection.js/assets/js/32.4d6e2200.js"><link rel="prefetch" href="/objection.js/assets/js/33.2b8c786d.js"><link rel="prefetch" href="/objection.js/assets/js/34.45bf78b1.js"><link rel="prefetch" href="/objection.js/assets/js/35.7159b8bd.js"><link rel="prefetch" href="/objection.js/assets/js/36.32a020d1.js"><link rel="prefetch" href="/objection.js/assets/js/37.de70add2.js"><link rel="prefetch" href="/objection.js/assets/js/38.579a7d0b.js"><link rel="prefetch" href="/objection.js/assets/js/39.551d8b62.js"><link rel="prefetch" href="/objection.js/assets/js/40.f8f2e89f.js"><link rel="prefetch" href="/objection.js/assets/js/41.6898b04b.js"><link rel="prefetch" href="/objection.js/assets/js/42.fede2e08.js"><link rel="prefetch" href="/objection.js/assets/js/43.1bc5e59f.js"><link rel="prefetch" href="/objection.js/assets/js/44.44999b29.js"><link rel="prefetch" href="/objection.js/assets/js/45.8de7fa91.js"><link rel="prefetch" href="/objection.js/assets/js/46.1cbbafae.js"><link rel="prefetch" href="/objection.js/assets/js/47.8899a37e.js"><link rel="prefetch" href="/objection.js/assets/js/48.443d957c.js"><link rel="prefetch" href="/objection.js/assets/js/49.8165807f.js"><link rel="prefetch" href="/objection.js/assets/js/50.43aaa717.js"><link rel="prefetch" href="/objection.js/assets/js/51.66c91b91.js"><link rel="prefetch" href="/objection.js/assets/js/52.63049f42.js"><link rel="prefetch" href="/objection.js/assets/js/53.b0321e8e.js"><link rel="prefetch" href="/objection.js/assets/js/54.195e9914.js"><link rel="prefetch" href="/objection.js/assets/js/55.48c84fe3.js"><link rel="prefetch" href="/objection.js/assets/js/56.9f10b04b.js"><link rel="prefetch" href="/objection.js/assets/js/57.72fbf613.js"><link rel="prefetch" href="/objection.js/assets/js/58.c3d39377.js"><link rel="prefetch" href="/objection.js/assets/js/8.3416ada3.js"><link rel="prefetch" href="/objection.js/assets/js/9.533e7631.js"><link rel="prefetch" href="/objection.js/assets/js/vendors~docsearch.6b70a5e2.js">
-    <link rel="stylesheet" href="/objection.js/assets/css/0.styles.c9862de9.css">
+    <link rel="preload" href="/objection.js/assets/css/0.styles.0f46ca33.css" as="style"><link rel="preload" href="/objection.js/assets/js/app.af4b32a9.js" as="script"><link rel="preload" href="/objection.js/assets/js/6.7d5e48c0.js" as="script"><link rel="preload" href="/objection.js/assets/js/7.0f19e18f.js" as="script"><link rel="preload" href="/objection.js/assets/js/30.764cbb73.js" as="script"><link rel="prefetch" href="/objection.js/assets/js/1.7032b783.js"><link rel="prefetch" href="/objection.js/assets/js/10.75d0ad77.js"><link rel="prefetch" href="/objection.js/assets/js/11.327185d8.js"><link rel="prefetch" href="/objection.js/assets/js/12.ccc6631d.js"><link rel="prefetch" href="/objection.js/assets/js/13.03f26a8c.js"><link rel="prefetch" href="/objection.js/assets/js/14.3cc11be9.js"><link rel="prefetch" href="/objection.js/assets/js/15.d383f181.js"><link rel="prefetch" href="/objection.js/assets/js/16.d18ec67f.js"><link rel="prefetch" href="/objection.js/assets/js/17.39def80d.js"><link rel="prefetch" href="/objection.js/assets/js/18.f4b6c941.js"><link rel="prefetch" href="/objection.js/assets/js/19.f23cfd7d.js"><link rel="prefetch" href="/objection.js/assets/js/2.2ee46ff4.js"><link rel="prefetch" href="/objection.js/assets/js/20.e6ea2a0f.js"><link rel="prefetch" href="/objection.js/assets/js/21.a2ab6ba4.js"><link rel="prefetch" href="/objection.js/assets/js/22.9949a4db.js"><link rel="prefetch" href="/objection.js/assets/js/23.c5902b15.js"><link rel="prefetch" href="/objection.js/assets/js/24.731cb5e0.js"><link rel="prefetch" href="/objection.js/assets/js/25.3b859f43.js"><link rel="prefetch" href="/objection.js/assets/js/26.c741e666.js"><link rel="prefetch" href="/objection.js/assets/js/27.54f6c9fc.js"><link rel="prefetch" href="/objection.js/assets/js/28.89492b12.js"><link rel="prefetch" href="/objection.js/assets/js/29.3dff4956.js"><link rel="prefetch" href="/objection.js/assets/js/3.b3ce0911.js"><link rel="prefetch" href="/objection.js/assets/js/31.d7d3c479.js"><link rel="prefetch" href="/objection.js/assets/js/32.dff1f06a.js"><link rel="prefetch" href="/objection.js/assets/js/33.0a4b2662.js"><link rel="prefetch" href="/objection.js/assets/js/34.8243c5cf.js"><link rel="prefetch" href="/objection.js/assets/js/35.f858e430.js"><link rel="prefetch" href="/objection.js/assets/js/36.5b5aca13.js"><link rel="prefetch" href="/objection.js/assets/js/37.f090f8fc.js"><link rel="prefetch" href="/objection.js/assets/js/38.ab9a0cfe.js"><link rel="prefetch" href="/objection.js/assets/js/39.c96e3d61.js"><link rel="prefetch" href="/objection.js/assets/js/40.b44c74dc.js"><link rel="prefetch" href="/objection.js/assets/js/41.a567f3bf.js"><link rel="prefetch" href="/objection.js/assets/js/42.16098f12.js"><link rel="prefetch" href="/objection.js/assets/js/43.7f987ec3.js"><link rel="prefetch" href="/objection.js/assets/js/44.f86e3c7c.js"><link rel="prefetch" href="/objection.js/assets/js/45.15867dad.js"><link rel="prefetch" href="/objection.js/assets/js/46.bb566d8c.js"><link rel="prefetch" href="/objection.js/assets/js/47.846c0a8e.js"><link rel="prefetch" href="/objection.js/assets/js/48.dc897c07.js"><link rel="prefetch" href="/objection.js/assets/js/49.19499152.js"><link rel="prefetch" href="/objection.js/assets/js/50.266eece6.js"><link rel="prefetch" href="/objection.js/assets/js/51.e45dcd57.js"><link rel="prefetch" href="/objection.js/assets/js/52.af4cd1ad.js"><link rel="prefetch" href="/objection.js/assets/js/53.5dfbc199.js"><link rel="prefetch" href="/objection.js/assets/js/54.47fff024.js"><link rel="prefetch" href="/objection.js/assets/js/55.665b2c0b.js"><link rel="prefetch" href="/objection.js/assets/js/56.65f3c3a6.js"><link rel="prefetch" href="/objection.js/assets/js/57.1cb79d8c.js"><link rel="prefetch" href="/objection.js/assets/js/8.d3fea037.js"><link rel="prefetch" href="/objection.js/assets/js/9.a610c6c3.js"><link rel="prefetch" href="/objection.js/assets/js/vendors~docsearch.d2b1c980.js">
+    <link rel="stylesheet" href="/objection.js/assets/css/0.styles.0f46ca33.css">
   </head>
   <body>
-    <div id="app" data-server-rendered="true"><div class="theme-container"><header class="navbar"><div class="sidebar-button"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" viewBox="0 0 448 512" class="icon"><path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path></svg></div> <a href="/objection.js/" class="home-link router-link-active"><!----> <span class="site-name">Objection.js</span></a> <div class="links"><form id="search-form" role="search" class="algolia-search-wrapper search-box"><input id="algolia-search-input" class="search-query"></form> <nav class="nav-links can-hide"><div class="nav-item"><a href="/objection.js/guide/" class="nav-link router-link-active">Guide</a></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="API Reference" class="dropdown-title"><span class="title">API Reference</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/objection.js/api/objection/" class="nav-link">Main Module</a></li><li class="dropdown-item"><!----> <a href="/objection.js/api/query-builder/" class="nav-link">Query Builder</a></li><li class="dropdown-item"><!----> <a href="/objection.js/api/model/" class="nav-link">Model</a></li><li class="dropdown-item"><!----> <a href="/objection.js/api/types/" class="nav-link">Types</a></li></ul></div></div><div class="nav-item"><a href="/objection.js/recipes/" class="nav-link">Recipe Book</a></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Release Notes" class="dropdown-title"><span class="title">Release Notes</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/objection.js/release-notes/changelog.html" class="nav-link">Changelog</a></li><li class="dropdown-item"><!----> <a href="/objection.js/release-notes/migration.html" class="nav-link">Migration to 2.0</a></li><li class="dropdown-item"><!----> <a href="https://github.com/Vincit/objection.js/tree/v1/doc" target="_blank" rel="noopener noreferrer" class="nav-link external">
+    <div id="app" data-server-rendered="true"><div class="theme-container"><header class="navbar"><div class="sidebar-button"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" viewBox="0 0 448 512" class="icon"><path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path></svg></div> <a href="/objection.js/" class="home-link router-link-active"><!----> <span class="site-name">Objection.js</span></a> <div class="links"><form id="search-form" role="search" class="algolia-search-wrapper search-box"><input id="algolia-search-input" class="search-query"></form> <nav class="nav-links can-hide"><div class="nav-item"><a href="/objection.js/guide/" class="nav-link router-link-active">
+  Guide
+</a></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="API Reference" class="dropdown-title"><span class="title">API Reference</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/objection.js/api/objection/" class="nav-link">
+  Main Module
+</a></li><li class="dropdown-item"><!----> <a href="/objection.js/api/query-builder/" class="nav-link">
+  Query Builder
+</a></li><li class="dropdown-item"><!----> <a href="/objection.js/api/model/" class="nav-link">
+  Model
+</a></li><li class="dropdown-item"><!----> <a href="/objection.js/api/types/" class="nav-link">
+  Types
+</a></li></ul></div></div><div class="nav-item"><a href="/objection.js/recipes/" class="nav-link">
+  Recipe Book
+</a></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Release Notes" class="dropdown-title"><span class="title">Release Notes</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/objection.js/release-notes/changelog.html" class="nav-link">
+  Changelog
+</a></li><li class="dropdown-item"><!----> <a href="/objection.js/release-notes/migration.html" class="nav-link">
+  Migration to 2.0
+</a></li><li class="dropdown-item"><!----> <a href="https://github.com/Vincit/objection.js/tree/v1/doc" target="_blank" rel="noopener noreferrer" class="nav-link external">
   v1.x documentation
   <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></li></ul></div></div><div class="nav-item"><a href="https://github.com/vincit/objection.js" target="_blank" rel="noopener noreferrer" class="nav-link external">
   ⭐ Star
   <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></div> <a href="https://github.com/vincit/objection.js" target="_blank" rel="noopener noreferrer" class="repo-link">
     GitHub
-    <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></nav></div></header> <div class="sidebar-mask"></div> <aside class="sidebar"><nav class="nav-links"><div class="nav-item"><a href="/objection.js/guide/" class="nav-link router-link-active">Guide</a></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="API Reference" class="dropdown-title"><span class="title">API Reference</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/objection.js/api/objection/" class="nav-link">Main Module</a></li><li class="dropdown-item"><!----> <a href="/objection.js/api/query-builder/" class="nav-link">Query Builder</a></li><li class="dropdown-item"><!----> <a href="/objection.js/api/model/" class="nav-link">Model</a></li><li class="dropdown-item"><!----> <a href="/objection.js/api/types/" class="nav-link">Types</a></li></ul></div></div><div class="nav-item"><a href="/objection.js/recipes/" class="nav-link">Recipe Book</a></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Release Notes" class="dropdown-title"><span class="title">Release Notes</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/objection.js/release-notes/changelog.html" class="nav-link">Changelog</a></li><li class="dropdown-item"><!----> <a href="/objection.js/release-notes/migration.html" class="nav-link">Migration to 2.0</a></li><li class="dropdown-item"><!----> <a href="https://github.com/Vincit/objection.js/tree/v1/doc" target="_blank" rel="noopener noreferrer" class="nav-link external">
+    <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></nav></div></header> <div class="sidebar-mask"></div> <aside class="sidebar"><nav class="nav-links"><div class="nav-item"><a href="/objection.js/guide/" class="nav-link router-link-active">
+  Guide
+</a></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="API Reference" class="dropdown-title"><span class="title">API Reference</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/objection.js/api/objection/" class="nav-link">
+  Main Module
+</a></li><li class="dropdown-item"><!----> <a href="/objection.js/api/query-builder/" class="nav-link">
+  Query Builder
+</a></li><li class="dropdown-item"><!----> <a href="/objection.js/api/model/" class="nav-link">
+  Model
+</a></li><li class="dropdown-item"><!----> <a href="/objection.js/api/types/" class="nav-link">
+  Types
+</a></li></ul></div></div><div class="nav-item"><a href="/objection.js/recipes/" class="nav-link">
+  Recipe Book
+</a></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="Release Notes" class="dropdown-title"><span class="title">Release Notes</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/objection.js/release-notes/changelog.html" class="nav-link">
+  Changelog
+</a></li><li class="dropdown-item"><!----> <a href="/objection.js/release-notes/migration.html" class="nav-link">
+  Migration to 2.0
+</a></li><li class="dropdown-item"><!----> <a href="https://github.com/Vincit/objection.js/tree/v1/doc" target="_blank" rel="noopener noreferrer" class="nav-link external">
   v1.x documentation
   <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></li></ul></div></div><div class="nav-item"><a href="https://github.com/vincit/objection.js" target="_blank" rel="noopener noreferrer" class="nav-link external">
   ⭐ Star
@@ -101,8 +133,8 @@ console<span class="token punctuation">.</span><span class="token function">log<
 <span class="token operator">and</span> <span class="token string">&quot;firstName&quot;</span> <span class="token operator">=</span> <span class="token string">'Jennifer'</span>
 <span class="token keyword">order</span> <span class="token keyword">by</span> <span class="token string">&quot;lastName&quot;</span> <span class="token keyword">asc</span>
 </code></pre></div><h3 id="insert-queries"><a href="#insert-queries" class="header-anchor">#</a> Insert queries</h3> <p>Insert queries are created by chaining the <a href="/objection.js/api/query-builder/mutate-methods.html#insert">insert</a> method to the query. See the <a href="/objection.js/api/query-builder/mutate-methods.html#insertgraph">insertGraph</a> method for inserting object graphs.</p> <p>In addition to the examples here, you can find more examples behind these links.</p> <ul><li><a href="/objection.js/api/query-builder/mutate-methods.html#insert">insert API reference</a></li> <li><a href="/objection.js/guide/query-examples.html#graph-inserts">graph inserts</a></li></ul> <h5 id="examples-2"><a href="#examples-2" class="header-anchor">#</a> Examples</h5> <div class="language-js extra-class"><pre class="language-js"><code><span class="token keyword">const</span> jennifer <span class="token operator">=</span> <span class="token keyword">await</span> Person<span class="token punctuation">.</span><span class="token function">query</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">insert</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
-  firstName<span class="token punctuation">:</span> <span class="token string">'Jennifer'</span><span class="token punctuation">,</span>
-  lastName<span class="token punctuation">:</span> <span class="token string">'Lawrence'</span>
+  firstName<span class="token operator">:</span> <span class="token string">'Jennifer'</span><span class="token punctuation">,</span>
+  lastName<span class="token operator">:</span> <span class="token string">'Lawrence'</span>
 <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
 console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>jennifer <span class="token keyword">instanceof</span> <span class="token class-name">Person</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// --&gt; true</span>
@@ -110,25 +142,25 @@ console<span class="token punctuation">.</span><span class="token function">log<
 console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>jennifer<span class="token punctuation">.</span><span class="token function">fullName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// --&gt; 'Jennifer Lawrence'</span>
 </code></pre></div><div class="language-sql extra-class"><pre class="language-sql"><code><span class="token keyword">insert</span> <span class="token keyword">into</span> <span class="token string">&quot;persons&quot;</span> <span class="token punctuation">(</span><span class="token string">&quot;firstName&quot;</span><span class="token punctuation">,</span> <span class="token string">&quot;lastName&quot;</span><span class="token punctuation">)</span> <span class="token keyword">values</span> <span class="token punctuation">(</span><span class="token string">'Jennifer'</span><span class="token punctuation">,</span> <span class="token string">'Lawrence'</span><span class="token punctuation">)</span>
 </code></pre></div><p>Just like with any query, you can mix in <code>raw</code> statements, subqueries, <code>knex.raw</code> instances etc.</p> <div class="language-js extra-class"><pre class="language-js"><code><span class="token keyword">const</span> jennifer <span class="token operator">=</span> <span class="token keyword">await</span> Person<span class="token punctuation">.</span><span class="token function">query</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">insert</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
-  firstName<span class="token punctuation">:</span> <span class="token string">'Average'</span><span class="token punctuation">,</span>
-  lastName<span class="token punctuation">:</span> <span class="token string">'Person'</span><span class="token punctuation">,</span>
-  age<span class="token punctuation">:</span> Person<span class="token punctuation">.</span><span class="token function">query</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">avg</span><span class="token punctuation">(</span><span class="token string">'age'</span><span class="token punctuation">)</span>
+  firstName<span class="token operator">:</span> <span class="token string">'Average'</span><span class="token punctuation">,</span>
+  lastName<span class="token operator">:</span> <span class="token string">'Person'</span><span class="token punctuation">,</span>
+  age<span class="token operator">:</span> Person<span class="token punctuation">.</span><span class="token function">query</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">avg</span><span class="token punctuation">(</span><span class="token string">'age'</span><span class="token punctuation">)</span>
 <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 </code></pre></div><h3 id="update-queries"><a href="#update-queries" class="header-anchor">#</a> Update queries</h3> <p>Update queries are created by chaining the <a href="/objection.js/api/query-builder/mutate-methods.html#update">update</a> or <a href="/objection.js/api/query-builder/mutate-methods.html#patch">patch</a> method to the query. <a href="/objection.js/api/query-builder/mutate-methods.html#patch">patch</a> and <a href="/objection.js/api/query-builder/mutate-methods.html#update">update</a> return the number of updated rows. If you want the freshly updated item as a result you can use the helper method <a href="/objection.js/api/query-builder/mutate-methods.html#patchandfetchbyid">patchAndFetchById</a> and <a href="/objection.js/api/query-builder/mutate-methods.html#updateandfetchbyid">updateAndFetchById</a>. On postgresql you can simply chain <a href="/objection.js/api/query-builder/find-methods.html#returning">.returning('*')</a> or take a look at <a href="/objection.js/recipes/returning-tricks.html">this recipe</a> for more ideas. See <a href="/objection.js/api/query-builder/mutate-methods.html#update">update</a> and <a href="/objection.js/api/query-builder/mutate-methods.html#patch">patch</a> API documentation for discussion about their differences.</p> <p>In addition to the examples here, you can find more examples behind these links.</p> <ul><li><a href="/objection.js/api/query-builder/mutate-methods.html#patch">patch API reference</a></li> <li><a href="/objection.js/recipes/raw-queries.html">raw queries</a></li></ul> <h5 id="examples-3"><a href="#examples-3" class="header-anchor">#</a> Examples</h5> <p>Update an item by id:</p> <div class="language-js extra-class"><pre class="language-js"><code><span class="token keyword">const</span> numUpdated <span class="token operator">=</span> <span class="token keyword">await</span> Person<span class="token punctuation">.</span><span class="token function">query</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
   <span class="token punctuation">.</span><span class="token function">findById</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>
   <span class="token punctuation">.</span><span class="token function">patch</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
-    firstName<span class="token punctuation">:</span> <span class="token string">'Jennifer'</span>
+    firstName<span class="token operator">:</span> <span class="token string">'Jennifer'</span>
   <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 </code></pre></div><div class="language-sql extra-class"><pre class="language-sql"><code><span class="token keyword">update</span> <span class="token string">&quot;persons&quot;</span> <span class="token keyword">set</span> <span class="token string">&quot;firstName&quot;</span> <span class="token operator">=</span> <span class="token string">'Jennifer'</span> <span class="token keyword">where</span> <span class="token string">&quot;id&quot;</span> <span class="token operator">=</span> <span class="token number">1</span>
 </code></pre></div><p>Update multiple items:</p> <div class="language-js extra-class"><pre class="language-js"><code><span class="token keyword">const</span> numUpdated <span class="token operator">=</span> <span class="token keyword">await</span> Person<span class="token punctuation">.</span><span class="token function">query</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-  <span class="token punctuation">.</span><span class="token function">patch</span><span class="token punctuation">(</span><span class="token punctuation">{</span> lastName<span class="token punctuation">:</span> <span class="token string">'Dinosaur'</span> <span class="token punctuation">}</span><span class="token punctuation">)</span>
+  <span class="token punctuation">.</span><span class="token function">patch</span><span class="token punctuation">(</span><span class="token punctuation">{</span> lastName<span class="token operator">:</span> <span class="token string">'Dinosaur'</span> <span class="token punctuation">}</span><span class="token punctuation">)</span>
   <span class="token punctuation">.</span><span class="token function">where</span><span class="token punctuation">(</span><span class="token string">'age'</span><span class="token punctuation">,</span> <span class="token string">'&gt;'</span><span class="token punctuation">,</span> <span class="token number">60</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
 console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">'all people over 60 years old are now dinosaurs'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>numUpdated<span class="token punctuation">,</span> <span class="token string">'people were updated'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 </code></pre></div><div class="language-sql extra-class"><pre class="language-sql"><code><span class="token keyword">update</span> <span class="token string">&quot;persons&quot;</span> <span class="token keyword">set</span> <span class="token string">&quot;lastName&quot;</span> <span class="token operator">=</span> <span class="token string">'Dinosaur'</span> <span class="token keyword">where</span> <span class="token string">&quot;age&quot;</span> <span class="token operator">&gt;</span> <span class="token number">60</span>
 </code></pre></div><p>Update and fetch an item:</p> <div class="language-js extra-class"><pre class="language-js"><code><span class="token keyword">const</span> updatedPerson <span class="token operator">=</span> <span class="token keyword">await</span> Person<span class="token punctuation">.</span><span class="token function">query</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">patchAndFetchById</span><span class="token punctuation">(</span><span class="token number">246</span><span class="token punctuation">,</span> <span class="token punctuation">{</span>
-  lastName<span class="token punctuation">:</span> <span class="token string">'Updated'</span>
+  lastName<span class="token operator">:</span> <span class="token string">'Updated'</span>
 <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
 console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>updatedPerson<span class="token punctuation">.</span>lastName<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// --&gt; Updated.</span>
@@ -217,17 +249,17 @@ console<span class="token punctuation">.</span><span class="token function">log<
 </code></pre></div><h3 id="relation-insert-queries"><a href="#relation-insert-queries" class="header-anchor">#</a> Relation insert queries</h3> <p>Chain the <a href="/objection.js/api/query-builder/mutate-methods.html#insert">insert</a> method to a <a href="/objection.js/api/model/static-methods.html#static-relatedquery">relatedQuery</a> or <a href="/objection.js/api/model/instance-methods.html#relatedquery">$relatedQuery</a> call to insert a related object for an item. The query inserts a new object to the related table and updates the needed tables to create the relationship. In case of many-to-many relation a row is inserted to the join table etc. Also check out <a href="/objection.js/api/query-builder/mutate-methods.html#insertgraph">insertGraph</a> method for an alternative way to insert related models.</p> <p>By default the inserted related models are appended to the parent model to a property by the same name as the relation. For example in our <code>person.$relatedQuery('pets').insert(obj)</code> example query, the return value would be appended to <code>person.pets</code>. This behaviour can be modified using <a href="/objection.js/api/model/static-properties.html#static-relatedinsertquerymutates">relatedInsertQueryMutates</a>. Also check out the <a href="/objection.js/api/model/instance-methods.html#setrelated">$setRelated</a> and
 <a href="/objection.js/api/model/instance-methods.html#appendrelated">$appendRelated</a> helpers.</p> <h5 id="examples-6"><a href="#examples-6" class="header-anchor">#</a> Examples</h5> <p>Add a pet for a person:</p> <div class="language-js extra-class"><pre class="language-js"><code><span class="token keyword">const</span> person <span class="token operator">=</span> <span class="token keyword">await</span> Person<span class="token punctuation">.</span><span class="token function">query</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">findById</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 </code></pre></div><div class="language-sql extra-class"><pre class="language-sql"><code><span class="token keyword">select</span> <span class="token string">&quot;persons&quot;</span><span class="token punctuation">.</span><span class="token operator">*</span> <span class="token keyword">from</span> <span class="token string">&quot;persons&quot;</span> <span class="token keyword">where</span> <span class="token string">&quot;persons&quot;</span><span class="token punctuation">.</span><span class="token string">&quot;id&quot;</span> <span class="token operator">=</span> <span class="token number">1</span>
-</code></pre></div><div class="language-js extra-class"><pre class="language-js"><code><span class="token keyword">const</span> fluffy <span class="token operator">=</span> <span class="token keyword">await</span> person<span class="token punctuation">.</span><span class="token function">$relatedQuery</span><span class="token punctuation">(</span><span class="token string">'pets'</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">insert</span><span class="token punctuation">(</span><span class="token punctuation">{</span> name<span class="token punctuation">:</span> <span class="token string">'Fluffy'</span> <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre></div><div class="language-js extra-class"><pre class="language-js"><code><span class="token keyword">const</span> fluffy <span class="token operator">=</span> <span class="token keyword">await</span> person<span class="token punctuation">.</span><span class="token function">$relatedQuery</span><span class="token punctuation">(</span><span class="token string">'pets'</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">insert</span><span class="token punctuation">(</span><span class="token punctuation">{</span> name<span class="token operator">:</span> <span class="token string">'Fluffy'</span> <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
 console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>person<span class="token punctuation">.</span>pets<span class="token punctuation">.</span><span class="token function">indexOf</span><span class="token punctuation">(</span>fluffy<span class="token punctuation">)</span> <span class="token operator">!==</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// --&gt; true</span>
 </code></pre></div><div class="language-sql extra-class"><pre class="language-sql"><code><span class="token keyword">insert</span> <span class="token keyword">into</span> <span class="token string">&quot;animals&quot;</span> <span class="token punctuation">(</span><span class="token string">&quot;name&quot;</span><span class="token punctuation">,</span> <span class="token string">&quot;ownerId&quot;</span><span class="token punctuation">)</span> <span class="token keyword">values</span> <span class="token punctuation">(</span><span class="token string">'Fluffy'</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span>
 </code></pre></div><p>Just like with <a href="#relation-find-queries">relation find queries</a>, you can save a query and add a pet for a person using one single query:</p> <div class="language-js extra-class"><pre class="language-js"><code><span class="token keyword">const</span> fluffy <span class="token operator">=</span> <span class="token keyword">await</span> Person<span class="token punctuation">.</span><span class="token function">relatedQuery</span><span class="token punctuation">(</span><span class="token string">'pets'</span><span class="token punctuation">)</span>
   <span class="token punctuation">.</span><span class="token function">for</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>
-  <span class="token punctuation">.</span><span class="token function">insert</span><span class="token punctuation">(</span><span class="token punctuation">{</span> name<span class="token punctuation">:</span> <span class="token string">'Fluffy'</span> <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">.</span><span class="token function">insert</span><span class="token punctuation">(</span><span class="token punctuation">{</span> name<span class="token operator">:</span> <span class="token string">'Fluffy'</span> <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 </code></pre></div><div class="language-sql extra-class"><pre class="language-sql"><code><span class="token keyword">insert</span> <span class="token keyword">into</span> <span class="token string">&quot;animals&quot;</span> <span class="token punctuation">(</span><span class="token string">&quot;name&quot;</span><span class="token punctuation">,</span> <span class="token string">&quot;ownerId&quot;</span><span class="token punctuation">)</span> <span class="token keyword">values</span> <span class="token punctuation">(</span><span class="token string">'Fluffy'</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span>
 </code></pre></div><p>If you want to write columns to the join table of a many-to-many relation you first need to specify the columns in the <code>extra</code> array of the <code>through</code> object in <a href="/objection.js/api/model/static-properties.html#static-relationmappings">relationMappings</a> (see the examples behind the link). For example, if you specified an array <code>extra: ['awesomeness']</code> in <a href="/objection.js/api/model/static-properties.html#static-relationmappings">relationMappings</a> then <code>awesomeness</code> is written to the join table in the following example:</p> <div class="language-js extra-class"><pre class="language-js"><code><span class="token keyword">const</span> movie <span class="token operator">=</span> <span class="token keyword">await</span> Person<span class="token punctuation">.</span><span class="token function">relatedQuery</span><span class="token punctuation">(</span><span class="token string">'movies'</span><span class="token punctuation">)</span>
   <span class="token punctuation">.</span><span class="token function">for</span><span class="token punctuation">(</span><span class="token number">100</span><span class="token punctuation">)</span>
-  <span class="token punctuation">.</span><span class="token function">insert</span><span class="token punctuation">(</span><span class="token punctuation">{</span> name<span class="token punctuation">:</span> <span class="token string">'The room'</span><span class="token punctuation">,</span> awesomeness<span class="token punctuation">:</span> <span class="token number">9001</span> <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">.</span><span class="token function">insert</span><span class="token punctuation">(</span><span class="token punctuation">{</span> name<span class="token operator">:</span> <span class="token string">'The room'</span><span class="token punctuation">,</span> awesomeness<span class="token operator">:</span> <span class="token number">9001</span> <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
 console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">'best movie ever was added'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 </code></pre></div><div class="language-sql extra-class"><pre class="language-sql"><code><span class="token keyword">insert</span> <span class="token keyword">into</span> <span class="token string">&quot;movies&quot;</span> <span class="token punctuation">(</span><span class="token string">&quot;name&quot;</span><span class="token punctuation">)</span>
@@ -278,8 +310,8 @@ console<span class="token punctuation">.</span><span class="token function">log<
 <span class="token comment">// is not executed. It's a placeholder that will be used to build</span>
 <span class="token comment">// a subquery when the `relatedQuery` gets executed.</span>
 <span class="token keyword">const</span> arnold <span class="token operator">=</span> Person<span class="token punctuation">.</span><span class="token function">query</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">findOne</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
-  firstName<span class="token punctuation">:</span> <span class="token string">'Arnold'</span><span class="token punctuation">,</span>
-  lastName<span class="token punctuation">:</span> <span class="token string">'Schwarzenegger'</span>
+  firstName<span class="token operator">:</span> <span class="token string">'Arnold'</span><span class="token punctuation">,</span>
+  lastName<span class="token operator">:</span> <span class="token string">'Schwarzenegger'</span>
 <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
 <span class="token keyword">await</span> Person<span class="token punctuation">.</span><span class="token function">relatedQuery</span><span class="token punctuation">(</span><span class="token string">'movies'</span><span class="token punctuation">)</span>
@@ -300,7 +332,7 @@ console<span class="token punctuation">.</span><span class="token function">log<
 <span class="token punctuation">)</span>
 </code></pre></div><h3 id="relation-update-queries"><a href="#relation-update-queries" class="header-anchor">#</a> Relation update queries</h3> <p>Relation update queries work just like the normal update queries, but the query is automatically filtered so that only the related items are affected.</p> <p>See the <a href="/objection.js/api/query-builder/mutate-methods.html#update">API documentation</a> of <code>update</code> method.</p> <h5 id="examples-9"><a href="#examples-9" class="header-anchor">#</a> Examples</h5> <div class="language-js extra-class"><pre class="language-js"><code><span class="token keyword">await</span> Person<span class="token punctuation">.</span><span class="token function">relatedQuery</span><span class="token punctuation">(</span><span class="token string">'pets'</span><span class="token punctuation">)</span>
   <span class="token punctuation">.</span><span class="token function">for</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
-  <span class="token punctuation">.</span><span class="token function">patch</span><span class="token punctuation">(</span><span class="token punctuation">{</span> name<span class="token punctuation">:</span> <span class="token function">raw</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">concat(&quot;name&quot;, ' the doggo')</span><span class="token template-punctuation string">`</span></span><span class="token punctuation">)</span> <span class="token punctuation">}</span><span class="token punctuation">)</span>
+  <span class="token punctuation">.</span><span class="token function">patch</span><span class="token punctuation">(</span><span class="token punctuation">{</span> name<span class="token operator">:</span> <span class="token function">raw</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">concat(&quot;name&quot;, ' the doggo')</span><span class="token template-punctuation string">`</span></span><span class="token punctuation">)</span> <span class="token punctuation">}</span><span class="token punctuation">)</span>
   <span class="token punctuation">.</span><span class="token function">where</span><span class="token punctuation">(</span><span class="token string">'species'</span><span class="token punctuation">,</span> <span class="token string">'dog'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 </code></pre></div><div class="language-sql extra-class"><pre class="language-sql"><code><span class="token keyword">update</span> <span class="token string">&quot;animals&quot;</span>
 <span class="token keyword">set</span> <span class="token string">&quot;name&quot;</span> <span class="token operator">=</span> concat<span class="token punctuation">(</span><span class="token string">&quot;name&quot;</span><span class="token punctuation">,</span> <span class="token string">' the doggo'</span><span class="token punctuation">)</span>
@@ -332,10 +364,10 @@ console<span class="token punctuation">.</span><span class="token function">log<
 console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>people<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">.</span>children<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token punctuation">.</span>pets<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">.</span>name<span class="token punctuation">)</span><span class="token punctuation">;</span>
 console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>people<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">.</span>children<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token punctuation">.</span>children<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>name<span class="token punctuation">)</span><span class="token punctuation">;</span>
 </code></pre></div><p>Here's the previous query using the <a href="/objection.js/api/types/#relationexpression-object-notation">object notation</a></p> <div class="language-js extra-class"><pre class="language-js"><code><span class="token keyword">const</span> people <span class="token operator">=</span> <span class="token keyword">await</span> Person<span class="token punctuation">.</span><span class="token function">query</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">withGraphFetched</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
-  pets<span class="token punctuation">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
-  children<span class="token punctuation">:</span> <span class="token punctuation">{</span>
-    pets<span class="token punctuation">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
-    children<span class="token punctuation">:</span> <span class="token boolean">true</span>
+  pets<span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+  children<span class="token operator">:</span> <span class="token punctuation">{</span>
+    pets<span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+    children<span class="token operator">:</span> <span class="token boolean">true</span>
   <span class="token punctuation">}</span>
 <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 </code></pre></div><p>Fetch one relation recursively:</p> <div class="language-js extra-class"><pre class="language-js"><code><span class="token keyword">const</span> people <span class="token operator">=</span> <span class="token keyword">await</span> Person<span class="token punctuation">.</span><span class="token function">query</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">withGraphFetched</span><span class="token punctuation">(</span><span class="token string">'[pets, children.^]'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
@@ -361,15 +393,15 @@ console<span class="token punctuation">.</span><span class="token function">log<
     <span class="token string">'[pets(selectName, onlyDogs), children(orderByAge).[pets, children]]'</span>
   <span class="token punctuation">)</span>
   <span class="token punctuation">.</span><span class="token function">modifiers</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
-    <span class="token function-variable function">selectName</span><span class="token punctuation">:</span> <span class="token parameter">builder</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+    <span class="token function-variable function">selectName</span><span class="token operator">:</span> <span class="token parameter">builder</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
       builder<span class="token punctuation">.</span><span class="token function">select</span><span class="token punctuation">(</span><span class="token string">'name'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
     <span class="token punctuation">}</span><span class="token punctuation">,</span>
 
-    <span class="token function-variable function">orderByAge</span><span class="token punctuation">:</span> <span class="token parameter">builder</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+    <span class="token function-variable function">orderByAge</span><span class="token operator">:</span> <span class="token parameter">builder</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
       builder<span class="token punctuation">.</span><span class="token function">orderBy</span><span class="token punctuation">(</span><span class="token string">'age'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
     <span class="token punctuation">}</span><span class="token punctuation">,</span>
 
-    <span class="token function-variable function">onlyDogs</span><span class="token punctuation">:</span> <span class="token parameter">builder</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+    <span class="token function-variable function">onlyDogs</span><span class="token operator">:</span> <span class="token parameter">builder</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
       builder<span class="token punctuation">.</span><span class="token function">where</span><span class="token punctuation">(</span><span class="token string">'species'</span><span class="token punctuation">,</span> <span class="token string">'dog'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
     <span class="token punctuation">}</span>
   <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
@@ -413,7 +445,7 @@ console<span class="token punctuation">.</span><span class="token function">log<
 
 <span class="token keyword">const</span> people <span class="token operator">=</span> <span class="token keyword">await</span> Person<span class="token punctuation">.</span><span class="token function">query</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">modifiers</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
   <span class="token comment">// This way you can bind arguments to modifiers.</span>
-  <span class="token function-variable function">onlyDogs</span><span class="token punctuation">:</span> <span class="token parameter">query</span> <span class="token operator">=&gt;</span> query<span class="token punctuation">.</span><span class="token function">modify</span><span class="token punctuation">(</span><span class="token string">'onlySpecies'</span><span class="token punctuation">,</span> <span class="token string">'dog'</span><span class="token punctuation">)</span>
+  <span class="token function-variable function">onlyDogs</span><span class="token operator">:</span> <span class="token parameter">query</span> <span class="token operator">=&gt;</span> query<span class="token punctuation">.</span><span class="token function">modify</span><span class="token punctuation">(</span><span class="token string">'onlySpecies'</span><span class="token punctuation">,</span> <span class="token string">'dog'</span><span class="token punctuation">)</span>
 <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">withGraphFetched</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">
     children(defaultSelects, orderByAge).[
       pets(onlyDogs, orderByName),
@@ -452,18 +484,18 @@ console<span class="token punctuation">.</span><span class="token function">log<
 <span class="token comment">// rows have foreign keys set, but no other columns get fetched from</span>
 <span class="token comment">// the database. You can use `insertGraphAndFetch` for that.</span>
 <span class="token keyword">const</span> graph <span class="token operator">=</span> <span class="token keyword">await</span> Person<span class="token punctuation">.</span><span class="token function">query</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">insertGraph</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
-  firstName<span class="token punctuation">:</span> <span class="token string">'Sylvester'</span><span class="token punctuation">,</span>
-  lastName<span class="token punctuation">:</span> <span class="token string">'Stallone'</span><span class="token punctuation">,</span>
+  firstName<span class="token operator">:</span> <span class="token string">'Sylvester'</span><span class="token punctuation">,</span>
+  lastName<span class="token operator">:</span> <span class="token string">'Stallone'</span><span class="token punctuation">,</span>
 
-  children<span class="token punctuation">:</span> <span class="token punctuation">[</span>
+  children<span class="token operator">:</span> <span class="token punctuation">[</span>
     <span class="token punctuation">{</span>
-      firstName<span class="token punctuation">:</span> <span class="token string">'Sage'</span><span class="token punctuation">,</span>
-      lastName<span class="token punctuation">:</span> <span class="token string">'Stallone'</span><span class="token punctuation">,</span>
+      firstName<span class="token operator">:</span> <span class="token string">'Sage'</span><span class="token punctuation">,</span>
+      lastName<span class="token operator">:</span> <span class="token string">'Stallone'</span><span class="token punctuation">,</span>
 
-      pets<span class="token punctuation">:</span> <span class="token punctuation">[</span>
+      pets<span class="token operator">:</span> <span class="token punctuation">[</span>
         <span class="token punctuation">{</span>
-          name<span class="token punctuation">:</span> <span class="token string">'Fluffy'</span><span class="token punctuation">,</span>
-          species<span class="token punctuation">:</span> <span class="token string">'dog'</span>
+          name<span class="token operator">:</span> <span class="token string">'Fluffy'</span><span class="token punctuation">,</span>
+          species<span class="token operator">:</span> <span class="token string">'dog'</span>
         <span class="token punctuation">}</span>
       <span class="token punctuation">]</span>
     <span class="token punctuation">}</span>
@@ -472,93 +504,93 @@ console<span class="token punctuation">.</span><span class="token function">log<
 </code></pre></div><p>The query above will insert 'Sylvester', 'Sage' and 'Fluffy' into db and create relationships between them as defined in the <a href="/objection.js/api/model/static-properties.html#static-relationmappings">relationMappings</a> of the models. Technically <a href="/objection.js/api/query-builder/mutate-methods.html#insertgraph">insertGraph</a> builds a dependency graph from the object graph and inserts the models that don't depend on any other models until the whole graph is inserted.</p> <p>If you need to refer to the same model in multiple places you can use the special properties <code>#id</code> and <code>#ref</code> like this:</p> <div class="language-js extra-class"><pre class="language-js"><code><span class="token keyword">await</span> Person<span class="token punctuation">.</span><span class="token function">query</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">insertGraph</span><span class="token punctuation">(</span>
   <span class="token punctuation">[</span>
     <span class="token punctuation">{</span>
-      firstName<span class="token punctuation">:</span> <span class="token string">'Jennifer'</span><span class="token punctuation">,</span>
-      lastName<span class="token punctuation">:</span> <span class="token string">'Lawrence'</span><span class="token punctuation">,</span>
+      firstName<span class="token operator">:</span> <span class="token string">'Jennifer'</span><span class="token punctuation">,</span>
+      lastName<span class="token operator">:</span> <span class="token string">'Lawrence'</span><span class="token punctuation">,</span>
 
-      movies<span class="token punctuation">:</span> <span class="token punctuation">[</span>
+      movies<span class="token operator">:</span> <span class="token punctuation">[</span>
         <span class="token punctuation">{</span>
-          <span class="token string">'#id'</span><span class="token punctuation">:</span> <span class="token string">'silverLiningsPlaybook'</span><span class="token punctuation">,</span>
-          name<span class="token punctuation">:</span> <span class="token string">'Silver Linings Playbook'</span><span class="token punctuation">,</span>
-          duration<span class="token punctuation">:</span> <span class="token number">122</span>
+          <span class="token string">'#id'</span><span class="token operator">:</span> <span class="token string">'silverLiningsPlaybook'</span><span class="token punctuation">,</span>
+          name<span class="token operator">:</span> <span class="token string">'Silver Linings Playbook'</span><span class="token punctuation">,</span>
+          duration<span class="token operator">:</span> <span class="token number">122</span>
         <span class="token punctuation">}</span>
       <span class="token punctuation">]</span>
     <span class="token punctuation">}</span><span class="token punctuation">,</span>
     <span class="token punctuation">{</span>
-      firstName<span class="token punctuation">:</span> <span class="token string">'Bradley'</span><span class="token punctuation">,</span>
-      lastName<span class="token punctuation">:</span> <span class="token string">'Cooper'</span><span class="token punctuation">,</span>
+      firstName<span class="token operator">:</span> <span class="token string">'Bradley'</span><span class="token punctuation">,</span>
+      lastName<span class="token operator">:</span> <span class="token string">'Cooper'</span><span class="token punctuation">,</span>
 
-      movies<span class="token punctuation">:</span> <span class="token punctuation">[</span>
+      movies<span class="token operator">:</span> <span class="token punctuation">[</span>
         <span class="token punctuation">{</span>
-          <span class="token string">'#ref'</span><span class="token punctuation">:</span> <span class="token string">'silverLiningsPlaybook'</span>
+          <span class="token string">'#ref'</span><span class="token operator">:</span> <span class="token string">'silverLiningsPlaybook'</span>
         <span class="token punctuation">}</span>
       <span class="token punctuation">]</span>
     <span class="token punctuation">}</span>
   <span class="token punctuation">]</span><span class="token punctuation">,</span>
-  <span class="token punctuation">{</span> allowRefs<span class="token punctuation">:</span> <span class="token boolean">true</span> <span class="token punctuation">}</span>
+  <span class="token punctuation">{</span> allowRefs<span class="token operator">:</span> <span class="token boolean">true</span> <span class="token punctuation">}</span>
 <span class="token punctuation">)</span><span class="token punctuation">;</span>
 </code></pre></div><p>Note that you need to also set the <code>allowRefs</code> option to true for this to work.</p> <p>The query above will insert only one movie (the 'Silver Linings Playbook') but both 'Jennifer' and 'Bradley' will have the movie related to them through the many-to-many relation <code>movies</code>. The <code>#id</code> can be any string. There are no format or length requirements for them. It is quite easy to create circular dependencies using <code>#id</code> and <code>#ref</code>. Luckily <a href="/objection.js/api/query-builder/mutate-methods.html#insertgraph">insertGraph</a> detects them and rejects the query with a clear error message.</p> <p>You can refer to the properties of other models anywhere in the graph using expressions of format <code>#ref{&lt;id&gt;.&lt;property&gt;}</code> as long as the reference doesn't create a circular dependency. For example:</p> <div class="language-js extra-class"><pre class="language-js"><code><span class="token keyword">await</span> Person
   <span class="token punctuation">.</span><span class="token function">query</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
   <span class="token punctuation">.</span><span class="token function">insertGraph</span><span class="token punctuation">(</span><span class="token punctuation">[</span>
     <span class="token punctuation">{</span>
-      <span class="token string">&quot;#id&quot;</span><span class="token punctuation">:</span> <span class="token string">'jenni'</span><span class="token punctuation">,</span>
-      firstName<span class="token punctuation">:</span> <span class="token string">'Jennifer'</span><span class="token punctuation">,</span>
-      lastName<span class="token punctuation">:</span> <span class="token string">'Lawrence'</span><span class="token punctuation">,</span>
+      <span class="token string">&quot;#id&quot;</span><span class="token operator">:</span> <span class="token string">'jenni'</span><span class="token punctuation">,</span>
+      firstName<span class="token operator">:</span> <span class="token string">'Jennifer'</span><span class="token punctuation">,</span>
+      lastName<span class="token operator">:</span> <span class="token string">'Lawrence'</span><span class="token punctuation">,</span>
 
-      pets<span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token punctuation">{</span>
-        name<span class="token punctuation">:</span> <span class="token string">&quot;I am the dog of #ref{jenni.firstName} whose id is #ref{jenni.id}&quot;</span><span class="token punctuation">,</span>
-        species<span class="token punctuation">:</span> <span class="token string">'dog'</span>
+      pets<span class="token operator">:</span> <span class="token punctuation">[</span><span class="token punctuation">{</span>
+        name<span class="token operator">:</span> <span class="token string">&quot;I am the dog of #ref{jenni.firstName} whose id is #ref{jenni.id}&quot;</span><span class="token punctuation">,</span>
+        species<span class="token operator">:</span> <span class="token string">'dog'</span>
       <span class="token punctuation">}</span>
     <span class="token punctuation">]</span><span class="token punctuation">,</span>
-    <span class="token punctuation">{</span> allowRefs<span class="token punctuation">:</span> <span class="token boolean">true</span> <span class="token punctuation">}</span>
+    <span class="token punctuation">{</span> allowRefs<span class="token operator">:</span> <span class="token boolean">true</span> <span class="token punctuation">}</span>
   <span class="token punctuation">}</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 </code></pre></div><p>Again, make sure you set the <code>allowRefs</code> option to true.</p> <p>The query above will insert a pet named <code>I am the dog of Jennifer whose id is 523</code> for Jennifer. If <code>#ref{}</code> is used within a string, the references are replaced with the referred values inside the string. If the reference string contains nothing but the reference, the referred value is copied to its place preserving its type.</p> <p>Existing rows can be related to newly inserted rows by using the <code>relate</code> option. <code>relate</code> can be <code>true</code> in which case all models in the graph that have an identifier get related. <code>relate</code> can also be an array of relation paths like <code>['children', 'children.movies.actors']</code> in which case only objects in those paths get related even if they have an idetifier.</p> <div class="language-js extra-class"><pre class="language-js"><code><span class="token keyword">await</span> Person<span class="token punctuation">.</span><span class="token function">query</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">insertGraph</span><span class="token punctuation">(</span>
   <span class="token punctuation">[</span>
     <span class="token punctuation">{</span>
-      firstName<span class="token punctuation">:</span> <span class="token string">'Jennifer'</span><span class="token punctuation">,</span>
-      lastName<span class="token punctuation">:</span> <span class="token string">'Lawrence'</span><span class="token punctuation">,</span>
+      firstName<span class="token operator">:</span> <span class="token string">'Jennifer'</span><span class="token punctuation">,</span>
+      lastName<span class="token operator">:</span> <span class="token string">'Lawrence'</span><span class="token punctuation">,</span>
 
-      movies<span class="token punctuation">:</span> <span class="token punctuation">[</span>
+      movies<span class="token operator">:</span> <span class="token punctuation">[</span>
         <span class="token punctuation">{</span>
-          id<span class="token punctuation">:</span> <span class="token number">2636</span>
+          id<span class="token operator">:</span> <span class="token number">2636</span>
         <span class="token punctuation">}</span>
       <span class="token punctuation">]</span>
     <span class="token punctuation">}</span>
   <span class="token punctuation">]</span><span class="token punctuation">,</span>
   <span class="token punctuation">{</span>
-    relate<span class="token punctuation">:</span> <span class="token boolean">true</span>
+    relate<span class="token operator">:</span> <span class="token boolean">true</span>
   <span class="token punctuation">}</span>
 <span class="token punctuation">)</span><span class="token punctuation">;</span>
 </code></pre></div><p>The query above would create a new person <code>Jennifer Lawrence</code> and add an existing movie (id = 2636) to its <code>movies</code> relation. The next query would do the same:</p> <div class="language-js extra-class"><pre class="language-js"><code><span class="token keyword">await</span> Person<span class="token punctuation">.</span><span class="token function">query</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">insertGraph</span><span class="token punctuation">(</span>
   <span class="token punctuation">[</span>
     <span class="token punctuation">{</span>
-      firstName<span class="token punctuation">:</span> <span class="token string">'Jennifer'</span><span class="token punctuation">,</span>
-      lastName<span class="token punctuation">:</span> <span class="token string">'Lawrence'</span><span class="token punctuation">,</span>
+      firstName<span class="token operator">:</span> <span class="token string">'Jennifer'</span><span class="token punctuation">,</span>
+      lastName<span class="token operator">:</span> <span class="token string">'Lawrence'</span><span class="token punctuation">,</span>
 
-      movies<span class="token punctuation">:</span> <span class="token punctuation">[</span>
+      movies<span class="token operator">:</span> <span class="token punctuation">[</span>
         <span class="token punctuation">{</span>
-          id<span class="token punctuation">:</span> <span class="token number">2636</span>
+          id<span class="token operator">:</span> <span class="token number">2636</span>
         <span class="token punctuation">}</span>
       <span class="token punctuation">]</span>
     <span class="token punctuation">}</span>
   <span class="token punctuation">]</span><span class="token punctuation">,</span>
   <span class="token punctuation">{</span>
-    relate<span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token string">'movies'</span><span class="token punctuation">]</span>
+    relate<span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">'movies'</span><span class="token punctuation">]</span>
   <span class="token punctuation">}</span>
 <span class="token punctuation">)</span><span class="token punctuation">;</span>
 </code></pre></div><p>The <code>relate</code> option can also contain nested relations:</p> <div class="language-js extra-class"><pre class="language-js"><code><span class="token keyword">await</span> Person<span class="token punctuation">.</span><span class="token function">query</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">insertGraph</span><span class="token punctuation">(</span>
   <span class="token punctuation">[</span>
     <span class="token punctuation">{</span>
-      firstName<span class="token punctuation">:</span> <span class="token string">'Jennifer'</span><span class="token punctuation">,</span>
-      lastName<span class="token punctuation">:</span> <span class="token string">'Lawrence'</span><span class="token punctuation">,</span>
+      firstName<span class="token operator">:</span> <span class="token string">'Jennifer'</span><span class="token punctuation">,</span>
+      lastName<span class="token operator">:</span> <span class="token string">'Lawrence'</span><span class="token punctuation">,</span>
 
-      movies<span class="token punctuation">:</span> <span class="token punctuation">[</span>
+      movies<span class="token operator">:</span> <span class="token punctuation">[</span>
         <span class="token punctuation">{</span>
-          name<span class="token punctuation">:</span> <span class="token string">'Silver Linings Playbook'</span><span class="token punctuation">,</span>
-          duration<span class="token punctuation">:</span> <span class="token number">122</span><span class="token punctuation">,</span>
+          name<span class="token operator">:</span> <span class="token string">'Silver Linings Playbook'</span><span class="token punctuation">,</span>
+          duration<span class="token operator">:</span> <span class="token number">122</span><span class="token punctuation">,</span>
 
-          actors<span class="token punctuation">:</span> <span class="token punctuation">[</span>
+          actors<span class="token operator">:</span> <span class="token punctuation">[</span>
             <span class="token punctuation">{</span>
-              id<span class="token punctuation">:</span> <span class="token number">2516</span>
+              id<span class="token operator">:</span> <span class="token number">2516</span>
             <span class="token punctuation">}</span>
           <span class="token punctuation">]</span>
         <span class="token punctuation">}</span>
@@ -566,102 +598,102 @@ console<span class="token punctuation">.</span><span class="token function">log<
     <span class="token punctuation">}</span>
   <span class="token punctuation">]</span><span class="token punctuation">,</span>
   <span class="token punctuation">{</span>
-    relate<span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token string">'movies.actors'</span><span class="token punctuation">]</span>
+    relate<span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">'movies.actors'</span><span class="token punctuation">]</span>
   <span class="token punctuation">}</span>
 <span class="token punctuation">)</span><span class="token punctuation">;</span>
 </code></pre></div><p>If you need to mix inserts and relates inside a single relation, you can use the special property <code>#dbRef</code></p> <div class="language-js extra-class"><pre class="language-js"><code><span class="token keyword">await</span> Person<span class="token punctuation">.</span><span class="token function">query</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">insertGraph</span><span class="token punctuation">(</span><span class="token punctuation">[</span>
   <span class="token punctuation">{</span>
-    firstName<span class="token punctuation">:</span> <span class="token string">'Jennifer'</span><span class="token punctuation">,</span>
-    lastName<span class="token punctuation">:</span> <span class="token string">'Lawrence'</span><span class="token punctuation">,</span>
+    firstName<span class="token operator">:</span> <span class="token string">'Jennifer'</span><span class="token punctuation">,</span>
+    lastName<span class="token operator">:</span> <span class="token string">'Lawrence'</span><span class="token punctuation">,</span>
 
-    movies<span class="token punctuation">:</span> <span class="token punctuation">[</span>
+    movies<span class="token operator">:</span> <span class="token punctuation">[</span>
       <span class="token punctuation">{</span>
-        <span class="token string">'#dbRef'</span><span class="token punctuation">:</span> <span class="token number">2636</span>
+        <span class="token string">'#dbRef'</span><span class="token operator">:</span> <span class="token number">2636</span>
       <span class="token punctuation">}</span><span class="token punctuation">,</span>
       <span class="token punctuation">{</span>
         <span class="token comment">// This will be inserted with an id.</span>
-        id<span class="token punctuation">:</span> <span class="token number">100</span><span class="token punctuation">,</span>
-        name<span class="token punctuation">:</span> <span class="token string">'New movie'</span>
+        id<span class="token operator">:</span> <span class="token number">100</span><span class="token punctuation">,</span>
+        name<span class="token operator">:</span> <span class="token string">'New movie'</span>
       <span class="token punctuation">}</span>
     <span class="token punctuation">]</span>
   <span class="token punctuation">}</span>
 <span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 </code></pre></div><h2 id="graph-upserts"><a href="#graph-upserts" class="header-anchor">#</a> Graph upserts</h2> <p>Arbitrary relation graphs can be upserted (insert + update + delete) using the <a href="/objection.js/api/query-builder/mutate-methods.html#upsertgraph">upsertGraph</a> method. This is best explained using examples, so check them out.</p> <p>By default <a href="/objection.js/api/query-builder/mutate-methods.html#upsertgraph">upsertGraph</a> method updates the objects that have an id, inserts objects that don't have an id and deletes all objects that are not present. This functionality can be modified in many ways by providing <a href="/objection.js/api/types/#type-upsertgraphoptions">UpsertGraphOptions</a> object as the second argument.</p> <p>The <a href="/objection.js/api/query-builder/mutate-methods.html#upsertgraph">upsertGraph</a> method works a little different than the other update and patch methods. When using <a href="/objection.js/api/query-builder/mutate-methods.html#upsertgraph">upsertGraph</a> any <code>where</code> or <code>having</code> methods are ignored. The models are updated based on the id properties in the graph. This is also clarified in the examples.</p> <p><a href="/objection.js/api/query-builder/mutate-methods.html#upsertgraph">upsertGraph</a> uses <a href="/objection.js/api/query-builder/mutate-methods.html#insertgraph">insertGraph</a> under the hood for inserts. That means that you can insert object graphs for relations and use all <a href="/objection.js/api/query-builder/mutate-methods.html#insertgraph">insertGraph</a> features like <code>#ref</code> references.</p> <p><a href="/objection.js/api/query-builder/mutate-methods.html#upsertgraph">upsertGraph</a> operation is <strong>not</strong> atomic by default! You need to start a transaction and pass it to the query using any of the supported ways. See the section about <a href="/objection.js/guide/transactions.html">transactions</a> for more information.</p> <p>See the <a href="/objection.js/api/query-builder/eager-methods.html#allowgraph">allowGraph</a> method if you need to limit which relations can be modified using <a href="/objection.js/api/query-builder/mutate-methods.html#upsertgraph">upsertGraph</a> method to avoid security issues.</p> <div class="custom-block warning"><p class="custom-block-title">WARNING</p> <p>WARNING!</p> <p>Before you start using <code>upsertGraph</code> beware that it's not the silver bullet it seems to be. If you start using it because it seems to provide a &quot;mongodb API&quot; for a relational database, you are using it for a wrong reason!</p> <p>Our suggestion is to first try to write any code without it and only use <code>upsertGraph</code> if it saves you <strong>a lot</strong> of code and makes things simpler. Over time you'll learn where <code>upsertGraph</code> helps and where it makes things more complicated. Don't use it by default for everything. You can search through the objection issues to see what kind of problems <code>upsertGraph</code> can cause if used too much.</p> <p>For simple things <code>upsertGraph</code> calls are easy to understand and remain readable. When you start passing it a bunch of options it becomes increasingly difficult for other developers (and even yourself) to understand.</p> <p>It's also really easy to create a server that doesn't work well with multiple users by overusing <code>upsertGraph</code>. That's because you can easily get into a situation where you override other user's changes if you always upsert large graphs at a time. Always try to update the minimum amount of rows and columns and you'll save yourself a lot of trouble in the long run.</p></div> <h5 id="examples-13"><a href="#examples-13" class="header-anchor">#</a> Examples</h5> <p>For the following examples, assume this is the content of the database:</p> <div class="language-js extra-class"><pre class="language-js"><code><span class="token punctuation">[</span><span class="token punctuation">{</span>
-  id<span class="token punctuation">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
-  firstName<span class="token punctuation">:</span> <span class="token string">'Jennifer'</span><span class="token punctuation">,</span>
-  lastName<span class="token punctuation">:</span> <span class="token string">'Aniston'</span><span class="token punctuation">,</span>
+  id<span class="token operator">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
+  firstName<span class="token operator">:</span> <span class="token string">'Jennifer'</span><span class="token punctuation">,</span>
+  lastName<span class="token operator">:</span> <span class="token string">'Aniston'</span><span class="token punctuation">,</span>
 
   <span class="token comment">// This is a BelongsToOneRelation</span>
-  parent<span class="token punctuation">:</span> <span class="token punctuation">{</span>
-    id<span class="token punctuation">:</span> <span class="token number">2</span><span class="token punctuation">,</span>
-    firstName<span class="token punctuation">:</span> <span class="token string">'Nancy'</span><span class="token punctuation">,</span>
-    lastName<span class="token punctuation">:</span> <span class="token string">'Dow'</span>
+  parent<span class="token operator">:</span> <span class="token punctuation">{</span>
+    id<span class="token operator">:</span> <span class="token number">2</span><span class="token punctuation">,</span>
+    firstName<span class="token operator">:</span> <span class="token string">'Nancy'</span><span class="token punctuation">,</span>
+    lastName<span class="token operator">:</span> <span class="token string">'Dow'</span>
   <span class="token punctuation">}</span><span class="token punctuation">,</span>
 
   <span class="token comment">// This is a HasManyRelation</span>
-  pets<span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token punctuation">{</span>
-    id<span class="token punctuation">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
-    name<span class="token punctuation">:</span> <span class="token string">'Doggo'</span><span class="token punctuation">,</span>
-    species<span class="token punctuation">:</span> <span class="token string">'Dog'</span><span class="token punctuation">,</span>
+  pets<span class="token operator">:</span> <span class="token punctuation">[</span><span class="token punctuation">{</span>
+    id<span class="token operator">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
+    name<span class="token operator">:</span> <span class="token string">'Doggo'</span><span class="token punctuation">,</span>
+    species<span class="token operator">:</span> <span class="token string">'Dog'</span><span class="token punctuation">,</span>
   <span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token punctuation">{</span>
-    id<span class="token punctuation">:</span> <span class="token number">2</span><span class="token punctuation">,</span>
-    name<span class="token punctuation">:</span> <span class="token string">'Kat'</span><span class="token punctuation">,</span>
-    species<span class="token punctuation">:</span> <span class="token string">'Cat'</span><span class="token punctuation">,</span>
+    id<span class="token operator">:</span> <span class="token number">2</span><span class="token punctuation">,</span>
+    name<span class="token operator">:</span> <span class="token string">'Kat'</span><span class="token punctuation">,</span>
+    species<span class="token operator">:</span> <span class="token string">'Cat'</span><span class="token punctuation">,</span>
   <span class="token punctuation">}</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
 
   <span class="token comment">// This is a ManyToManyRelation</span>
-  movies<span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token punctuation">{</span>
-    id<span class="token punctuation">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
-    name<span class="token punctuation">:</span> <span class="token string">'Horrible Bosses'</span><span class="token punctuation">,</span>
+  movies<span class="token operator">:</span> <span class="token punctuation">[</span><span class="token punctuation">{</span>
+    id<span class="token operator">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
+    name<span class="token operator">:</span> <span class="token string">'Horrible Bosses'</span><span class="token punctuation">,</span>
 
-    reviews<span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token punctuation">{</span>
-      id<span class="token punctuation">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
-      title<span class="token punctuation">:</span> <span class="token string">'Meh'</span><span class="token punctuation">,</span>
-      stars<span class="token punctuation">:</span> <span class="token number">3</span><span class="token punctuation">,</span>
-      text<span class="token punctuation">:</span> <span class="token string">'Meh'</span>
+    reviews<span class="token operator">:</span> <span class="token punctuation">[</span><span class="token punctuation">{</span>
+      id<span class="token operator">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
+      title<span class="token operator">:</span> <span class="token string">'Meh'</span><span class="token punctuation">,</span>
+      stars<span class="token operator">:</span> <span class="token number">3</span><span class="token punctuation">,</span>
+      text<span class="token operator">:</span> <span class="token string">'Meh'</span>
     <span class="token punctuation">}</span><span class="token punctuation">]</span>
   <span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token punctuation">{</span>
-    id<span class="token punctuation">:</span> <span class="token number">2</span>
-    name<span class="token punctuation">:</span> <span class="token string">'Wanderlust'</span><span class="token punctuation">,</span>
+    id<span class="token operator">:</span> <span class="token number">2</span>
+    name<span class="token operator">:</span> <span class="token string">'Wanderlust'</span><span class="token punctuation">,</span>
 
-    reviews<span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token punctuation">{</span>
-      id<span class="token punctuation">:</span> <span class="token number">2</span><span class="token punctuation">,</span>
-      title<span class="token punctuation">:</span> <span class="token string">'Brilliant'</span><span class="token punctuation">,</span>
-      stars<span class="token punctuation">:</span> <span class="token number">5</span><span class="token punctuation">,</span>
-      text<span class="token punctuation">:</span> <span class="token string">'Makes me want to travel'</span>
+    reviews<span class="token operator">:</span> <span class="token punctuation">[</span><span class="token punctuation">{</span>
+      id<span class="token operator">:</span> <span class="token number">2</span><span class="token punctuation">,</span>
+      title<span class="token operator">:</span> <span class="token string">'Brilliant'</span><span class="token punctuation">,</span>
+      stars<span class="token operator">:</span> <span class="token number">5</span><span class="token punctuation">,</span>
+      text<span class="token operator">:</span> <span class="token string">'Makes me want to travel'</span>
     <span class="token punctuation">}</span><span class="token punctuation">]</span>
   <span class="token punctuation">}</span><span class="token punctuation">]</span>
 <span class="token punctuation">}</span><span class="token punctuation">]</span>
-</code></pre></div><p>By default <a href="/objection.js/api/query-builder/mutate-methods.html#upsertgraph">upsertGraph</a> method updates the objects that have an id, inserts objects that don't have an id and deletes all objects that are not present. Off course the delete only applies to relations and not the root. Here's a basic example:</p> <div class="language-js extra-class"><pre class="language-js"><code><span class="token comment">// The return value of `upsertGraph` is the input graph converted into</span>
+</code></pre></div><p>By default <a href="/objection.js/api/query-builder/mutate-methods.html#upsertgraph">upsertGraph</a> method updates the objects that have an id, inserts objects that don't have an id and deletes all objects that are not present. Of course the delete only applies to relations and not the root. Here's a basic example:</p> <div class="language-js extra-class"><pre class="language-js"><code><span class="token comment">// The return value of `upsertGraph` is the input graph converted into</span>
 <span class="token comment">// model instances. Inserted objects have ids added to them related</span>
 <span class="token comment">// rows have foreign keys set but no other columns get fetched from</span>
 <span class="token comment">// the database. You can use `upsertGraphAndFetch` for that.</span>
 <span class="token keyword">const</span> graph <span class="token operator">=</span> <span class="token keyword">await</span> Person<span class="token punctuation">.</span><span class="token function">query</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">upsertGraph</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
   <span class="token comment">// This updates the `Jennifer Aniston` person since the id property is present.</span>
-  id<span class="token punctuation">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
-  firstName<span class="token punctuation">:</span> <span class="token string">'Jonnifer'</span><span class="token punctuation">,</span>
+  id<span class="token operator">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
+  firstName<span class="token operator">:</span> <span class="token string">'Jonnifer'</span><span class="token punctuation">,</span>
 
-  parent<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+  parent<span class="token operator">:</span> <span class="token punctuation">{</span>
     <span class="token comment">// This also gets updated since the id property is present. If no id was given</span>
     <span class="token comment">// here, Nancy Dow would get deleted, a new Person John Aniston would</span>
     <span class="token comment">// get inserted and related to Jennifer.</span>
-    id<span class="token punctuation">:</span> <span class="token number">2</span><span class="token punctuation">,</span>
-    firstName<span class="token punctuation">:</span> <span class="token string">'John'</span><span class="token punctuation">,</span>
-    lastName<span class="token punctuation">:</span> <span class="token string">'Aniston'</span>
+    id<span class="token operator">:</span> <span class="token number">2</span><span class="token punctuation">,</span>
+    firstName<span class="token operator">:</span> <span class="token string">'John'</span><span class="token punctuation">,</span>
+    lastName<span class="token operator">:</span> <span class="token string">'Aniston'</span>
   <span class="token punctuation">}</span><span class="token punctuation">,</span>
 
   <span class="token comment">// Notice that Kat the Cat is not listed in `pets`. It will get deleted.</span>
-  pets<span class="token punctuation">:</span> <span class="token punctuation">[</span>
+  pets<span class="token operator">:</span> <span class="token punctuation">[</span>
     <span class="token punctuation">{</span>
       <span class="token comment">// Jennifer just got a new pet. Insert it and relate it to Jennifer. Notice</span>
       <span class="token comment">// that there is no id!</span>
-      name<span class="token punctuation">:</span> <span class="token string">'Wolfgang'</span><span class="token punctuation">,</span>
-      species<span class="token punctuation">:</span> <span class="token string">'Dog'</span>
+      name<span class="token operator">:</span> <span class="token string">'Wolfgang'</span><span class="token punctuation">,</span>
+      species<span class="token operator">:</span> <span class="token string">'Dog'</span>
     <span class="token punctuation">}</span><span class="token punctuation">,</span>
     <span class="token punctuation">{</span>
       <span class="token comment">// It turns out Doggo is a cat. Update it.</span>
-      id<span class="token punctuation">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
-      species<span class="token punctuation">:</span> <span class="token string">'Cat'</span>
+      id<span class="token operator">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
+      species<span class="token operator">:</span> <span class="token string">'Cat'</span>
     <span class="token punctuation">}</span>
   <span class="token punctuation">]</span><span class="token punctuation">,</span>
 
@@ -669,90 +701,90 @@ console<span class="token punctuation">.</span><span class="token function">log<
   <span class="token comment">// It is also worth mentioning that the Wanderlust's `reviews` or any</span>
   <span class="token comment">// other relations are NOT recursively deleted (unless you have</span>
   <span class="token comment">// defined `ON DELETE CASCADE` or other hooks in the db).</span>
-  movies<span class="token punctuation">:</span> <span class="token punctuation">[</span>
+  movies<span class="token operator">:</span> <span class="token punctuation">[</span>
     <span class="token punctuation">{</span>
-      id<span class="token punctuation">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
+      id<span class="token operator">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
 
       <span class="token comment">// Upsert graphs can be arbitrarily deep. This modifies the</span>
       <span class="token comment">// reviews of &quot;Horrible Bosses&quot;.</span>
-      reviews<span class="token punctuation">:</span> <span class="token punctuation">[</span>
+      reviews<span class="token operator">:</span> <span class="token punctuation">[</span>
         <span class="token punctuation">{</span>
           <span class="token comment">// Update a review.</span>
-          id<span class="token punctuation">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
-          stars<span class="token punctuation">:</span> <span class="token number">2</span><span class="token punctuation">,</span>
-          text<span class="token punctuation">:</span> <span class="token string">'Even more Meh'</span>
+          id<span class="token operator">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
+          stars<span class="token operator">:</span> <span class="token number">2</span><span class="token punctuation">,</span>
+          text<span class="token operator">:</span> <span class="token string">'Even more Meh'</span>
         <span class="token punctuation">}</span><span class="token punctuation">,</span>
         <span class="token punctuation">{</span>
           <span class="token comment">// And insert another one.</span>
-          stars<span class="token punctuation">:</span> <span class="token number">5</span><span class="token punctuation">,</span>
-          title<span class="token punctuation">:</span> <span class="token string">'Loved it'</span><span class="token punctuation">,</span>
-          text<span class="token punctuation">:</span> <span class="token string">'Best movie ever'</span>
+          stars<span class="token operator">:</span> <span class="token number">5</span><span class="token punctuation">,</span>
+          title<span class="token operator">:</span> <span class="token string">'Loved it'</span><span class="token punctuation">,</span>
+          text<span class="token operator">:</span> <span class="token string">'Best movie ever'</span>
         <span class="token punctuation">}</span><span class="token punctuation">,</span>
         <span class="token punctuation">{</span>
           <span class="token comment">// And insert a third one.</span>
-          stars<span class="token punctuation">:</span> <span class="token number">4</span><span class="token punctuation">,</span>
-          title<span class="token punctuation">:</span> <span class="token string">'4 / 5'</span><span class="token punctuation">,</span>
-          text<span class="token punctuation">:</span> <span class="token string">'Would see again'</span>
+          stars<span class="token operator">:</span> <span class="token number">4</span><span class="token punctuation">,</span>
+          title<span class="token operator">:</span> <span class="token string">'4 / 5'</span><span class="token punctuation">,</span>
+          text<span class="token operator">:</span> <span class="token string">'Would see again'</span>
         <span class="token punctuation">}</span>
       <span class="token punctuation">]</span>
     <span class="token punctuation">}</span>
   <span class="token punctuation">]</span>
 <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 </code></pre></div><p>By giving <code>relate: true</code> and/or <code>unrelate: true</code> options as the second argument, you can change the behaviour so that instead of inserting and deleting rows, they are related and/or unrelated. Rows with no id still get inserted, but rows that have an id and are not currently related, get related.</p> <div class="language-js extra-class"><pre class="language-js"><code><span class="token keyword">const</span> options <span class="token operator">=</span> <span class="token punctuation">{</span>
-  relate<span class="token punctuation">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
-  unrelate<span class="token punctuation">:</span> <span class="token boolean">true</span>
+  relate<span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+  unrelate<span class="token operator">:</span> <span class="token boolean">true</span>
 <span class="token punctuation">}</span><span class="token punctuation">;</span>
 
 <span class="token keyword">await</span> Person<span class="token punctuation">.</span><span class="token function">query</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">upsertGraph</span><span class="token punctuation">(</span>
   <span class="token punctuation">{</span>
     <span class="token comment">// This updates the `Jennifer Aniston` person since the id property is present.</span>
-    id<span class="token punctuation">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
-    firstName<span class="token punctuation">:</span> <span class="token string">'Jonnifer'</span><span class="token punctuation">,</span>
+    id<span class="token operator">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
+    firstName<span class="token operator">:</span> <span class="token string">'Jonnifer'</span><span class="token punctuation">,</span>
 
     <span class="token comment">// Unrelate the parent. This doesn't delete it.</span>
-    parent<span class="token punctuation">:</span> <span class="token keyword">null</span><span class="token punctuation">,</span>
+    parent<span class="token operator">:</span> <span class="token keyword">null</span><span class="token punctuation">,</span>
 
     <span class="token comment">// Notice that Kat the Cat is not listed in `pets`. It will get unrelated.</span>
-    pets<span class="token punctuation">:</span> <span class="token punctuation">[</span>
+    pets<span class="token operator">:</span> <span class="token punctuation">[</span>
       <span class="token punctuation">{</span>
         <span class="token comment">// Jennifer just got a new pet. Insert it and relate it to Jennifer. Notice</span>
         <span class="token comment">// that there is no id!</span>
-        name<span class="token punctuation">:</span> <span class="token string">'Wolfgang'</span><span class="token punctuation">,</span>
-        species<span class="token punctuation">:</span> <span class="token string">'Dog'</span>
+        name<span class="token operator">:</span> <span class="token string">'Wolfgang'</span><span class="token punctuation">,</span>
+        species<span class="token operator">:</span> <span class="token string">'Dog'</span>
       <span class="token punctuation">}</span><span class="token punctuation">,</span>
       <span class="token punctuation">{</span>
         <span class="token comment">// It turns out Doggo is a cat. Update it.</span>
-        id<span class="token punctuation">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
-        species<span class="token punctuation">:</span> <span class="token string">'Cat'</span>
+        id<span class="token operator">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
+        species<span class="token operator">:</span> <span class="token string">'Cat'</span>
       <span class="token punctuation">}</span>
     <span class="token punctuation">]</span><span class="token punctuation">,</span>
 
     <span class="token comment">// Notice that Wanderlust is missing from the list. It will get unrelated.</span>
-    movies<span class="token punctuation">:</span> <span class="token punctuation">[</span>
+    movies<span class="token operator">:</span> <span class="token punctuation">[</span>
       <span class="token punctuation">{</span>
-        id<span class="token punctuation">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
+        id<span class="token operator">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
 
         <span class="token comment">// Upsert graphs can be arbitrarily deep. This modifies the</span>
         <span class="token comment">// reviews of &quot;Horrible Bosses&quot;.</span>
-        reviews<span class="token punctuation">:</span> <span class="token punctuation">[</span>
+        reviews<span class="token operator">:</span> <span class="token punctuation">[</span>
           <span class="token punctuation">{</span>
             <span class="token comment">// Update a review.</span>
-            id<span class="token punctuation">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
-            stars<span class="token punctuation">:</span> <span class="token number">2</span><span class="token punctuation">,</span>
-            text<span class="token punctuation">:</span> <span class="token string">'Even more Meh'</span>
+            id<span class="token operator">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
+            stars<span class="token operator">:</span> <span class="token number">2</span><span class="token punctuation">,</span>
+            text<span class="token operator">:</span> <span class="token string">'Even more Meh'</span>
           <span class="token punctuation">}</span><span class="token punctuation">,</span>
           <span class="token punctuation">{</span>
             <span class="token comment">// And insert another one.</span>
-            stars<span class="token punctuation">:</span> <span class="token number">5</span><span class="token punctuation">,</span>
-            title<span class="token punctuation">:</span> <span class="token string">'Loved it'</span><span class="token punctuation">,</span>
-            text<span class="token punctuation">:</span> <span class="token string">'Best movie ever'</span>
+            stars<span class="token operator">:</span> <span class="token number">5</span><span class="token punctuation">,</span>
+            title<span class="token operator">:</span> <span class="token string">'Loved it'</span><span class="token punctuation">,</span>
+            text<span class="token operator">:</span> <span class="token string">'Best movie ever'</span>
           <span class="token punctuation">}</span>
         <span class="token punctuation">]</span>
       <span class="token punctuation">}</span><span class="token punctuation">,</span>
       <span class="token punctuation">{</span>
         <span class="token comment">// This is some existing movie that isn't currently related to Jennifer.</span>
         <span class="token comment">// It will get related.</span>
-        id<span class="token punctuation">:</span> <span class="token number">1253</span>
+        id<span class="token operator">:</span> <span class="token number">1253</span>
       <span class="token punctuation">}</span>
     <span class="token punctuation">]</span>
   <span class="token punctuation">}</span><span class="token punctuation">,</span>
@@ -760,58 +792,58 @@ console<span class="token punctuation">.</span><span class="token function">log<
 <span class="token punctuation">)</span><span class="token punctuation">;</span>
 </code></pre></div><p><code>relate</code> and <code>unrelate</code> (and all other <a href="/objection.js/api/types/#type-upsertgraphoptions">options</a> can also be lists of relation paths. In that case the option is only applied for the listed relations.</p> <div class="language-js extra-class"><pre class="language-js"><code><span class="token keyword">const</span> options <span class="token operator">=</span> <span class="token punctuation">{</span>
   <span class="token comment">// Only enable `unrelate` functionality for these two paths.</span>
-  unrelate<span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token string">'pets'</span><span class="token punctuation">,</span> <span class="token string">'movies.reviews'</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+  unrelate<span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">'pets'</span><span class="token punctuation">,</span> <span class="token string">'movies.reviews'</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
   <span class="token comment">// Only enable `relate` functionality for 'movies' relation.</span>
-  relate<span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token string">'movies'</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+  relate<span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">'movies'</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
   <span class="token comment">// Disable deleting for movies.</span>
-  noDelete<span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token string">'movies'</span><span class="token punctuation">]</span>
+  noDelete<span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">'movies'</span><span class="token punctuation">]</span>
 <span class="token punctuation">}</span><span class="token punctuation">;</span>
 
 <span class="token keyword">await</span> Person<span class="token punctuation">.</span><span class="token function">query</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">upsertGraph</span><span class="token punctuation">(</span>
   <span class="token punctuation">{</span>
-    id<span class="token punctuation">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
+    id<span class="token operator">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
 
     <span class="token comment">// This gets deleted since `unrelate` list doesn't have 'parent' in it</span>
     <span class="token comment">// and deleting is the default behaviour.</span>
-    parent<span class="token punctuation">:</span> <span class="token keyword">null</span><span class="token punctuation">,</span>
+    parent<span class="token operator">:</span> <span class="token keyword">null</span><span class="token punctuation">,</span>
 
     <span class="token comment">// Notice that Kat the Cat is not listed in `pets`. It will get unrelated.</span>
-    pets<span class="token punctuation">:</span> <span class="token punctuation">[</span>
+    pets<span class="token operator">:</span> <span class="token punctuation">[</span>
       <span class="token punctuation">{</span>
         <span class="token comment">// It turns out Doggo is a cat. Update it.</span>
-        id<span class="token punctuation">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
-        species<span class="token punctuation">:</span> <span class="token string">'Cat'</span>
+        id<span class="token operator">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
+        species<span class="token operator">:</span> <span class="token string">'Cat'</span>
       <span class="token punctuation">}</span>
     <span class="token punctuation">]</span><span class="token punctuation">,</span>
 
     <span class="token comment">// Notice that Wanderlust is missing from the list. It will NOT get unrelated</span>
     <span class="token comment">// or deleted since `unrelate` list doesn't contain `movies` and `noDelete`</span>
     <span class="token comment">// list does.</span>
-    movies<span class="token punctuation">:</span> <span class="token punctuation">[</span>
+    movies<span class="token operator">:</span> <span class="token punctuation">[</span>
       <span class="token punctuation">{</span>
-        id<span class="token punctuation">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
+        id<span class="token operator">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
 
         <span class="token comment">// Upsert graphs can be arbitrarily deep. This modifies the</span>
         <span class="token comment">// reviews of &quot;Horrible Bosses&quot;.</span>
-        reviews<span class="token punctuation">:</span> <span class="token punctuation">[</span>
+        reviews<span class="token operator">:</span> <span class="token punctuation">[</span>
           <span class="token punctuation">{</span>
             <span class="token comment">// Update a review.</span>
-            id<span class="token punctuation">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
-            stars<span class="token punctuation">:</span> <span class="token number">2</span><span class="token punctuation">,</span>
-            text<span class="token punctuation">:</span> <span class="token string">'Even more Meh'</span>
+            id<span class="token operator">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
+            stars<span class="token operator">:</span> <span class="token number">2</span><span class="token punctuation">,</span>
+            text<span class="token operator">:</span> <span class="token string">'Even more Meh'</span>
           <span class="token punctuation">}</span><span class="token punctuation">,</span>
           <span class="token punctuation">{</span>
             <span class="token comment">// And insert another one.</span>
-            stars<span class="token punctuation">:</span> <span class="token number">5</span><span class="token punctuation">,</span>
-            title<span class="token punctuation">:</span> <span class="token string">'Loved it'</span><span class="token punctuation">,</span>
-            text<span class="token punctuation">:</span> <span class="token string">'Best movie ever'</span>
+            stars<span class="token operator">:</span> <span class="token number">5</span><span class="token punctuation">,</span>
+            title<span class="token operator">:</span> <span class="token string">'Loved it'</span><span class="token punctuation">,</span>
+            text<span class="token operator">:</span> <span class="token string">'Best movie ever'</span>
           <span class="token punctuation">}</span>
         <span class="token punctuation">]</span>
       <span class="token punctuation">}</span><span class="token punctuation">,</span>
       <span class="token punctuation">{</span>
         <span class="token comment">// This is some existing movie that isn't currently related to Jennifer.</span>
         <span class="token comment">// It will get related.</span>
-        id<span class="token punctuation">:</span> <span class="token number">1253</span>
+        id<span class="token operator">:</span> <span class="token number">1253</span>
       <span class="token punctuation">}</span>
     <span class="token punctuation">]</span>
   <span class="token punctuation">}</span><span class="token punctuation">,</span>
@@ -819,9 +851,13 @@ console<span class="token punctuation">.</span><span class="token function">log<
 <span class="token punctuation">)</span><span class="token punctuation">;</span>
 </code></pre></div><p>You can disable updates, inserts, deletes etc. for the whole <a href="/objection.js/api/query-builder/mutate-methods.html#upsertgraph">upsertGraph</a> operation or for individual relations by using the <code>noUpdate</code>, <code>noInsert</code>, <code>noDelete</code> etc. options. See <a href="/objection.js/api/types/#type-upsertgraphoptions">UpsertGraphOptions</a> docs for more info.</p></div> <footer class="page-edit"><!----> <!----></footer> <div class="page-nav"><p class="inner"><span class="prev">
       ←
-      <a href="/objection.js/guide/relations.html" class="prev">Relations</a></span> <span class="next"><a href="/objection.js/guide/transactions.html">Transactions</a>
+      <a href="/objection.js/guide/relations.html" class="prev">
+        Relations
+      </a></span> <span class="next"><a href="/objection.js/guide/transactions.html">
+        Transactions
+      </a>
       →
     </span></p></div> </main></div><div class="global-ui"></div></div>
-    <script src="/objection.js/assets/js/app.5ed08341.js" defer></script><script src="/objection.js/assets/js/6.4413d797.js" defer></script><script src="/objection.js/assets/js/7.e45d78f3.js" defer></script><script src="/objection.js/assets/js/30.19b07b69.js" defer></script>
+    <script src="/objection.js/assets/js/app.af4b32a9.js" defer></script><script src="/objection.js/assets/js/6.7d5e48c0.js" defer></script><script src="/objection.js/assets/js/7.0f19e18f.js" defer></script><script src="/objection.js/assets/js/30.764cbb73.js" defer></script>
   </body>
 </html>
