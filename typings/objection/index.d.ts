@@ -1213,7 +1213,7 @@ declare namespace Objection {
   export interface RelationThrough<M extends Model> {
     from: RelationMappingColumnRef;
     to: RelationMappingColumnRef;
-    extra?: string[] | Record<string, string>;
+    extra?: string | string[] | Record<string, string>;
     modelClass?: ModelClassSpecifier;
     beforeInsert?: RelationMappingHook<M>;
   }
