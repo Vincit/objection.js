@@ -1070,10 +1070,11 @@ declare namespace Objection {
     omit(modelClass: typeof Model, properties: string[]): this;
     // Deprecated
     omit(properties: string[]): this;
-    // Deprecated
+
     traverse(filterConstructor: typeof Model, traverser: TraverserFunction): R;
-    // Deprecated
     traverse(traverser: TraverserFunction): R;
+    traverseAsync(filterConstructor: typeof Model, traverser: TraverserFunction): Promise<R>;
+    traverseAsync(traverser: TraverserFunction): Promise<R>;
 
     page(page: number, pageSize: number): PageQueryBuilder<this>;
     range(): PageQueryBuilder<this>;
@@ -1701,6 +1702,8 @@ declare namespace Objection {
     $clone(opt?: CloneOptions): this;
     $traverse(filterConstructor: typeof Model, traverser: TraverserFunction): this;
     $traverse(traverser: TraverserFunction): this;
+    $traverseAsync(filterConstructor: typeof Model, traverser: TraverserFunction): Promise<this>;
+    $traverseAsync(traverser: TraverserFunction): Promise<this>;
 
     $knex(): Knex;
     $transaction(): Knex;
