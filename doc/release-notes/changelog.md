@@ -1,5 +1,18 @@
 # Changelog
 
+## 2.2.0
+
+### What's new
+
+- Fixes [#1770](https://github.com/Vincit/objection.js/issues/1770)
+- Fixes [#1699](https://github.com/Vincit/objection.js/issues/1699)
+- Fixes [#1703](https://github.com/Vincit/objection.js/issues/1703)
+- Fixes [#1675](https://github.com/Vincit/objection.js/issues/1675)
+- Fixes [#1708](https://github.com/Vincit/objection.js/issues/1708)
+- Fixes [#1743](https://github.com/Vincit/objection.js/issues/1743)
+- Fixes [#1731](https://github.com/Vincit/objection.js/issues/1731)
+- Fixes [#1761](https://github.com/Vincit/objection.js/issues/1761)
+
 ## 2.1.4
 
 ### What's new
