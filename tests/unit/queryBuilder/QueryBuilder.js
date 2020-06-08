@@ -654,6 +654,41 @@ describe('QueryBuilder', () => {
       });
   });
 
+  it('throwing at any phase should call the onError hook', done => {
+    let called = false;
+    QueryBuilder.forClass(TestModel)
+      .runBefore(function(result, builder) {
+        throw new Error();
+      })
+      .onError(function(err, builder) {
+        called = true;
+      })
+      .then(() => {
+        expect(called).to.equal(true);
+        done();
+      })
+      .catch(err => {
+        done(err);
+      });
+  });
+
+  it('any return value from onError should be the result of the query', done => {
+    QueryBuilder.forClass(TestModel)
+      .runBefore(function(result, builder) {
+        throw new Error();
+      })
+      .onError(function(err, builder) {
+        return 'my custom error';
+      })
+      .then(result => {
+        expect(result).to.equal('my custom error');
+        done();
+      })
+      .catch(err => {
+        done(err);
+      });
+  });
+
   it('should call run* methods in the correct order', done => {
     mockKnexQueryResults = [0];
 
