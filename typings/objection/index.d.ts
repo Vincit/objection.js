@@ -14,8 +14,7 @@
 
 import * as ajv from 'ajv';
 import * as dbErrors from 'db-errors';
-import * as knex from 'knex';
-import Knex = require('knex');
+import * as Knex from 'knex';
 
 // Export the entire Objection namespace.
 export = Objection;
@@ -118,7 +117,7 @@ declare namespace Objection {
     castTo(sqlType: string): this;
   }
 
-  type Raw = RawBuilder | knex.Raw;
+  type Raw = RawBuilder | Knex.Raw;
   type Operator = string;
   type ColumnRef = string | Raw | ReferenceBuilder;
   type TableRef = ColumnRef | AnyQueryBuilder;
@@ -526,7 +525,7 @@ declare namespace Objection {
   interface JoinMethod<QB extends AnyQueryBuilder> {
     (table: TableRef, leftCol: ColumnRef, op: Operator, rightCol: ColumnRef): QB;
     (table: TableRef, leftCol: ColumnRef, rightCol: ColumnRef): QB;
-    (table: TableRef, cb: CallbackVoid<knex.JoinClause>): QB;
+    (table: TableRef, cb: CallbackVoid<Knex.JoinClause>): QB;
     (table: TableRef, raw: Raw): QB;
     (raw: Raw): QB;
   }
@@ -608,7 +607,7 @@ declare namespace Objection {
   }
 
   interface ColumnInfoMethod<QB extends AnyQueryBuilder> {
-    (): Promise<knex.ColumnInfo>;
+    (): Promise<Knex.ColumnInfo>;
   }
 
   interface TableRefForMethod {
@@ -667,7 +666,7 @@ declare namespace Objection {
   }
 
   interface OnBuildKnexCallback<QB extends AnyQueryBuilder> {
-    (this: QB, knexQuery: knex.QueryBuilder, query: QB): void;
+    (this: QB, knexQuery: Knex.QueryBuilder, query: QB): void;
   }
 
   interface OnBuildKnexMethod<QB extends AnyQueryBuilder> {
@@ -1173,8 +1172,8 @@ declare namespace Objection {
     result?: R;
   }
 
-  export type Transaction = knex.Transaction;
-  export type TransactionOrKnex = Transaction | knex;
+  export type Transaction = Knex.Transaction;
+  export type TransactionOrKnex = Transaction | Knex;
 
   export interface RelationMappings {
     [relationName: string]: RelationMapping<any>;
@@ -1359,7 +1358,7 @@ declare namespace Objection {
   }
 
   export interface FetchTableMetadataOptions {
-    knex?: knex;
+    knex?: Knex;
     force?: boolean;
     table?: string;
   }
@@ -1435,8 +1434,8 @@ declare namespace Objection {
     tableMetadata(opt?: TableMetadataOptions): TableMetadata;
     fetchTableMetadata(opt?: FetchTableMetadataOptions): Promise<TableMetadata>;
 
-    knex(knex?: knex): knex;
-    knexQuery(): knex.QueryBuilder;
+    knex(knex?: Knex): Knex;
+    knexQuery(): Knex.QueryBuilder;
     startTransaction(knexOrTransaction?: TransactionOrKnex): Promise<Transaction>;
 
     transaction<T>(callback: (trx: Transaction) => Promise<T>): Promise<T>;
@@ -1565,8 +1564,8 @@ declare namespace Objection {
     static tableMetadata(opt?: TableMetadataOptions): TableMetadata;
     static fetchTableMetadata(opt?: FetchTableMetadataOptions): Promise<TableMetadata>;
 
-    static knex(knex?: knex): knex;
-    static knexQuery(): knex.QueryBuilder;
+    static knex(knex?: Knex): Knex;
+    static knexQuery(): Knex.QueryBuilder;
     static startTransaction(knexOrTransaction?: TransactionOrKnex): Promise<Transaction>;
 
     static transaction<T>(callback: (trx: Transaction) => Promise<T>): Promise<T>;
@@ -1698,8 +1697,8 @@ declare namespace Objection {
     $traverse(filterConstructor: typeof Model, traverser: TraverserFunction): this;
     $traverse(traverser: TraverserFunction): this;
 
-    $knex(): knex;
-    $transaction(): knex;
+    $knex(): Knex;
+    $transaction(): Knex;
 
     QueryBuilderType: QueryBuilder<this, this[]>;
   }
@@ -1713,7 +1712,7 @@ declare namespace Objection {
    * @tutorial https://vincit.github.io/objection.js/guide/transactions.html#creating-a-transaction
    */
   export interface transaction {
-    start(knexOrModel: knex | AnyModelConstructor): Promise<Transaction>;
+    start(knexOrModel: Knex | AnyModelConstructor): Promise<Transaction>;
 
     <MC1 extends AnyModelConstructor, ReturnValue>(
       modelClass1: MC1,
@@ -1790,7 +1789,7 @@ declare namespace Objection {
       ) => Promise<ReturnValue>
     ): Promise<ReturnValue>;
 
-    <ReturnValue>(knex: knex, callback: (trx: Transaction) => Promise<ReturnValue>): Promise<
+    <ReturnValue>(knex: Knex, callback: (trx: Transaction) => Promise<ReturnValue>): Promise<
       ReturnValue
     >;
   }
