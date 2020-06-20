@@ -2805,7 +2805,7 @@ module.exports = session => {
           return parent2
             .$relatedQuery('model2Relation1')
             .aliasFor('Model1Model2', 'm1m2')
-            .where('extra3', 'extra 6')
+            .where('m1m2.extra3', 'extra 6')
             .then(related => {
               expect(related).to.eql([
                 {

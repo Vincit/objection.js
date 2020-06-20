@@ -1278,6 +1278,126 @@ module.exports = session => {
         .execute();
     });
 
+    if (session.isPostgres()) {
+      it('should be able to use a distinctOn trick to fetch one of each related item', async () => {
+        await session.populate({
+          id: 1,
+          model1Prop1: 'root',
+          model1Relation2: [
+            {
+              idCol: 1,
+              model2Prop1: '1',
+              model2Relation1: [
+                {
+                  id: 2,
+                  model1Prop1: '11'
+                },
+                {
+                  id: 3,
+                  model1Prop1: '12'
+                }
+              ]
+            },
+            {
+              idCol: 2,
+
+              model2Prop1: '2',
+              model2Relation1: [
+                {
+                  id: 4,
+                  model1Prop1: '21'
+                },
+                {
+                  id: 5,
+                  model1Prop1: '22'
+                }
+              ]
+            },
+            {
+              idCol: 3,
+
+              model2Prop1: '3',
+              model2Relation1: [
+                {
+                  id: 6,
+                  model1Prop1: '31'
+                },
+                {
+                  id: 7,
+                  model1Prop1: '32'
+                }
+              ]
+            }
+          ]
+        });
+
+        const result = await Model2.query()
+          .withGraphFetched('model2Relation1(onlyFirst)')
+          .orderBy('id_col')
+          .modifiers({
+            onlyFirst(query) {
+              query
+                .orderBy(['model2Id', { column: 'model1Prop1', order: 'desc' }])
+                .distinctOn('model2Id');
+            }
+          });
+
+        expect(result).to.eql([
+          {
+            idCol: 1,
+            model1Id: 1,
+            model2Prop1: '1',
+            model2Prop2: null,
+            model2Relation1: [
+              {
+                id: 3,
+                model1Id: null,
+                model1Prop1: '12',
+                model1Prop2: null,
+                aliasedExtra: null,
+                $afterFindCalled: 1
+              }
+            ],
+            $afterFindCalled: 1
+          },
+          {
+            idCol: 2,
+            model1Id: 1,
+            model2Prop1: '2',
+            model2Prop2: null,
+            model2Relation1: [
+              {
+                id: 5,
+                model1Id: null,
+                model1Prop1: '22',
+                model1Prop2: null,
+                aliasedExtra: null,
+                $afterFindCalled: 1
+              }
+            ],
+            $afterFindCalled: 1
+          },
+          {
+            idCol: 3,
+            model1Id: 1,
+            model2Prop1: '3',
+            model2Prop2: null,
+            model2Relation1: [
+              {
+                id: 7,
+                model1Id: null,
+                model1Prop1: '32',
+                model1Prop2: null,
+                aliasedExtra: null,
+                $afterFindCalled: 1
+              }
+            ],
+            $afterFindCalled: 1
+          }
+        ]);
+      });
+    }
+
     // TODO: enable for v2.0.
     it.skip('should fail with a clear error when a duplicate relation is detected', () => {
       expect(() => {
