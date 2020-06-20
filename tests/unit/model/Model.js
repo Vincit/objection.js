@@ -1597,6 +1597,31 @@ describe('Model', () => {
         c: 1000
       });
     });
+
+    it('should not try to set readonly properties from super classes', () => {
+      class BaseModel extends Model {
+        static get virtualAttributes() {
+          return ['foo'];
+        }
+
+        get foo() {
+          return this.a + this.b;
+        }
+      }
+
+      class Model1 extends BaseModel {}
+
+      expect(Model1.fromJson({ a: 100, b: 10, foo: 666 }).toJSON()).to.eql({
+        a: 100,
+        b: 10,
+        foo: 110
+      });
+
+      expect(Model1.fromJson({ a: 100, b: 10, foo: 666 }).$toDatabaseJson()).to.eql({
+        a: 100,
+        b: 10
+      });
+    });
   });
 
   describe('cloneObjectAttributes', () => {
