@@ -141,6 +141,19 @@ module.exports = session => {
       }
     });
 
+    it('an error with a clear message should be thrown if undefined is passed to deleteById', done => {
+      Model1.query()
+        .deleteById(undefined)
+        .then(() => {
+          done(new Error('should not get here'));
+        })
+        .catch(err => {
+          expect(err.message).to.equal('undefined was passed to deleteById');
+          done();
+        })
+        .catch(done);
+    });
+
     describe('.$query().delete()', () => {
       beforeEach(() => {
         return session.populate([

@@ -664,6 +664,32 @@ module.exports = session => {
             .catch(done);
         });
 
+        it('an error with a clear message should be thrown if undefined is passed to findById', done => {
+          Model1.query()
+            .findById(undefined)
+            .then(() => {
+              done(new Error('should not get here'));
+            })
+            .catch(err => {
+              expect(err.message).to.equal('undefined was passed to findById');
+              done();
+            })
+            .catch(done);
+        });
+
+        it('an error with a clear message should be thrown if undefined is passed to findById (composite key)', done => {
+          Model1.query()
+            .findById([undefined, 1])
+            .then(() => {
+              done(new Error('should not get here'));
+            })
+            .catch(err => {
+              expect(err.message).to.equal('undefined was passed to findById');
+              done();
+            })
+            .catch(done);
+        });
+
         it('.throwIfNotFound() should throw error returned by `createNotFoundError`', done => {
           class CustomError extends Error {
             constructor(ctx) {
