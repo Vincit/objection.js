@@ -14,7 +14,6 @@ node_js:
   - '11'
   - '12'
   - '13'
-  - '14'
 
 before_script:
   - psql -U postgres -c "CREATE USER objection SUPERUSER"
