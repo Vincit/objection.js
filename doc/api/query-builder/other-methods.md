@@ -802,29 +802,6 @@ Executes the query and returns a Promise.
 | --------- | ---------------------------------------------------------- |
 | `Promise` | Promise the will be resolved with the result of the query. |
 
-## reduce()
-
-```js
-const promise = queryBuilder.reduce(reducer, initialValue);
-```
-
-Executes the query and calls `reduce(reducer, initialValue)` for the returned promise.
-
-##### Arguments
-
-| Argument     | Type     | Default                                 | Description       |
-| ------------ | -------- | --------------------------------------- | ----------------- |
-| reducer      | function | undefined                               | Reducer function  |
-| initialValue | any      | first element of the reduced collection | First arg for the |
-
-reducer function
-
-##### Return value
-
-| Type      | Description                                                |
-| --------- | ---------------------------------------------------------- |
-| `Promise` | Promise the will be resolved with the result of the query. |
-
 ## catch()
 
 ```js
