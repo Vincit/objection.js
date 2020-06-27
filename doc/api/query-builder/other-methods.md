@@ -840,26 +840,6 @@ Executes the query and returns a Promise.
 | --------- | ---------------------------------------------------------- |
 | `Promise` | Promise the will be resolved with the result of the query. |
 
-## map()
-
-```js
-const promise = queryBuilder.map(mapper);
-```
-
-Executes the query and calls `map(mapper)` for the returned promise.
-
-##### Arguments
-
-| Argument | Type     | Default  | Description     |
-| -------- | -------- | -------- | --------------- |
-| mapper   | function | identity | Mapper function |
-
-##### Return value
-
-| Type      | Description                                                |
-| --------- | ---------------------------------------------------------- |
-| `Promise` | Promise the will be resolved with the result of the query. |
-
 ## reduce()
 
 ```js
