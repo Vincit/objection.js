@@ -33,7 +33,7 @@ app.listen(port, () => {
 // Error handling.
 //
 // NOTE: This is not a good error handler, this is a simple one. See the error handing
-//       recipe for a better handler: http://vincit.github.io/objection.js/#error-handling
+//       recipe for a better handler: http://vincit.github.io/objection.js/recipes/error-handling.html
 async function errorHandler(ctx: Context, next: () => Promise<any>) {
   try {
     await next()
