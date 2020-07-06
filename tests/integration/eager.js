@@ -1435,6 +1435,19 @@ module.exports = session => {
         expect(models).to.eql(result);
       });
 
+      it('should not fetch an existing nested relation when `skipFetched` option is true', async () => {
+        let result = await TestModel.query()
+          .withGraphFetched('model1Relation1')
+          .whereIn('id', [1, 2, 3]);
+
+        queries = [];
+        result = await TestModel.fetchGraph(result, 'model1Relation1.model1Relation1', {
+          skipFetched: true
+        });
+
+        expect(queries).to.have.length(1);
+      });
+
       it('should fetch an existing relation when `skipFetched` option is true if not all needed relation props exist', async () => {
         const model = await TestModel.query()
           .withGraphFetched('model1Relation1')
