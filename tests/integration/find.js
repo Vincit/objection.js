@@ -610,7 +610,7 @@ module.exports = session => {
             });
         });
 
-        it('custom .throwIfNotFound() with empty result', done => {
+        it('.throwIfNotFound() with empty result', done => {
           Model1.query()
             .where('model1Prop1', 'There is no value like me')
             .throwIfNotFound()

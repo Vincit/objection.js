@@ -590,6 +590,10 @@ declare namespace Objection {
     (arg: T): QB;
   }
 
+  interface OptionalOneArgMethod<T, QB extends AnyQueryBuilder> {
+    (arg?: T): QB;
+  }
+
   interface StringReturningMethod {
     (): string;
   }
@@ -1038,7 +1042,7 @@ declare namespace Objection {
     // Deprecated
     allowUpsert: AllowGraphMethod<this>;
 
-    throwIfNotFound: IdentityMethod<this>;
+    throwIfNotFound: OptionalOneArgMethod<object, this>;
     returning: ReturningMethod;
     forUpdate: IdentityMethod<this>;
     forShare: IdentityMethod<this>;

@@ -999,9 +999,9 @@ You can replace `Model.NotFoundError` with your own error by implementing the st
 
 ##### Arguments
 
-| Argument | Type   | Description                      |
-| -------- | ------ | -------------------------------- |
-| data     | object | optional object with custom data |
+| Argument | Type   | Description                                                                                                                                                                                                                                                                                                                      |
+| -------- | ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| data     | object | optional object with custom data may contain any property such as message, type. The object is returned in the error thrown under the `data` property. A special case is for the optional message property. This is used to set the title of the error. These extra properties can be leveraged in the error handling middleware |
 
 ##### Return value
 
@@ -1016,7 +1016,10 @@ try {
   await Language.query()
     .where('name', 'Java')
     .andWhere('isModern', true)
-    .throwIfNotFound({ message: `Custom message returned` });
+    .throwIfNotFound({
+      message: `Custom message returned`,
+      type: `Custom type`
+    });
 } catch (err) {
   // No results found.
   console.log(err instanceof Language.NotFoundError); // --> true
