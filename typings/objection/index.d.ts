@@ -120,7 +120,7 @@ declare namespace Objection {
   type Raw = RawBuilder | Knex.Raw;
   type Operator = string;
   type ColumnRef = string | Raw | ReferenceBuilder;
-  type TableRef = ColumnRef | AnyQueryBuilder;
+  type TableRef<QB extends AnyQueryBuilder> = ColumnRef | AnyQueryBuilder | CallbackVoid<QB>;
 
   type PrimitiveValue =
     | string
@@ -349,10 +349,7 @@ declare namespace Objection {
   }
 
   interface FromMethod<QB extends AnyQueryBuilder> {
-    (table: string): QB;
-    (cb: CallbackVoid<QB>): QB;
-    (raw: Raw): QB;
-    <QBP extends AnyQueryBuilder>(qb: QBP): QB;
+    (table: TableRef<QB>): QB;
   }
 
   interface WhereMethod<QB extends AnyQueryBuilder> {
@@ -523,10 +520,10 @@ declare namespace Objection {
   }
 
   interface JoinMethod<QB extends AnyQueryBuilder> {
-    (table: TableRef, leftCol: ColumnRef, op: Operator, rightCol: ColumnRef): QB;
-    (table: TableRef, leftCol: ColumnRef, rightCol: ColumnRef): QB;
-    (table: TableRef, cb: CallbackVoid<Knex.JoinClause>): QB;
-    (table: TableRef, raw: Raw): QB;
+    (table: TableRef<QB>, leftCol: ColumnRef, op: Operator, rightCol: ColumnRef): QB;
+    (table: TableRef<QB>, leftCol: ColumnRef, rightCol: ColumnRef): QB;
+    (table: TableRef<QB>, cb: CallbackVoid<Knex.JoinClause>): QB;
+    (table: TableRef<QB>, raw: Raw): QB;
     (raw: Raw): QB;
   }
 

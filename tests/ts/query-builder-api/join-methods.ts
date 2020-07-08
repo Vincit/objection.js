@@ -60,4 +60,8 @@ import { raw } from '../../..';
   await Person.query().outerJoin(raw('pets'));
   await Person.query().fullOuterJoin(raw('pets'));
   await Person.query().crossJoin(raw('pets'));
+
+  await Person.query().innerJoin('pets', 'pets.foo', 'persons.bar');
+  await Person.query().innerJoin(Person.query(), 'persons.foo', 'persons.bar');
+  await Person.query().innerJoin(qb => qb.from('pets').as('pets'), 'pets.foo', 'persons.bar');
 })();
