@@ -326,8 +326,6 @@ Simply call [\$relatedQuery('relationName')](/api/model/instance-methods.html#re
 
 The static method [relatedQuery](/api/model/static-methods.html#static-relatedquery) can be used to create related queries for multiple items using identifiers, model instances or even subqueries. This allows you to build complex queries by composing simple pieces.
 
-By default the fetched related items are assigned to the parent model to a property by the same name as the relation. For example in our `person.$relatedQuery('pets')` example query, the return value would be assigned to `person.pets`. This behaviour can be modified using [relatedFindQueryMutates](/api/model/static-properties.html#static-relatedfindquerymutates). Also check out [\$setRelated](/api/model/instance-methods.html#setrelated) and [\$appendRelated](/api/model/instance-methods.html#appendrelated) helpers.
-
 In addition to the examples here, you can find more examples behind these links.
 
 - [relation subqueries](/recipes/relation-subqueries.html)
@@ -350,8 +348,6 @@ const dogs = await person
   .$relatedQuery('pets')
   .where('species', 'dog')
   .orderBy('name');
-
-console.log(dogs[0] instanceof Animal); // --> true
 ```
 
 ```sql
@@ -361,7 +357,7 @@ and "animals"."ownerId" = 1
 order by "name" asc
 ```
 
-The above example needed two queries to find pets of a person. You can do this with one single query using the static [relatedQuery](/api/model/static-methods.html#static-relatedquery) method.
+The above example needed two queries to find pets of a person. You can do this with one single query using the static [relatedQuery](/api/model/static-methods.html#static-relatedquery) method:
 
 ```js
 const dogs = await Person.relatedQuery('pets')
@@ -377,7 +373,18 @@ and "animals"."ownerId" = 1
 order by "name" asc
 ```
 
-If you want to fetch dogs for multiple people in one query, you can pass an array of identifiers for the `for` method like this:
+With `HasManyRelation`s the `relatedQuery` helper may just seem like unnecessary bloat. You can of course simply write the necessary SQL directly.
+
+```js
+const dogs = await Pet.query()
+  .where('species', 'dog')
+  .where('ownerId', 1)
+  .orderBy('name')
+```
+
+The `relatedQuery` helper comes in handy with `ManyToManyRelation`s and provides a unified API for all kinds of relations. You can write the same code regardless of the relation type. Or you may simply prefer the `relatedQuery` style. Now back to the examples :)
+
+If you want to fetch dogs for multiple people in one query, you can pass an array of identifiers to the `for` method like this:
 
 ```js
 const dogs = await Person.relatedQuery('pets')
@@ -397,11 +404,11 @@ You can even give it a subquery! The following example fetches all dogs of all p
 
 ```js
 // Note that there is no `await` here. This query does not get executed.
-const jennifers = Person.query().where('name', 'Jennifer');
+const jennifersSubQuery = Person.query().where('name', 'Jennifer');
 
 // This is the only executed query in this example.
 const dogs = await Person.relatedQuery('pets')
-  .for(jennifers)
+  .for(jennifersSubQuery)
   .where('species', 'dog')
   .orderBy('name');
 ```
@@ -421,8 +428,6 @@ order by "name" asc
 
 Chain the [insert](/api/query-builder/mutate-methods.html#insert) method to a [relatedQuery](/api/model/static-methods.html#static-relatedquery) or [\$relatedQuery](/api/model/instance-methods.html#relatedquery) call to insert a related object for an item. The query inserts a new object to the related table and updates the needed tables to create the relationship. In case of many-to-many relation a row is inserted to the join table etc. Also check out [insertGraph](/api/query-builder/mutate-methods.html#insertgraph) method for an alternative way to insert related models.
 
-By default the inserted related models are appended to the parent model to a property by the same name as the relation. For example in our `person.$relatedQuery('pets').insert(obj)` example query, the return value would be appended to `person.pets`. This behaviour can be modified using [relatedInsertQueryMutates](/api/model/static-properties.html#static-relatedinsertquerymutates). Also check out the [\$setRelated](/api/model/instance-methods.html#setrelated) and
-[\$appendRelated](/api/model/instance-methods.html#appendrelated) helpers.
 
 ##### Examples
 
@@ -438,15 +443,13 @@ select "persons".* from "persons" where "persons"."id" = 1
 
 ```js
 const fluffy = await person.$relatedQuery('pets').insert({ name: 'Fluffy' });
-
-console.log(person.pets.indexOf(fluffy) !== -1); // --> true
 ```
 
 ```sql
 insert into "animals" ("name", "ownerId") values ('Fluffy', 1)
 ```
 
-Just like with [relation find queries](#relation-find-queries), you can save a query and add a pet for a person using one single query:
+Just like with [relation find queries](#relation-find-queries), you can save a query and add a pet for a person using one single query by utilizing the static `relatedQuery` method:
 
 ```js
 const fluffy = await Person.relatedQuery('pets')
@@ -633,13 +636,13 @@ See the [API documentation](/api/query-builder/mutate-methods.html#update) of `u
 ```js
 await Person.relatedQuery('pets')
   .for([1, 2])
-  .patch({ name: raw(`concat("name", ' the doggo')`) })
+  .patch({ name: raw(`concat(name, ' the doggo')`) })
   .where('species', 'dog');
 ```
 
 ```sql
 update "animals"
-set "name" = concat("name", ' the doggo')
+set "name" = concat(name, ' the doggo')
 where "animals"."ownerId" in (1, 2)
 and "species" = 'dog'
 ```
