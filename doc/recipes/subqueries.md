@@ -28,7 +28,7 @@ const peopleOlderThanAverage = await Person.query().where(
 console.log(peopleOlderThanAverage);
 ```
 
-You can use [ref](/api/objection.js#ref) to reference the parent query in subqueries:
+You can use [ref](/api/objection/#ref) to reference the parent query in subqueries:
 
 ```js
 const { ref } = require('objection');
