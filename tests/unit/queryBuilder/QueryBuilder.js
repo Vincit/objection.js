@@ -934,6 +934,51 @@ describe('QueryBuilder', () => {
       .catch(done);
   });
 
+  it('should consider withSchema when looking for column info', done => {
+    class TestModelRelated extends Model {
+      static get tableName() {
+        return 'Related';
+      }
+    }
+
+    class TestModel extends Model {
+      static get tableName() {
+        return 'Model';
+      }
+
+      static get relationMappings() {
+        return {
+          relatedModel: {
+            relation: Model.BelongsToOneRelation,
+            modelClass: TestModelRelated,
+            join: {
+              from: 'Model.id',
+              to: 'Related.id'
+            }
+          }
+        };
+      }
+    }
+    TestModel.knex(mockKnex);
+    TestModelRelated.knex(mockKnex);
+
+    mockKnexQueryResults = [[{ count: '123' }]];
+    QueryBuilder.forClass(TestModel)
+      .withSchema('someSchema')
+      .withGraphJoined('relatedModel')
+      .then(res => {
+        expect(executedQueries).to.eql([
+          "select * from information_schema.columns where table_name = 'Model' and table_catalog = NULL and table_schema = 'someSchema'",
+          "select * from information_schema.columns where table_name = 'Related' and table_catalog = NULL and table_schema = 'someSchema'",
+          'select "Model"."0" as "0" from "someSchema"."Model" left join "someSchema"."Related" as "relatedModel" on "relatedModel"."id" = "Model"."id"'
+        ]);
+        console.log(res);
+        console.log(executedQueries);
+        done();
+      })
+      .catch(done);
+  });
+
   it('range should return a range and the total count', done => {
     mockKnexQueryResults = [[{ a: '1' }], [{ count: '123' }]];
     QueryBuilder.forClass(TestModel)
