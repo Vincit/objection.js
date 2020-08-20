@@ -91,7 +91,8 @@ For eg: consider we want to connect to different databases based on some request
 For eg:
 
 1. ExpressJs middleware
-```
+
+```js
 const { AsyncLocalStorage } = require('async_hooks');
 const storage = new AsyncLocalStorage();
 
@@ -111,7 +112,7 @@ app.use(function(req, res, next) {
 
 2.  Override `Model.prototype.constructor.knex` function
 
-```
+```js
 const { Model } = require('objection');
 
 Model.prototype.constructor.knex = function() {
