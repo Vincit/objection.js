@@ -79,7 +79,7 @@ app.get('/people', async (req, res) => {
 
 The [Async hooks](https://nodejs.org/api/async_hooks.html#async_hooks_async_hooks) modules in latest Nodejs provides a native implementation of "continuation-local-storage" called [AsyncLocalStorage](https://nodejs.org/api/async_hooks.html#async_hooks_class_asynclocalstorage)
 
-This was added in Nodejs `v13.10.0` but, a "usable" version is only available @ `v15` after fixing some critical (bugs)(https://github.com/knex/knex/issues/3879)
+This was added in Nodejs `v13.10.0` but, a "usable" version is only available @ `v15` after fixing some critical [bugs](https://github.com/knex/knex/issues/3879)
 
 The basic idea is like thread level static variables, we can store/set "async stack" level variables and those variables will preserve its value for any functions invoked ( directly or indirectly ) from that particular "async stack"
 
