@@ -74,3 +74,52 @@ app.get('/people', async (req, res) => {
   res.send(people);
 });
 ```
+
+## Using AsyncLocalStorage API
+
+The [Async hooks](https://nodejs.org/api/async_hooks.html#async_hooks_async_hooks) modules in latest Nodejs provides a native implementation of "continuation-local-storage" called [AsyncLocalStorage](https://nodejs.org/api/async_hooks.html#async_hooks_class_asynclocalstorage)
+
+This was added in Nodejs `v13.10.0` but, a "usable" version is only available @ `v15` after fixing some critical (bugs)(https://github.com/knex/knex/issues/3879)
+
+The basic idea is like thread level static variables, we can store/set "async stack" level variables and those variables will preserve its value for any functions invoked ( directly or indirectly ) from that particular "async stack"
+
+For eg: consider we want to connect to different databases based on some request data. Then we have to do two things
+
+1. Write a middleware which captures data from request and set it as a "AsyncLocalStorage" variable.
+2. Override `Model.prototype.constructor.knex` function in Objection.js ( Every single query in Objection.js is using this function to get a connected knex instance ) in such a way that, we return a knex instance by using the information stored in previously set "AsyncLocalStorage" variable.
+
+For eg:
+
+1. ExpressJs middleware
+```
+const { AsyncLocalStorage } = require('async_hooks');
+const storage = new AsyncLocalStorage();
+
+app.use(function(req, res, next) {
+  /*
+   * Here we are connecting to db based on subdomain name.
+   * client1.example.com => client1db
+   * client2.example.com => client2db
+   */
+  const host = req.headers['host'];
+  const clientDomain = host.substring(0, host.indexOf('.'));
+  storage.run(clientDomain, ()=>{
+    setImmediate(next);
+  });
+});
+```
+
+2.  Override `Model.prototype.constructor.knex` function
+
+```
+const { Model } = require('objection');
+
+Model.prototype.constructor.knex = function() {
+  const clientDomain = storage.getStore();
+  return getKnexInstanceForClient(clientDomain);
+};
+
+```
+where `getKnexInstanceForClient` function returns a connected knex instance based on provided `clientDomain` data
+
+In the above example Point 1 and 2 can be written different files, but both should share the `storage` variable it can be shared either by using global variables or using a module / singleton 
