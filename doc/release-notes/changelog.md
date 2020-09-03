@@ -687,7 +687,7 @@ Person.prototype.fullName = function() {
 - [`insertGraphAndFetch`](#insertgraphandfetch) with `insertWithRelatedAndFetch` alias. [#172](https://github.com/Vincit/objection.js/issues/172)
 - Added [`$beforeDelete`](#_s_beforedelete) and [`$afterDelete`](#_s_afterdelete) hooks [#112](https://github.com/Vincit/objection.js/issues/112)
 - Old values can now be accessed from `$beforeUpdate`, `$afterUpdate`, `$beforeValidate` and `$afterValidate` hooks [#185](https://github.com/Vincit/objection.js/issues/185)
-- Support length property [#168](ttps://github.com/Vincit/objection.js/issues/168)
+- Support length property [#168](https://github.com/Vincit/objection.js/issues/168)
 - Make sure operations are executed in the order they are called [#180](https://github.com/Vincit/objection.js/issues/180)
 - Fetch nothing if the `where` clauses hit no rows in `update/patchAndFetchById` methods [#189](https://github.com/Vincit/objection.js/issues/189)
 - Lots of performance tweaks.
