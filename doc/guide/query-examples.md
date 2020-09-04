@@ -136,7 +136,7 @@ Objection allows a bit more modern syntax with groupings and subqueries. Where k
 
 ```js
 const nonMiddleAgedJennifers = await Person.query()
-  .where(builder => builder.where('age', '<', 4).orWhere('age', '>', 60))
+  .where(builder => builder.where('age', '<', 40).orWhere('age', '>', 60))
   .where('firstName', 'Jennifer')
   .orderBy('lastName');
 
