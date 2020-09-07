@@ -2512,7 +2512,7 @@ module.exports = session => {
             });
         });
 
-        it('should have access to `inputItems`', () => {
+        it('should have access to `inputItems`', async () => {
           Movie.beforeInsert = createHookSpy(({ inputItems }) => {
             expect(inputItems.length).to.equal(1);
             expect(inputItems[0] instanceof Movie).to.equal(true);
@@ -2523,11 +2523,9 @@ module.exports = session => {
             ]);
           });
 
-          return Movie.query()
-            .insert({ name: 'Inserted' })
-            .then(() => {
-              expect(Movie.beforeInsert.calls.length).to.equal(1);
-            });
+          await Movie.query().insert({ name: 'Inserted' });
+          await Movie.query().insertAndFetch({ name: 'Inserted' });
+          expect(Movie.beforeInsert.calls.length).to.equal(2);
         });
 
         it('should be able to fetch the rows about to be updated', () => {
