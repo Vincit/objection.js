@@ -42,7 +42,7 @@ async function main() {
 
   const jennifer = await Person.query()
     .findOne({ firstName: 'Jennifer' })
-    .eager('pets');
+    .withGraphFetched('pets');
 
   chai.expect(jennifer.pets[0].name).to.equal('Doggo');
 }
@@ -265,10 +265,10 @@ async function createSchema() {
 
 main()
   .then(() => {
-    console.log('success')
-    return knex.destroy()
+    console.log('success');
+    return knex.destroy();
   })
   .catch(err => {
-    console.error(err)
-    return knex.destroy()
+    console.error(err);
+    return knex.destroy();
   });
