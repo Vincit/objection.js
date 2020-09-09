@@ -1142,6 +1142,7 @@ declare namespace Objection {
     clearOrder: IdentityMethod<this>;
     clearWhere: IdentityMethod<this>;
     clearWithGraph: IdentityMethod<this>;
+    clearWithGraphFetched: IdentityMethod<this>;
     clearAllowGraph: IdentityMethod<this>;
     // Deprecated
     clearEager: IdentityMethod<this>;
