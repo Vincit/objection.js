@@ -371,10 +371,6 @@ declare namespace Objection {
     <QBA extends AnyQueryBuilder>(qb: QBA): QB;
 
     (obj: PartialModelObject<ModelType<QB>>): QB;
-    // We must allow any keys in the object. The previous type
-    // is kind of useless, but maybe one day vscode and other
-    // tools can autocomplete using it.
-    (obj: object): QB;
   }
 
   interface WhereRawMethod<QB extends AnyQueryBuilder> extends RawInterface<QB> {}

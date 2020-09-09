@@ -19,6 +19,12 @@ import { Person } from '../fixtures/person';
     firstName: 'Jennifer',
     lastName: 'Lawrence'
   });
+  await Person.query().findOne({
+    firstName: 'Jennifer',
+    lastName: 'Lawrence',
+    // @ts-expect-error
+    DOESNT_EXIST: 'none'
+  });
   await Person.query().findOne('age', '>', 20);
   await Person.query().findOne(raw('random() < 0.5'));
 
@@ -101,7 +107,7 @@ import { Person } from '../fixtures/person';
     .where(function() {
       this.where('id', 1).orWhere('id', '>', 10);
     })
-    .orWhere({ name: 'Tester' });
+    .orWhere({ lastName: 'Tester' });
   await Person.query().where('firstName', 'like', '%mark%');
   await Person.query().where('votes', '>', 100);
   let subquery = Person.query()
@@ -112,7 +118,7 @@ import { Person } from '../fixtures/person';
   await Person.query().where('id', 'in', subquery);
   await Person.query()
     .where('id', 1)
-    .orWhere({ votes: 100, user: 'knex' });
+    .orWhere({ age: 100, oldLastName: 'knex' });
 
   await Person.query()
     .whereNot({
@@ -125,7 +131,7 @@ import { Person } from '../fixtures/person';
     .whereNot(function() {
       this.where('id', 1).orWhereNot('id', '>', 10);
     })
-    .orWhereNot({ name: 'Tester' });
+    .orWhereNot({ lastName: 'Tester' });
   await Person.query().whereNot('votes', '>', 100);
   subquery = Person.query()
     .whereNot('votes', '>', 100)
