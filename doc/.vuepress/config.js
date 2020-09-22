@@ -1,6 +1,6 @@
 module.exports = {
   title: 'Objection.js',
-  description: 'An SQL friendly ORM for node.js',
+  description: 'A SQL friendly ORM for node.js',
   base: '/objection.js/',
 
   themeConfig: {
