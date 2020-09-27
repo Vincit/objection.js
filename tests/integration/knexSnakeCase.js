@@ -246,6 +246,30 @@ module.exports = session => {
               expect(res).to.containSubset({ firstName: 'Arto', parentId: null });
             });
         });
+
+        it('raw upsert with returning', () => {
+          let originalId;
+
+          return Person.query(knex)
+            .insert({ firstName: 'Arto' })
+            .returning('*')
+            .then(res => {
+              originalId = res.id;
+
+              return knex.raw(
+                `
+                  ?
+                  ON CONFLICT (id) DO UPDATE
+                  SET first_name = EXCLUDED.first_name
+                  RETURNING *
+                `,
+                [knex('person').insert({ id: res.id, firstName: 'Kenny' })]
+              );
+            })
+            .then(res => {
+              expect(res).to.containSubset([{ id: originalId, firstName: 'Kenny' }]);
+            });
+        });
       }
 
       it('joinRelated', () => {
