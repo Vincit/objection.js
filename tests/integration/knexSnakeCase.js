@@ -247,7 +247,7 @@ module.exports = session => {
             });
         });
 
-        it('raw upsert with returning', () => {
+        it('maps rows array on raw query with returning', () => {
           let originalId;
 
           return Person.query(knex)
@@ -266,8 +266,8 @@ module.exports = session => {
                 [knex('person').insert({ id: res.id, firstName: 'Kenny' })]
               );
             })
-            .then(res => {
-              expect(res).to.containSubset([{ id: originalId, firstName: 'Kenny' }]);
+            .then(({ rows }) => {
+              expect(rows).to.containSubset([{ id: originalId, firstName: 'Kenny' }]);
             });
         });
       }
