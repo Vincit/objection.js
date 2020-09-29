@@ -73,7 +73,7 @@ TIP: Consider using [modifiers](/recipes/modifiers.html#usage-in-a-query) instea
 
 # Extending the query builder in typescript
 
-With typescript, you need to add some extra type properties for the custom query builder. These are necessary until typescript fully supports our use case. The good news is that you only need to define them once for the shared `BaseModel`. If you don't already have one, it's time to crate it.
+With typescript, you need to add some extra type properties for the custom query builder. These are necessary until typescript fully supports our use case. The good news is that you only need to define them once for the shared `BaseModel`. If you don't already have one, it's time to create it.
 
 ```ts
 import { Model, Page } from 'objection';
