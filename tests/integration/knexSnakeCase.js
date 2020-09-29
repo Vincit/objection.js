@@ -64,6 +64,12 @@ module.exports = session => {
       }
     }
 
+    class Tricky extends Model {
+      static get tableName() {
+        return 'tricky';
+      }
+    }
+
     before(() => {
       // Create schema with the knex instance that doesn't
       // have identifier mapping configured.
@@ -72,6 +78,7 @@ module.exports = session => {
         .dropTableIfExists('animal')
         .dropTableIfExists('movie')
         .dropTableIfExists('person')
+        .dropTableIfExists('tricky')
         .createTable('person', table => {
           table.increments('id').primary();
           table.string('first_name');
@@ -93,6 +100,10 @@ module.exports = session => {
         .createTable('person_movie', table => {
           table.integer('person_id');
           table.integer('movie_id');
+        })
+        .createTable('tricky', table => {
+          table.increments('id').primary();
+          table.string('rows');
         });
     });
 
@@ -232,7 +243,7 @@ module.exports = session => {
       });
 
       afterEach(() => {
-        return ['animal', 'personMovie', 'movie', 'person'].reduce((promise, table) => {
+        return ['animal', 'personMovie', 'movie', 'person', 'tricky'].reduce((promise, table) => {
           return promise.then(() => knex(table).delete());
         }, Promise.resolve());
       });
@@ -270,7 +281,31 @@ module.exports = session => {
               expect(rows).to.containSubset([{ id: originalId, firstName: 'Kenny' }]);
             });
         });
+
+        it('raw query returning "rows" column', () => {
+          return knex
+            .raw(
+              `
+                INSERT INTO tricky (rows)
+                VALUES (?)
+                RETURNING *
+              `,
+              ['foo_bar_baz']
+            )
+            .then(({ rows }) => {
+              expect(rows).to.containSubset([{ rows: 'foo_bar_baz' }]);
+            });
+        });
       }
+
+      it('returning single record with "rows" column', () => {
+        return Tricky.query(knex)
+          .insert({ rows: 'foo_bar_baz' })
+          .returning('*')
+          .then(res => {
+            expect(res).to.containSubset({ rows: 'foo_bar_baz' });
+          });
+      });
 
       it('joinRelated', () => {
         return Person.query(knex)
