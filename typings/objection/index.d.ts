@@ -1006,7 +1006,7 @@ declare namespace Objection {
     ): NumberQueryBuilder<this>;
 
     unrelate(): NumberQueryBuilder<this>;
-    for(ids: ForIdValue | ForIdValue[]): this;
+    for<MF extends Model>(ids: ForIdValue | ForIdValue[] | QueryBuilder<MF, any> | MF | Array<MF>): this;
 
     withGraphFetched(expr: RelationExpression<M>, options?: GraphOptions): this;
     withGraphJoined(expr: RelationExpression<M>, options?: GraphOptions): this;
