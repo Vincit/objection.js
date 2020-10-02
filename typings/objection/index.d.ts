@@ -712,6 +712,7 @@ declare namespace Objection {
     noRelate?: boolean | string[];
     noUnrelate?: boolean | string[];
     allowRefs?: boolean;
+    applyStrictEquality?: boolean;
   }
 
   interface UpsertGraphMethod<M extends Model> {
