@@ -435,7 +435,8 @@ describe('utils', () => {
       [Buffer.from('00000000000000000000000000007AAC', 'hex')]
     ];
     it('should work with Buffer items', () => {
-      expect(uniqBy(items)).to.eql(items);
+      const itemsForTest = items.map(([value]) => value);
+      expect(uniqBy(itemsForTest)).to.eql(itemsForTest);
     });
     it('should work with Buffer[] items', () => {
       expect(uniqBy(items)).to.eql(items);
