@@ -90,5 +90,21 @@ module.exports = session => {
 
       expect(result).to.eql(inserted);
     });
+    it('should fetch multiple relations correctly', async () => {
+      const ids = [
+        Buffer.from('00000000000000000000000000007AAC', 'hex'),
+        Buffer.from('00000000000000000000000000007AAD', 'hex'),
+        Buffer.from('00000000000000000000000000007AAE', 'hex')
+      ];
+      const graph = ids.map(id => ({
+        id,
+        roles: [{ id: crypto.randomBytes(16) }]
+      }));
+      const inserted = await User.query().insertGraph(graph);
+      const result = await User.query()
+        .findByIds(ids)
+        .withGraphFetched('roles');
+      expect(result).to.eql(inserted);
+    });
   });
 };
