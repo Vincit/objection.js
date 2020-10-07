@@ -12,7 +12,7 @@ const {
 const { range } = require('lodash');
 const { compose, mixin } = require('../../lib/utils/mixin');
 const { map } = require('../../lib/utils/promiseUtils');
-const { jsonEquals } = require('../../lib/utils/objectUtils');
+const { jsonEquals, uniqBy } = require('../../lib/utils/objectUtils');
 
 describe('utils', () => {
   describe('mixin', () => {
@@ -426,6 +426,24 @@ describe('utils', () => {
           ]
         )
       ).to.equal(false);
+    });
+  });
+  describe('uniqBy', () => {
+    const items = [
+      [Buffer.from('00000000000000000000000000007AAD', 'hex')],
+      [Buffer.from('00000000000000000000000000007AAE', 'hex')],
+      [Buffer.from('00000000000000000000000000007AAC', 'hex')]
+    ];
+    it('should work with Buffer items', () => {
+      expect(uniqBy(items)).to.eql(items);
+    });
+    it('should work with Buffer[] items', () => {
+      expect(uniqBy(items)).to.eql(items);
+    });
+    it('should work with Buffer[] items with custom keyGetter function', () => {
+      expect(
+        uniqBy(items, item => item.map(x => (Buffer.isBuffer(x) ? x.toString('hex') : x)).join(','))
+      ).to.eql(items);
     });
   });
 });
