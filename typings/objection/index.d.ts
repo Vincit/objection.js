@@ -1707,7 +1707,7 @@ declare namespace Objection {
     $traverseAsync(filterConstructor: typeof Model, traverser: TraverserFunction): Promise<this>;
     $traverseAsync(traverser: TraverserFunction): Promise<this>;
 
-    $knex(): Knex;
+    $knex(knex?: Knex): Knex;
     $transaction(): Knex;
 
     QueryBuilderType: QueryBuilder<this, this[]>;
