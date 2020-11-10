@@ -1393,6 +1393,7 @@ declare namespace Objection {
     pickJsonSchemaProperties: boolean;
     relatedFindQueryMutates: boolean;
     relatedInsertQueryMutates: boolean;
+    useLimitInFirst: boolean;
     modifiers: Modifiers;
     columnNameMappers: ColumnNameMappers;
 
@@ -1519,6 +1520,7 @@ declare namespace Objection {
     static pickJsonSchemaProperties: boolean;
     static relatedFindQueryMutates: boolean;
     static relatedInsertQueryMutates: boolean;
+    static useLimitInFirst: boolean;
     static modifiers: Modifiers;
     static columnNameMappers: ColumnNameMappers;
 
