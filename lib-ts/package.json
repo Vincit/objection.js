@@ -7,13 +7,6 @@
     "url": "git://github.com/vincit/objection.js.git"
   },
   "scripts": {
-    "pretest": "npm-run-all pretty:quick lint:staged",
-    "prettier:format": "./node_modules/.bin/prettier **/*.{ts,js,json,yml} -l --ignore-path ./.eslintignore",
-    "prettier:fix": "./node_modules/.bin/prettier **/*.{ts,js,json,yml} --write --ignore-path ./.eslintignore",
-    "eslint:format": "./node_modules/.bin/eslint **/*.{ts,js} --ignore-path ./.eslintignore",
-    "eslint:fix": "./node_modules/.bin/eslint . --ignore-path ./.eslintignore --fix",
-    "pretty:quick": "./node_modules/.bin/pretty-quick --ignore-path ./.eslintignore --staged",
-    "lint:staged": "./node_modules/.bin/lint-staged",
     "prepublishOnly": "yarn build",
     "dry-run": "npm publish --dry-run",
     "test": "jest --runInBand --config .unit.jest.config.js",
@@ -53,7 +46,6 @@
     "eslint-plugin-promise": "^4.2.1",
     "husky": "^3.1.0",
     "jest": "26.2.2",
-    "lint-staged": "^10.2.7",
     "npm-run-all": "^4.1.5",
     "prettier": "2.1.2",
     "pretty-quick": "3.1.0",
@@ -69,9 +61,6 @@
     "dist"
   ],
   "dependencies": {},
-  "lint-staged": {
-    "*.{js,ts}": "yarn eslint:fix"
-  },
   "husky": {
     "hooks": {
       "pre-commit": "yarn test"
