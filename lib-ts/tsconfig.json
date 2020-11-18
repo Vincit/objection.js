@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "target": "ES2015",
+    "module": "ES2015",
+    "declaration": true,
+    "sourceMap": true,
+    "outDir": "./dist",
+    "strict": true,
+    "noUnusedParameters": true,
+    "noImplicitThis": true
+  },
+  "include": ["utils"],
+  "exclude": [
+    "node_modules",
+    "utils/**/*.test.ts",
+    "build",
+    "dist",
+    "rollup.config.js"
+  ]
+}

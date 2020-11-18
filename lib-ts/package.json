@@ -1,0 +1,80 @@
+{
+  "name": "objection",
+  "version": "2.2.2",
+  "description": "An SQL-friendly ORM for Node.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/vincit/objection.js.git"
+  },
+  "scripts": {
+    "pretest": "npm-run-all pretty:quick lint:staged",
+    "prettier:format": "./node_modules/.bin/prettier **/*.{ts,js,json,yml} -l --ignore-path ./.eslintignore",
+    "prettier:fix": "./node_modules/.bin/prettier **/*.{ts,js,json,yml} --write --ignore-path ./.eslintignore",
+    "eslint:format": "./node_modules/.bin/eslint **/*.{ts,js} --ignore-path ./.eslintignore",
+    "eslint:fix": "./node_modules/.bin/eslint . --ignore-path ./.eslintignore --fix",
+    "pretty:quick": "./node_modules/.bin/pretty-quick --ignore-path ./.eslintignore --staged",
+    "lint:staged": "./node_modules/.bin/lint-staged",
+    "prepublishOnly": "yarn build",
+    "dry-run": "npm publish --dry-run",
+    "test": "jest --runInBand --config .unit.jest.config.js",
+    "test:watch": "jest --config .unit.jest.config.js --watch",
+    "test:coverage": "jest --coverage --config .unit.jest.config.js",
+    "send:coveralls": "coveralls < coverage/lcov.info",
+    "test:coveralls": "npm-run-all test:coverage send:coveralls",
+    "clean": "rimraf dist temp",
+    "clean:temp": "rimraf temp",
+    "build:c": "rollup -c",
+    "build": "npm-run-all build:c clean:temp",
+    "build:watch": "rollup -c -w",
+    "start": "npm-run-all clean build:watch",
+    "prepare": "yarn build"
+  },
+  "source": "index.ts",
+  "main": "dist/index.js",
+  "module": "dist/index.es.js",
+  "jsnext:main": "dist/index.es.js",
+  "typings": "dist/index.d.ts",
+  "devDependencies": {
+    "@babel/core": "^7.7.2",
+    "@babel/preset-env": "^7.7.1",
+    "@babel/preset-typescript": "^7.7.2",
+    "@rollup/plugin-babel": "^5.0.0",
+    "@rollup/plugin-commonjs": "^11.0.2",
+    "@rollup/plugin-node-resolve": "^7.1.1",
+    "@types/jest": "^24.0.22",
+    "@typescript-eslint/eslint-plugin": "4.5.0",
+    "@typescript-eslint/parser": "4.5.0",
+    "babel-eslint": "^10.0.3",
+    "babel-jest": "26.2.2",
+    "coveralls": "^3.1.0",
+    "eslint": "^6.8.0",
+    "eslint-config-prettier": "^6.7.0",
+    "eslint-plugin-prettier": "^3.1.2",
+    "eslint-plugin-promise": "^4.2.1",
+    "husky": "^3.1.0",
+    "jest": "26.2.2",
+    "lint-staged": "^10.2.7",
+    "npm-run-all": "^4.1.5",
+    "prettier": "2.1.2",
+    "pretty-quick": "3.1.0",
+    "rimraf": "^3.0.0",
+    "rollup": "2.32.1",
+    "rollup-plugin-dts": "1.4.13",
+    "rollup-plugin-peer-deps-external": "^2.2.0",
+    "rollup-plugin-typescript2": "^0.25.3",
+    "tslib": "^1.10.0",
+    "typescript": "4.0.3"
+  },
+  "files": [
+    "dist"
+  ],
+  "dependencies": {},
+  "lint-staged": {
+    "*.{js,ts}": "yarn eslint:fix"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "yarn test"
+    }
+  }
+}

@@ -19,7 +19,8 @@
     "prettier": "prettier --write \"{examples,lib,tests,typings,doc}/**/*.{js,ts}\"",
     "eslint": "eslint --format codeframe \"examples/**/*.js\" \"lib/**/*.js\" \"tests/**/*.js\"",
     "docs:dev": "vuepress dev doc",
-    "docs:build": "vuepress build doc"
+    "docs:build": "vuepress build doc",
+    "dry-run": "npm publish --dry-run"
   },
   "publishConfig": {
     "tag": "next"
@@ -57,6 +58,7 @@
     "README.md",
     "LICENSE",
     "lib/*",
+    "lib-ts/dist/*",
     "typings/*"
   ],
   "types": "./typings/objection/index.d.ts",
