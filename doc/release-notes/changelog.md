@@ -148,7 +148,7 @@
 
 ### Breaking changes
 
-See the [migration guide](/1.x/migration.md).
+See the [migration guide](/release-notes/migration.md).
 
 ## 1.6.10
 
