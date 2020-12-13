@@ -9,13 +9,13 @@ module.exports = {
 
     algolia: {
       apiKey: '8b9b4ac9f68d11c702e8102479760861',
-      indexName: 'vincit_objectionjs'
+      indexName: 'vincit_objectionjs',
     },
 
     nav: [
       {
         text: 'Guide',
-        link: '/guide/'
+        link: '/guide/',
       },
 
       {
@@ -23,26 +23,26 @@ module.exports = {
         items: [
           {
             text: 'Main Module',
-            link: '/api/objection/'
+            link: '/api/objection/',
           },
           {
             text: 'Query Builder',
-            link: '/api/query-builder/'
+            link: '/api/query-builder/',
           },
           {
             text: 'Model',
-            link: '/api/model/'
+            link: '/api/model/',
           },
           {
             text: 'Types',
-            link: '/api/types/'
-          }
-        ]
+            link: '/api/types/',
+          },
+        ],
       },
 
       {
         text: 'Recipe Book',
-        link: '/recipes/'
+        link: '/recipes/',
       },
 
       {
@@ -50,23 +50,23 @@ module.exports = {
         items: [
           {
             text: 'Changelog',
-            link: '/release-notes/changelog.md'
+            link: '/release-notes/changelog.md',
           },
           {
             text: 'Migration to 2.0',
-            link: '/release-notes/migration.md'
+            link: '/release-notes/migration.md',
           },
           {
             text: 'v1.x documentation',
-            link: 'https://github.com/Vincit/objection.js/tree/v1/doc'
-          }
-        ]
+            link: 'https://github.com/Vincit/objection.js/tree/v1/doc',
+          },
+        ],
       },
 
       {
         text: '⭐ Star',
-        link: 'https://github.com/vincit/objection.js'
-      }
+        link: 'https://github.com/vincit/objection.js',
+      },
     ],
 
     sidebar: {
@@ -85,9 +85,9 @@ module.exports = {
             'validation',
             'documents',
             'plugins',
-            'contributing'
-          ]
-        }
+            'contributing',
+          ],
+        },
       ],
 
       '/api/model/': [
@@ -98,16 +98,16 @@ module.exports = {
             'overview',
             'static-properties',
             'static-methods',
-            'instance-methods'
-          ]
-        }
+            'instance-methods',
+          ],
+        },
       ],
 
       '/api/objection/': [
         {
           title: 'Objection API Reference',
-          collapsable: false
-        }
+          collapsable: false,
+        },
       ],
 
       '/api/query-builder/': [
@@ -120,9 +120,9 @@ module.exports = {
             'eager-methods',
             'join-methods',
             'other-methods',
-            'static-methods'
-          ]
-        }
+            'static-methods',
+          ],
+        },
       ],
 
       '/recipes/': [
@@ -151,10 +151,10 @@ module.exports = {
             'default-values',
             'error-handling',
             'ternary-relationships',
-            'indexing-postgresql-jsonb-columns'
-          ]
-        }
-      ]
-    }
-  }
+            'indexing-postgresql-jsonb-columns',
+          ],
+        },
+      ],
+    },
+  },
 };

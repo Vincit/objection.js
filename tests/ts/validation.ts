@@ -9,33 +9,29 @@ import { Person } from './fixtures/person';
   person.$validate({ firstName: 'jennifer' }, { patch: true });
 
   await Person.query().insert({ firstName: 'jennifer', lastName: 'Lawrence' });
-  await Person.query()
-    .update({ firstName: 'jennifer', lastName: 'Lawrence' })
-    .where('id', 10);
+  await Person.query().update({ firstName: 'jennifer', lastName: 'Lawrence' }).where('id', 10);
 
   // Patch operation ignores the `required` property of the schema
   // and only validates the given properties. This allows a subset
   // of model's properties to be updated.
-  await Person.query()
-    .patch({ age: 24 })
-    .where('age', '<', 24);
+  await Person.query().patch({ age: 24 }).where('age', '<', 24);
 
   await Person.query().insertGraph({
     firstName: 'Jennifer',
     pets: [
       {
-        name: 'Fluffy'
-      }
-    ]
+        name: 'Fluffy',
+      },
+    ],
   });
 
   await Person.query().upsertGraph({
     id: 1,
     pets: [
       {
-        name: 'Fluffy II'
-      }
-    ]
+        name: 'Fluffy II',
+      },
+    ],
   });
 
   try {
@@ -70,8 +66,8 @@ import { Person } from './fixtures/person';
       type: 'InvalidOneTimeCode',
       message: 'Wrong code',
       data: {
-        supplied: '1234'
-      }
+        supplied: '1234',
+      },
     });
   } catch (e) {
     if (e instanceof ValidationError) {

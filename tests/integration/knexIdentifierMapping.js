@@ -3,7 +3,7 @@ const Promise = require('bluebird');
 const { expect } = require('chai');
 const { Model, knexIdentifierMapping } = require('../../');
 
-module.exports = session => {
+module.exports = (session) => {
   describe('knexIdentifierMapping', () => {
     let knex;
 
@@ -19,8 +19,8 @@ module.exports = session => {
             modelClass: Person,
             join: {
               from: 'person.parentId',
-              to: 'person.id'
-            }
+              to: 'person.id',
+            },
           },
 
           pets: {
@@ -28,8 +28,8 @@ module.exports = session => {
             modelClass: Animal,
             join: {
               from: 'person.id',
-              to: 'animal.ownerId'
-            }
+              to: 'animal.ownerId',
+            },
           },
 
           movies: {
@@ -39,11 +39,11 @@ module.exports = session => {
               from: 'person.id',
               through: {
                 from: 'personMovie.personId',
-                to: 'personMovie.movieId'
+                to: 'personMovie.movieId',
               },
-              to: 'movie.id'
-            }
-          }
+              to: 'movie.id',
+            },
+          },
         };
       }
     }
@@ -68,21 +68,21 @@ module.exports = session => {
         .dropTableIfExists('animal')
         .dropTableIfExists('movie')
         .dropTableIfExists('person')
-        .createTable('person', table => {
+        .createTable('person', (table) => {
           table.increments('id').primary();
           table.string('first_name');
           table.integer('parent_id');
         })
-        .createTable('animal', table => {
+        .createTable('animal', (table) => {
           table.increments('id').primary();
           table.string('animal_name');
           table.integer('owner_id');
         })
-        .createTable('movie', table => {
+        .createTable('movie', (table) => {
           table.increments('id').primary();
           table.string('movie_name');
         })
-        .createTable('person_movie', table => {
+        .createTable('person_movie', (table) => {
           table.integer('person_id');
           table.integer('movie_id');
         });
@@ -101,7 +101,7 @@ module.exports = session => {
           person_id: 'personId',
           movie_id: 'movieId',
           snake_case_test_table: 'snakeCaseTestTable',
-          animal_name: 'animalName'
+          animal_name: 'animalName',
         })
       );
 
@@ -125,7 +125,7 @@ module.exports = session => {
 
       it('createTable', () => {
         return knex.schema
-          .createTable(table, table => {
+          .createTable(table, (table) => {
             table.increments('id');
             table.string('fName');
           })
@@ -135,20 +135,20 @@ module.exports = session => {
           .then(() => {
             return knex(table);
           })
-          .then(rows => {
+          .then((rows) => {
             expect(rows).to.eql([{ id: 1, fName: 'fooBar' }]);
 
             // Query with a knex without case mapping.
             return session.knex('snake_case_test_table');
           })
-          .then(rows => {
+          .then((rows) => {
             expect(rows).to.eql([{ id: 1, first_name: 'fooBar' }]);
           });
       });
 
       it('dropTable', () => {
         return knex.schema
-          .createTable(table, table => {
+          .createTable(table, (table) => {
             table.increments('id');
           })
           .dropTableIfExists(table);
@@ -156,17 +156,17 @@ module.exports = session => {
 
       it('hasTable (true)', () => {
         return knex.schema
-          .createTable(table, table => {
+          .createTable(table, (table) => {
             table.increments('id');
           })
           .hasTable(table)
-          .then(hasTable => {
+          .then((hasTable) => {
             expect(!!hasTable).to.equal(true);
           });
       });
 
       it('hasTable (false)', () => {
-        return knex.schema.hasTable(table).then(hasTable => {
+        return knex.schema.hasTable(table).then((hasTable) => {
           expect(hasTable).to.equal(false);
         });
       });
@@ -181,27 +181,27 @@ module.exports = session => {
             fName: 'Teppo',
 
             parent: {
-              fName: 'Matti'
-            }
+              fName: 'Matti',
+            },
           },
 
           pets: [
             {
-              animalName: 'Hurtta'
+              animalName: 'Hurtta',
             },
             {
-              animalName: 'Katti'
-            }
+              animalName: 'Katti',
+            },
           ],
 
           movies: [
             {
-              movieName: 'Salkkarit the movie'
+              movieName: 'Salkkarit the movie',
             },
             {
-              movieName: 'Salkkarit 2, the low quality continues'
-            }
-          ]
+              movieName: 'Salkkarit 2, the low quality continues',
+            },
+          ],
         });
       });
 
@@ -214,32 +214,32 @@ module.exports = session => {
       it('$relatedQuery', () => {
         return Person.query(knex)
           .findOne({ fName: 'Seppo' })
-          .then(model => {
+          .then((model) => {
             return model.$relatedQuery('pets', knex).orderBy('animalName');
           })
-          .then(pets => {
+          .then((pets) => {
             expect(pets).to.containSubset([
               {
-                animalName: 'Hurtta'
+                animalName: 'Hurtta',
               },
               {
-                animalName: 'Katti'
-              }
+                animalName: 'Katti',
+              },
             ]);
           });
       });
 
       [Model.WhereInEagerAlgorithm, Model.JoinEagerAlgorithm, Model.NaiveEagerAlgorithm].forEach(
-        eagerAlgo => {
+        (eagerAlgo) => {
           it(`eager (${eagerAlgo.name})`, () => {
             return Person.query(knex)
               .select('person.fName as rootFirstName')
-              .modifyEager('parent', qb => qb.select('fName as parentFirstName'))
-              .modifyEager('parent.parent', qb => qb.select('fName as grandParentFirstName'))
+              .modifyEager('parent', (qb) => qb.select('fName as parentFirstName'))
+              .modifyEager('parent.parent', (qb) => qb.select('fName as grandParentFirstName'))
               .eager('[parent.parent, pets, movies]')
               .eagerAlgorithm(eagerAlgo)
               .orderBy('person.fName')
-              .then(people => {
+              .then((people) => {
                 expect(people.length).to.equal(3);
                 expect(people).to.containSubset([
                   {
@@ -249,38 +249,38 @@ module.exports = session => {
                       parentFirstName: 'Teppo',
 
                       parent: {
-                        grandParentFirstName: 'Matti'
-                      }
+                        grandParentFirstName: 'Matti',
+                      },
                     },
 
                     pets: [
                       {
-                        animalName: 'Hurtta'
+                        animalName: 'Hurtta',
                       },
                       {
-                        animalName: 'Katti'
-                      }
+                        animalName: 'Katti',
+                      },
                     ],
 
                     movies: [
                       {
-                        movieName: 'Salkkarit 2, the low quality continues'
+                        movieName: 'Salkkarit 2, the low quality continues',
                       },
                       {
-                        movieName: 'Salkkarit the movie'
-                      }
-                    ]
+                        movieName: 'Salkkarit the movie',
+                      },
+                    ],
                   },
                   {
                     rootFirstName: 'Teppo',
 
                     parent: {
-                      parentFirstName: 'Matti'
-                    }
+                      parentFirstName: 'Matti',
+                    },
                   },
                   {
-                    rootFirstName: 'Matti'
-                  }
+                    rootFirstName: 'Matti',
+                  },
                 ]);
               });
           });

@@ -10,15 +10,15 @@ module.exports = (_, ctx) => ({
     const isAlgoliaSearch =
       themeConfig.algolia ||
       Object.keys((siteConfig.locales && themeConfig.locales) || {}).some(
-        base => themeConfig.locales[base].algolia
+        (base) => themeConfig.locales[base].algolia
       );
 
     return {
       '@AlgoliaSearchBox': isAlgoliaSearch
         ? path.resolve(__dirname, 'components/AlgoliaSearchBox.vue')
-        : path.resolve(__dirname, 'noopModule.js')
+        : path.resolve(__dirname, 'noopModule.js'),
     };
   },
 
-  extend: '@vuepress/theme-default'
+  extend: '@vuepress/theme-default',
 });

@@ -1,7 +1,7 @@
 const expect = require('expect.js');
 const { Model } = require('../../../');
 
-module.exports = session => {
+module.exports = (session) => {
   if (session.isMySql()) {
     describe('mysql binary columns', () => {
       let TestModel;
@@ -9,7 +9,7 @@ module.exports = session => {
       before(() => {
         return session.knex.schema
           .dropTableIfExists('mysql_binary_test')
-          .createTable('mysql_binary_test', table => {
+          .createTable('mysql_binary_test', (table) => {
             table.increments('id').primary();
             table.binary('binary', 4);
           });
@@ -49,11 +49,11 @@ module.exports = session => {
       it('#insert should insert a buffer', () => {
         return TestModel.query()
           .insert({ binary: buffer() })
-          .then(ret => {
+          .then((ret) => {
             expect(bufferEquals(buffer(), ret.binary)).to.equal(true);
             return session.knex(TestModel.getTableName());
           })
-          .then(rows => {
+          .then((rows) => {
             expect(bufferEquals(buffer(), rows[0].binary)).to.equal(true);
           });
       });

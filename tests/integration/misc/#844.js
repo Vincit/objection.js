@@ -1,7 +1,7 @@
 const { expect } = require('chai');
 const { Model } = require('../../../');
 
-module.exports = session => {
+module.exports = (session) => {
   describe(`Ambiguous column mapping for RelationJoinBuilder (no table ref) #844`, () => {
     let knex = session.knex;
     let Person;
@@ -12,21 +12,17 @@ module.exports = session => {
         .dropTableIfExists('Person_Movie')
         .dropTableIfExists('Movie')
         .dropTableIfExists('Person')
-        .createTable('Person', table => {
+        .createTable('Person', (table) => {
           table.increments('id').primary();
-          table
-            .integer('parentId')
-            .unsigned()
-            .references('id')
-            .inTable('Person');
+          table.integer('parentId').unsigned().references('id').inTable('Person');
           table.string('name');
           table.integer('age');
         })
-        .createTable('Movie', table => {
+        .createTable('Movie', (table) => {
           table.increments('id').primary();
           table.string('name');
         })
-        .createTable('Person_Movie', table => {
+        .createTable('Person_Movie', (table) => {
           table.increments('id').primary();
           table
             .integer('personId')
@@ -34,12 +30,7 @@ module.exports = session => {
             .references('id')
             .inTable('Person')
             .onDelete('CASCADE');
-          table
-            .integer('movieId')
-            .unsigned()
-            .references('id')
-            .inTable('Movie')
-            .onDelete('CASCADE');
+          table.integer('movieId').unsigned().references('id').inTable('Movie').onDelete('CASCADE');
         });
     });
 
@@ -65,11 +56,11 @@ module.exports = session => {
                 from: 'Person.id',
                 through: {
                   from: 'Person_Movie.personId',
-                  to: 'Person_Movie.movieId'
+                  to: 'Person_Movie.movieId',
                 },
-                to: 'Movie.id'
-              }
-            }
+                to: 'Movie.id',
+              },
+            },
           };
         }
       };
@@ -81,11 +72,8 @@ module.exports = session => {
 
         static get modifiers() {
           return {
-            onlyOldActors: builder =>
-              builder
-                .select('Movie.name')
-                .joinRelated('actors')
-                .where('actors.age', '>', 40)
+            onlyOldActors: (builder) =>
+              builder.select('Movie.name').joinRelated('actors').where('actors.age', '>', 40),
           };
         }
 
@@ -98,11 +86,11 @@ module.exports = session => {
                 from: 'Movie.id',
                 through: {
                   from: 'Person_Movie.movieId',
-                  to: 'Person_Movie.personId'
+                  to: 'Person_Movie.personId',
                 },
-                to: 'Person.id'
-              }
-            }
+                to: 'Person.id',
+              },
+            },
           };
         }
       };
@@ -118,9 +106,9 @@ module.exports = session => {
             {
               id: 1,
               name: 'person 1',
-              age: 30
-            }
-          ]
+              age: 30,
+            },
+          ],
         },
         {
           id: 2,
@@ -130,10 +118,10 @@ module.exports = session => {
             {
               id: 2,
               name: 'person 2',
-              age: 50
-            }
-          ]
-        }
+              age: 50,
+            },
+          ],
+        },
       ]);
     });
 
@@ -141,7 +129,7 @@ module.exports = session => {
       return Person.query(session.knex)
         .select('Person.name', 'movies.name as movieName')
         .joinRelated('movies(onlyOldActors)')
-        .then(results => {
+        .then((results) => {
           expect(results.length).to.equal(1);
           expect(results[0].movieName).to.equal('movie 2');
         });

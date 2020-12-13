@@ -1,13 +1,13 @@
 const { expect } = require('chai');
 const { Model } = require('../../../');
 
-module.exports = session => {
+module.exports = (session) => {
   describe(`modifiers that have no where or select statements don't work with joinRelated #712`, () => {
     let knex = session.knex;
     let Person;
 
     before(() => {
-      return knex.schema.dropTableIfExists('Person').createTable('Person', table => {
+      return knex.schema.dropTableIfExists('Person').createTable('Person', (table) => {
         table.increments('id').primary();
         table.string('name');
         table.integer('parentId');
@@ -26,15 +26,15 @@ module.exports = session => {
 
         static get modifiers() {
           return {
-            notFirstChild: builder => {
-              builder.from(subQuery => {
+            notFirstChild: (builder) => {
+              builder.from((subQuery) => {
                 subQuery
                   .select('Person.*')
                   .from('Person')
                   .where('name', '!=', 'child 1')
                   .as('Person');
               });
-            }
+            },
           };
         }
 
@@ -45,9 +45,9 @@ module.exports = session => {
               modelClass: Person,
               join: {
                 from: 'Person.id',
-                to: 'Person.parentId'
-              }
-            }
+                to: 'Person.parentId',
+              },
+            },
           };
         }
       };
@@ -62,13 +62,13 @@ module.exports = session => {
         children: [
           {
             id: 2,
-            name: 'child 1'
+            name: 'child 1',
           },
           {
             id: 3,
-            name: 'child 2'
-          }
-        ]
+            name: 'child 2',
+          },
+        ],
       });
     });
 
@@ -78,7 +78,7 @@ module.exports = session => {
         .select('Person.*', 'children.name as childName')
         .joinRelated('children(notFirstChild)')
         .orderBy('childName')
-        .then(people => {
+        .then((people) => {
           expect(people).to.have.length(1);
           expect(people[0].childName).to.equal('child 2');
         });

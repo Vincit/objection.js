@@ -3,7 +3,7 @@
 const Person = require('./models/Person')
 const Movie = require('./models/Movie')
 
-module.exports = router => {
+module.exports = (router) => {
   /**
    * Create a new Person.
    *
@@ -12,10 +12,10 @@ module.exports = router => {
    * a single person, `insertGraph` and `allowGraph` can be replaced by
    * `insert(ctx.request.body)`.
    */
-  router.post('/persons', async ctx => {
+  router.post('/persons', async (ctx) => {
     // insertGraph can run multiple queries. It's a good idea to
     // run it inside a transaction.
-    const insertedGraph = await Person.transaction(async trx => {
+    const insertedGraph = await Person.transaction(async (trx) => {
       const insertedGraph = await Person.query(trx)
         // For security reasons, limit the relations that can be inserted.
         .allowGraph('[pets, children.[pets, movies], movies, parent]')
@@ -45,7 +45,7 @@ module.exports = router => {
    *  withMovieCount:  return Persons with a `movieCount` column that holds the
    *                   number of movies the person has acted in.
    */
-  router.get('/persons', async ctx => {
+  router.get('/persons', async (ctx) => {
     const query = Person.query()
 
     if (ctx.query.select) {
@@ -78,19 +78,11 @@ module.exports = router => {
     }
 
     if (ctx.query.withPetCount) {
-      query.select(
-        Person.relatedQuery('pets')
-          .count()
-          .as('petCount')
-      )
+      query.select(Person.relatedQuery('pets').count().as('petCount'))
     }
 
     if (ctx.query.withMovieCount) {
-      query.select(
-        Person.relatedQuery('movies')
-          .count()
-          .as('movieCount')
-      )
+      query.select(Person.relatedQuery('movies').count().as('movieCount'))
     }
 
     // You can uncomment the next line to see the SQL that gets executed.
@@ -102,38 +94,32 @@ module.exports = router => {
   /**
    * Update a single Person.
    */
-  router.patch('/persons/:id', async ctx => {
-    const numUpdated = await Person.query()
-      .findById(ctx.params.id)
-      .patch(ctx.request.body)
+  router.patch('/persons/:id', async (ctx) => {
+    const numUpdated = await Person.query().findById(ctx.params.id).patch(ctx.request.body)
 
     ctx.body = {
-      success: numUpdated == 1
+      success: numUpdated == 1,
     }
   })
 
   /**
    * Delete a person.
    */
-  router.delete('/persons/:id', async ctx => {
-    const numDeleted = await Person.query()
-      .findById(ctx.params.id)
-      .delete()
+  router.delete('/persons/:id', async (ctx) => {
+    const numDeleted = await Person.query().findById(ctx.params.id).delete()
 
     ctx.body = {
-      success: numDeleted == 1
+      success: numDeleted == 1,
     }
   })
 
   /**
    * Insert a new child for a person.
    */
-  router.post('/persons/:id/children', async ctx => {
+  router.post('/persons/:id/children', async (ctx) => {
     const personId = parseInt(ctx.params.id)
 
-    const child = await Person.relatedQuery('children')
-      .for(personId)
-      .insert(ctx.request.body)
+    const child = await Person.relatedQuery('children').for(personId).insert(ctx.request.body)
 
     ctx.body = child
   })
@@ -149,7 +135,7 @@ module.exports = router => {
    *  actorInMovie:    only return children that are actors in this movie.
    *                   Provide the name of the movie.
    */
-  router.get('/persons/:id/children', async ctx => {
+  router.get('/persons/:id/children', async (ctx) => {
     const query = Person.relatedQuery('children').for(ctx.params.id)
 
     if (ctx.query.select) {
@@ -179,12 +165,10 @@ module.exports = router => {
   /**
    * Insert a new pet for a Person.
    */
-  router.post('/persons/:id/pets', async ctx => {
+  router.post('/persons/:id/pets', async (ctx) => {
     const personId = parseInt(ctx.params.id)
 
-    const pet = await Person.relatedQuery('pets')
-      .for(personId)
-      .insert(ctx.request.body)
+    const pet = await Person.relatedQuery('pets').for(personId).insert(ctx.request.body)
 
     ctx.body = pet
   })
@@ -197,7 +181,7 @@ module.exports = router => {
    *  name:       the name of the pets to fetch
    *  species:    the species of the pets to fetch
    */
-  router.get('/persons/:id/pets', async ctx => {
+  router.get('/persons/:id/pets', async (ctx) => {
     const query = Person.relatedQuery('pets').for(ctx.params.id)
 
     if (ctx.query.name) {
@@ -215,7 +199,7 @@ module.exports = router => {
   /**
    * Insert a new movie.
    */
-  router.post('/movies', async ctx => {
+  router.post('/movies', async (ctx) => {
     const movie = await Movie.query().insert(ctx.request.body)
     ctx.body = movie
   })
@@ -223,13 +207,13 @@ module.exports = router => {
   /**
    * Add existing Person as an actor to a movie.
    */
-  router.post('/movies/:movieId/actors/:personId', async ctx => {
+  router.post('/movies/:movieId/actors/:personId', async (ctx) => {
     const numRelated = await Movie.relatedQuery('actors')
       .for(ctx.params.movieId)
       .relate(ctx.params.personId)
 
     ctx.body = {
-      success: numRelated == 1
+      success: numRelated == 1,
     }
   })
 
@@ -237,21 +221,21 @@ module.exports = router => {
    * Remove a connection between a movie and an actor. Doesn't delete
    * the movie or the actor. Just removes their connection.
    */
-  router.delete('/movies/:movieId/actors/:personId', async ctx => {
+  router.delete('/movies/:movieId/actors/:personId', async (ctx) => {
     const numUnrelated = await Movie.relatedQuery('actors')
       .for(ctx.params.movieId)
       .unrelate()
       .where('persons.id', ctx.params.personId)
 
     ctx.body = {
-      success: numUnrelated == 1
+      success: numUnrelated == 1,
     }
   })
 
   /**
    * Get Movie's actors.
    */
-  router.get('/movies/:id/actors', async ctx => {
+  router.get('/movies/:id/actors', async (ctx) => {
     const actors = await Movie.relatedQuery('actors').for(ctx.params.id)
     ctx.body = actors
   })

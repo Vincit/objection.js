@@ -1,7 +1,7 @@
 const { Model } = require('../../../');
 const { expect } = require('chai');
 
-module.exports = session => {
+module.exports = (session) => {
   describe(`relations should be loaded lazily #1202`, () => {
     let knex = session.knex;
     let Person;
@@ -11,12 +11,12 @@ module.exports = session => {
       return knex.schema
         .dropTableIfExists('cousins')
         .dropTableIfExists('persons')
-        .createTable('persons', table => {
+        .createTable('persons', (table) => {
           table.increments('id').primary();
           table.integer('parentId');
           table.string('name');
         })
-        .createTable('cousins', table => {
+        .createTable('cousins', (table) => {
           table.integer('id1');
           table.integer('id2');
         });
@@ -44,8 +44,8 @@ module.exports = session => {
               },
               join: {
                 from: 'persons.parentId',
-                to: 'persons.id'
-              }
+                to: 'persons.id',
+              },
             },
 
             cousins: {
@@ -58,11 +58,11 @@ module.exports = session => {
                 from: 'persons.id',
                 through: {
                   from: 'cousins.id1',
-                  to: 'cousins.id2'
+                  to: 'cousins.id2',
                 },
-                to: 'persons.id'
-              }
-            }
+                to: 'persons.id',
+              },
+            },
           };
         }
       };
@@ -79,25 +79,16 @@ module.exports = session => {
         .insert({ name: 'Meinhart ' })
         .returning('id')
         .then(([id]) => {
-          return session
-            .knex('persons')
-            .insert({ name: 'Arnold', parentId: id })
-            .returning('id');
+          return session.knex('persons').insert({ name: 'Arnold', parentId: id }).returning('id');
         })
         .then(([arnoldId]) => {
           return Promise.all([
-            session
-              .knex('persons')
-              .insert({ name: 'Hans' })
-              .returning('id'),
-            session
-              .knex('persons')
-              .insert({ name: 'Urs' })
-              .returning('id')
+            session.knex('persons').insert({ name: 'Hans' }).returning('id'),
+            session.knex('persons').insert({ name: 'Urs' }).returning('id'),
           ]).then(([[hansId], [ursId]]) => {
             return Promise.all([
               session.knex('cousins').insert({ id1: arnoldId, id2: hansId }),
-              session.knex('cousins').insert({ id1: arnoldId, id2: ursId })
+              session.knex('cousins').insert({ id1: arnoldId, id2: ursId }),
             ]);
           });
         });
@@ -123,7 +114,7 @@ module.exports = session => {
     it('finding a model should not load relations', () => {
       return Person.query()
         .findOne({ name: 'Arnold' })
-        .then(result => {
+        .then((result) => {
           expect(result).to.containSubset({ name: 'Arnold' });
           expect(loadedRelations).to.have.length(0);
         });
@@ -132,7 +123,7 @@ module.exports = session => {
     it('toJSON a model should not load relations', () => {
       return Person.query()
         .findOne({ name: 'Arnold' })
-        .then(result => {
+        .then((result) => {
           result.toJSON();
           result.$toDatabaseJson();
           expect(loadedRelations).to.have.length(0);
@@ -166,7 +157,7 @@ module.exports = session => {
     it('$relatedQuery should only load the queried relation', () => {
       return Person.query()
         .findOne({ name: 'Arnold' })
-        .then(arnold => {
+        .then((arnold) => {
           return arnold.$relatedQuery('cousins');
         })
         .then(() => {
@@ -179,8 +170,8 @@ module.exports = session => {
         .insertGraph({
           name: 'Sami',
           parent: {
-            name: 'Liisa'
-          }
+            name: 'Liisa',
+          },
         })
         .then(() => {
           expect(loadedRelations).to.eql(['parent']);
@@ -192,9 +183,9 @@ module.exports = session => {
         name: 'Ardnold',
         cousins: [
           {
-            name: 'Hans'
-          }
-        ]
+            name: 'Hans',
+          },
+        ],
       });
 
       expect(loadedRelations).to.eql(['cousins']);

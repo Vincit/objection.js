@@ -23,7 +23,7 @@ describe('HasManyRelation', () => {
   before(() => {
     let knex = Knex({ client: 'pg' });
 
-    mockKnex = knexMocker(knex, function(mock, oldImpl, args) {
+    mockKnex = knexMocker(knex, function (mock, oldImpl, args) {
       executedQueries.push(this.toString());
 
       let result = mockKnexQueryResults.shift() || [];
@@ -50,7 +50,7 @@ describe('HasManyRelation', () => {
 
       static get modifiers() {
         return {
-          modifier: builder => builder.where('filteredProperty', true)
+          modifier: (builder) => builder.where('filteredProperty', true),
         };
       }
     };
@@ -66,8 +66,8 @@ describe('HasManyRelation', () => {
       relation: HasManyRelation,
       join: {
         from: 'OwnerModel.oid',
-        to: 'RelatedModel.ownerId'
-      }
+        to: 'RelatedModel.ownerId',
+      },
     });
 
     compositeKeyRelation = new HasManyRelation('nameOfOurRelation', OwnerModel);
@@ -76,8 +76,8 @@ describe('HasManyRelation', () => {
       relation: HasManyRelation,
       join: {
         from: ['OwnerModel.aid', 'OwnerModel.bid'],
-        to: ['RelatedModel.ownerAId', 'RelatedModel.ownerBId']
-      }
+        to: ['RelatedModel.ownerAId', 'RelatedModel.ownerBId'],
+      },
     });
   });
 
@@ -86,7 +86,7 @@ describe('HasManyRelation', () => {
       let owner = OwnerModel.fromJson({ oid: 666 });
       let expectedResult = [
         { a: 1, ownerId: 666 },
-        { a: 2, ownerId: 666 }
+        { a: 2, ownerId: 666 },
       ];
 
       mockKnexQueryResults = [expectedResult];
@@ -94,11 +94,11 @@ describe('HasManyRelation', () => {
       let builder = QueryBuilder.forClass(RelatedModel)
         .where('name', 'Teppo')
         .orWhere('age', '>', 60)
-        .findOperationFactory(builder => {
+        .findOperationFactory((builder) => {
           return relation.find(builder, RelationOwner.create(owner));
         });
 
-      return builder.then(result => {
+      return builder.then((result) => {
         expect(result).to.have.length(2);
         expect(result).to.eql(expectedResult);
         expect(owner.nameOfOurRelation).to.eql(expectedResult);
@@ -117,14 +117,14 @@ describe('HasManyRelation', () => {
     it('should generate a find query (composite key)', () => {
       let owners = [
         OwnerModel.fromJson({ aid: 11, bid: 22 }),
-        OwnerModel.fromJson({ aid: 11, bid: 33 })
+        OwnerModel.fromJson({ aid: 11, bid: 33 }),
       ];
 
       let expectedResult = [
         { a: 1, ownerAId: 11, ownerBId: 22 },
         { a: 2, ownerAId: 11, ownerBId: 22 },
         { a: 3, ownerAId: 11, ownerBId: 33 },
-        { a: 4, ownerAId: 11, ownerBId: 33 }
+        { a: 4, ownerAId: 11, ownerBId: 33 },
       ];
 
       mockKnexQueryResults = [expectedResult];
@@ -132,20 +132,20 @@ describe('HasManyRelation', () => {
       let builder = QueryBuilder.forClass(RelatedModel)
         .where('name', 'Teppo')
         .orWhere('age', '>', 60)
-        .findOperationFactory(builder => {
+        .findOperationFactory((builder) => {
           return compositeKeyRelation.find(builder, RelationOwner.create(owners));
         });
 
-      return builder.then(result => {
+      return builder.then((result) => {
         expect(result).to.have.length(4);
         expect(result).to.eql(expectedResult);
         expect(owners[0].nameOfOurRelation).to.eql([
           { a: 1, ownerAId: 11, ownerBId: 22 },
-          { a: 2, ownerAId: 11, ownerBId: 22 }
+          { a: 2, ownerAId: 11, ownerBId: 22 },
         ]);
         expect(owners[1].nameOfOurRelation).to.eql([
           { a: 3, ownerAId: 11, ownerBId: 33 },
-          { a: 4, ownerAId: 11, ownerBId: 33 }
+          { a: 4, ownerAId: 11, ownerBId: 33 },
         ]);
         expect(result[0]).to.be.a(RelatedModel);
         expect(result[1]).to.be.a(RelatedModel);
@@ -168,7 +168,7 @@ describe('HasManyRelation', () => {
         { a: 1, ownerId: 666 },
         { a: 2, ownerId: 666 },
         { a: 3, ownerId: 667 },
-        { a: 4, ownerId: 667 }
+        { a: 4, ownerId: 667 },
       ];
 
       mockKnexQueryResults = [expectedResult];
@@ -176,20 +176,20 @@ describe('HasManyRelation', () => {
       let builder = QueryBuilder.forClass(RelatedModel)
         .where('name', 'Teppo')
         .orWhere('age', '>', 60)
-        .findOperationFactory(builder => {
+        .findOperationFactory((builder) => {
           return relation.find(builder, RelationOwner.create(owners));
         });
 
-      return builder.then(result => {
+      return builder.then((result) => {
         expect(result).to.have.length(4);
         expect(result).to.eql(expectedResult);
         expect(owners[0].nameOfOurRelation).to.eql([
           { a: 1, ownerId: 666 },
-          { a: 2, ownerId: 666 }
+          { a: 2, ownerId: 666 },
         ]);
         expect(owners[1].nameOfOurRelation).to.eql([
           { a: 3, ownerId: 667 },
-          { a: 4, ownerId: 667 }
+          { a: 4, ownerId: 667 },
         ]);
         expect(result[0]).to.be.a(RelatedModel);
         expect(result[1]).to.be.a(RelatedModel);
@@ -209,7 +209,7 @@ describe('HasManyRelation', () => {
       let owner = OwnerModel.fromJson({ oid: 666 });
       let expectedResult = [
         { a: 1, ownerId: 666 },
-        { a: 2, ownerId: 666 }
+        { a: 2, ownerId: 666 },
       ];
 
       mockKnexQueryResults = [expectedResult];
@@ -218,11 +218,11 @@ describe('HasManyRelation', () => {
         .where('name', 'Teppo')
         .orWhere('age', '>', 60)
         .select('name')
-        .findOperationFactory(builder => {
+        .findOperationFactory((builder) => {
           return relation.find(builder, RelationOwner.create(owner));
         });
 
-      return builder.then(result => {
+      return builder.then((result) => {
         expect(result).to.have.length(2);
         expect(result).to.eql(expectedResult);
         expect(owner.nameOfOurRelation).to.eql(expectedResult);
@@ -244,7 +244,7 @@ describe('HasManyRelation', () => {
       let owner = OwnerModel.fromJson({ oid: 666 });
       let expectedResult = [
         { a: 1, ownerId: 666 },
-        { a: 2, ownerId: 666 }
+        { a: 2, ownerId: 666 },
       ];
 
       mockKnexQueryResults = [expectedResult];
@@ -252,11 +252,11 @@ describe('HasManyRelation', () => {
       let builder = QueryBuilder.forClass(RelatedModel)
         .where('name', 'Teppo')
         .orWhere('age', '>', 60)
-        .findOperationFactory(builder => {
+        .findOperationFactory((builder) => {
           return relation.find(builder, RelationOwner.create(owner));
         });
 
-      return builder.then(result => {
+      return builder.then((result) => {
         expect(result).to.have.length(2);
         expect(result).to.eql(expectedResult);
         expect(owner.nameOfOurRelation).to.eql(expectedResult);
@@ -273,12 +273,12 @@ describe('HasManyRelation', () => {
     });
 
     it('should apply a modifier function', () => {
-      createModifiedRelation(builder => builder.where('someColumn', 'foo'));
+      createModifiedRelation((builder) => builder.where('someColumn', 'foo'));
 
       let owner = OwnerModel.fromJson({ oid: 666 });
       let expectedResult = [
         { a: 1, ownerId: 666 },
-        { a: 2, ownerId: 666 }
+        { a: 2, ownerId: 666 },
       ];
 
       mockKnexQueryResults = [expectedResult];
@@ -286,11 +286,11 @@ describe('HasManyRelation', () => {
       let builder = QueryBuilder.forClass(RelatedModel)
         .where('name', 'Teppo')
         .orWhere('age', '>', 60)
-        .findOperationFactory(builder => {
+        .findOperationFactory((builder) => {
           return relation.find(builder, RelationOwner.create(owner));
         });
 
-      return builder.then(result => {
+      return builder.then((result) => {
         expect(result).to.have.length(2);
         expect(result).to.eql(expectedResult);
         expect(owner.nameOfOurRelation).to.eql(expectedResult);
@@ -312,7 +312,7 @@ describe('HasManyRelation', () => {
       let owner = OwnerModel.fromJson({ oid: 666 });
       let expectedResult = [
         { a: 1, ownerId: 666 },
-        { a: 2, ownerId: 666 }
+        { a: 2, ownerId: 666 },
       ];
 
       mockKnexQueryResults = [expectedResult];
@@ -320,11 +320,11 @@ describe('HasManyRelation', () => {
       let builder = QueryBuilder.forClass(RelatedModel)
         .where('name', 'Teppo')
         .orWhere('age', '>', 60)
-        .findOperationFactory(builder => {
+        .findOperationFactory((builder) => {
           return relation.find(builder, RelationOwner.create(owner));
         });
 
-      return builder.then(result => {
+      return builder.then((result) => {
         expect(result).to.have.length(2);
         expect(result).to.eql(expectedResult);
         expect(owner.nameOfOurRelation).to.eql(expectedResult);
@@ -349,7 +349,7 @@ describe('HasManyRelation', () => {
       let related = [RelatedModel.fromJson({ a: 'str1' }), RelatedModel.fromJson({ a: 'str2' })];
 
       let builder = QueryBuilder.forClass(RelatedModel)
-        .insertOperationFactory(builder => {
+        .insertOperationFactory((builder) => {
           return relation.insert(builder, RelationOwner.create(owner));
         })
         .insert(related);
@@ -357,7 +357,7 @@ describe('HasManyRelation', () => {
       let toString = builder.toKnexQuery().toString();
       let toSql = builder.toKnexQuery().toString();
 
-      return builder.then(result => {
+      return builder.then((result) => {
         expect(executedQueries).to.have.length(1);
         expect(executedQueries[0]).to.equal(toString);
         expect(executedQueries[0]).to.equal(toSql);
@@ -368,7 +368,7 @@ describe('HasManyRelation', () => {
         expect(owner.nameOfOurRelation).to.eql(result);
         expect(result).to.eql([
           { a: 'str1', id: 1, ownerId: 666 },
-          { a: 'str2', id: 2, ownerId: 666 }
+          { a: 'str2', id: 2, ownerId: 666 },
         ]);
         expect(result[0]).to.be.a(RelatedModel);
         expect(result[1]).to.be.a(RelatedModel);
@@ -382,7 +382,7 @@ describe('HasManyRelation', () => {
       let related = [RelatedModel.fromJson({ a: 'str1' }), RelatedModel.fromJson({ a: 'str2' })];
 
       let builder = QueryBuilder.forClass(RelatedModel)
-        .insertOperationFactory(builder => {
+        .insertOperationFactory((builder) => {
           return compositeKeyRelation.insert(builder, RelationOwner.create(owner));
         })
         .insert(related);
@@ -390,7 +390,7 @@ describe('HasManyRelation', () => {
       let toString = builder.toKnexQuery().toString();
       let toSql = builder.toKnexQuery().toString();
 
-      return builder.then(result => {
+      return builder.then((result) => {
         expect(executedQueries).to.have.length(1);
         expect(executedQueries[0]).to.equal(toString);
         expect(executedQueries[0]).to.equal(toSql);
@@ -401,7 +401,7 @@ describe('HasManyRelation', () => {
         expect(owner.nameOfOurRelation).to.eql(result);
         expect(result).to.eql([
           { a: 'str1', id: 1, ownerAId: 11, ownerBId: 22 },
-          { a: 'str2', id: 2, ownerAId: 11, ownerBId: 22 }
+          { a: 'str2', id: 2, ownerAId: 11, ownerBId: 22 },
         ]);
         expect(result[0]).to.be.a(RelatedModel);
         expect(result[1]).to.be.a(RelatedModel);
@@ -415,18 +415,18 @@ describe('HasManyRelation', () => {
       let related = [{ a: 'str1' }, { a: 'str2' }];
 
       return QueryBuilder.forClass(RelatedModel)
-        .insertOperationFactory(builder => {
+        .insertOperationFactory((builder) => {
           return relation.insert(builder, RelationOwner.create(owner));
         })
         .insert(related)
-        .then(result => {
+        .then((result) => {
           expect(executedQueries).to.have.length(1);
           expect(executedQueries[0]).to.equal(
             'insert into "RelatedModel" ("a", "ownerId") values (\'str1\', 666), (\'str2\', 666) returning "id"'
           );
           expect(result).to.eql([
             { a: 'str1', id: 1, ownerId: 666 },
-            { a: 'str2', id: 2, ownerId: 666 }
+            { a: 'str2', id: 2, ownerId: 666 },
           ]);
           expect(result[0]).to.be.a(RelatedModel);
           expect(result[1]).to.be.a(RelatedModel);
@@ -440,11 +440,11 @@ describe('HasManyRelation', () => {
       let related = RelatedModel.fromJson({ a: 'str1' });
 
       return QueryBuilder.forClass(RelatedModel)
-        .insertOperationFactory(builder => {
+        .insertOperationFactory((builder) => {
           return relation.insert(builder, RelationOwner.create(owner));
         })
         .insert(related)
-        .then(result => {
+        .then((result) => {
           expect(executedQueries).to.have.length(1);
           expect(executedQueries[0]).to.equal(
             'insert into "RelatedModel" ("a", "ownerId") values (\'str1\', 666) returning "id"'
@@ -461,11 +461,11 @@ describe('HasManyRelation', () => {
       let related = { a: 'str1' };
 
       return QueryBuilder.forClass(RelatedModel)
-        .insertOperationFactory(builder => {
+        .insertOperationFactory((builder) => {
           return relation.insert(builder, RelationOwner.create(owner));
         })
         .insert(related)
-        .then(result => {
+        .then((result) => {
           expect(executedQueries).to.have.length(1);
           expect(executedQueries[0]).to.equal(
             'insert into "RelatedModel" ("a", "ownerId") values (\'str1\', 666) returning "id"'
@@ -484,7 +484,7 @@ describe('HasManyRelation', () => {
       let update = RelatedModel.fromJson({ a: 'str1' });
 
       let builder = QueryBuilder.forClass(RelatedModel)
-        .updateOperationFactory(builder => {
+        .updateOperationFactory((builder) => {
           return relation.update(builder, RelationOwner.create(owner));
         })
         .update(update)
@@ -492,7 +492,7 @@ describe('HasManyRelation', () => {
         .whereNotNull('thingy')
         .select('shouldBeIgnored');
 
-      return builder.then(numUpdated => {
+      return builder.then((numUpdated) => {
         expect(numUpdated).to.equal(42);
         expect(executedQueries).to.have.length(1);
         expect(executedQueries[0]).to.equal(builder.toKnexQuery().toString());
@@ -510,7 +510,7 @@ describe('HasManyRelation', () => {
       let update = RelatedModel.fromJson({ a: 'str1' });
 
       let builder = QueryBuilder.forClass(RelatedModel)
-        .updateOperationFactory(builder => {
+        .updateOperationFactory((builder) => {
           return compositeKeyRelation.update(builder, RelationOwner.create(owner));
         })
         .update(update)
@@ -518,7 +518,7 @@ describe('HasManyRelation', () => {
         .whereNotNull('thingy')
         .select('shouldBeIgnored');
 
-      return builder.then(numUpdated => {
+      return builder.then((numUpdated) => {
         expect(numUpdated).to.equal(42);
         expect(executedQueries).to.have.length(1);
         expect(executedQueries[0]).to.equal(builder.toKnexQuery().toString());
@@ -536,14 +536,14 @@ describe('HasManyRelation', () => {
       let update = { a: 'str1' };
 
       return QueryBuilder.forClass(RelatedModel)
-        .updateOperationFactory(builder => {
+        .updateOperationFactory((builder) => {
           return relation.update(builder, RelationOwner.create(owner));
         })
         .update(update)
         .where('gender', 'male')
         .whereNotNull('thingy')
         .select('shouldBeIgnored')
-        .then(numUpdated => {
+        .then((numUpdated) => {
           expect(numUpdated).to.equal(42);
           expect(executedQueries).to.have.length(1);
           expect(executedQueries[0]).to.eql(
@@ -561,14 +561,14 @@ describe('HasManyRelation', () => {
       let update = RelatedModel.fromJson({ a: 'str1' });
 
       return QueryBuilder.forClass(RelatedModel)
-        .updateOperationFactory(builder => {
+        .updateOperationFactory((builder) => {
           return relation.update(builder, RelationOwner.create(owner));
         })
         .update(update)
         .where('gender', 'male')
         .whereNotNull('thingy')
         .select('shouldBeIgnored')
-        .then(numUpdated => {
+        .then((numUpdated) => {
           expect(numUpdated).to.equal(42);
           expect(executedQueries).to.have.length(1);
           expect(executedQueries[0]).to.eql(
@@ -586,7 +586,7 @@ describe('HasManyRelation', () => {
       let patch = RelatedModel.fromJson({ a: 'str1' });
 
       let builder = QueryBuilder.forClass(RelatedModel)
-        .patchOperationFactory(builder => {
+        .patchOperationFactory((builder) => {
           return relation.patch(builder, RelationOwner.create(owner));
         })
         .patch(patch)
@@ -594,7 +594,7 @@ describe('HasManyRelation', () => {
         .whereNotNull('thingy')
         .select('shouldBeIgnored');
 
-      return builder.then(numUpdated => {
+      return builder.then((numUpdated) => {
         expect(numUpdated).to.equal(42);
         expect(executedQueries).to.have.length(1);
         expect(executedQueries[0]).to.equal(builder.toKnexQuery().toString());
@@ -613,22 +613,22 @@ describe('HasManyRelation', () => {
         required: ['b'],
         properties: {
           a: { type: 'string' },
-          b: { type: 'string' }
-        }
+          b: { type: 'string' },
+        },
       };
 
       let owner = OwnerModel.fromJson({ oid: 666 });
       let patch = { a: 'str1' };
 
       return QueryBuilder.forClass(RelatedModel)
-        .patchOperationFactory(builder => {
+        .patchOperationFactory((builder) => {
           return relation.patch(builder, RelationOwner.create(owner));
         })
         .patch(patch)
         .where('gender', 'male')
         .whereNotNull('thingy')
         .select('shouldBeIgnored')
-        .then(numUpdated => {
+        .then((numUpdated) => {
           expect(numUpdated).to.equal(42);
           expect(executedQueries).to.have.length(1);
           expect(executedQueries[0]).to.eql(
@@ -642,11 +642,11 @@ describe('HasManyRelation', () => {
       let owner = OwnerModel.fromJson({ oid: 666 });
 
       return QueryBuilder.forClass(RelatedModel)
-        .patchOperationFactory(builder => {
+        .patchOperationFactory((builder) => {
           return relation.patch(builder, RelationOwner.create(owner));
         })
         .increment('test', 1)
-        .then(numUpdated => {
+        .then((numUpdated) => {
           expect(numUpdated).to.equal(42);
           expect(executedQueries).to.have.length(1);
           expect(executedQueries[0]).to.eql(
@@ -660,11 +660,11 @@ describe('HasManyRelation', () => {
       let owner = OwnerModel.fromJson({ oid: 666 });
 
       return QueryBuilder.forClass(RelatedModel)
-        .patchOperationFactory(builder => {
+        .patchOperationFactory((builder) => {
           return relation.patch(builder, RelationOwner.create(owner));
         })
         .decrement('test', 10)
-        .then(numUpdated => {
+        .then((numUpdated) => {
           expect(numUpdated).to.equal(42);
           expect(executedQueries).to.have.length(1);
           expect(executedQueries[0]).to.eql(
@@ -680,7 +680,7 @@ describe('HasManyRelation', () => {
       let patch = RelatedModel.fromJson({ a: 'str1' });
 
       return QueryBuilder.forClass(RelatedModel)
-        .patchOperationFactory(builder => {
+        .patchOperationFactory((builder) => {
           return relation.patch(builder, RelationOwner.create(owner));
         })
         .patch(patch)
@@ -701,7 +701,7 @@ describe('HasManyRelation', () => {
       let owner = OwnerModel.fromJson({ oid: 666 });
 
       let builder = QueryBuilder.forClass(RelatedModel)
-        .deleteOperationFactory(builder => {
+        .deleteOperationFactory((builder) => {
           return relation.delete(builder, RelationOwner.create(owner));
         })
         .delete()
@@ -709,7 +709,7 @@ describe('HasManyRelation', () => {
         .whereNotNull('thingy')
         .select('shouldBeIgnored');
 
-      return builder.then(result => {
+      return builder.then((result) => {
         expect(executedQueries).to.have.length(1);
         expect(result).to.eql({});
 
@@ -725,7 +725,7 @@ describe('HasManyRelation', () => {
       let owner = OwnerModel.fromJson({ aid: 11, bid: 22 });
 
       let builder = QueryBuilder.forClass(RelatedModel)
-        .deleteOperationFactory(builder => {
+        .deleteOperationFactory((builder) => {
           return compositeKeyRelation.delete(builder, RelationOwner.create(owner));
         })
         .delete()
@@ -733,7 +733,7 @@ describe('HasManyRelation', () => {
         .whereNotNull('thingy')
         .select('shouldBeIgnored');
 
-      return builder.then(result => {
+      return builder.then((result) => {
         expect(executedQueries).to.have.length(1);
         expect(result).to.eql({});
 
@@ -750,14 +750,14 @@ describe('HasManyRelation', () => {
       let owner = OwnerModel.fromJson({ oid: 666 });
 
       return QueryBuilder.forClass(RelatedModel)
-        .deleteOperationFactory(builder => {
+        .deleteOperationFactory((builder) => {
           return relation.delete(builder, RelationOwner.create(owner));
         })
         .delete()
         .where('gender', 'male')
         .whereNotNull('thingy')
         .select('shouldBeIgnored')
-        .then(result => {
+        .then((result) => {
           expect(executedQueries).to.have.length(1);
           expect(result).to.eql({});
           expect(executedQueries[0]).to.eql(
@@ -773,12 +773,12 @@ describe('HasManyRelation', () => {
       let owner = OwnerModel.fromJson({ oid: 666 });
 
       let builder = QueryBuilder.forClass(RelatedModel)
-        .relateOperationFactory(builder => {
+        .relateOperationFactory((builder) => {
           return relation.relate(builder, RelationOwner.create(owner));
         })
         .relate(10);
 
-      return builder.then(result => {
+      return builder.then((result) => {
         expect(executedQueries).to.have.length(1);
         expect(result).to.eql(123);
 
@@ -795,12 +795,12 @@ describe('HasManyRelation', () => {
       let owner = OwnerModel.fromJson({ oid: 666 });
 
       let builder = QueryBuilder.forClass(RelatedModel)
-        .relateOperationFactory(builder => {
+        .relateOperationFactory((builder) => {
           return relation.relate(builder, RelationOwner.create(owner));
         })
         .relate([10, 20, 30]);
 
-      return builder.then(result => {
+      return builder.then((result) => {
         expect(executedQueries).to.have.length(1);
         expect(result).to.eql([5, 6, 7]);
 
@@ -817,12 +817,12 @@ describe('HasManyRelation', () => {
       let owner = OwnerModel.fromJson({ oid: 666 });
 
       let builder = QueryBuilder.forClass(RelatedModel)
-        .relateOperationFactory(builder => {
+        .relateOperationFactory((builder) => {
           return relation.relate(builder, RelationOwner.create(owner));
         })
         .relate({ id: 10 });
 
-      return builder.then(result => {
+      return builder.then((result) => {
         expect(executedQueries).to.have.length(1);
         expect(result).to.eql(123);
 
@@ -839,12 +839,12 @@ describe('HasManyRelation', () => {
       let owner = OwnerModel.fromJson({ oid: 666 });
 
       let builder = QueryBuilder.forClass(RelatedModel)
-        .relateOperationFactory(builder => {
+        .relateOperationFactory((builder) => {
           return relation.relate(builder, RelationOwner.create(owner));
         })
         .relate([{ id: 10 }, { id: 20 }]);
 
-      return builder.then(result => {
+      return builder.then((result) => {
         expect(executedQueries).to.have.length(1);
         expect(result).to.eql(123);
 
@@ -861,12 +861,12 @@ describe('HasManyRelation', () => {
       let owner = OwnerModel.fromJson({ aid: 11, bid: 22 });
 
       let builder = QueryBuilder.forClass(RelatedModel)
-        .relateOperationFactory(builder => {
+        .relateOperationFactory((builder) => {
           return compositeKeyRelation.relate(builder, RelationOwner.create(owner));
         })
         .relate([1, 2, 3]);
 
-      return builder.then(result => {
+      return builder.then((result) => {
         expect(executedQueries).to.have.length(1);
         expect(result).to.eql(123);
 
@@ -883,11 +883,11 @@ describe('HasManyRelation', () => {
       let owner = OwnerModel.fromJson({ oid: 666 });
 
       return QueryBuilder.forClass(RelatedModel)
-        .relateOperationFactory(builder => {
+        .relateOperationFactory((builder) => {
           return relation.relate(builder, RelationOwner.create(owner));
         })
         .relate(11)
-        .then(result => {
+        .then((result) => {
           expect(executedQueries).to.have.length(1);
           expect(result).to.eql(123);
           expect(executedQueries[0]).to.eql(
@@ -903,13 +903,13 @@ describe('HasManyRelation', () => {
       let owner = OwnerModel.fromJson({ oid: 666 });
 
       let builder = QueryBuilder.forClass(RelatedModel)
-        .unrelateOperationFactory(builder => {
+        .unrelateOperationFactory((builder) => {
           return relation.unrelate(builder, RelationOwner.create(owner));
         })
         .unrelate()
         .whereIn('code', [55, 66, 77]);
 
-      return builder.then(result => {
+      return builder.then((result) => {
         expect(executedQueries).to.have.length(1);
         expect(result).to.eql(123);
 
@@ -926,13 +926,13 @@ describe('HasManyRelation', () => {
       let owner = OwnerModel.fromJson({ aid: 11, bid: 22 });
 
       let builder = QueryBuilder.forClass(RelatedModel)
-        .unrelateOperationFactory(builder => {
+        .unrelateOperationFactory((builder) => {
           return compositeKeyRelation.unrelate(builder, RelationOwner.create(owner));
         })
         .unrelate()
         .whereIn('code', [55, 66, 77]);
 
-      return builder.then(result => {
+      return builder.then((result) => {
         expect(executedQueries).to.have.length(1);
         expect(result).to.eql(123);
 
@@ -949,12 +949,12 @@ describe('HasManyRelation', () => {
       let owner = OwnerModel.fromJson({ oid: 666 });
 
       return QueryBuilder.forClass(RelatedModel)
-        .unrelateOperationFactory(builder => {
+        .unrelateOperationFactory((builder) => {
           return relation.unrelate(builder, RelationOwner.create(owner));
         })
         .unrelate()
         .whereIn('code', [55, 66, 77])
-        .then(result => {
+        .then((result) => {
           expect(executedQueries).to.have.length(1);
           expect(result).to.eql({});
           expect(executedQueries[0]).to.eql(
@@ -973,10 +973,10 @@ describe('HasManyRelation', () => {
           join: {
             from: 'OwnerModel.oid',
             through: {},
-            to: 'RelatedModel.ownerId'
-          }
+            to: 'RelatedModel.ownerId',
+          },
         });
-      }).to.throwException(err => {
+      }).to.throwException((err) => {
         expect(err.message).to.equal(
           'OwnerModel.relationMappings.nameOfOurRelation: Property join.through is not supported for this relation type.'
         );
@@ -994,8 +994,8 @@ describe('HasManyRelation', () => {
       filter: filter,
       join: {
         from: 'OwnerModel.oid',
-        to: 'RelatedModel.ownerId'
-      }
+        to: 'RelatedModel.ownerId',
+      },
     });
   }
 });

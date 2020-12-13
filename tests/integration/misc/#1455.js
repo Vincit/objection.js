@@ -1,7 +1,7 @@
 const { Model, transaction } = require('../../../');
 const { expect } = require('chai');
 
-module.exports = session => {
+module.exports = (session) => {
   describe('UpsertGraph deletes rows for relation which is not mentioned in graph #1455', () => {
     let knex = session.knex;
     let Role;
@@ -14,29 +14,23 @@ module.exports = session => {
         .then(() => knex.schema.dropTableIfExists('sets'))
         .then(() => knex.schema.dropTableIfExists('setsAttributes'))
         .then(() => {
-          return knex.schema.createTable('roles', table => {
+          return knex.schema.createTable('roles', (table) => {
             table.increments();
             table.string('name').notNullable();
           });
         })
         .then(() => {
-          return knex.schema.createTable('sets', table => {
+          return knex.schema.createTable('sets', (table) => {
             table.increments();
             table.string('name').notNullable();
-            table
-              .integer('roleId')
-              .unsigned()
-              .notNullable();
+            table.integer('roleId').unsigned().notNullable();
           });
         })
         .then(() => {
-          return knex.schema.createTable('setsAttributes', table => {
+          return knex.schema.createTable('setsAttributes', (table) => {
             table.increments();
             table.string('name').notNullable();
-            table
-              .integer('setId')
-              .unsigned()
-              .notNullable();
+            table.integer('setId').unsigned().notNullable();
           });
         });
     });
@@ -77,8 +71,8 @@ module.exports = session => {
             setAttributes: {
               relation: BaseModel.HasManyRelation,
               modelClass: SetAttribute,
-              join: { from: 'sets.id', to: 'setsAttributes.setId' }
-            }
+              join: { from: 'sets.id', to: 'setsAttributes.setId' },
+            },
           };
         }
       }
@@ -93,8 +87,8 @@ module.exports = session => {
             sets: {
               relation: BaseModel.HasManyRelation,
               modelClass: Set,
-              join: { from: 'roles.id', to: 'sets.roleId' }
-            }
+              join: { from: 'roles.id', to: 'sets.roleId' },
+            },
           };
         }
       };
@@ -103,28 +97,28 @@ module.exports = session => {
     });
 
     it('test', () => {
-      return transaction(Role.knex(), trx =>
+      return transaction(Role.knex(), (trx) =>
         Role.query(trx).insertGraph({
           name: 'First Role',
           sets: [
             {
               name: 'First Set',
-              setAttributes: [{ name: 'First SetAttribute' }, { name: 'Second SetAttribute' }]
-            }
-          ]
+              setAttributes: [{ name: 'First SetAttribute' }, { name: 'Second SetAttribute' }],
+            },
+          ],
         })
       )
-        .then(role => {
-          return transaction(Role.knex(), trx =>
+        .then((role) => {
+          return transaction(Role.knex(), (trx) =>
             Role.query(trx).upsertGraph({
               id: role.id,
               sets: [
                 { id: role.sets[0].id },
                 {
                   name: 'Second Set',
-                  setAttributes: [{ name: 'First SetAttribute' }, { name: 'Second SetAttribute' }]
-                }
-              ]
+                  setAttributes: [{ name: 'First SetAttribute' }, { name: 'Second SetAttribute' }],
+                },
+              ],
             })
           );
         })
@@ -139,10 +133,10 @@ module.exports = session => {
 
               orderByName(query) {
                 query.orderBy('name');
-              }
+              },
             });
         })
-        .then(setsAfterUpsertGraph => {
+        .then((setsAfterUpsertGraph) => {
           expect(setsAfterUpsertGraph).to.containSubset({
             id: 1,
             name: 'First Role',
@@ -154,8 +148,8 @@ module.exports = session => {
 
                 setAttributes: [
                   { name: 'First SetAttribute', setId: 1 },
-                  { name: 'Second SetAttribute', setId: 1 }
-                ]
+                  { name: 'Second SetAttribute', setId: 1 },
+                ],
               },
               {
                 id: 2,
@@ -164,10 +158,10 @@ module.exports = session => {
 
                 setAttributes: [
                   { name: 'First SetAttribute', setId: 2 },
-                  { name: 'Second SetAttribute', setId: 2 }
-                ]
-              }
-            ]
+                  { name: 'Second SetAttribute', setId: 2 },
+                ],
+              },
+            ],
           });
         });
     });

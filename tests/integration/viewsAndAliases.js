@@ -5,10 +5,10 @@ const mockKnexFactory = require('../../testUtils/mockKnex');
 
 // This is another one of those features that need a separate test suite
 // because they are so pervasive.
-module.exports = session => {
+module.exports = (session) => {
   const queries = [];
 
-  const knex = mockKnexFactory(session.knex, function(mock, oldImpl, args) {
+  const knex = mockKnexFactory(session.knex, function (mock, oldImpl, args) {
     queries.push(this.toString());
     return oldImpl.apply(this, args);
   });
@@ -40,11 +40,11 @@ module.exports = session => {
                 model1Relation2: [
                   {
                     idCol: 4,
-                    model2Prop1: 'hejsan 4'
-                  }
-                ]
-              }
-            }
+                    model2Prop1: 'hejsan 4',
+                  },
+                ],
+              },
+            },
           },
 
           model1Relation2: [
@@ -58,9 +58,9 @@ module.exports = session => {
 
                 model1Relation1: {
                   id: 9,
-                  model1Prop1: 'hello 9'
-                }
-              }
+                  model1Prop1: 'hello 9',
+                },
+              },
             },
             {
               idCol: 2,
@@ -70,7 +70,7 @@ module.exports = session => {
                 {
                   id: 5,
                   model1Prop1: 'hello 5',
-                  aliasedExtra: 'extra 5'
+                  aliasedExtra: 'extra 5',
                 },
                 {
                   id: 6,
@@ -79,20 +79,20 @@ module.exports = session => {
 
                   model1Relation1: {
                     id: 7,
-                    model1Prop1: 'hello 7'
+                    model1Prop1: 'hello 7',
                   },
 
                   model1Relation2: [
                     {
                       idCol: 3,
-                      model2Prop1: 'hejsan 3'
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        }
+                      model2Prop1: 'hejsan 3',
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
       ]);
     });
 
@@ -121,7 +121,7 @@ module.exports = session => {
             model1Id: 3,
             model1Prop1: 'hello 2',
             model1Prop2: null,
-            $afterFindCalled: 1
+            $afterFindCalled: 1,
           },
 
           model1Relation2: [
@@ -131,7 +131,7 @@ module.exports = session => {
               model2Prop1: 'hejsan 1',
               model2Prop2: null,
               $afterFindCalled: 1,
-              model2Relation1: []
+              model2Relation1: [],
             },
             {
               idCol: 2,
@@ -149,7 +149,7 @@ module.exports = session => {
                   aliasedExtra: 'extra 5',
                   model1Relation1: null,
                   model1Relation2: [],
-                  $afterFindCalled: 1
+                  $afterFindCalled: 1,
                 },
                 {
                   id: 6,
@@ -164,7 +164,7 @@ module.exports = session => {
                     model1Id: null,
                     model1Prop1: 'hello 7',
                     model1Prop2: null,
-                    $afterFindCalled: 1
+                    $afterFindCalled: 1,
                   },
 
                   model1Relation2: [
@@ -173,14 +173,14 @@ module.exports = session => {
                       model1Id: 6,
                       model2Prop1: 'hejsan 3',
                       model2Prop2: null,
-                      $afterFindCalled: 1
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        }
+                      $afterFindCalled: 1,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
       ];
     });
 
@@ -198,7 +198,7 @@ module.exports = session => {
           .findById(1)
           .table('Model1 as someAlias')
           .joinRelated('[model1Relation1, model1Relation2, model1Relation3]')
-          .then(models => {
+          .then((models) => {
             if (utils.isPostgres(session.knex)) {
               expect(queries[0].replace(/\s/g, '')).to.equal(
                 `
@@ -218,17 +218,14 @@ module.exports = session => {
       it('should use alias with an instance query', () => {
         return Model1.query()
           .findById(1)
-          .then(model => {
+          .then((model) => {
             queries.splice(0, queries.length);
-            return model
-              .$query()
-              .alias('foo')
-              .joinRelated('model1Relation1.model1Relation1');
+            return model.$query().alias('foo').joinRelated('model1Relation1.model1Relation1');
           })
-          .then(model => {
+          .then((model) => {
             if (session.isPostgres()) {
               expect(queries).to.eql([
-                'select "foo".* from "Model1" as "foo" inner join "Model1" as "model1Relation1" on "model1Relation1"."id" = "foo"."model1Id" inner join "Model1" as "model1Relation1:model1Relation1" on "model1Relation1:model1Relation1"."id" = "model1Relation1"."model1Id" where "foo"."id" = 1'
+                'select "foo".* from "Model1" as "foo" inner join "Model1" as "model1Relation1" on "model1Relation1"."id" = "foo"."model1Id" inner join "Model1" as "model1Relation1:model1Relation1" on "model1Relation1:model1Relation1"."id" = "model1Relation1"."model1Id" where "foo"."id" = 1',
               ]);
             }
           });
@@ -240,7 +237,7 @@ module.exports = session => {
           .table('Model1 as someAlias')
           .eager(fullEager)
           .then(sortEager)
-          .then(model => {
+          .then((model) => {
             if (utils.isPostgres(session.knex)) {
               queries.sort();
 
@@ -250,7 +247,7 @@ module.exports = session => {
                 /select "someAlias"\.\* from "Model1" as "someAlias" where "someAlias"\."id" = 1/,
                 /select "someAlias"\.\* from "Model1" as "someAlias" where "someAlias"\."id" in \(2\)/,
                 /select "someAlias"\.\* from "Model1" as "someAlias" where "someAlias"\."id" in \(7\)/,
-                /select "someAlias"\.\*, "Model1Model2"\."extra3" as "aliasedExtra", "Model1Model2"\."model2Id" as "objectiontmpjoin0" from "Model1" as "someAlias" inner join "Model1Model2" on "someAlias"\."id" = "Model1Model2"\."model1Id" where "Model1Model2"\."model2Id" in (\(1, 2\)|\(2, 1\))/
+                /select "someAlias"\.\*, "Model1Model2"\."extra3" as "aliasedExtra", "Model1Model2"\."model2Id" as "objectiontmpjoin0" from "Model1" as "someAlias" inner join "Model1Model2" on "someAlias"\."id" = "Model1Model2"\."model1Id" where "Model1Model2"\."model2Id" in (\(1, 2\)|\(2, 1\))/,
               ];
 
               expectedQueries.forEach((expectedQuery, i) => {
@@ -268,7 +265,7 @@ module.exports = session => {
           .alias('someAlias')
           .eager(fullEager)
           .then(sortEager)
-          .then(model => {
+          .then((model) => {
             if (utils.isPostgres(session.knex)) {
               queries.sort();
 
@@ -278,7 +275,7 @@ module.exports = session => {
                 /select "someAlias"\.\* from "Model1" as "someAlias" where "someAlias"\."id" = 1/,
                 /select "someAlias"\.\* from "Model1" as "someAlias" where "someAlias"\."id" in \(2\)/,
                 /select "someAlias"\.\* from "Model1" as "someAlias" where "someAlias"\."id" in \(7\)/,
-                /select "someAlias"\.\*, "Model1Model2"\."extra3" as "aliasedExtra", "Model1Model2"\."model2Id" as "objectiontmpjoin0" from "Model1" as "someAlias" inner join "Model1Model2" on "someAlias"\."id" = "Model1Model2"\."model1Id" where "Model1Model2"\."model2Id" in (\(1, 2\)|\(2, 1\))/
+                /select "someAlias"\.\*, "Model1Model2"\."extra3" as "aliasedExtra", "Model1Model2"\."model2Id" as "objectiontmpjoin0" from "Model1" as "someAlias" inner join "Model1Model2" on "someAlias"\."id" = "Model1Model2"\."model1Id" where "Model1Model2"\."model2Id" in (\(1, 2\)|\(2, 1\))/,
               ];
 
               expectedQueries.forEach((expectedQuery, i) => {
@@ -297,7 +294,7 @@ module.exports = session => {
           .eager(fullEager)
           .eagerAlgorithm(Model1.JoinEagerAlgorithm)
           .then(sortEager)
-          .then(model => {
+          .then((model) => {
             if (utils.isPostgres(session.knex)) {
               expect(queries.length).to.equal(1);
               expect(queries[0].replace(/\s/g, '')).to.equal(
@@ -381,7 +378,7 @@ module.exports = session => {
             .findById(1)
             .table('someView')
             .joinRelated('[model1Relation1, model1Relation2, model1Relation3]')
-            .then(models => {
+            .then((models) => {
               if (utils.isPostgres(session.knex)) {
                 expect(queries[0].replace(/\s/g, '')).to.equal(
                   `
@@ -404,7 +401,7 @@ module.exports = session => {
             .table('someView')
             .eager(fullEager)
             .then(sortEager)
-            .then(model => {
+            .then((model) => {
               queries.sort();
 
               const expectedQueries = [
@@ -413,7 +410,7 @@ module.exports = session => {
                 /select "someView"\.\* from "someView" where "someView"\."id" = 1/,
                 /select "someView"\.\* from "someView" where "someView"\."id" in \(2\)/,
                 /select "someView"\.\* from "someView" where "someView"\."id" in \(7\)/,
-                /select "someView"\.\*, "Model1Model2"\."extra3" as "aliasedExtra", "Model1Model2"\."model2Id" as "objectiontmpjoin0" from "someView" inner join "Model1Model2" on "someView"\."id" = "Model1Model2"\."model1Id" where "Model1Model2"\."model2Id" in (\(1, 2\)|\(2, 1\))/
+                /select "someView"\.\*, "Model1Model2"\."extra3" as "aliasedExtra", "Model1Model2"\."model2Id" as "objectiontmpjoin0" from "someView" inner join "Model1Model2" on "someView"\."id" = "Model1Model2"\."model1Id" where "Model1Model2"\."model2Id" in (\(1, 2\)|\(2, 1\))/,
               ];
 
               expectedQueries.forEach((expectedQuery, i) => {
@@ -435,7 +432,7 @@ module.exports = session => {
                     model1Prop1: 'hello 2',
                     model1Prop2: null,
                     viewProp: 'hello 2',
-                    $afterFindCalled: 1
+                    $afterFindCalled: 1,
                   },
 
                   model1Relation2: [
@@ -445,7 +442,7 @@ module.exports = session => {
                       model2Prop1: 'hejsan 1',
                       model2Prop2: null,
                       $afterFindCalled: 1,
-                      model2Relation1: []
+                      model2Relation1: [],
                     },
                     {
                       idCol: 2,
@@ -464,7 +461,7 @@ module.exports = session => {
                           aliasedExtra: 'extra 5',
                           model1Relation1: null,
                           model1Relation2: [],
-                          $afterFindCalled: 1
+                          $afterFindCalled: 1,
                         },
                         {
                           id: 6,
@@ -481,7 +478,7 @@ module.exports = session => {
                             model1Prop1: 'hello 7',
                             model1Prop2: null,
                             viewProp: 'hello 7',
-                            $afterFindCalled: 1
+                            $afterFindCalled: 1,
                           },
 
                           model1Relation2: [
@@ -490,14 +487,14 @@ module.exports = session => {
                               model1Id: 6,
                               model2Prop1: 'hejsan 3',
                               model2Prop2: null,
-                              $afterFindCalled: 1
-                            }
-                          ]
-                        }
-                      ]
-                    }
-                  ]
-                }
+                              $afterFindCalled: 1,
+                            },
+                          ],
+                        },
+                      ],
+                    },
+                  ],
+                },
               ]);
             });
         });
@@ -509,7 +506,7 @@ module.exports = session => {
             .eager(fullEager)
             .eagerAlgorithm(Model1.JoinEagerAlgorithm)
             .then(sortEager)
-            .then(model => {
+            .then((model) => {
               expect(queries.length).to.equal(1);
               expect(queries[0].replace(/\s/g, '')).to.equal(
                 `
@@ -565,7 +562,7 @@ module.exports = session => {
               // This makes sure, `Model1` and `someView` have different metadata.
               expect(Array.from(Model1.$$tableMetadata.keys()).sort()).to.eql([
                 'Model1',
-                'someView'
+                'someView',
               ]);
               expect(model).to.eql([
                 {
@@ -582,7 +579,7 @@ module.exports = session => {
                     model1Prop1: 'hello 2',
                     model1Prop2: null,
                     viewProp: 'hello 2',
-                    $afterFindCalled: 1
+                    $afterFindCalled: 1,
                   },
 
                   model1Relation2: [
@@ -592,7 +589,7 @@ module.exports = session => {
                       model2Prop1: 'hejsan 1',
                       model2Prop2: null,
                       $afterFindCalled: 1,
-                      model2Relation1: []
+                      model2Relation1: [],
                     },
                     {
                       idCol: 2,
@@ -611,7 +608,7 @@ module.exports = session => {
                           aliasedExtra: 'extra 5',
                           model1Relation1: null,
                           model1Relation2: [],
-                          $afterFindCalled: 1
+                          $afterFindCalled: 1,
                         },
                         {
                           id: 6,
@@ -628,7 +625,7 @@ module.exports = session => {
                             model1Prop1: 'hello 7',
                             model1Prop2: null,
                             viewProp: 'hello 7',
-                            $afterFindCalled: 1
+                            $afterFindCalled: 1,
                           },
 
                           model1Relation2: [
@@ -637,14 +634,14 @@ module.exports = session => {
                               model1Id: 6,
                               model2Prop1: 'hejsan 3',
                               model2Prop2: null,
-                              $afterFindCalled: 1
-                            }
-                          ]
-                        }
-                      ]
-                    }
-                  ]
-                }
+                              $afterFindCalled: 1,
+                            },
+                          ],
+                        },
+                      ],
+                    },
+                  ],
+                },
               ]);
             });
         });
@@ -655,8 +652,8 @@ module.exports = session => {
             .table('someView')
             .eager(fullEager)
             .eagerAlgorithm(Model1.JoinEagerAlgorithm)
-            .modifyEager('model1Relation1', builder => builder.select('someView.id'))
-            .modifyEager('model1Relation2.model2Relation1', builder =>
+            .modifyEager('model1Relation1', (builder) => builder.select('someView.id'))
+            .modifyEager('model1Relation2.model2Relation1', (builder) =>
               builder.select('someView.id')
             )
             .then(sortEager)
@@ -717,7 +714,7 @@ function sortEager(models) {
     mods = [mods];
   }
 
-  mods.forEach(model => {
+  mods.forEach((model) => {
     if (model.model1Relation2) {
       model.model1Relation2 = _.sortBy(model.model1Relation2, 'idCol');
     }

@@ -1,7 +1,7 @@
 const Promise = require('bluebird');
 const expect = require('expect.js');
 
-module.exports = session => {
+module.exports = (session) => {
   // Tests that various queries that start multiple queries behind the scenes
   // don't cause unhandled rejection errors if one of the queries fail.
   describe('unhandler rejection errors', () => {
@@ -9,7 +9,7 @@ module.exports = session => {
 
     let unhandledErrors = [];
 
-    const unhandledRejectionHandler = err => {
+    const unhandledRejectionHandler = (err) => {
       unhandledErrors.push(err);
     };
 
@@ -31,37 +31,37 @@ module.exports = session => {
           model1Prop1: '1',
 
           model1Relation1: {
-            model1Prop1: '3'
+            model1Prop1: '3',
           },
 
           model1Relation2: [
             {
-              model2Prop1: '1'
-            }
-          ]
+              model2Prop1: '1',
+            },
+          ],
         },
         {
           model1Prop1: '2',
 
           model1Relation1: {
-            model1Prop1: '4'
+            model1Prop1: '4',
           },
 
           model1Relation2: [
             {
-              model2Prop1: '2'
-            }
-          ]
-        }
+              model2Prop1: '2',
+            },
+          ],
+        },
       ]);
     });
 
-    it('range', done => {
+    it('range', (done) => {
       Model1.query()
         .table('doesnt_exist')
         .range(1, 2)
         .then(() => done(new Error('should not get here')))
-        .catch(err => {
+        .catch((err) => {
           expect(unhandledErrors).to.be.empty();
           done();
         })

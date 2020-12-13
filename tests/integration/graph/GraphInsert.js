@@ -9,7 +9,7 @@ const { GraphNodeDbExistence } = require('../../../lib/queryBuilder/graph/GraphN
 const { GraphFetcher } = require('../../../lib/queryBuilder/graph/GraphFetcher');
 const { asArray } = require('../../../lib/utils/objectUtils');
 
-module.exports = session => {
+module.exports = (session) => {
   const ID_NOT_IN_DB = 1000000;
 
   describe('GraphInsert tests', () => {
@@ -35,18 +35,18 @@ module.exports = session => {
         modelClass: Person,
 
         graphIn: {
-          name: 'Brad'
+          name: 'Brad',
         },
 
-        queryOut: query => query,
+        queryOut: (query) => query,
 
         graphOut: [
           {
-            name: 'Brad'
-          }
+            name: 'Brad',
+          },
         ],
 
-        postgresNumQueries: 1
+        postgresNumQueries: 1,
       });
     });
 
@@ -64,8 +64,8 @@ module.exports = session => {
                 name: 'Mooses',
 
                 favoritePerson: {
-                  '#ref': 'matti'
-                }
+                  '#ref': 'matti',
+                },
               },
               {
                 name: 'Sara',
@@ -75,26 +75,26 @@ module.exports = session => {
 
                   relatives: [
                     {
-                      '#ref': 'sami'
+                      '#ref': 'sami',
                     },
                     {
-                      '#ref': 'marika'
-                    }
-                  ]
-                }
-              }
+                      '#ref': 'marika',
+                    },
+                  ],
+                },
+              },
             ],
 
             relatives: [
               {
                 '#id': 'sami',
                 name: 'Sami',
-                isChild: true
+                isChild: true,
               },
               {
                 '#id': 'marika',
                 name: 'Marika',
-                isChild: true
+                isChild: true,
               },
               {
                 name: 'Samuel',
@@ -102,11 +102,11 @@ module.exports = session => {
                 relatives: [
                   {
                     '#ref': 'anja',
-                    isChild: true
-                  }
-                ]
-              }
-            ]
+                    isChild: true,
+                  },
+                ],
+              },
+            ],
           },
           {
             '#id': 'anja',
@@ -115,13 +115,13 @@ module.exports = session => {
             relatives: [
               {
                 name: 'Marjukka',
-                isChild: true
-              }
-            ]
-          }
+                isChild: true,
+              },
+            ],
+          },
         ],
 
-        queryOut: query =>
+        queryOut: (query) =>
           query
             .eager(
               '[pets.favoritePerson.relatives(orderByName), relatives(orderByName).relatives(orderByName)]'
@@ -138,8 +138,8 @@ module.exports = session => {
                 name: 'Mooses',
 
                 favoritePerson: {
-                  name: 'Matti'
-                }
+                  name: 'Matti',
+                },
               },
               {
                 name: 'Sara',
@@ -149,24 +149,24 @@ module.exports = session => {
 
                   relatives: [
                     {
-                      name: 'Marika'
+                      name: 'Marika',
                     },
                     {
-                      name: 'Sami'
-                    }
-                  ]
-                }
-              }
+                      name: 'Sami',
+                    },
+                  ],
+                },
+              },
             ],
 
             relatives: [
               {
                 name: 'Marika',
-                isChild: true
+                isChild: true,
               },
               {
                 name: 'Sami',
-                isChild: true
+                isChild: true,
               },
               {
                 name: 'Samuel',
@@ -175,11 +175,11 @@ module.exports = session => {
                 relatives: [
                   {
                     name: 'Anja',
-                    isChild: true
-                  }
-                ]
-              }
-            ]
+                    isChild: true,
+                  },
+                ],
+              },
+            ],
           },
           {
             name: 'Anja',
@@ -187,13 +187,13 @@ module.exports = session => {
             relatives: [
               {
                 name: 'Marjukka',
-                isChild: true
-              }
-            ]
-          }
+                isChild: true,
+              },
+            ],
+          },
         ],
 
-        postgresNumQueries: 3
+        postgresNumQueries: 3,
       });
     });
 
@@ -207,13 +207,13 @@ module.exports = session => {
             name: 'Liisa',
 
             data: {
-              someNumber: 42
+              someNumber: 42,
             },
 
             pets: [
               {
-                name: 'Sara #ref{liisa.data.someNumber}'
-              }
+                name: 'Sara #ref{liisa.data.someNumber}',
+              },
             ],
 
             relatives: [
@@ -222,13 +222,13 @@ module.exports = session => {
 
                 data: {
                   motherName: '#ref{liisa.name}',
-                  someNumber: '#ref{liisa.data.someNumber}'
-                }
-              }
-            ]
+                  someNumber: '#ref{liisa.data.someNumber}',
+                },
+              },
+            ],
           },
 
-          queryOut: query => query.where('name', 'Liisa').eager('[relatives, pets]'),
+          queryOut: (query) => query.where('name', 'Liisa').eager('[relatives, pets]'),
 
           graphOut: [
             {
@@ -236,8 +236,8 @@ module.exports = session => {
 
               pets: [
                 {
-                  name: 'Sara 42'
-                }
+                  name: 'Sara 42',
+                },
               ],
 
               relatives: [
@@ -246,14 +246,14 @@ module.exports = session => {
 
                   data: {
                     motherName: 'Liisa',
-                    someNumber: 42
-                  }
-                }
-              ]
-            }
+                    someNumber: 42,
+                  },
+                },
+              ],
+            },
           ],
 
-          postgresNumQueries: 4
+          postgresNumQueries: 4,
         });
       });
     });
@@ -265,16 +265,16 @@ module.exports = session => {
       beforeEach(() => {
         return Person.query()
           .insert({ name: 'Matti' })
-          .then(model => {
+          .then((model) => {
             matti = model;
 
             return Promise.all([
               matti
                 .$relatedQuery('relatives')
                 .insert({ name: 'Sami', isChild: true })
-                .then(model => {
+                .then((model) => {
                   sami = model;
-                })
+                }),
             ]);
           });
       });
@@ -288,11 +288,11 @@ module.exports = session => {
 
             relatives: [
               {
-                id: sami.id
+                id: sami.id,
               },
               {
-                name: 'Marika'
-              }
+                name: 'Marika',
+              },
             ],
 
             pets: [
@@ -300,13 +300,13 @@ module.exports = session => {
                 name: 'Mooses',
 
                 favoritePerson: {
-                  '#dbRef': matti.id
-                }
-              }
-            ]
+                  '#dbRef': matti.id,
+                },
+              },
+            ],
           },
 
-          queryOut: query => query.eager('[relatives, pets.favoritePerson]').findById(matti.id),
+          queryOut: (query) => query.eager('[relatives, pets.favoritePerson]').findById(matti.id),
 
           graphOut: {
             id: matti.id,
@@ -315,11 +315,11 @@ module.exports = session => {
               {
                 id: sami.id,
                 isChild: true,
-                isParent: false
+                isParent: false,
               },
               {
-                name: 'Marika'
-              }
+                name: 'Marika',
+              },
             ],
 
             pets: [
@@ -328,13 +328,13 @@ module.exports = session => {
 
                 favoritePerson: {
                   id: matti.id,
-                  name: 'Matti'
-                }
-              }
-            ]
+                  name: 'Matti',
+                },
+              },
+            ],
           },
 
-          postgresNumQueries: 3
+          postgresNumQueries: 3,
         });
       });
     });
@@ -348,23 +348,23 @@ module.exports = session => {
             name: 'Doggo',
 
             favoritePerson: {
-              name: 'Brad'
-            }
+              name: 'Brad',
+            },
           },
 
-          queryOut: query => query.eager('favoritePerson'),
+          queryOut: (query) => query.eager('favoritePerson'),
 
           graphOut: [
             {
               name: 'Doggo',
 
               favoritePerson: {
-                name: 'Brad'
-              }
-            }
+                name: 'Brad',
+              },
+            },
           ],
 
-          postgresNumQueries: 2
+          postgresNumQueries: 2,
         });
       });
 
@@ -378,11 +378,11 @@ module.exports = session => {
 
             favoritePerson: {
               id: 1,
-              name: 'Brad'
-            }
+              name: 'Brad',
+            },
           },
 
-          queryOut: query => query.eager('favoritePerson'),
+          queryOut: (query) => query.eager('favoritePerson'),
 
           graphOut: [
             {
@@ -391,12 +391,12 @@ module.exports = session => {
 
               favoritePerson: {
                 id: 1,
-                name: 'Brad'
-              }
-            }
+                name: 'Brad',
+              },
+            },
           ],
 
-          postgresNumQueries: 2
+          postgresNumQueries: 2,
         });
       });
 
@@ -413,13 +413,13 @@ module.exports = session => {
                 name: 'Doggo',
 
                 favoritePerson: {
-                  '#ref': 'brad'
-                }
-              }
-            ]
+                  '#ref': 'brad',
+                },
+              },
+            ],
           },
 
-          queryOut: query => query.eager('pets.favoritePerson'),
+          queryOut: (query) => query.eager('pets.favoritePerson'),
 
           graphOut: [
             {
@@ -430,18 +430,18 @@ module.exports = session => {
                   name: 'Doggo',
 
                   favoritePerson: {
-                    name: 'Brad'
-                  }
-                }
-              ]
-            }
+                    name: 'Brad',
+                  },
+                },
+              ],
+            },
           ],
 
           postgresNumQueries: 2,
 
           check(graph) {
             expect(graph[0].id).to.equal(graph[0].pets[0].favoritePerson.id);
-          }
+          },
         });
       });
 
@@ -449,7 +449,7 @@ module.exports = session => {
         beforeEach(() => {
           return Person.query().insert({
             id: ID_NOT_IN_DB,
-            name: 'Brad'
+            name: 'Brad',
           });
         });
 
@@ -461,27 +461,27 @@ module.exports = session => {
               name: 'Doggo',
 
               favoritePerson: {
-                id: ID_NOT_IN_DB
-              }
+                id: ID_NOT_IN_DB,
+              },
             },
 
             graphOptions: {
-              relate: ['favoritePerson']
+              relate: ['favoritePerson'],
             },
 
-            queryOut: query => query.eager('favoritePerson'),
+            queryOut: (query) => query.eager('favoritePerson'),
 
             graphOut: [
               {
                 name: 'Doggo',
 
                 favoritePerson: {
-                  name: 'Brad'
-                }
-              }
+                  name: 'Brad',
+                },
+              },
             ],
 
-            postgresNumQueries: 1
+            postgresNumQueries: 1,
           });
         });
 
@@ -493,27 +493,27 @@ module.exports = session => {
               name: 'Doggo',
 
               favoritePerson: {
-                id: ID_NOT_IN_DB
-              }
+                id: ID_NOT_IN_DB,
+              },
             },
 
             graphOptions: {
-              relate: true
+              relate: true,
             },
 
-            queryOut: query => query.eager('favoritePerson'),
+            queryOut: (query) => query.eager('favoritePerson'),
 
             graphOut: [
               {
                 name: 'Doggo',
 
                 favoritePerson: {
-                  name: 'Brad'
-                }
-              }
+                  name: 'Brad',
+                },
+              },
             ],
 
-            postgresNumQueries: 1
+            postgresNumQueries: 1,
           });
         });
       });
@@ -522,7 +522,7 @@ module.exports = session => {
         beforeEach(() => {
           return Person.query().insert({
             id: ID_NOT_IN_DB,
-            name: 'Brad'
+            name: 'Brad',
           });
         });
 
@@ -534,23 +534,23 @@ module.exports = session => {
               name: 'Doggo',
 
               favoritePerson: {
-                '#dbRef': ID_NOT_IN_DB
-              }
+                '#dbRef': ID_NOT_IN_DB,
+              },
             },
 
-            queryOut: query => query.eager('favoritePerson'),
+            queryOut: (query) => query.eager('favoritePerson'),
 
             graphOut: [
               {
                 name: 'Doggo',
 
                 favoritePerson: {
-                  name: 'Brad'
-                }
-              }
+                  name: 'Brad',
+                },
+              },
             ],
 
-            postgresNumQueries: 1
+            postgresNumQueries: 1,
           });
         });
       });
@@ -566,15 +566,15 @@ module.exports = session => {
 
             relatives: [
               {
-                name: 'Nick'
+                name: 'Nick',
               },
               {
-                name: 'Sandra'
-              }
-            ]
+                name: 'Sandra',
+              },
+            ],
           },
 
-          queryOut: query => query.eager('relatives').where('name', 'Brad'),
+          queryOut: (query) => query.eager('relatives').where('name', 'Brad'),
 
           graphOut: [
             {
@@ -583,17 +583,17 @@ module.exports = session => {
               relatives: [
                 {
                   name: 'Nick',
-                  isFriend: false
+                  isFriend: false,
                 },
                 {
                   name: 'Sandra',
-                  isChild: false
-                }
-              ]
-            }
+                  isChild: false,
+                },
+              ],
+            },
           ],
 
-          postgresNumQueries: 2
+          postgresNumQueries: 2,
         });
       });
 
@@ -608,16 +608,16 @@ module.exports = session => {
             relatives: [
               {
                 id: 2,
-                name: 'Nick'
+                name: 'Nick',
               },
               {
                 id: 3,
-                name: 'Sandra'
-              }
-            ]
+                name: 'Sandra',
+              },
+            ],
           },
 
-          queryOut: query => query.eager('relatives').where('name', 'Brad'),
+          queryOut: (query) => query.eager('relatives').where('name', 'Brad'),
 
           graphOut: [
             {
@@ -628,18 +628,18 @@ module.exports = session => {
                 {
                   id: 2,
                   name: 'Nick',
-                  isFriend: false
+                  isFriend: false,
                 },
                 {
                   id: 3,
                   name: 'Sandra',
-                  isChild: false
-                }
-              ]
-            }
+                  isChild: false,
+                },
+              ],
+            },
           ],
 
-          postgresNumQueries: 2
+          postgresNumQueries: 2,
         });
       });
 
@@ -653,16 +653,16 @@ module.exports = session => {
             relatives: [
               {
                 name: 'Nick',
-                isFriend: raw('1 = 1')
+                isFriend: raw('1 = 1'),
               },
               {
                 name: 'Sandra',
-                isChild: true
-              }
-            ]
+                isChild: true,
+              },
+            ],
           },
 
-          queryOut: query => query.eager('relatives').where('name', 'Brad'),
+          queryOut: (query) => query.eager('relatives').where('name', 'Brad'),
 
           graphOut: [
             {
@@ -672,17 +672,17 @@ module.exports = session => {
                 {
                   name: 'Nick',
                   isFriend: true,
-                  isChild: false
+                  isChild: false,
                 },
                 {
                   name: 'Sandra',
-                  isChild: true
-                }
-              ]
-            }
+                  isChild: true,
+                },
+              ],
+            },
           ],
 
-          postgresNumQueries: 2
+          postgresNumQueries: 2,
         });
       });
 
@@ -696,16 +696,16 @@ module.exports = session => {
 
             relatives: [
               {
-                name: 'Nick'
+                name: 'Nick',
               },
               {
                 name: 'Sandra',
-                isChild: true
-              }
-            ]
+                isChild: true,
+              },
+            ],
           },
 
-          queryOut: query => query.eager('relatives').where('name', 'Brad'),
+          queryOut: (query) => query.eager('relatives').where('name', 'Brad'),
 
           graphOut: [
             {
@@ -718,20 +718,20 @@ module.exports = session => {
                   isFriend: false,
                   isChild: false,
                   isParent: true,
-                  data: {}
+                  data: {},
                 },
                 {
                   name: 'Sandra',
                   isChild: true,
                   // These are set by the beforeInsert hooks.
                   isParent: false,
-                  data: {}
-                }
-              ]
-            }
+                  data: {},
+                },
+              ],
+            },
           ],
 
-          postgresNumQueries: 2
+          postgresNumQueries: 2,
         });
       });
 
@@ -747,16 +747,16 @@ module.exports = session => {
               relatives: [
                 {
                   name: 'Nick',
-                  isFriend: raw('1 = 1')
+                  isFriend: raw('1 = 1'),
                 },
                 {
                   '#ref': 'brad',
-                  isChild: true
-                }
-              ]
+                  isChild: true,
+                },
+              ],
             },
 
-            queryOut: query => query.eager('relatives(orderByName)').where('name', 'Brad'),
+            queryOut: (query) => query.eager('relatives(orderByName)').where('name', 'Brad'),
 
             graphOut: [
               {
@@ -765,21 +765,21 @@ module.exports = session => {
                 relatives: [
                   {
                     name: 'Nick',
-                    isFriend: true
+                    isFriend: true,
                   },
                   {
                     name: 'Brad',
-                    isChild: true
-                  }
-                ]
-              }
+                    isChild: true,
+                  },
+                ],
+              },
             ],
 
             postgresNumQueries: 2,
 
             check(graphOut) {
               expect(graphOut[0].id).to.equal(graphOut[0].relatives[0].id);
-            }
+            },
           });
         });
       });
@@ -788,7 +788,7 @@ module.exports = session => {
         beforeEach(() => {
           return Person.query().insert({
             id: ID_NOT_IN_DB,
-            name: 'Vlad'
+            name: 'Vlad',
           });
         });
 
@@ -802,16 +802,16 @@ module.exports = session => {
               relatives: [
                 {
                   '#dbRef': ID_NOT_IN_DB,
-                  isFriend: raw('1 = 1')
+                  isFriend: raw('1 = 1'),
                 },
                 {
                   name: 'Sandra',
-                  isChild: true
-                }
-              ]
+                  isChild: true,
+                },
+              ],
             },
 
-            queryOut: query => query.eager('relatives(orderById)').where('name', 'Brad'),
+            queryOut: (query) => query.eager('relatives(orderById)').where('name', 'Brad'),
 
             graphOut: [
               {
@@ -821,17 +821,17 @@ module.exports = session => {
                   {
                     id: ID_NOT_IN_DB,
                     name: 'Vlad',
-                    isFriend: true
+                    isFriend: true,
                   },
                   {
                     name: 'Sandra',
-                    isChild: true
-                  }
-                ]
-              }
+                    isChild: true,
+                  },
+                ],
+              },
             ],
 
-            postgresNumQueries: 2
+            postgresNumQueries: 2,
           });
         });
 
@@ -845,20 +845,20 @@ module.exports = session => {
               relatives: [
                 {
                   id: ID_NOT_IN_DB,
-                  isFriend: raw('1 = 1')
+                  isFriend: raw('1 = 1'),
                 },
                 {
                   name: 'Sandra',
-                  isChild: true
-                }
-              ]
+                  isChild: true,
+                },
+              ],
             },
 
             graphOptions: {
-              relate: ['relatives']
+              relate: ['relatives'],
             },
 
-            queryOut: query => query.eager('relatives(orderById)').where('name', 'Brad'),
+            queryOut: (query) => query.eager('relatives(orderById)').where('name', 'Brad'),
 
             graphOut: [
               {
@@ -868,17 +868,17 @@ module.exports = session => {
                   {
                     id: ID_NOT_IN_DB,
                     name: 'Vlad',
-                    isFriend: true
+                    isFriend: true,
                   },
                   {
                     name: 'Sandra',
-                    isChild: true
-                  }
-                ]
-              }
+                    isChild: true,
+                  },
+                ],
+              },
             ],
 
-            postgresNumQueries: 2
+            postgresNumQueries: 2,
           });
         });
 
@@ -892,20 +892,20 @@ module.exports = session => {
               relatives: [
                 {
                   id: ID_NOT_IN_DB,
-                  isFriend: raw('1 = 1')
+                  isFriend: raw('1 = 1'),
                 },
                 {
                   name: 'Sandra',
-                  isChild: true
-                }
-              ]
+                  isChild: true,
+                },
+              ],
             },
 
             graphOptions: {
-              relate: true
+              relate: true,
             },
 
-            queryOut: query => query.eager('relatives(orderById)').where('name', 'Brad'),
+            queryOut: (query) => query.eager('relatives(orderById)').where('name', 'Brad'),
 
             graphOut: [
               {
@@ -915,17 +915,17 @@ module.exports = session => {
                   {
                     id: ID_NOT_IN_DB,
                     name: 'Vlad',
-                    isFriend: true
+                    isFriend: true,
                   },
                   {
                     name: 'Sandra',
-                    isChild: true
-                  }
-                ]
-              }
+                    isChild: true,
+                  },
+                ],
+              },
             ],
 
-            postgresNumQueries: 2
+            postgresNumQueries: 2,
           });
         });
       });
@@ -941,15 +941,15 @@ module.exports = session => {
 
             pets: [
               {
-                name: 'Sara'
+                name: 'Sara',
               },
               {
-                name: 'Miina'
-              }
-            ]
+                name: 'Miina',
+              },
+            ],
           },
 
-          queryOut: query => query.eager('pets').where('name', 'Matti'),
+          queryOut: (query) => query.eager('pets').where('name', 'Matti'),
 
           graphOut: [
             {
@@ -957,16 +957,16 @@ module.exports = session => {
 
               pets: [
                 {
-                  name: 'Sara'
+                  name: 'Sara',
                 },
                 {
-                  name: 'Miina'
-                }
-              ]
-            }
+                  name: 'Miina',
+                },
+              ],
+            },
           ],
 
-          postgresNumQueries: 2
+          postgresNumQueries: 2,
         });
       });
 
@@ -981,16 +981,16 @@ module.exports = session => {
             pets: [
               {
                 id: 1,
-                name: 'Sara'
+                name: 'Sara',
               },
               {
                 id: 2,
-                name: 'Miina'
-              }
-            ]
+                name: 'Miina',
+              },
+            ],
           },
 
-          queryOut: query => query.eager('pets').where('name', 'Matti'),
+          queryOut: (query) => query.eager('pets').where('name', 'Matti'),
 
           graphOut: [
             {
@@ -1000,17 +1000,17 @@ module.exports = session => {
               pets: [
                 {
                   id: 1,
-                  name: 'Sara'
+                  name: 'Sara',
                 },
                 {
                   id: 2,
-                  name: 'Miina'
-                }
-              ]
-            }
+                  name: 'Miina',
+                },
+              ],
+            },
           ],
 
-          postgresNumQueries: 2
+          postgresNumQueries: 2,
         });
       });
     });
@@ -1022,7 +1022,7 @@ module.exports = session => {
       queryOut,
       graphOut,
       postgresNumQueries = null,
-      check
+      check,
     }) {
       const builder = modelClass.query();
       const models = modelClass.ensureModelArray(graphIn, { skipValidation: true });
@@ -1032,19 +1032,19 @@ module.exports = session => {
       const nodeDbExistence = GraphNodeDbExistence.createEveryNodeExistsExistence();
 
       return GraphFetcher.fetchCurrentGraph({ builder, graph, graphOptions })
-        .then(currentGraph => {
+        .then((currentGraph) => {
           numExecutedQueries = 0;
 
           const graphInsert = new GraphInsert({
             graph,
             currentGraph,
             graphOptions,
-            nodeDbExistence
+            nodeDbExistence,
           });
           const actions = graphInsert.createActions();
           let promise = Promise.resolve();
 
-          actions.forEach(action => {
+          actions.forEach((action) => {
             promise = promise.then(() => action.run(builder));
           });
 
@@ -1056,7 +1056,7 @@ module.exports = session => {
           }
         })
         .then(() => queryOut(modelClass.query()))
-        .then(result => {
+        .then((result) => {
           expect(result).to.containSubset(graphOut);
 
           if (check) {
@@ -1082,50 +1082,35 @@ module.exports = session => {
         .dropTableIfExists('relatives')
         .dropTableIfExists('pets')
         .dropTableIfExists('persons')
-        .createTable('persons', table => {
+        .createTable('persons', (table) => {
           table.increments('id');
           table.string('name');
           table.text('data');
         })
-        .createTable('pets', table => {
+        .createTable('pets', (table) => {
           table.increments('id');
           table.string('name');
-          table
-            .integer('ownerId')
-            .unsigned()
-            .references('persons.id');
-          table
-            .integer('favoritePersonId')
-            .unsigned()
-            .references('persons.id');
+          table.integer('ownerId').unsigned().references('persons.id');
+          table.integer('favoritePersonId').unsigned().references('persons.id');
         })
-        .createTable('relatives', table => {
+        .createTable('relatives', (table) => {
           table.increments('id');
           table.boolean('isFriend').defaultTo(false);
           table.boolean('isParent').defaultTo(true);
           table.boolean('isChild').defaultTo(false);
-          table
-            .integer('personId1')
-            .unsigned()
-            .references('persons.id');
-          table
-            .integer('personId2')
-            .unsigned()
-            .references('persons.id');
+          table.integer('personId1').unsigned().references('persons.id');
+          table.integer('personId2').unsigned().references('persons.id');
           // Disallow duplicates.
           table.unique(['personId1', 'personId2']);
         });
     }
 
     function dropSchema() {
-      return session.knex.schema
-        .dropTable('relatives')
-        .dropTable('pets')
-        .dropTable('persons');
+      return session.knex.schema.dropTable('relatives').dropTable('pets').dropTable('persons');
     }
 
     function createModels() {
-      mockKnex = mockKnexFactory(session.knex, function(_, oldImpl, args) {
+      mockKnex = mockKnexFactory(session.knex, function (_, oldImpl, args) {
         ++numExecutedQueries;
         return oldImpl.apply(this, args);
       });
@@ -1137,8 +1122,8 @@ module.exports = session => {
 
         static get modifiers() {
           return {
-            orderById: builder => builder.orderBy('id'),
-            orderByName: builder => builder.orderBy('name')
+            orderById: (builder) => builder.orderBy('id'),
+            orderByName: (builder) => builder.orderBy('name'),
           };
         }
 
@@ -1153,8 +1138,8 @@ module.exports = session => {
               data: { type: 'object' },
               isFriend: { type: 'boolean' },
               isChild: { type: 'boolean' },
-              isParent: { type: 'boolean' }
-            }
+              isParent: { type: 'boolean' },
+            },
           };
         }
 
@@ -1192,11 +1177,11 @@ module.exports = session => {
 
                   beforeInsert(obj) {
                     obj.isParent = !obj.isChild;
-                  }
+                  },
                 },
 
-                to: 'persons.id'
-              }
+                to: 'persons.id',
+              },
             },
 
             pets: {
@@ -1204,9 +1189,9 @@ module.exports = session => {
               relation: Model.HasManyRelation,
               join: {
                 from: 'persons.id',
-                to: 'pets.ownerId'
-              }
-            }
+                to: 'pets.ownerId',
+              },
+            },
           };
         }
       };
@@ -1225,8 +1210,8 @@ module.exports = session => {
               id: { type: 'integer' },
               name: { type: 'string' },
               ownerId: { type: ['integer', 'null'] },
-              favoritePersonId: { type: ['integer', 'null'] }
-            }
+              favoritePersonId: { type: ['integer', 'null'] },
+            },
           };
         }
 
@@ -1237,9 +1222,9 @@ module.exports = session => {
               relation: Model.BelongsToOneRelation,
               join: {
                 from: 'pets.favoritePersonId',
-                to: 'persons.id'
-              }
-            }
+                to: 'persons.id',
+              },
+            },
           };
         }
       };

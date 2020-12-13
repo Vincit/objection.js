@@ -19,19 +19,19 @@ describe('AjvValidator', () => {
         TestRef1: {
           type: 'object',
           properties: {
-            aRequiredProp1: { type: 'string' }
+            aRequiredProp1: { type: 'string' },
           },
-          required: ['aRequiredProp1']
+          required: ['aRequiredProp1'],
         },
         TestRef2: {
           type: 'object',
           properties: {
-            aRequiredProp2: { type: 'string' }
+            aRequiredProp2: { type: 'string' },
           },
-          required: ['aRequiredProp2']
-        }
+          required: ['aRequiredProp2'],
+        },
       },
-      anyOf: [{ $ref: '#/definitions/TestRef1' }, { $ref: '#/definitions/TestRef2' }]
+      anyOf: [{ $ref: '#/definitions/TestRef1' }, { $ref: '#/definitions/TestRef2' }],
     };
 
     it('should remove required fields from definitions', () => {
@@ -40,7 +40,7 @@ describe('AjvValidator', () => {
       const definitions = Object.entries(validators.schema.definitions);
 
       expect(definitions.length).to.be(2);
-      definitions.forEach(d => expect(d.required).to.be(undefined));
+      definitions.forEach((d) => expect(d.required).to.be(undefined));
     });
   });
 });

@@ -16,7 +16,7 @@ export class Animal extends objection.Model {
 
     format(json: objection.Pojo) {
       return json;
-    }
+    },
   };
 
   static get modifiers() {
@@ -27,7 +27,7 @@ export class Animal extends objection.Model {
 
       onlyDogs(builder: objection.QueryBuilder<Animal>) {
         builder.where('species', 'dog');
-      }
+      },
     };
   }
 }

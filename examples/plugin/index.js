@@ -5,7 +5,7 @@
 //
 // A plugin should be a function that takes a model class as an argument. A plugin then needs to
 // extends that model and return it. A plugin should never modify the model directly!
-module.exports = Model => {
+module.exports = (Model) => {
   // If your plugin extends the QueryBuilder, you need to extend `Model.QueryBuilder`
   // since it may have already been extended by other plugins.
   class SessionQueryBuilder extends Model.QueryBuilder {
@@ -17,7 +17,7 @@ module.exports = Model => {
       // not a reserved word or some objection.js concept. You can store any data
       // to the query context.
       return this.mergeContext({
-        session: session
+        session: session,
       });
     }
   }

@@ -1,7 +1,7 @@
 const { Model } = require('../../');
 const expect = require('chai').expect;
 
-module.exports = session => {
+module.exports = (session) => {
   describe('modifiers', () => {
     class Person extends Model {
       static get tableName() {
@@ -15,8 +15,8 @@ module.exports = session => {
             modelClass: Person,
             join: {
               from: 'person.parentId',
-              to: 'person.id'
-            }
+              to: 'person.id',
+            },
           },
 
           pets: {
@@ -24,8 +24,8 @@ module.exports = session => {
             modelClass: Animal,
             join: {
               from: 'person.id',
-              to: 'animal.ownerId'
-            }
+              to: 'animal.ownerId',
+            },
           },
 
           movies: {
@@ -35,11 +35,11 @@ module.exports = session => {
               from: 'person.id',
               through: {
                 from: 'personMovie.personId',
-                to: 'personMovie.movieId'
+                to: 'personMovie.movieId',
               },
-              to: 'movie.id'
-            }
-          }
+              to: 'movie.id',
+            },
+          },
         };
       }
     }
@@ -53,7 +53,7 @@ module.exports = session => {
         return {
           filterByName(query, name) {
             query.where('name', name);
-          }
+          },
         };
       }
     }
@@ -67,7 +67,7 @@ module.exports = session => {
         return {
           atLeastStars(query, starLimit = 4) {
             query.where('stars', '>=', starLimit);
-          }
+          },
         };
       }
     }
@@ -78,25 +78,22 @@ module.exports = session => {
         .dropTableIfExists('animal')
         .dropTableIfExists('movie')
         .dropTableIfExists('person')
-        .createTable('person', table => {
+        .createTable('person', (table) => {
           table.increments('id').primary();
           table.string('name');
           table.integer('parentId');
         })
-        .createTable('animal', table => {
+        .createTable('animal', (table) => {
           table.increments('id').primary();
           table.string('name');
           table.integer('ownerId');
         })
-        .createTable('movie', table => {
+        .createTable('movie', (table) => {
           table.increments('id').primary();
-          table
-            .integer('stars')
-            .defaultTo(0)
-            .notNullable();
+          table.integer('stars').defaultTo(0).notNullable();
           table.string('name');
         })
-        .createTable('personMovie', table => {
+        .createTable('personMovie', (table) => {
           table.integer('personId');
           table.integer('movieId');
         });
@@ -119,42 +116,42 @@ module.exports = session => {
               name: 'Arnold',
 
               parent: {
-                name: 'Gustav'
+                name: 'Gustav',
               },
 
               pets: [
                 {
-                  name: 'Freud'
+                  name: 'Freud',
                 },
                 {
-                  name: 'Stalin'
-                }
+                  name: 'Stalin',
+                },
               ],
 
               movies: [
                 {
                   name: 'Terminator',
-                  stars: 4
+                  stars: 4,
                 },
                 {
                   name: 'Terminator 2',
-                  stars: 3
+                  stars: 3,
                 },
                 {
                   name: 'Terminator 3',
-                  stars: 2
-                }
-              ]
+                  stars: 2,
+                },
+              ],
             },
             {
               name: 'Meinhard',
 
               pets: [
                 {
-                  name: 'Ruffus'
-                }
-              ]
-            }
+                  name: 'Ruffus',
+                },
+              ],
+            },
           ]);
         });
     });
@@ -169,7 +166,7 @@ module.exports = session => {
           },
           onlyDictators(query) {
             query.modify('filterByName', 'Stalin');
-          }
+          },
         });
 
       for (const movie of arnold.movies) {
@@ -190,7 +187,7 @@ module.exports = session => {
           },
           onlyDictators(query) {
             query.modify('filterByName', 'Stalin');
-          }
+          },
         });
 
       for (const movie of arnold.movies) {
@@ -212,13 +209,13 @@ module.exports = session => {
           },
           onlyDictators(query) {
             query.modify('filterByName', 'Stalin');
-          }
+          },
         })
         .orderBy(['person.name', 'movies.name', 'pets.name']);
 
       expect(result).to.eql([
         { name: 'Arnold', movieName: 'Terminator', petName: 'Stalin' },
-        { name: 'Arnold', movieName: 'Terminator 2', petName: 'Stalin' }
+        { name: 'Arnold', movieName: 'Terminator 2', petName: 'Stalin' },
       ]);
     });
 

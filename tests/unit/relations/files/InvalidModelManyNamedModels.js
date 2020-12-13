@@ -16,5 +16,5 @@ module.exports = {
   someCrap: 42,
   RelatedModel1,
   moreUselessShit: {},
-  RelatedModel2
+  RelatedModel2,
 };

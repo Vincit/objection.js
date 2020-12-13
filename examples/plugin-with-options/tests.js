@@ -15,13 +15,13 @@ describe('example plugin tests', () => {
       client: 'sqlite3',
       useNullAsDefault: true,
       connection: {
-        filename: './test.db'
-      }
+        filename: './test.db',
+      },
     });
   });
 
   before(() => {
-    return knex.schema.createTable('Person', table => {
+    return knex.schema.createTable('Person', (table) => {
       table.increments('id').primary();
       table.string('name');
       table.string('createdBy');
@@ -47,7 +47,7 @@ describe('example plugin tests', () => {
     const sessionPlugin = sessionPluginFactory();
 
     const session = {
-      userId: 'foo'
+      userId: 'foo',
     };
 
     class Person extends sessionPlugin(Model) {
@@ -59,7 +59,7 @@ describe('example plugin tests', () => {
     return Person.query(knex)
       .session(session)
       .insert({ name: 'Jennifer' })
-      .then(jennifer => {
+      .then((jennifer) => {
         expect(jennifer.createdBy).to.equal(session.userId);
         expect(jennifer.createdAt).to.match(ISO_DATE_REGEX);
       });
@@ -77,13 +77,10 @@ describe('example plugin tests', () => {
     return Person.query(knex)
       .session({ userId: 'foo' })
       .insert({ name: 'Jennifer' })
-      .then(jennifer => {
-        return jennifer
-          .$query(knex)
-          .session({ userId: 'bar' })
-          .patchAndFetch({ name: 'Jonnifer' });
+      .then((jennifer) => {
+        return jennifer.$query(knex).session({ userId: 'bar' }).patchAndFetch({ name: 'Jonnifer' });
       })
-      .then(jonnifer => {
+      .then((jonnifer) => {
         expect(jonnifer.createdBy).to.equal('foo');
         expect(jonnifer.createdAt).to.match(ISO_DATE_REGEX);
         expect(jonnifer.modifiedBy).to.equal('bar');
@@ -94,7 +91,7 @@ describe('example plugin tests', () => {
   it('should not add `modifiedBy` or `createdBy` if `options.setModifiedBy` and `options.setCreatedBy` are false', () => {
     const sessionPlugin = sessionPluginFactory({
       setModifiedBy: false,
-      setCreatedBy: false
+      setCreatedBy: false,
     });
 
     class Person extends sessionPlugin(Model) {
@@ -106,13 +103,10 @@ describe('example plugin tests', () => {
     return Person.query(knex)
       .session({ userId: 'foo' })
       .insert({ name: 'Jennifer' })
-      .then(jennifer => {
-        return jennifer
-          .$query(knex)
-          .session({ userId: 'bar' })
-          .patchAndFetch({ name: 'Jonnifer' });
+      .then((jennifer) => {
+        return jennifer.$query(knex).session({ userId: 'bar' }).patchAndFetch({ name: 'Jonnifer' });
       })
-      .then(jonnifer => {
+      .then((jonnifer) => {
         expect(jonnifer.createdBy).to.equal(null);
         expect(jonnifer.createdAt).to.match(ISO_DATE_REGEX);
         expect(jonnifer.modifiedBy).to.equal(null);

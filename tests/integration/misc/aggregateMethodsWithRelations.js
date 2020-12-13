@@ -1,6 +1,6 @@
 const expect = require('expect.js');
 
-module.exports = session => {
+module.exports = (session) => {
   describe('aggregate methods with relations', () => {
     beforeEach(() => {
       return session.populate([
@@ -9,13 +9,13 @@ module.exports = session => {
           model1Relation2: [
             { model2_prop1: 'one' },
             { model2_prop1: 'two' },
-            { model2_prop1: 'three' }
-          ]
+            { model2_prop1: 'three' },
+          ],
         },
         {
           model1Prop1: 'b',
-          model1Relation2: [{ model2_prop1: 'four' }, { model2_prop1: 'five' }]
-        }
+          model1Relation2: [{ model2_prop1: 'four' }, { model2_prop1: 'five' }],
+        },
       ]);
     });
 
@@ -26,7 +26,7 @@ module.exports = session => {
         .joinRelated('model1Relation2')
         .groupBy('Model1.id')
         .orderBy('Model1.model1Prop1')
-        .then(models => {
+        .then((models) => {
           expect(models[0].relCount).to.eql(3);
           expect(models[1].relCount).to.eql(2);
         });

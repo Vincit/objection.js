@@ -11,13 +11,13 @@ import { Person } from '../../fixtures/person';
   await person.$relatedQuery('movies').relate({
     foo: 50,
     bar: 20,
-    baz: 10
+    baz: 10,
   });
 
   const someMovie = await Movie.query().findById(2);
 
   await someMovie.$relatedQuery('actors').relate({
     id: 50,
-    someExtra: "I'll be written to the join table"
+    someExtra: "I'll be written to the join table",
   });
 })();

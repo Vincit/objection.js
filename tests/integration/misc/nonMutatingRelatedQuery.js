@@ -1,6 +1,6 @@
 const { expect } = require('chai');
 
-module.exports = session => {
+module.exports = (session) => {
   describe('non-mutating related query', () => {
     class ModelOne extends session.unboundModels.Model1 {
       static get relatedFindQueryMutates() {
@@ -35,23 +35,23 @@ module.exports = session => {
 
           model1Relation1: {
             id: 2,
-            model1Prop1: 'belongs to one'
+            model1Prop1: 'belongs to one',
           },
 
           model1Relation2: [
             {
               idCol: 3,
-              model2Prop1: 'has many'
-            }
+              model2Prop1: 'has many',
+            },
           ],
 
           model1Relation3: [
             {
               idCol: 4,
-              model2Prop1: 'many to many'
-            }
-          ]
-        }
+              model2Prop1: 'many to many',
+            },
+          ],
+        },
       ]);
     });
 
@@ -59,15 +59,15 @@ module.exports = session => {
       it('belongs to one', () => {
         return ModelOne.query()
           .findOne({ model1Prop1: 'root' })
-          .then(model => {
+          .then((model) => {
             return model.$relatedQuery('model1Relation1').then(() => model);
           })
-          .then(model => {
+          .then((model) => {
             expect(model.toJSON()).to.eql({
               id: 1,
               model1Id: 2,
               model1Prop1: 'root',
-              model1Prop2: null
+              model1Prop2: null,
             });
           });
       });
@@ -75,15 +75,15 @@ module.exports = session => {
       it('has many', () => {
         return ModelOne.query()
           .findOne({ model1Prop1: 'root' })
-          .then(model => {
+          .then((model) => {
             return model.$relatedQuery('model1Relation2').then(() => model);
           })
-          .then(model => {
+          .then((model) => {
             expect(model.toJSON()).to.eql({
               id: 1,
               model1Id: 2,
               model1Prop1: 'root',
-              model1Prop2: null
+              model1Prop2: null,
             });
           });
       });
@@ -91,15 +91,15 @@ module.exports = session => {
       it('many to many', () => {
         return ModelOne.query()
           .findOne({ model1Prop1: 'root' })
-          .then(model => {
+          .then((model) => {
             return model.$relatedQuery('model1Relation3').then(() => model);
           })
-          .then(model => {
+          .then((model) => {
             expect(model.toJSON()).to.eql({
               id: 1,
               model1Id: 2,
               model1Prop1: 'root',
-              model1Prop2: null
+              model1Prop2: null,
             });
           });
       });
@@ -109,18 +109,18 @@ module.exports = session => {
       it('belongs to one', () => {
         return ModelOne.query()
           .findOne({ model1Prop1: 'root' })
-          .then(model => {
+          .then((model) => {
             return model
               .$relatedQuery('model1Relation1')
               .insert({ id: 10, model1Prop1: 'new' })
               .then(() => model);
           })
-          .then(model => {
+          .then((model) => {
             expect(model.toJSON()).to.eql({
               id: 1,
               model1Id: 10,
               model1Prop1: 'root',
-              model1Prop2: null
+              model1Prop2: null,
             });
           });
       });
@@ -128,18 +128,18 @@ module.exports = session => {
       it('has many', () => {
         return ModelOne.query()
           .findOne({ model1Prop1: 'root' })
-          .then(model => {
+          .then((model) => {
             return model
               .$relatedQuery('model1Relation2')
               .insert({ model2Prop1: 'new' })
               .then(() => model);
           })
-          .then(model => {
+          .then((model) => {
             expect(model.toJSON()).to.eql({
               id: 1,
               model1Id: 2,
               model1Prop1: 'root',
-              model1Prop2: null
+              model1Prop2: null,
             });
           });
       });
@@ -147,18 +147,18 @@ module.exports = session => {
       it('many to many', () => {
         return ModelOne.query()
           .findOne({ model1Prop1: 'root' })
-          .then(model => {
+          .then((model) => {
             return model
               .$relatedQuery('model1Relation3')
               .insert({ model2Prop1: 'new' })
               .then(() => model);
           })
-          .then(model => {
+          .then((model) => {
             expect(model.toJSON()).to.eql({
               id: 1,
               model1Id: 2,
               model1Prop1: 'root',
-              model1Prop2: null
+              model1Prop2: null,
             });
           });
       });

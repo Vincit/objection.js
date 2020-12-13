@@ -1,17 +1,15 @@
 import { Person } from '../fixtures/person';
 
 (async () => {
-  await Person.query()
-    .where('firstName', 'Arnold')
-    .withGraphFetched('pets');
+  await Person.query().where('firstName', 'Arnold').withGraphFetched('pets');
 
   await Person.query().withGraphFetched('children.[pets, movies]');
 
   await Person.query().withGraphFetched({
     children: {
       pets: true,
-      movies: true
-    }
+      movies: true,
+    },
   });
 
   await Person.query()
@@ -27,7 +25,7 @@ import { Person } from '../fixtures/person';
 
       onlyDogs(builder) {
         builder.where('species', 'dog');
-      }
+      },
     });
 
   await Person.query().modifiers({
@@ -38,7 +36,7 @@ import { Person } from '../fixtures/person';
 
     filterDogs(builder) {
       builder.modify('filterSpecies', 'dog');
-    }
+    },
   }).withGraphFetched(`
     children(defaultSelects, orderByAge, filterFemale).[
       pets(filterDogs, orderByName),
@@ -48,11 +46,11 @@ import { Person } from '../fixtures/person';
 
   await Person.query()
     .withGraphFetched('children.[pets, movies]')
-    .modifyGraph('children', builder => {
+    .modifyGraph('children', (builder) => {
       // Order children by age and only select id.
       builder.orderBy('age').select('id');
     })
-    .modifyGraph('children.[pets, movies]', builder => {
+    .modifyGraph('children.[pets, movies]', (builder) => {
       // Only select `pets` and `movies` whose id > 10 for the children.
       builder.where('id', '>', 10);
     });
@@ -68,9 +66,7 @@ import { Person } from '../fixtures/person';
     ]
   ]`);
 
-  await Person.query()
-    .where('id', 1)
-    .withGraphFetched('children.children');
+  await Person.query().where('id', 1).withGraphFetched('children.children');
 
   await Person.query()
     .withGraphJoined('children.[pets, movies]')
@@ -78,9 +74,7 @@ import { Person } from '../fixtures/person';
     .where('children:pets.name', 'Fluffy')
     .where('children:movies.name', 'like', 'Terminator%');
 
-  await Person.query()
-    .withGraphJoined('pets')
-    .where('persons.id', '>', 100);
+  await Person.query().withGraphJoined('pets').where('persons.id', '>', 100);
 
   const builder = Person.query().withGraphFetched('children.pets(onlyId)');
 
@@ -88,13 +82,9 @@ import { Person } from '../fixtures/person';
   expr.children.movies = true;
   builder.withGraphFetched(expr);
 
-  await Person.query()
-    .allowGraph('[children.pets, movies]')
-    .withGraphFetched('movies.actors');
+  await Person.query().allowGraph('[children.pets, movies]').withGraphFetched('movies.actors');
 
-  await Person.query()
-    .allowGraph('[children.pets, movies]')
-    .withGraphFetched('children.pets');
+  await Person.query().allowGraph('[children.pets, movies]').withGraphFetched('children.pets');
 
   await Person.query()
     .allowGraph('[children.pets, movies]')
@@ -106,15 +96,15 @@ import { Person } from '../fixtures/person';
           pets: [
             {
               name: 'Fluffy',
-              species: 'dog'
+              species: 'dog',
             },
             {
               name: 'Scrappy',
-              species: 'dog'
-            }
-          ]
-        }
-      ]
+              species: 'dog',
+            },
+          ],
+        },
+      ],
     });
 
   await Person.query()
@@ -127,15 +117,15 @@ import { Person } from '../fixtures/person';
           pets: [
             {
               name: 'Fluffy',
-              species: 'dog'
+              species: 'dog',
             },
             {
               name: 'Scrappy',
-              species: 'dog'
-            }
-          ]
-        }
-      ]
+              species: 'dog',
+            },
+          ],
+        },
+      ],
     });
 
   await Person.query().clearAllowGraph();
@@ -143,19 +133,19 @@ import { Person } from '../fixtures/person';
 
   await Person.query()
     .withGraphFetched('[children.[pets, movies], movies]')
-    .modifyGraph('children.pets', builder => {
+    .modifyGraph('children.pets', (builder) => {
       builder.where('age', '>', 10);
     });
 
   await Person.query()
     .withGraphFetched('[children.[pets, movies], movies]')
-    .modifyGraph('children.[pets, movies]', builder => {
+    .modifyGraph('children.[pets, movies]', (builder) => {
       builder.orderBy('id');
     });
 
   await Person.query()
     .withGraphFetched('[children.[pets, movies], movies]')
-    .modifyGraph('[children.movies, movies]', builder => {
+    .modifyGraph('[children.movies, movies]', (builder) => {
       builder.where('name', 'like', '%Predator%');
     });
 

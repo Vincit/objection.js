@@ -4,14 +4,14 @@ const { Model } = require('../../../');
 const expect = require('expect.js');
 const Promise = require('bluebird');
 
-module.exports = session => {
+module.exports = (session) => {
   describe('mysql', () => {
     let db2Knex;
     let T1;
     let T2;
 
     before(
-      Promise.coroutine(function*() {
+      Promise.coroutine(function* () {
         yield session.knex.raw('CREATE DATABASE IF NOT EXISTS objection_test_2');
 
         const db2Config = _.cloneDeep(session.opt.knexConfig);
@@ -21,12 +21,12 @@ module.exports = session => {
         yield db2Knex.schema.dropTableIfExists('t2');
         yield db2Knex.schema.dropTableIfExists('t1');
 
-        yield db2Knex.schema.createTable('t1', table => {
+        yield db2Knex.schema.createTable('t1', (table) => {
           table.integer('id').primary();
           table.integer('foo');
         });
 
-        yield db2Knex.schema.createTable('t2', table => {
+        yield db2Knex.schema.createTable('t2', (table) => {
           table.integer('id').primary();
           table.integer('t1_id').references('t1.id');
           table.integer('bar');
@@ -35,7 +35,7 @@ module.exports = session => {
     );
 
     after(
-      Promise.coroutine(function*() {
+      Promise.coroutine(function* () {
         yield db2Knex.schema.dropTableIfExists('t2');
         yield db2Knex.schema.dropTableIfExists('t1');
         yield db2Knex.destroy();
@@ -55,9 +55,9 @@ module.exports = session => {
               modelClass: T2Model,
               join: {
                 from: 'objection_test_2.t1.id',
-                to: 'objection_test_2.t2.t1_id'
-              }
-            }
+                to: 'objection_test_2.t2.t1_id',
+              },
+            },
           };
         }
       }
@@ -73,9 +73,9 @@ module.exports = session => {
               modelClass: T1Model,
               join: {
                 from: 'objection_test_2.t1.id',
-                to: 'objection_test_2.t2.t1_id'
-              }
-            }
+                to: 'objection_test_2.t2.t1_id',
+              },
+            },
           };
         }
       }
@@ -85,7 +85,7 @@ module.exports = session => {
     });
 
     beforeEach(
-      Promise.coroutine(function*() {
+      Promise.coroutine(function* () {
         yield db2Knex('t2').delete();
         yield db2Knex('t1').delete();
       })
@@ -97,7 +97,7 @@ module.exports = session => {
         .then(() => {
           return db2Knex('t1');
         })
-        .then(rows => {
+        .then((rows) => {
           expect(rows).to.eql([{ id: 1, foo: 1 }]);
         });
     });
@@ -110,14 +110,14 @@ module.exports = session => {
           manyT2: [
             {
               id: 1,
-              bar: 2
-            }
-          ]
+              bar: 2,
+            },
+          ],
         })
         .then(() => {
           return Promise.all([db2Knex('t1'), db2Knex('t2')]);
         })
-        .then(res => {
+        .then((res) => {
           expect(res).to.eql([[{ id: 1, foo: 1 }], [{ id: 1, bar: 2, t1_id: 1 }]]);
         });
     });
@@ -128,13 +128,13 @@ module.exports = session => {
         .then(() => {
           return T1.query().select('objection_test_2.t1.*');
         })
-        .then(models => {
+        .then((models) => {
           expect(models).to.eql([{ id: 1, foo: 1 }]);
         })
         .then(() => {
           return T1.query().select('objection_test_2.t1.id');
         })
-        .then(models => {
+        .then((models) => {
           expect(models).to.eql([{ id: 1 }]);
         });
     });
@@ -147,16 +147,14 @@ module.exports = session => {
           manyT2: [
             {
               id: 1,
-              bar: 2
-            }
-          ]
+              bar: 2,
+            },
+          ],
         })
         .then(() => {
-          return T1.query()
-            .eager('manyT2')
-            .select('objection_test_2.t1.*');
+          return T1.query().eager('manyT2').select('objection_test_2.t1.*');
         })
-        .then(models => {
+        .then((models) => {
           expect(models).to.eql([
             {
               id: 1,
@@ -165,30 +163,30 @@ module.exports = session => {
                 {
                   id: 1,
                   t1_id: 1,
-                  bar: 2
-                }
-              ]
-            }
+                  bar: 2,
+                },
+              ],
+            },
           ]);
         })
         .then(() => {
           return T1.query()
             .eager('manyT2')
             .select('objection_test_2.t1.foo')
-            .modifyEager('manyT2', builder => {
+            .modifyEager('manyT2', (builder) => {
               builder.select('bar');
             });
         })
-        .then(models => {
+        .then((models) => {
           expect(models).to.eql([
             {
               foo: 1,
               manyT2: [
                 {
-                  bar: 2
-                }
-              ]
-            }
+                  bar: 2,
+                },
+              ],
+            },
           ]);
         });
     });

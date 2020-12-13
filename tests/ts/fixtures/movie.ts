@@ -32,19 +32,19 @@ export class Movie extends objection.Model {
         from: ['Movie.id1', 'Model.id2'],
         through: {
           from: 'Actors.movieId',
-          to: ref('Actors.personId').castInt()
+          to: ref('Actors.personId').castInt(),
         },
-        to: [ref('Person.id1'), 'Person.id2']
+        to: [ref('Person.id1'), 'Person.id2'],
       },
-      filter: qb => qb.orderByRaw('coalesce(title, id)')
+      filter: (qb) => qb.orderByRaw('coalesce(title, id)'),
     },
     director: {
       relation: objection.Model.BelongsToOneRelation,
       modelClass: Person,
       join: {
         from: 'Movie.directorId',
-        to: 'Person.id'
-      }
-    }
+        to: 'Person.id',
+      },
+    },
   };
 }

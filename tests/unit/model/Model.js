@@ -41,7 +41,7 @@ describe('Model', () => {
       let json = { a: 1 };
       let options = { b: 2 };
 
-      Model1.prototype.$parseJson = function(jsn, opt) {
+      Model1.prototype.$parseJson = function (jsn, opt) {
         ++calls;
         expect(jsn).to.eql(json);
         expect(opt).to.eql(options);
@@ -72,13 +72,13 @@ describe('Model', () => {
                   type: 'object',
                   additionalProperties: false,
                   properties: {
-                    f: { type: 'number' }
-                  }
-                }
-              }
-            }
-          }
-        }
+                    f: { type: 'number' },
+                  },
+                },
+              },
+            },
+          },
+        },
       };
 
       expect(() => {
@@ -99,7 +99,7 @@ describe('Model', () => {
 
       expect(() => {
         Model1.fromJson({ a: 1, b: '1' });
-      }).to.throwException(exp => {
+      }).to.throwException((exp) => {
         expect(exp).to.be.a(ValidationError);
         expect(exp.data).to.have.property('a');
         expect(exp.data).to.have.property('b');
@@ -107,35 +107,35 @@ describe('Model', () => {
 
       expect(() => {
         Model1.fromJson({ b: 1 });
-      }).to.throwException(exp => {
+      }).to.throwException((exp) => {
         expect(exp).to.be.a(ValidationError);
         expect(exp.data).to.have.property('a');
       });
 
       expect(() => {
         Model1.fromJson({ a: 'a', additional: 1 });
-      }).to.throwException(exp => {
+      }).to.throwException((exp) => {
         expect(exp).to.be.a(ValidationError);
         expect(exp.data).to.have.property('additional');
       });
 
       expect(() => {
         Model1.fromJson({ a: 'a', c: { d: 10 } });
-      }).to.throwException(exp => {
+      }).to.throwException((exp) => {
         expect(exp).to.be.a(ValidationError);
         expect(exp.data).to.have.property('c.d');
       });
 
       expect(() => {
         Model1.fromJson({ a: 'a', c: { d: 'test', e: [{ f: 'not a number' }] } });
-      }).to.throwException(exp => {
+      }).to.throwException((exp) => {
         expect(exp).to.be.a(ValidationError);
         expect(exp.data).to.have.property('c.e[0].f');
       });
 
       expect(() => {
         Model1.fromJson({ a: 'a', c: { d: 'test', e: [{ additional: true }] } });
-      }).to.throwException(exp => {
+      }).to.throwException((exp) => {
         expect(exp).to.be.a(ValidationError);
         expect(exp.data).to.have.property('c.e[0].additional');
       });
@@ -150,11 +150,11 @@ describe('Model', () => {
         required: ['a'],
         properties: {
           a: { type: 'string' },
-          b: { type: 'number' }
-        }
+          b: { type: 'number' },
+        },
       };
 
-      Model1.prototype.$validate = function(jsn, opt) {
+      Model1.prototype.$validate = function (jsn, opt) {
         Model.prototype.$validate.call(this, jsn, opt);
 
         ++calls;
@@ -164,7 +164,7 @@ describe('Model', () => {
 
       expect(() => {
         Model1.fromJson(json, options);
-      }).not.to.throwException(err => {
+      }).not.to.throwException((err) => {
         console.log(err.stack);
       });
 
@@ -181,10 +181,10 @@ describe('Model', () => {
             required: ['a'],
             properties: {
               a: { type: 'string' },
-              b: { type: 'number' }
-            }
+              b: { type: 'number' },
+            },
           };
-        }
+        },
       });
 
       for (let i = 0; i < 10; ++i) {
@@ -209,11 +209,11 @@ describe('Model', () => {
         required: ['a'],
         properties: {
           a: { type: 'string' },
-          b: { type: 'number' }
-        }
+          b: { type: 'number' },
+        },
       };
 
-      Model1.prototype.$beforeValidate = function(schema, jsn, opt) {
+      Model1.prototype.$beforeValidate = function (schema, jsn, opt) {
         ++calls;
 
         expect(opt).to.eql(options);
@@ -240,11 +240,11 @@ describe('Model', () => {
         required: ['a'],
         properties: {
           a: { type: 'string' },
-          b: { type: 'number' }
-        }
+          b: { type: 'number' },
+        },
       };
 
-      Model1.prototype.$afterValidate = function(jsn, opt) {
+      Model1.prototype.$afterValidate = function (jsn, opt) {
         ++calls;
         expect(opt).to.eql(options);
         expect(jsn).to.eql(json);
@@ -262,8 +262,8 @@ describe('Model', () => {
         required: ['a'],
         properties: {
           a: { type: 'string' },
-          b: { type: 'number' }
-        }
+          b: { type: 'number' },
+        },
       };
 
       expect(() => {
@@ -277,7 +277,7 @@ describe('Model', () => {
 
       expect(() => {
         Model1.fromJson({ a: 1, b: '1' }, { patch: true });
-      }).to.throwException(exp => {
+      }).to.throwException((exp) => {
         expect(exp).to.be.a(ValidationError);
         expect(exp.data).to.have.property('a');
         expect(exp.data).to.have.property('b');
@@ -292,18 +292,18 @@ describe('Model', () => {
       Model1.jsonSchema = {
         oneOf: [
           {
-            required: ['a']
+            required: ['a'],
           },
           {
-            required: ['b']
-          }
+            required: ['b'],
+          },
         ],
 
         properties: {
           a: { type: 'string' },
           b: { type: 'number' },
-          c: { type: 'string' }
-        }
+          c: { type: 'string' },
+        },
       };
 
       expect(() => {
@@ -320,25 +320,25 @@ describe('Model', () => {
 
       expect(() => {
         Model1.fromJson({ c: 'str' }, { patch: true });
-      }).to.not.throwException(err => console.log(err));
+      }).to.not.throwException((err) => console.log(err));
     });
 
     it('should skip requirement validation if options.patch == true (anyOf)', () => {
       Model1.jsonSchema = {
         anyOf: [
           {
-            required: ['a']
+            required: ['a'],
           },
           {
-            required: ['b']
-          }
+            required: ['b'],
+          },
         ],
 
         properties: {
           a: { type: 'string' },
           b: { type: 'number' },
-          c: { type: 'string' }
-        }
+          c: { type: 'string' },
+        },
       };
 
       expect(() => {
@@ -355,7 +355,7 @@ describe('Model', () => {
 
       expect(() => {
         Model1.fromJson({ c: 'str' }, { patch: true });
-      }).to.not.throwException(err => console.log(err));
+      }).to.not.throwException((err) => console.log(err));
     });
 
     it('should skip requirement validation if options.patch == true (if/then)', () => {
@@ -363,22 +363,22 @@ describe('Model', () => {
         properties: {
           a: { type: 'string' },
           b: { type: 'number' },
-          c: { type: 'string' }
+          c: { type: 'string' },
         },
 
         if: {
           properties: {
             a: {
-              enum: ['foo']
-            }
-          }
+              enum: ['foo'],
+            },
+          },
         },
         then: {
-          required: ['b']
+          required: ['b'],
         },
         else: {
-          required: ['c']
-        }
+          required: ['c'],
+        },
       };
 
       expect(() => {
@@ -411,8 +411,8 @@ describe('Model', () => {
         required: ['a'],
         properties: {
           a: { type: 'string' },
-          b: { type: 'number' }
-        }
+          b: { type: 'number' },
+        },
       };
 
       expect(() => {
@@ -440,8 +440,8 @@ describe('Model', () => {
         properties: {
           a: { type: 'string', default: 'default string' },
           b: { type: 'number', default: 666 },
-          c: { type: 'object', default: obj }
-        }
+          c: { type: 'object', default: obj },
+        },
       };
 
       let model = Model1.fromJson({ a: 'str' });
@@ -460,8 +460,8 @@ describe('Model', () => {
         properties: {
           a: { type: 'string', default: 'default string' },
           b: { type: 'number', default: 666 },
-          c: { type: 'object', default: obj }
-        }
+          c: { type: 'object', default: obj },
+        },
       };
 
       let model = Model1.fromJson({ a: 'str' }, { skipValidation: true });
@@ -481,7 +481,7 @@ describe('Model', () => {
     // https://github.com/Vincit/objection.js/issues/205
     it('should not throw TypeError when jsonSchema.properties == undefined', () => {
       Model1.jsonSchema = {
-        required: ['a']
+        required: ['a'],
       };
 
       let model = Model1.fromJson({ a: 100 });
@@ -491,12 +491,12 @@ describe('Model', () => {
 
     it('should validate but not pass if jsonSchema.required exists and jsonSchema.properties == undefined', () => {
       Model1.jsonSchema = {
-        required: ['a']
+        required: ['a'],
       };
 
       expect(() => {
         Model1.fromJson({ b: 200 });
-      }).to.throwException(exp => {
+      }).to.throwException((exp) => {
         expect(exp).to.be.a(ValidationError);
       });
     });
@@ -509,8 +509,8 @@ describe('Model', () => {
         properties: {
           a: { type: 'string', default: 'default string' },
           b: { type: 'number', default: 666 },
-          c: { type: 'object', default: obj }
-        }
+          c: { type: 'object', default: obj },
+        },
       };
 
       let model = Model1.fromJson({ b: 10 }, { patch: true });
@@ -525,13 +525,13 @@ describe('Model', () => {
         required: ['a'],
         properties: {
           a: { type: 'number' },
-          b: { type: 'string', minLength: 4 }
-        }
+          b: { type: 'string', minLength: 4 },
+        },
       };
 
       expect(() => {
         Model1.fromJson({ b: 'abc' });
-      }).to.throwException(exp => {
+      }).to.throwException((exp) => {
         expect(exp).to.be.a(ValidationError);
         expect(exp.data).to.have.property('a');
         expect(exp.data['a']).to.be.a(Array);
@@ -619,14 +619,14 @@ describe('Model', () => {
           a: {
             type: 'string',
             minLength: 5,
-            pattern: '^\\d+$'
-          }
-        }
+            pattern: '^\\d+$',
+          },
+        },
       };
 
       expect(() => {
         Model1.fromJson({ a: 'four' });
-      }).to.throwException(exp => {
+      }).to.throwException((exp) => {
         expect(exp).to.be.a(ValidationError);
         expect(exp.data).to.have.property('a');
         expect(exp.data['a']).to.be.a(Array);
@@ -651,17 +651,17 @@ describe('Model', () => {
           modelClass: Model2,
           join: {
             from: 'Model1.id',
-            to: 'Model2.model1Id'
-          }
+            to: 'Model2.model1Id',
+          },
         },
         relation2: {
           relation: Model.BelongsToOneRelation,
           modelClass: Model1,
           join: {
             from: 'Model1.id',
-            to: 'Model1.model1Id'
-          }
-        }
+            to: 'Model1.model1Id',
+          },
+        },
       };
 
       let model = Model1.fromJson({
@@ -669,9 +669,9 @@ describe('Model', () => {
         model1Id: 13,
         relation1: [
           { id: 11, model1Id: 10 },
-          { id: 12, model1Id: 10 }
+          { id: 12, model1Id: 10 },
         ],
-        relation2: { id: 13, model1Id: null }
+        relation2: { id: 13, model1Id: null },
       });
 
       expect(model.relation1[0]).to.be.a(Model2);
@@ -698,26 +698,26 @@ describe('Model', () => {
           modelClass: Model2,
           join: {
             from: 'Model1.id',
-            to: 'Model2.model1Id'
-          }
+            to: 'Model2.model1Id',
+          },
         },
         relation2: {
           relation: Model.BelongsToOneRelation,
           modelClass: Model1,
           join: {
             from: 'Model1.id',
-            to: 'Model1.model1Id'
-          }
-        }
+            to: 'Model1.model1Id',
+          },
+        },
       };
 
       let model = Model1.fromJson({
         id: 10,
-        model1Id: 13
+        model1Id: 13,
       });
       model.relation1 = [
         { id: 11, model1Id: 10 },
-        { id: 12, model1Id: 10 }
+        { id: 12, model1Id: 10 },
       ];
       model.relation2 = { id: 13, model1Id: null };
 
@@ -737,17 +737,17 @@ describe('Model', () => {
           modelClass: Model2,
           join: {
             from: 'Model1.id',
-            to: 'Model2.model1Id'
-          }
+            to: 'Model2.model1Id',
+          },
         },
         relation2: {
           relation: Model.BelongsToOneRelation,
           modelClass: Model1,
           join: {
             from: 'Model1.id',
-            to: 'Model1.model1Id'
-          }
-        }
+            to: 'Model1.model1Id',
+          },
+        },
       };
 
       let model = Model1.fromJson(
@@ -756,9 +756,9 @@ describe('Model', () => {
           model1Id: 13,
           relation1: [
             { id: 11, model1Id: 10 },
-            { id: 12, model1Id: 10 }
+            { id: 12, model1Id: 10 },
           ],
-          relation2: { id: 13, model1Id: null }
+          relation2: { id: 13, model1Id: null },
         },
         { skipParseRelations: true }
       );
@@ -777,17 +777,17 @@ describe('Model', () => {
           modelClass: Model2,
           join: {
             from: 'Model1.id',
-            to: 'Model2.model1Id'
-          }
+            to: 'Model2.model1Id',
+          },
         },
         relation2: {
           relation: Model.BelongsToOneRelation,
           modelClass: Model1,
           join: {
             from: 'Model1.id',
-            to: 'Model1.model1Id'
-          }
-        }
+            to: 'Model1.model1Id',
+          },
+        },
       };
 
       let model = Model1.fromJson(
@@ -795,7 +795,7 @@ describe('Model', () => {
           id: 10,
           model1Id: 13,
           relation1: [1, 2, '3', null, undefined, 6],
-          relation2: '5'
+          relation2: '5',
         },
         { skipParseRelations: true }
       );
@@ -813,9 +813,9 @@ describe('Model', () => {
           modelClass: Model,
           join: {
             from: 'Model.id',
-            to: 'Model.model1Id'
-          }
-        }
+            to: 'Model.model1Id',
+          },
+        },
       };
 
       let model = Model.fromJson({ a: 1, b: 2, someRelation: null });
@@ -837,8 +837,8 @@ describe('Model', () => {
           modelClass: Model2,
           join: {
             from: 'Model1.id',
-            to: 'Model2.model1Id'
-          }
+            to: 'Model2.model1Id',
+          },
         },
 
         relation2: {
@@ -846,16 +846,16 @@ describe('Model', () => {
           modelClass: Model1,
           join: {
             from: 'Model1.id',
-            to: 'Model1.model1Id'
-          }
-        }
+            to: 'Model1.model1Id',
+          },
+        },
       };
     });
 
     it('should parse nested relations into model instances even if the root is a model', () => {
       let model1 = Model1.fromJson({
         id: 10,
-        model1Id: 13
+        model1Id: 13,
       });
 
       model1.relation1 = [{ value: 1 }, { value: 2 }];
@@ -875,7 +875,7 @@ describe('Model', () => {
         id: 10,
         model1Id: 13,
         relation1: [{ value: 1 }, { value: 2 }],
-        relation2: { value: 3, relation1: [{ value: 4 }] }
+        relation2: { value: 3, relation1: [{ value: 4 }] },
       });
 
       let model2 = Model1.ensureModel(model1);
@@ -927,7 +927,7 @@ describe('Model', () => {
       let calls = 0;
       let json = { a: 1 };
 
-      Model1.prototype.$parseDatabaseJson = jsn => {
+      Model1.prototype.$parseDatabaseJson = (jsn) => {
         ++calls;
         expect(jsn).to.eql(json);
         return { c: 3 };
@@ -952,7 +952,7 @@ describe('Model', () => {
       expect(Model1.fromJson({ a: 1, b: 2, c: { d: [1, 3] } }).$toJson()).to.eql({
         a: 1,
         b: 2,
-        c: { d: [1, 3] }
+        c: { d: [1, 3] },
       });
     });
 
@@ -960,7 +960,7 @@ describe('Model', () => {
       let calls = 0;
       let json = { a: 1 };
 
-      Model1.prototype.$formatJson = jsn => {
+      Model1.prototype.$formatJson = (jsn) => {
         ++calls;
         expect(jsn).to.eql(json);
         jsn.b = 2;
@@ -978,7 +978,7 @@ describe('Model', () => {
     it('should call $toJson for properties of class Model', () => {
       let Model2 = createModelClass();
 
-      Model2.prototype.$formatJson = jsn => {
+      Model2.prototype.$formatJson = (jsn) => {
         jsn.d = 3;
         return jsn;
       };
@@ -1002,7 +1002,7 @@ describe('Model', () => {
     });
 
     it('should be called by JSON.stringify', () => {
-      Model1.prototype.$formatJson = jsn => {
+      Model1.prototype.$formatJson = (jsn) => {
         jsn.b = 2;
         return jsn;
       };
@@ -1039,7 +1039,7 @@ describe('Model', () => {
       expect(Model1.fromJson({ a: 1, b: 2, c: { d: [1, 3] } }).$toDatabaseJson()).to.eql({
         a: 1,
         b: 2,
-        c: { d: [1, 3] }
+        c: { d: [1, 3] },
       });
     });
 
@@ -1047,7 +1047,7 @@ describe('Model', () => {
       let calls = 0;
       let json = { a: 1 };
 
-      Model1.prototype.$formatDatabaseJson = jsn => {
+      Model1.prototype.$formatDatabaseJson = (jsn) => {
         ++calls;
         expect(jsn).to.eql(json);
         jsn.b = 2;
@@ -1100,7 +1100,7 @@ describe('Model', () => {
     it('should clone', () => {
       let Model2 = createModelClass();
 
-      Model2.prototype.$formatJson = jsn => {
+      Model2.prototype.$formatJson = (jsn) => {
         jsn.d = 3;
         return jsn;
       };
@@ -1118,7 +1118,7 @@ describe('Model', () => {
         g: { h: 100 },
         r: [{ h: 50 }],
         b: { c: 2, d: 3 },
-        e: [{ f: 100, d: 3 }]
+        e: [{ f: 100, d: 3 }],
       });
 
       expect(clone.g).to.not.equal(model.g);
@@ -1136,9 +1136,9 @@ describe('Model', () => {
           modelClass: Model,
           join: {
             from: 'Model.id',
-            to: 'Model.model1Id'
-          }
-        }
+            to: 'Model.model1Id',
+          },
+        },
       };
 
       let model = Model.fromJson({ a: 1, b: 2, someRelation: { a: 3, b: 4 } });
@@ -1153,11 +1153,11 @@ describe('Model', () => {
 
     beforeEach(() => {
       Model1 = createModelClass({
-        $formatDatabaseJson: json => {
+        $formatDatabaseJson: (json) => {
           return _.mapKeys(json, (value, key) => {
             return _.snakeCase(key);
           });
-        }
+        },
       });
     });
 
@@ -1171,11 +1171,11 @@ describe('Model', () => {
 
     beforeEach(() => {
       Model1 = createModelClass({
-        $parseDatabaseJson: json => {
+        $parseDatabaseJson: (json) => {
           return _.mapKeys(json, (value, key) => {
             return _.camelCase(key);
           });
-        }
+        },
       });
     });
 
@@ -1215,7 +1215,7 @@ describe('Model', () => {
       expect(model.$pick({ a: true, b: false, d: true }).toJSON()).to.eql({ a: 1, d: '4' });
       expect(model.$pick({ a: true, b: false, d: true }).$toDatabaseJson()).to.eql({
         a: 1,
-        d: '4'
+        d: '4',
       });
       expect(model.$pick({ a: true, b: false, d: true }).$e).to.eql('5');
     });
@@ -1252,7 +1252,7 @@ describe('Model', () => {
       expect(model.$omit({ a: false, b: true, c: true }).toJSON()).to.eql({ a: 1, d: '4' });
       expect(model.$omit({ a: false, b: true, c: true }).$toDatabaseJson()).to.eql({
         a: 1,
-        d: '4'
+        d: '4',
       });
       expect(model.$omit({ a: false, b: true, c: true, $e: true }).$e).to.eql('5');
     });
@@ -1279,7 +1279,7 @@ describe('Model', () => {
           a: 100,
           b: 10,
           rel1: Model1.fromJson({ a: 101, b: 11 }),
-          rel2: [Model1.fromJson({ a: 102, b: 12 }), Model1.fromJson({ a: 103, b: 13 })]
+          rel2: [Model1.fromJson({ a: 102, b: 12 }), Model1.fromJson({ a: 103, b: 13 })],
         }).toJSON()
       ).to.eql({
         a: 100,
@@ -1289,13 +1289,13 @@ describe('Model', () => {
         rel1: {
           a: 101,
           b: 11,
-          foo: 112
+          foo: 112,
         },
 
         rel2: [
           { a: 102, b: 12, foo: 114 },
-          { a: 103, b: 13, foo: 116 }
-        ]
+          { a: 103, b: 13, foo: 116 },
+        ],
       });
     });
 
@@ -1319,7 +1319,7 @@ describe('Model', () => {
           a: 100,
           b: 10,
           rel1: Model1.fromJson({ a: 101, b: 11 }),
-          rel2: [Model1.fromJson({ a: 102, b: 12 }), Model1.fromJson({ a: 103, b: 13 })]
+          rel2: [Model1.fromJson({ a: 102, b: 12 }), Model1.fromJson({ a: 103, b: 13 })],
         }).toJSON({ virtuals: false })
       ).to.eql({
         a: 100,
@@ -1327,13 +1327,13 @@ describe('Model', () => {
 
         rel1: {
           a: 101,
-          b: 11
+          b: 11,
         },
 
         rel2: [
           { a: 102, b: 12 },
-          { a: 103, b: 13 }
-        ]
+          { a: 103, b: 13 },
+        ],
       });
     });
 
@@ -1357,7 +1357,7 @@ describe('Model', () => {
           a: 100,
           b: 10,
           rel1: Model1.fromJson({ a: 101, b: 11 }),
-          rel2: [Model1.fromJson({ a: 102, b: 12 }), Model1.fromJson({ a: 103, b: 13 })]
+          rel2: [Model1.fromJson({ a: 102, b: 12 }), Model1.fromJson({ a: 103, b: 13 })],
         }).$toJson({ virtuals: false })
       ).to.eql({
         a: 100,
@@ -1365,13 +1365,13 @@ describe('Model', () => {
 
         rel1: {
           a: 101,
-          b: 11
+          b: 11,
         },
 
         rel2: [
           { a: 102, b: 12 },
-          { a: 103, b: 13 }
-        ]
+          { a: 103, b: 13 },
+        ],
       });
     });
 
@@ -1395,7 +1395,7 @@ describe('Model', () => {
           a: 100,
           b: 10,
           rel1: Model1.fromJson({ a: 101, b: 11 }),
-          rel2: [Model1.fromJson({ a: 102, b: 12 }), Model1.fromJson({ a: 103, b: 13 })]
+          rel2: [Model1.fromJson({ a: 102, b: 12 }), Model1.fromJson({ a: 103, b: 13 })],
         }).$toJson({ virtuals: ['foo', 'bar'] })
       ).to.eql({
         a: 100,
@@ -1407,13 +1407,13 @@ describe('Model', () => {
           a: 101,
           b: 11,
           foo: 112,
-          bar: 1111
+          bar: 1111,
         },
 
         rel2: [
           { a: 102, b: 12, foo: 114, bar: 1224 },
-          { a: 103, b: 13, foo: 116, bar: 1339 }
-        ]
+          { a: 103, b: 13, foo: 116, bar: 1339 },
+        ],
       });
     });
 
@@ -1440,9 +1440,9 @@ describe('Model', () => {
               modelClass: Model1,
               join: {
                 from: 'Model2.model1Id',
-                to: 'Model1.id'
-              }
-            }
+                to: 'Model1.id',
+              },
+            },
           };
         }
 
@@ -1455,8 +1455,8 @@ describe('Model', () => {
         a: 'a',
         model1: {
           b: 'b',
-          c: 'c'
-        }
+          c: 'c',
+        },
       });
 
       expect(model2.toJSON()).to.eql({
@@ -1465,8 +1465,8 @@ describe('Model', () => {
         model1: {
           b: 'b',
           c: 'c',
-          foo: 'foo'
-        }
+          foo: 'foo',
+        },
       });
     });
 
@@ -1493,9 +1493,9 @@ describe('Model', () => {
               modelClass: Model1,
               join: {
                 from: 'Model2.model1Id',
-                to: 'Model1.id'
-              }
-            }
+                to: 'Model1.id',
+              },
+            },
           };
         }
 
@@ -1508,8 +1508,8 @@ describe('Model', () => {
         a: 'a',
         model1: {
           b: 'b',
-          c: 'c'
-        }
+          c: 'c',
+        },
       });
 
       expect(model2.toJSON({})).to.eql({
@@ -1518,8 +1518,8 @@ describe('Model', () => {
         model1: {
           b: 'b',
           c: 'c',
-          foo: 'foo'
-        }
+          foo: 'foo',
+        },
       });
     });
 
@@ -1541,7 +1541,7 @@ describe('Model', () => {
       expect(Model1.fromJson({ a: 100, b: 10 }).toJSON()).to.eql({
         a: 100,
         b: 10,
-        foo: 110
+        foo: 110,
       });
     });
 
@@ -1579,7 +1579,7 @@ describe('Model', () => {
         bar: 1000,
         foo: 200,
         baz: 300,
-        notEvenVirtual: 2000
+        notEvenVirtual: 2000,
       });
 
       expect(model.toJSON()).to.eql({
@@ -1588,13 +1588,13 @@ describe('Model', () => {
         c: 1000,
         foo: 110,
         bar: 1000,
-        baz: 20
+        baz: 20,
       });
 
       expect(model.$toDatabaseJson()).to.eql({
         a: 10,
         b: 100,
-        c: 1000
+        c: 1000,
       });
     });
 
@@ -1614,12 +1614,12 @@ describe('Model', () => {
       expect(Model1.fromJson({ a: 100, b: 10, foo: 666 }).toJSON()).to.eql({
         a: 100,
         b: 10,
-        foo: 110
+        foo: 110,
       });
 
       expect(Model1.fromJson({ a: 100, b: 10, foo: 666 }).$toDatabaseJson()).to.eql({
         a: 100,
-        b: 10
+        b: 10,
       });
     });
   });
@@ -1630,12 +1630,12 @@ describe('Model', () => {
 
       const obj = {
         foo: {
-          bar: 1
-        }
+          bar: 1,
+        },
       };
 
       const person = Person.fromDatabaseJson({
-        objectField: obj
+        objectField: obj,
       });
 
       expect(person.objectField).to.equal(obj);
@@ -1668,12 +1668,12 @@ describe('Model', () => {
 
       const obj = {
         foo: {
-          bar: 1
-        }
+          bar: 1,
+        },
       };
 
       const person = Person.fromDatabaseJson({
-        objectField: obj
+        objectField: obj,
       });
 
       expect(person.objectField).to.equal(obj);
@@ -1706,9 +1706,9 @@ describe('Model', () => {
           modelClass: Model2,
           join: {
             from: 'Model1.id',
-            to: 'Model2.model1Id'
-          }
-        }
+            to: 'Model2.model1Id',
+          },
+        },
       };
     };
 
@@ -1724,15 +1724,15 @@ describe('Model', () => {
       type: 'object',
       properties: {
         prop1: { type: 'number' },
-        prop2: { type: 'string' }
-      }
+        prop2: { type: 'string' },
+      },
     };
 
     let model = Model.fromJson({
       prop1: 10,
       prop2: '10',
       prop3: 'should be removed',
-      prop4: { also: 'this' }
+      prop4: { also: 'this' },
     });
 
     let json = model.$toDatabaseJson();
@@ -1766,22 +1766,22 @@ describe('Model', () => {
         modelClass: Model,
         join: {
           from: 'Model.id',
-          to: 'Model.model1Id'
-        }
-      }
+          to: 'Model.model1Id',
+        },
+      },
     };
 
     Model.jsonSchema = {
       type: 'object',
       properties: {
-        someRelation: { type: 'object' }
-      }
+        someRelation: { type: 'object' },
+      },
     };
 
     let model = Model.fromJson({
       someRelation: {
-        value: 'should be removed'
-      }
+        value: 'should be removed',
+      },
     });
 
     let json = model.$toDatabaseJson();
@@ -1799,15 +1799,15 @@ describe('Model', () => {
       type: 'object',
       properties: {
         prop1: { type: 'number' },
-        prop2: { type: 'string' }
-      }
+        prop2: { type: 'string' },
+      },
     };
 
     let model = Model.fromJson({
       prop1: 10,
       prop2: '10',
       prop3: 'should not be removed',
-      prop4: { also: 'this' }
+      prop4: { also: 'this' },
     });
 
     let json = model.$toDatabaseJson();
@@ -1840,51 +1840,51 @@ describe('Model', () => {
         prop2: {
           type: 'object',
           properties: {
-            subProp1: { type: 'number' }
-          }
+            subProp1: { type: 'number' },
+          },
         },
         prop3: {
           type: 'array',
           items: {
             type: 'object',
             properties: {
-              subProp2: { type: 'boolean' }
-            }
-          }
+              subProp2: { type: 'boolean' },
+            },
+          },
         },
         prop4: {
           anyOf: [
             {
-              type: 'array'
+              type: 'array',
             },
             {
-              type: 'string'
-            }
-          ]
+              type: 'string',
+            },
+          ],
         },
         prop5: {
           oneOf: [
             {
-              type: 'object'
+              type: 'object',
             },
             {
-              type: 'string'
-            }
-          ]
-        }
-      }
+              type: 'string',
+            },
+          ],
+        },
+      },
     };
 
     let inputJson = {
       prop1: 'text',
       prop2: {
-        subProp1: 1000
+        subProp1: 1000,
       },
       prop3: [{ subProp2: true }, { subProp2: false }],
       prop4: [1, 2, 3],
       prop5: {
-        subProp3: 'str'
-      }
+        subProp3: 'str',
+      },
     };
 
     let model = Model.fromJson(inputJson);
@@ -1919,8 +1919,8 @@ describe('Model', () => {
             prop2: {
               type: 'object',
               properties: {
-                subProp1: { type: 'number' }
-              }
+                subProp1: { type: 'number' },
+              },
             },
 
             // This will not be converted because it is not listed in `jsonAttributes`.
@@ -1929,11 +1929,11 @@ describe('Model', () => {
               items: {
                 type: 'object',
                 properties: {
-                  subProp2: { type: 'boolean' }
-                }
-              }
-            }
-          }
+                  subProp2: { type: 'boolean' },
+                },
+              },
+            },
+          },
         };
       }
 
@@ -1945,9 +1945,9 @@ describe('Model', () => {
     let inputJson = {
       prop1: 'text',
       prop2: {
-        subProp1: 1000
+        subProp1: 1000,
       },
-      prop3: [{ subProp2: true }, { subProp2: false }]
+      prop3: [{ subProp2: true }, { subProp2: false }],
     };
 
     let model = TestModel.fromJson(inputJson);
@@ -1982,16 +1982,16 @@ describe('Model', () => {
         modelClass: Model2,
         join: {
           from: 'Model1.id',
-          to: 'Model2.model1Id'
-        }
+          to: 'Model2.model1Id',
+        },
       },
       belongsToOne: {
         relation: Model.BelongsToOneRelation,
         modelClass: Model1,
         join: {
           from: 'Model1.id',
-          to: 'Model1.model1Id'
-        }
+          to: 'Model1.model1Id',
+        },
       },
       manyToMany: {
         relation: Model.ManyToManyRelation,
@@ -2000,11 +2000,11 @@ describe('Model', () => {
           from: 'Model1.id',
           through: {
             from: 'Model1_Model1.id1',
-            to: 'Model1_Model1.id2'
+            to: 'Model1_Model1.id2',
           },
-          to: 'Model1.id'
-        }
-      }
+          to: 'Model1.id',
+        },
+      },
     };
 
     const model1 = Model1.fromJson({});
@@ -2038,16 +2038,16 @@ describe('Model', () => {
         modelClass: Model2,
         join: {
           from: 'Model1.id',
-          to: 'Model2.model1Id'
-        }
+          to: 'Model2.model1Id',
+        },
       },
       belongsToOne: {
         relation: Model.BelongsToOneRelation,
         modelClass: Model1,
         join: {
           from: 'Model1.id',
-          to: 'Model1.model1Id'
-        }
+          to: 'Model1.model1Id',
+        },
       },
       manyToMany: {
         relation: Model.ManyToManyRelation,
@@ -2056,11 +2056,11 @@ describe('Model', () => {
           from: 'Model1.id',
           through: {
             from: 'Model1_Model1.id1',
-            to: 'Model1_Model1.id2'
+            to: 'Model1_Model1.id2',
           },
-          to: 'Model1.id'
-        }
-      }
+          to: 'Model1.id',
+        },
+      },
     };
 
     const model1 = Model1.fromJson({});
@@ -2093,9 +2093,9 @@ describe('Model', () => {
         modelClass: Model,
         join: {
           from: 'Model.id',
-          to: 'Model.model1Id'
-        }
-      }
+          to: 'Model.model1Id',
+        },
+      },
     };
 
     let model = Model.fromJson({ a: 1, b: 2, someRelation: { a: 3, b: 4 } });
@@ -2113,9 +2113,9 @@ describe('Model', () => {
         modelClass: Model,
         join: {
           from: 'Model.id',
-          to: 'Model.model1Id'
-        }
-      }
+          to: 'Model.model1Id',
+        },
+      },
     };
 
     let model = Model.fromJson({ a: 1, b: 2, someRelation: { a: 3, b: 4 } });
@@ -2175,9 +2175,9 @@ describe('Model', () => {
         modelClass: Model2,
         join: {
           from: 'Model1.id',
-          to: 'Model2.someId'
-        }
-      }
+          to: 'Model2.someId',
+        },
+      },
     };
 
     Model1.QueryBuilder = MyQueryBuilder1;
@@ -2203,17 +2203,17 @@ describe('Model', () => {
           modelClass: Model2,
           join: {
             from: 'Model1.id',
-            to: 'Model2.model1Id'
-          }
+            to: 'Model2.model1Id',
+          },
         },
         relation2: {
           relation: Model.BelongsToOneRelation,
           modelClass: Model1,
           join: {
             from: 'Model1.id',
-            to: 'Model1.model1Id'
-          }
-        }
+            to: 'Model1.model1Id',
+          },
+        },
       };
     });
 
@@ -2223,14 +2223,14 @@ describe('Model', () => {
         model1Id: 2,
         relation1: [
           { id: 4, model1Id: 1 },
-          { id: 5, model1Id: 1 }
+          { id: 5, model1Id: 1 },
         ],
         relation2: {
           id: 2,
           model1Id: 3,
           relation1: [
             { id: 6, model1Id: 2 },
-            { id: 7, model1Id: 2 }
+            { id: 7, model1Id: 2 },
           ],
           relation2: {
             id: 3,
@@ -2253,10 +2253,10 @@ describe('Model', () => {
               { id: 22, model1Id: 3 },
               { id: 23, model1Id: 3 },
               { id: 24, model1Id: 3 },
-              { id: 25, model1Id: 3 }
-            ]
-          }
-        }
+              { id: 25, model1Id: 3 },
+            ],
+          },
+        },
       });
     });
 
@@ -2264,7 +2264,7 @@ describe('Model', () => {
       let model1Ids = [];
       let model2Ids = [];
 
-      Model1.traverse([model], model => {
+      Model1.traverse([model], (model) => {
         if (model instanceof Model1) {
           model1Ids.push(model.id);
         } else if (model instanceof Model2) {
@@ -2278,13 +2278,13 @@ describe('Model', () => {
 
     it('traverse([], traverser) should not throw', () => {
       expect(() => {
-        Model1.traverse([], function() {});
+        Model1.traverse([], function () {});
       }).to.not.throwException();
     });
 
     it('traverse(undefined, traverser) should not throw', () => {
       expect(() => {
-        Model1.traverse(undefined, function() {});
+        Model1.traverse(undefined, function () {});
       }).to.not.throwException();
     });
 
@@ -2327,7 +2327,7 @@ describe('Model', () => {
       let model1Ids = [];
       let model2Ids = [];
 
-      Model1.traverse(model, model => {
+      Model1.traverse(model, (model) => {
         if (model instanceof Model1) {
           model1Ids.push(model.id);
         } else if (model instanceof Model2) {
@@ -2343,7 +2343,7 @@ describe('Model', () => {
       let model1Ids = [];
       let model2Ids = [];
 
-      Model1.traverse(null, model, model => {
+      Model1.traverse(null, model, (model) => {
         if (model instanceof Model1) {
           model1Ids.push(model.id);
         } else if (model instanceof Model2) {
@@ -2359,9 +2359,9 @@ describe('Model', () => {
       let model1Ids = [];
       let model2Ids = [];
 
-      Model1.traverse(Model2, model, model => {
+      Model1.traverse(Model2, model, (model) => {
         model2Ids.push(model.id);
-      }).traverse(Model1, model, model => {
+      }).traverse(Model1, model, (model) => {
         model1Ids.push(model.id);
       });
 
@@ -2373,7 +2373,7 @@ describe('Model', () => {
       let model1Ids = [];
       let model2Ids = [];
 
-      model.$traverse(model => {
+      model.$traverse((model) => {
         if (model instanceof Model1) {
           model1Ids.push(model.id);
         } else if (model instanceof Model2) {
@@ -2390,10 +2390,10 @@ describe('Model', () => {
       let model2Ids = [];
 
       model
-        .$traverse(Model1, model => {
+        .$traverse(Model1, (model) => {
           model1Ids.push(model.id);
         })
-        .$traverse(Model2, model => {
+        .$traverse(Model2, (model) => {
           model2Ids.push(model.id);
         });
 
@@ -2417,17 +2417,17 @@ describe('Model', () => {
           modelClass: Model2,
           join: {
             from: 'Model1.id',
-            to: 'Model2.model1Id'
-          }
+            to: 'Model2.model1Id',
+          },
         },
         relation2: {
           relation: Model.BelongsToOneRelation,
           modelClass: Model1,
           join: {
             from: 'Model1.id',
-            to: 'Model1.model1Id'
-          }
-        }
+            to: 'Model1.model1Id',
+          },
+        },
       };
     });
 
@@ -2437,14 +2437,14 @@ describe('Model', () => {
         model1Id: 2,
         relation1: [
           { id: 4, model1Id: 1 },
-          { id: 5, model1Id: 1 }
+          { id: 5, model1Id: 1 },
         ],
         relation2: {
           id: 2,
           model1Id: 3,
           relation1: [
             { id: 6, model1Id: 2 },
-            { id: 7, model1Id: 2 }
+            { id: 7, model1Id: 2 },
           ],
           relation2: {
             id: 3,
@@ -2467,10 +2467,10 @@ describe('Model', () => {
               { id: 22, model1Id: 3 },
               { id: 23, model1Id: 3 },
               { id: 24, model1Id: 3 },
-              { id: 25, model1Id: 3 }
-            ]
-          }
-        }
+              { id: 25, model1Id: 3 },
+            ],
+          },
+        },
       });
     });
 
@@ -2478,8 +2478,8 @@ describe('Model', () => {
       let model1Ids = [];
       let model2Ids = [];
 
-      return Model1.traverseAsync([model], model => {
-        return new Promise(resolve => {
+      return Model1.traverseAsync([model], (model) => {
+        return new Promise((resolve) => {
           setTimeout(() => {
             if (model instanceof Model1) {
               model1Ids.push(model.id);
@@ -2499,8 +2499,8 @@ describe('Model', () => {
       let model1Ids = [];
       let model2Ids = [];
 
-      return Model1.traverseAsync(model, model => {
-        return new Promise(resolve => {
+      return Model1.traverseAsync(model, (model) => {
+        return new Promise((resolve) => {
           setTimeout(() => {
             if (model instanceof Model1) {
               model1Ids.push(model.id);
@@ -2555,11 +2555,11 @@ describe('Model', () => {
       let model1Ids = [];
       let model2Ids = [];
 
-      return Model1.traverseAsync(Model2, model, model => {
+      return Model1.traverseAsync(Model2, model, (model) => {
         model2Ids.push(model.id);
       })
         .then(() => {
-          return Model1.traverseAsync(Model1, model, model => {
+          return Model1.traverseAsync(Model1, model, (model) => {
             model1Ids.push(model.id);
           });
         })
@@ -2574,8 +2574,8 @@ describe('Model', () => {
       let model2Ids = [];
 
       return model
-        .$traverseAsync(model => {
-          return new Promise(resolve => {
+        .$traverseAsync((model) => {
+          return new Promise((resolve) => {
             setTimeout(() => {
               if (model instanceof Model1) {
                 model1Ids.push(model.id);
@@ -2596,13 +2596,13 @@ describe('Model', () => {
   it('$validate should run hooks and strip relations', () => {
     let Model1 = modelClass('Model1');
 
-    Model1.prototype.$parseJson = function(json, opt) {
+    Model1.prototype.$parseJson = function (json, opt) {
       json = Model.prototype.$parseJson.apply(this, arguments);
       json.foo = parseInt(json.foo);
       return json;
     };
 
-    Model1.prototype.$formatJson = function(json, opt) {
+    Model1.prototype.$formatJson = function (json, opt) {
       json = Model.prototype.$formatJson.apply(this, arguments);
       json.foo = json.foo.toString();
       return json;
@@ -2611,8 +2611,8 @@ describe('Model', () => {
     Model1.jsonSchema = {
       type: 'object',
       properties: {
-        foo: { type: 'integer' }
-      }
+        foo: { type: 'integer' },
+      },
     };
 
     Model1.relationMappings = {
@@ -2621,9 +2621,9 @@ describe('Model', () => {
         modelClass: Model1,
         join: {
           from: 'Model1.id',
-          to: 'Model1.someId'
-        }
-      }
+          to: 'Model1.someId',
+        },
+      },
     };
 
     let model = Model1.fromJson({ foo: '10' });

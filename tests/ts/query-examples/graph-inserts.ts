@@ -13,11 +13,11 @@ import { Person } from '../fixtures/person';
         pets: [
           {
             name: 'Fluffy',
-            species: 'dog'
-          }
-        ]
-      }
-    ]
+            species: 'dog',
+          },
+        ],
+      },
+    ],
   });
 
   await Person.query().insertGraph([
@@ -29,9 +29,9 @@ import { Person } from '../fixtures/person';
         {
           '#id': 'silverLiningsPlaybook',
           title: 'Silver Linings Playbook',
-          duration: 122
-        }
-      ]
+          duration: 122,
+        },
+      ],
     },
     {
       firstName: 'Bradley',
@@ -39,10 +39,10 @@ import { Person } from '../fixtures/person';
 
       movies: [
         {
-          '#ref': 'silverLiningsPlaybook'
-        }
-      ]
-    }
+          '#ref': 'silverLiningsPlaybook',
+        },
+      ],
+    },
   ]);
 
   await Person.query().insertGraph([
@@ -54,10 +54,10 @@ import { Person } from '../fixtures/person';
       pets: [
         {
           name: 'I am the dog of #ref{jenni.firstName} whose id is #ref{jenni.id}',
-          species: 'dog'
-        }
-      ]
-    }
+          species: 'dog',
+        },
+      ],
+    },
   ]);
 
   await Person.query().insertGraph(
@@ -68,13 +68,13 @@ import { Person } from '../fixtures/person';
 
         movies: [
           {
-            id: 2636
-          }
-        ]
-      }
+            id: 2636,
+          },
+        ],
+      },
     ],
     {
-      relate: true
+      relate: true,
     }
   );
 
@@ -86,13 +86,13 @@ import { Person } from '../fixtures/person';
 
         movies: [
           {
-            id: 2636
-          }
-        ]
-      }
+            id: 2636,
+          },
+        ],
+      },
     ],
     {
-      relate: ['movies']
+      relate: ['movies'],
     }
   );
 
@@ -109,15 +109,15 @@ import { Person } from '../fixtures/person';
 
             actors: [
               {
-                id: 2516
-              }
-            ]
-          }
-        ]
-      }
+                id: 2516,
+              },
+            ],
+          },
+        ],
+      },
     ],
     {
-      relate: ['movies.actors']
+      relate: ['movies.actors'],
     }
   );
 
@@ -128,14 +128,14 @@ import { Person } from '../fixtures/person';
 
       movies: [
         {
-          '#dbRef': 2636
+          '#dbRef': 2636,
         },
         {
           // This will be inserted with an id.
           id: 100,
-          title: 'New movie'
-        }
-      ]
-    }
+          title: 'New movie',
+        },
+      ],
+    },
   ]);
 })();

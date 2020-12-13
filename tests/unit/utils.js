@@ -6,7 +6,7 @@ const {
   snakeCase,
   camelCase,
   snakeCaseKeys,
-  camelCaseKeys
+  camelCaseKeys,
 } = require('../../lib/utils/identifierMapping');
 
 const { range } = require('lodash');
@@ -19,14 +19,14 @@ describe('utils', () => {
     it('should mixin rest of the arguments to the first argument', () => {
       class X {}
 
-      const m1 = C =>
+      const m1 = (C) =>
         class extends C {
           f() {
             return 1;
           }
         };
 
-      const m2 = C =>
+      const m2 = (C) =>
         class extends C {
           f() {
             return super.f() + 1;
@@ -57,14 +57,14 @@ describe('utils', () => {
     it('should compose multiple functions', () => {
       class X {}
 
-      const m1 = C =>
+      const m1 = (C) =>
         class extends C {
           f() {
             return 1;
           }
         };
 
-      const m2 = C =>
+      const m2 = (C) =>
         class extends C {
           f() {
             return super.f() + 1;
@@ -219,18 +219,18 @@ describe('utils', () => {
 
           return Promise.delay(Math.round(Math.random() * 10))
             .then(() => 2 * item)
-            .then(result => {
+            .then((result) => {
               --running;
               return result;
             });
-        }).then(result => {
+        }).then((result) => {
           expect(maxRunning).to.equal(numItems);
-          expect(result).to.eql(range(numItems).map(it => it * 2));
+          expect(result).to.eql(range(numItems).map((it) => it * 2));
           expect(startOrder).to.eql(range(numItems));
         });
       });
 
-      it('should not start new operations after an error has been thrown', done => {
+      it('should not start new operations after an error has been thrown', (done) => {
         const numItems = 20;
 
         let errorThrown = false;
@@ -253,7 +253,7 @@ describe('utils', () => {
           .then(() => {
             done(new Error('should not get here'));
           })
-          .catch(err => {
+          .catch((err) => {
             expect(err.message).to.equal('fail');
             expect(callbackCalledAfterError).to.equal(false);
             done();
@@ -277,14 +277,14 @@ describe('utils', () => {
 
             return Promise.delay(Math.round(Math.random() * 10))
               .then(() => 2 * item)
-              .then(result => {
+              .then((result) => {
                 --running;
                 return result;
               });
           },
           { concurrency }
-        ).then(result => {
-          expect(result).to.eql(range(numItems).map(it => it * 2));
+        ).then((result) => {
+          expect(result).to.eql(range(numItems).map((it) => it * 2));
           expect(startOrder).to.eql(range(numItems));
         });
       });
@@ -301,8 +301,8 @@ describe('utils', () => {
             return 2 * item;
           },
           { concurrency }
-        ).then(result => {
-          expect(result).to.eql(range(numItems).map(it => it * 2));
+        ).then((result) => {
+          expect(result).to.eql(range(numItems).map((it) => it * 2));
           expect(startOrder).to.eql(range(numItems));
         });
       });
@@ -363,10 +363,10 @@ describe('utils', () => {
       expect(
         jsonEquals(
           {
-            a: [1, { b: 'foo' }, false]
+            a: [1, { b: 'foo' }, false],
           },
           {
-            a: [1, { b: 'foo' }, false]
+            a: [1, { b: 'foo' }, false],
           }
         )
       ).to.equal(true);
@@ -374,10 +374,10 @@ describe('utils', () => {
       expect(
         jsonEquals(
           {
-            a: [1, { b: 'foo' }, false]
+            a: [1, { b: 'foo' }, false],
           },
           {
-            a: [1, { b: 'bar' }, false]
+            a: [1, { b: 'bar' }, false],
           }
         )
       ).to.equal(false);
@@ -385,10 +385,10 @@ describe('utils', () => {
       expect(
         jsonEquals(
           {
-            a: [1, { b: 'foo' }, false]
+            a: [1, { b: 'foo' }, false],
           },
           {
-            a: [1, { b: 'foo' }, true]
+            a: [1, { b: 'foo' }, true],
           }
         )
       ).to.equal(false);
@@ -397,15 +397,15 @@ describe('utils', () => {
         jsonEquals(
           [
             {
-              a: [1, { b: 'foo' }, false]
+              a: [1, { b: 'foo' }, false],
             },
-            1
+            1,
           ],
           [
             {
-              a: [1, { b: 'foo' }, false]
+              a: [1, { b: 'foo' }, false],
             },
-            1
+            1,
           ]
         )
       ).to.equal(true);
@@ -414,15 +414,15 @@ describe('utils', () => {
         jsonEquals(
           [
             {
-              a: [1, { b: 'foo' }, false]
+              a: [1, { b: 'foo' }, false],
             },
-            1
+            1,
           ],
           [
             {
-              a: ['1', { b: 'foo' }, false]
+              a: ['1', { b: 'foo' }, false],
             },
-            1
+            1,
           ]
         )
       ).to.equal(false);
@@ -432,7 +432,7 @@ describe('utils', () => {
     const items = [
       [Buffer.from('00000000000000000000000000007AAD', 'hex')],
       [Buffer.from('00000000000000000000000000007AAE', 'hex')],
-      [Buffer.from('00000000000000000000000000007AAC', 'hex')]
+      [Buffer.from('00000000000000000000000000007AAC', 'hex')],
     ];
     it('should work with Buffer items', () => {
       const itemsForTest = items.map(([value]) => value);
@@ -443,7 +443,9 @@ describe('utils', () => {
     });
     it('should work with Buffer[] items with custom keyGetter function', () => {
       expect(
-        uniqBy(items, item => item.map(x => (Buffer.isBuffer(x) ? x.toString('hex') : x)).join(','))
+        uniqBy(items, (item) =>
+          item.map((x) => (Buffer.isBuffer(x) ? x.toString('hex') : x)).join(',')
+        )
       ).to.eql(items);
     });
   });

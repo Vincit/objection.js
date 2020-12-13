@@ -1,13 +1,13 @@
 const { Model } = require('../../../');
 
-module.exports = session => {
+module.exports = (session) => {
   describe('has one relation tree', () => {
     let TestModel;
 
     before(() => {
       return session.knex.schema
         .dropTableIfExists('has_one_relation_tree_test')
-        .createTable('has_one_relation_tree_test', table => {
+        .createTable('has_one_relation_tree_test', (table) => {
           table.increments('id');
           table.string('value');
           table.integer('previousId');
@@ -31,8 +31,8 @@ module.exports = session => {
               modelClass: this,
               join: {
                 from: `${this.tableName}.previousId`,
-                to: `${this.tableName}.id`
-              }
+                to: `${this.tableName}.id`,
+              },
             },
 
             next: {
@@ -40,9 +40,9 @@ module.exports = session => {
               modelClass: this,
               join: {
                 from: `${this.tableName}.id`,
-                to: `${this.tableName}.previousId`
-              }
-            }
+                to: `${this.tableName}.previousId`,
+              },
+            },
           };
         }
       };
@@ -59,16 +59,14 @@ module.exports = session => {
             value: 'previous 1',
 
             previous: {
-              value: 'previous 2'
-            }
-          }
+              value: 'previous 2',
+            },
+          },
         })
         .then(() => {
-          return TestModel.query()
-            .findOne({ value: 'root' })
-            .eager('previous.^');
+          return TestModel.query().findOne({ value: 'root' }).eager('previous.^');
         })
-        .then(result => {
+        .then((result) => {
           // console.dir(result, { depth: null });
         });
     });

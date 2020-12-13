@@ -3,7 +3,7 @@ const expect = require('expect.js');
 const expectPartEql = require('./../../testUtils/testUtils').expectPartialEqual;
 const isPostgres = require('../../lib/utils/knexUtils').isPostgres;
 
-module.exports = session => {
+module.exports = (session) => {
   const Model1 = session.models.Model1;
   const Model2 = session.models.Model2;
 
@@ -18,23 +18,23 @@ module.exports = session => {
               {
                 idCol: 1,
                 model2Prop1: 'text 1',
-                model2Prop2: 2
+                model2Prop2: 2,
               },
               {
                 idCol: 2,
                 model2Prop1: 'text 2',
-                model2Prop2: 1
-              }
-            ]
+                model2Prop2: 1,
+              },
+            ],
           },
           {
             id: 2,
-            model1Prop1: 'hello 2'
+            model1Prop1: 'hello 2',
           },
           {
             id: 3,
-            model1Prop1: 'hello 3'
-          }
+            model1Prop1: 'hello 3',
+          },
         ]);
       });
 
@@ -42,11 +42,11 @@ module.exports = session => {
         return Model1.query()
           .delete()
           .where('id', '=', 2)
-          .then(numDeleted => {
+          .then((numDeleted) => {
             expect(numDeleted).to.equal(1);
             return session.knex('Model1').orderBy('id');
           })
-          .then(rows => {
+          .then((rows) => {
             expect(rows).to.have.length(2);
             expectPartEql(rows[0], { id: 1, model1Prop1: 'hello 1' });
             expectPartEql(rows[1], { id: 3, model1Prop1: 'hello 3' });
@@ -57,11 +57,11 @@ module.exports = session => {
         return Model2.query()
           .del()
           .where('model2_prop2', 1)
-          .then(numDeleted => {
+          .then((numDeleted) => {
             expect(numDeleted).to.equal(1);
             return session.knex('model2').orderBy('id_col');
           })
-          .then(rows => {
+          .then((rows) => {
             expect(rows).to.have.length(1);
             expectPartEql(rows[0], { id_col: 1, model2_prop1: 'text 1', model2_prop2: 2 });
           });
@@ -70,11 +70,11 @@ module.exports = session => {
       it('should delete a model using deleteById', () => {
         return Model1.query()
           .deleteById(2)
-          .then(numDeleted => {
+          .then((numDeleted) => {
             expect(numDeleted).to.equal(1);
             return session.knex('Model1').orderBy('id');
           })
-          .then(rows => {
+          .then((rows) => {
             expect(rows).to.have.length(2);
             expectPartEql(rows[0], { id: 1, model1Prop1: 'hello 1' });
             expectPartEql(rows[1], { id: 3, model1Prop1: 'hello 3' });
@@ -86,17 +86,17 @@ module.exports = session => {
           return Model1.query()
             .deleteById(2)
             .returning('*')
-            .then(deletedRow => {
+            .then((deletedRow) => {
               expect(deletedRow).to.eql({
                 id: 2,
                 model1Id: null,
                 model1Prop1: 'hello 2',
-                model1Prop2: null
+                model1Prop2: null,
               });
 
               return session.knex('Model1').orderBy('id');
             })
-            .then(rows => {
+            .then((rows) => {
               expect(rows).to.have.length(2);
               expectPartEql(rows[0], { id: 1, model1Prop1: 'hello 1' });
               expectPartEql(rows[1], { id: 3, model1Prop1: 'hello 3' });
@@ -108,11 +108,11 @@ module.exports = session => {
         return Model1.query()
           .delete()
           .where('model1Prop1', '<', 'hello 3')
-          .then(numDeleted => {
+          .then((numDeleted) => {
             expect(numDeleted).to.equal(2);
             return session.knex('Model1').orderBy('id');
           })
-          .then(rows => {
+          .then((rows) => {
             expect(rows).to.have.length(1);
             expectPartEql(rows[0], { id: 3, model1Prop1: 'hello 3' });
           });
@@ -126,14 +126,14 @@ module.exports = session => {
             .delete()
             .where('model1Prop1', '<', 'hello 3')
             .returning('*')
-            .then(deletedObjects => {
+            .then((deletedObjects) => {
               expect(deletedObjects).to.have.length(2);
               deleted1 = _.find(deletedObjects, { id: 1 });
               expect(deleted1).to.be.a(Model1);
               expectPartEql(deleted1, { id: 1, model1Prop1: 'hello 1' });
               return session.knex('Model1').orderBy('id');
             })
-            .then(rows => {
+            .then((rows) => {
               expect(rows).to.have.length(1);
               expectPartEql(rows[0], { id: 3, model1Prop1: 'hello 3' });
             });
@@ -141,13 +141,13 @@ module.exports = session => {
       }
     });
 
-    it('an error with a clear message should be thrown if undefined is passed to deleteById', done => {
+    it('an error with a clear message should be thrown if undefined is passed to deleteById', (done) => {
       Model1.query()
         .deleteById(undefined)
         .then(() => {
           done(new Error('should not get here'));
         })
-        .catch(err => {
+        .catch((err) => {
           expect(err.message).to.equal('undefined was passed to deleteById');
           done();
         })
@@ -159,12 +159,12 @@ module.exports = session => {
         return session.populate([
           {
             id: 1,
-            model1Prop1: 'hello 1'
+            model1Prop1: 'hello 1',
           },
           {
             id: 2,
-            model1Prop1: 'hello 2'
-          }
+            model1Prop1: 'hello 2',
+          },
         ]);
       });
 
@@ -174,13 +174,13 @@ module.exports = session => {
         return model
           .$query()
           .delete()
-          .then(numDeleted => {
+          .then((numDeleted) => {
             expect(numDeleted).to.equal(1);
             expect(model.$beforeDeleteCalled).to.equal(1);
             expect(model.$afterDeleteCalled).to.equal(1);
             return session.knex('Model1').orderBy('id');
           })
-          .then(rows => {
+          .then((rows) => {
             expect(rows).to.have.length(1);
             expectPartEql(rows[0], { id: 2, model1Prop1: 'hello 2' });
           });
@@ -194,13 +194,13 @@ module.exports = session => {
             .$query()
             .delete()
             .returning('model1Prop1', 'model1Prop2')
-            .then(deleted => {
+            .then((deleted) => {
               const expected = { model1Prop1: 'hello 1', model1Prop2: null };
               expect(deleted).to.be.a(Model1);
               expect(deleted).to.eql(expected);
               return session.knex('Model1').orderBy('id');
             })
-            .then(rows => {
+            .then((rows) => {
               expect(rows).to.have.length(1);
               expectPartEql(rows[0], { id: 2, model1Prop1: 'hello 2' });
             });
@@ -213,18 +213,18 @@ module.exports = session => {
             .$query()
             .delete()
             .returning('*')
-            .then(deleted => {
+            .then((deleted) => {
               const expected = {
                 id: 2,
                 model1Id: null,
                 model1Prop1: 'hello 2',
-                model1Prop2: null
+                model1Prop2: null,
               };
               expect(deleted).to.be.a(Model1);
               expect(deleted).to.eql(expected);
               return session.knex('Model1').orderBy('id');
             })
-            .then(rows => {
+            .then((rows) => {
               expect(rows).to.have.length(1);
               expectPartEql(rows[0], { id: 1, model1Prop1: 'hello 1' });
             });
@@ -234,20 +234,20 @@ module.exports = session => {
       it('should should call $beforeDelete and $afterDelete hooks', () => {
         let model = Model1.fromJson({ id: 1 });
 
-        model.$beforeDelete = function() {
+        model.$beforeDelete = function () {
           let self = this;
           return Model1.query()
             .findById(this.id)
-            .then(model => {
+            .then((model) => {
               self.before = model;
             });
         };
 
-        model.$afterDelete = function() {
+        model.$afterDelete = function () {
           let self = this;
           return Model1.query()
             .findById(this.id)
-            .then(model => {
+            .then((model) => {
               self.after = model || null;
             });
         };
@@ -260,13 +260,13 @@ module.exports = session => {
             expect(model.after).to.equal(null);
             return session.knex('Model1').orderBy('id');
           })
-          .then(rows => {
+          .then((rows) => {
             expect(rows).to.have.length(1);
             expectPartEql(rows[0], { id: 2, model1Prop1: 'hello 2' });
           });
       });
 
-      it('should throw if the id is undefiend', done => {
+      it('should throw if the id is undefiend', (done) => {
         let model = Model1.fromJson({ model1Prop2: 1 });
 
         model
@@ -275,7 +275,7 @@ module.exports = session => {
           .then(() => {
             done(new Error('should not get here'));
           })
-          .catch(err => {
+          .catch((err) => {
             expect(err.message).to.equal(
               `one of the identifier columns [id] is null or undefined. Have you specified the correct identifier column for the model 'Model1' using the 'idColumn' property?`
             );
@@ -284,7 +284,7 @@ module.exports = session => {
           .catch(done);
       });
 
-      it('should throw if the id is null', done => {
+      it('should throw if the id is null', (done) => {
         let model = Model1.fromJson({ id: null });
 
         model
@@ -293,7 +293,7 @@ module.exports = session => {
           .then(() => {
             done(new Error('should not get here'));
           })
-          .catch(err => {
+          .catch((err) => {
             expect(err.message).to.equal(
               `one of the identifier columns [id] is null or undefined. Have you specified the correct identifier column for the model 'Model1' using the 'idColumn' property?`
             );
@@ -315,22 +315,22 @@ module.exports = session => {
               model1Prop1: 'hello 1',
               model1Relation1: {
                 id: 2,
-                model1Prop1: 'hello 2'
-              }
+                model1Prop1: 'hello 2',
+              },
             },
             {
               id: 3,
               model1Prop1: 'hello 3',
               model1Relation1: {
                 id: 4,
-                model1Prop1: 'hello 4'
-              }
-            }
+                model1Prop1: 'hello 4',
+              },
+            },
           ]);
         });
 
         beforeEach(() => {
-          return Model1.query().then(parents => {
+          return Model1.query().then((parents) => {
             parent1 = _.find(parents, { id: 1 });
             parent2 = _.find(parents, { id: 3 });
           });
@@ -340,11 +340,11 @@ module.exports = session => {
           return parent1
             .$relatedQuery('model1Relation1')
             .delete()
-            .then(numDeleted => {
+            .then((numDeleted) => {
               expect(numDeleted).to.equal(1);
               return session.knex('Model1').orderBy('id');
             })
-            .then(rows => {
+            .then((rows) => {
               expect(rows).to.have.length(3);
               expectPartEql(rows[0], { id: 1, model1Prop1: 'hello 1' });
               expectPartEql(rows[1], { id: 3, model1Prop1: 'hello 3' });
@@ -359,12 +359,12 @@ module.exports = session => {
               .delete()
               .first()
               .returning('*')
-              .then(deletedObject => {
+              .then((deletedObject) => {
                 expect(deletedObject).to.be.a(Model1);
                 expectPartEql(deletedObject, { id: 2, model1Prop1: 'hello 2' });
                 return session.knex('Model1').orderBy('id');
               })
-              .then(rows => {
+              .then((rows) => {
                 expect(rows).to.have.length(3);
                 expectPartEql(rows[0], { id: 1, model1Prop1: 'hello 1' });
                 expectPartEql(rows[1], { id: 3, model1Prop1: 'hello 3' });
@@ -377,11 +377,11 @@ module.exports = session => {
           return parent2
             .$relatedQuery('model1Relation1')
             .delete()
-            .then(numDeleted => {
+            .then((numDeleted) => {
               expect(numDeleted).to.equal(1);
               return session.knex('Model1').orderBy('id');
             })
-            .then(rows => {
+            .then((rows) => {
               expect(rows).to.have.length(3);
               expectPartEql(rows[0], { id: 1, model1Prop1: 'hello 1' });
               expectPartEql(rows[1], { id: 2, model1Prop1: 'hello 2' });
@@ -403,19 +403,19 @@ module.exports = session => {
                 {
                   idCol: 1,
                   model2Prop1: 'text 1',
-                  model2Prop2: 6
+                  model2Prop2: 6,
                 },
                 {
                   idCol: 2,
                   model2Prop1: 'text 2',
-                  model2Prop2: 5
+                  model2Prop2: 5,
                 },
                 {
                   idCol: 3,
                   model2Prop1: 'text 3',
-                  model2Prop2: 4
-                }
-              ]
+                  model2Prop2: 4,
+                },
+              ],
             },
             {
               id: 2,
@@ -424,25 +424,25 @@ module.exports = session => {
                 {
                   idCol: 4,
                   model2Prop1: 'text 4',
-                  model2Prop2: 3
+                  model2Prop2: 3,
                 },
                 {
                   idCol: 5,
                   model2Prop1: 'text 5',
-                  model2Prop2: 2
+                  model2Prop2: 2,
                 },
                 {
                   idCol: 6,
                   model2Prop1: 'text 6',
-                  model2Prop2: 1
-                }
-              ]
-            }
+                  model2Prop2: 1,
+                },
+              ],
+            },
           ]);
         });
 
         beforeEach(() => {
-          return Model1.query().then(parents => {
+          return Model1.query().then((parents) => {
             parent1 = _.find(parents, { id: 1 });
             parent2 = _.find(parents, { id: 2 });
           });
@@ -452,11 +452,11 @@ module.exports = session => {
           return parent1
             .$relatedQuery('model1Relation2')
             .delete()
-            .then(numDeleted => {
+            .then((numDeleted) => {
               expect(numDeleted).to.equal(3);
               return session.knex('model2').orderBy('id_col');
             })
-            .then(rows => {
+            .then((rows) => {
               expect(rows).to.have.length(3);
               expectPartEql(rows[0], { id_col: 4, model2_prop1: 'text 4' });
               expectPartEql(rows[1], { id_col: 5, model2_prop1: 'text 5' });
@@ -472,14 +472,14 @@ module.exports = session => {
               .$relatedQuery('model1Relation2')
               .delete()
               .returning('*')
-              .then(deletedObjects => {
+              .then((deletedObjects) => {
                 expect(deletedObjects).to.have.length(3);
                 child1 = _.find(deletedObjects, { idCol: 1 });
                 expect(child1).to.be.a(Model2);
                 expectPartEql(child1, { idCol: 1, model2Prop1: 'text 1' });
                 return session.knex('model2').orderBy('id_col');
               })
-              .then(rows => {
+              .then((rows) => {
                 expect(rows).to.have.length(3);
                 expectPartEql(rows[0], { id_col: 4, model2_prop1: 'text 4' });
                 expectPartEql(rows[1], { id_col: 5, model2_prop1: 'text 5' });
@@ -493,11 +493,11 @@ module.exports = session => {
             .$relatedQuery('model1Relation2')
             .delete()
             .where('id_col', 2)
-            .then(numDeleted => {
+            .then((numDeleted) => {
               expect(numDeleted).to.equal(1);
               return session.knex('model2').orderBy('id_col');
             })
-            .then(rows => {
+            .then((rows) => {
               expect(rows).to.have.length(5);
               expectPartEql(rows[0], { id_col: 1, model2_prop1: 'text 1' });
               expectPartEql(rows[1], { id_col: 3, model2_prop1: 'text 3' });
@@ -513,11 +513,11 @@ module.exports = session => {
             .delete()
             .where('model2_prop2', '<', 6)
             .where('model2_prop1', 'like', 'text %')
-            .then(numDeleted => {
+            .then((numDeleted) => {
               expect(numDeleted).to.equal(2);
               return session.knex('model2').orderBy('id_col');
             })
-            .then(rows => {
+            .then((rows) => {
               expect(rows).to.have.length(4);
               expectPartEql(rows[0], { id_col: 1, model2_prop1: 'text 1' });
               expectPartEql(rows[1], { id_col: 4, model2_prop1: 'text 4' });
@@ -544,21 +544,21 @@ module.exports = session => {
                     {
                       id: 3,
                       model1Prop1: 'blaa 1',
-                      model1Prop2: 6
+                      model1Prop2: 6,
                     },
                     {
                       id: 4,
                       model1Prop1: 'blaa 2',
-                      model1Prop2: 5
+                      model1Prop2: 5,
                     },
                     {
                       id: 5,
                       model1Prop1: 'blaa 3',
-                      model1Prop2: 4
-                    }
-                  ]
-                }
-              ]
+                      model1Prop2: 4,
+                    },
+                  ],
+                },
+              ],
             },
             {
               id: 2,
@@ -571,27 +571,27 @@ module.exports = session => {
                     {
                       id: 6,
                       model1Prop1: 'blaa 4',
-                      model1Prop2: 3
+                      model1Prop2: 3,
                     },
                     {
                       id: 7,
                       model1Prop1: 'blaa 5',
-                      model1Prop2: 2
+                      model1Prop2: 2,
                     },
                     {
                       id: 8,
                       model1Prop1: 'blaa 6',
-                      model1Prop2: 1
-                    }
-                  ]
-                }
-              ]
-            }
+                      model1Prop2: 1,
+                    },
+                  ],
+                },
+              ],
+            },
           ]);
         });
 
         beforeEach(() => {
-          return Model2.query().then(parents => {
+          return Model2.query().then((parents) => {
             parent1 = _.find(parents, { idCol: 1 });
             parent2 = _.find(parents, { idCol: 2 });
           });
@@ -601,11 +601,11 @@ module.exports = session => {
           return parent1
             .$relatedQuery('model2Relation1')
             .delete()
-            .then(numDeleted => {
+            .then((numDeleted) => {
               expect(numDeleted).to.equal(3);
               return session.knex('Model1').orderBy('Model1.id');
             })
-            .then(rows => {
+            .then((rows) => {
               expect(rows).to.have.length(5);
               expectPartEql(rows[0], { id: 1, model1Prop1: 'hello 1' });
               expectPartEql(rows[1], { id: 2, model1Prop1: 'hello 2' });
@@ -620,11 +620,11 @@ module.exports = session => {
             .$relatedQuery('model2Relation1')
             .delete()
             .where('Model1.id', 5)
-            .then(numDeleted => {
+            .then((numDeleted) => {
               expect(numDeleted).to.equal(1);
               return session.knex('Model1').orderBy('Model1.id');
             })
-            .then(rows => {
+            .then((rows) => {
               expect(rows).to.have.length(7);
               expectPartEql(rows[0], { id: 1, model1Prop1: 'hello 1' });
               expectPartEql(rows[1], { id: 2, model1Prop1: 'hello 2' });
@@ -640,11 +640,11 @@ module.exports = session => {
           return parent1
             .$relatedQuery('model2Relation1')
             .deleteById(5)
-            .then(numDeleted => {
+            .then((numDeleted) => {
               expect(numDeleted).to.equal(1);
               return session.knex('Model1').orderBy('Model1.id');
             })
-            .then(rows => {
+            .then((rows) => {
               expect(rows).to.have.length(7);
               expectPartEql(rows[0], { id: 1, model1Prop1: 'hello 1' });
               expectPartEql(rows[1], { id: 2, model1Prop1: 'hello 2' });
@@ -662,17 +662,17 @@ module.exports = session => {
               .$relatedQuery('model2Relation1')
               .returning('*')
               .deleteById(5)
-              .then(deletedRow => {
+              .then((deletedRow) => {
                 expect(deletedRow).to.eql({
                   id: 5,
                   model1Id: null,
                   model1Prop1: 'blaa 3',
-                  model1Prop2: 4
+                  model1Prop2: 4,
                 });
 
                 return session.knex('Model1').orderBy('Model1.id');
               })
-              .then(rows => {
+              .then((rows) => {
                 expect(rows).to.have.length(7);
                 expectPartEql(rows[0], { id: 1, model1Prop1: 'hello 1' });
                 expectPartEql(rows[1], { id: 2, model1Prop1: 'hello 2' });
@@ -691,11 +691,11 @@ module.exports = session => {
             .delete()
             .where('model1Prop1', 'like', 'blaa 4')
             .orWhere('model1Prop1', 'like', 'blaa 6')
-            .then(numDeleted => {
+            .then((numDeleted) => {
               expect(numDeleted).to.equal(2);
               return session.knex('Model1').orderBy('Model1.id');
             })
-            .then(rows => {
+            .then((rows) => {
               expect(rows).to.have.length(6);
               expectPartEql(rows[0], { id: 1, model1Prop1: 'hello 1' });
               expectPartEql(rows[1], { id: 2, model1Prop1: 'hello 2' });
@@ -716,14 +716,14 @@ module.exports = session => {
               .where('model1Prop1', 'like', 'blaa 4')
               .orWhere('model1Prop1', 'like', 'blaa 6')
               .returning('*')
-              .then(deletedObjects => {
+              .then((deletedObjects) => {
                 expect(deletedObjects).to.have.length(2);
                 child1 = _.find(deletedObjects, { id: 6 });
                 expect(child1).to.be.a(Model1);
                 expectPartEql(child1, { id: 6, model1Prop1: 'blaa 4' });
                 return session.knex('Model1').orderBy('Model1.id');
               })
-              .then(rows => {
+              .then((rows) => {
                 expect(rows).to.have.length(6);
                 expectPartEql(rows[0], { id: 1, model1Prop1: 'hello 1' });
                 expectPartEql(rows[1], { id: 2, model1Prop1: 'hello 2' });
@@ -740,11 +740,11 @@ module.exports = session => {
             .$relatedQuery('model2Relation1')
             .delete()
             .where('model1Prop2', '<', 6)
-            .then(numDeleted => {
+            .then((numDeleted) => {
               expect(numDeleted).to.equal(2);
               return session.knex('Model1').orderBy('Model1.id');
             })
-            .then(rows => {
+            .then((rows) => {
               expect(rows).to.have.length(6);
               expectPartEql(rows[0], { id: 1, model1Prop1: 'hello 1' });
               expectPartEql(rows[1], { id: 2, model1Prop1: 'hello 2' });
@@ -771,10 +771,10 @@ module.exports = session => {
                   model2Relation2: {
                     id: 3,
                     model1Prop1: 'blaa 1',
-                    model1Prop2: 1
-                  }
-                }
-              ]
+                    model1Prop2: 1,
+                  },
+                },
+              ],
             },
             {
               id: 2,
@@ -786,16 +786,16 @@ module.exports = session => {
                   model2Relation2: {
                     id: 4,
                     model1Prop1: 'blaa 2',
-                    model1Prop2: 2
-                  }
-                }
-              ]
-            }
+                    model1Prop2: 2,
+                  },
+                },
+              ],
+            },
           ]);
         });
 
         beforeEach(() => {
-          return Model2.query().then(parents => {
+          return Model2.query().then((parents) => {
             parent = _.find(parents, { idCol: 2 });
           });
         });
@@ -804,11 +804,11 @@ module.exports = session => {
           return parent
             .$relatedQuery('model2Relation2')
             .delete()
-            .then(numDeleted => {
+            .then((numDeleted) => {
               expect(numDeleted).to.equal(1);
               return session.knex('Model1').orderBy('Model1.id');
             })
-            .then(rows => {
+            .then((rows) => {
               expect(rows).to.have.length(3);
               expectPartEql(rows[0], { id: 1, model1Prop1: 'hello 1' });
               expectPartEql(rows[1], { id: 2, model1Prop1: 'hello 2' });
@@ -823,12 +823,12 @@ module.exports = session => {
               .delete()
               .first()
               .returning('*')
-              .then(deletedObject => {
+              .then((deletedObject) => {
                 expect(deletedObject).to.be.a(Model1);
                 expectPartEql(deletedObject, { id: 4, model1Prop1: 'blaa 2' });
                 return session.knex('Model1').orderBy('Model1.id');
               })
-              .then(rows => {
+              .then((rows) => {
                 expect(rows).to.have.length(3);
                 expectPartEql(rows[0], { id: 1, model1Prop1: 'hello 1' });
                 expectPartEql(rows[1], { id: 2, model1Prop1: 'hello 2' });
@@ -848,17 +848,17 @@ module.exports = session => {
               model1Prop1: 'hello 1',
               model1Relation1: {
                 id: 2,
-                model1Prop1: 'hello 2'
-              }
+                model1Prop1: 'hello 2',
+              },
             },
             {
               id: 3,
               model1Prop1: 'hello 3',
               model1Relation1: {
                 id: 4,
-                model1Prop1: 'hello 4'
-              }
-            }
+                model1Prop1: 'hello 4',
+              },
+            },
           ]);
         });
 
@@ -866,11 +866,11 @@ module.exports = session => {
           return Model1.relatedQuery('model1Relation1')
             .for(1)
             .delete()
-            .then(numDeleted => {
+            .then((numDeleted) => {
               expect(numDeleted).to.equal(1);
               return session.knex('Model1').orderBy('id');
             })
-            .then(rows => {
+            .then((rows) => {
               expect(rows).to.have.length(3);
               expectPartEql(rows[0], { id: 1, model1Prop1: 'hello 1' });
               expectPartEql(rows[1], { id: 3, model1Prop1: 'hello 3' });
@@ -885,12 +885,12 @@ module.exports = session => {
               .delete()
               .first()
               .returning('*')
-              .then(deletedObject => {
+              .then((deletedObject) => {
                 expect(deletedObject).to.be.a(Model1);
                 expectPartEql(deletedObject, { id: 2, model1Prop1: 'hello 2' });
                 return session.knex('Model1').orderBy('id');
               })
-              .then(rows => {
+              .then((rows) => {
                 expect(rows).to.have.length(3);
                 expectPartEql(rows[0], { id: 1, model1Prop1: 'hello 1' });
                 expectPartEql(rows[1], { id: 3, model1Prop1: 'hello 3' });
@@ -903,11 +903,11 @@ module.exports = session => {
           return Model1.relatedQuery('model1Relation1')
             .for(Model1.query().findById(3))
             .delete()
-            .then(numDeleted => {
+            .then((numDeleted) => {
               expect(numDeleted).to.equal(1);
               return session.knex('Model1').orderBy('id');
             })
-            .then(rows => {
+            .then((rows) => {
               expect(rows).to.have.length(3);
               expectPartEql(rows[0], { id: 1, model1Prop1: 'hello 1' });
               expectPartEql(rows[1], { id: 2, model1Prop1: 'hello 2' });
@@ -926,19 +926,19 @@ module.exports = session => {
                 {
                   idCol: 1,
                   model2Prop1: 'text 1',
-                  model2Prop2: 6
+                  model2Prop2: 6,
                 },
                 {
                   idCol: 2,
                   model2Prop1: 'text 2',
-                  model2Prop2: 5
+                  model2Prop2: 5,
                 },
                 {
                   idCol: 3,
                   model2Prop1: 'text 3',
-                  model2Prop2: 4
-                }
-              ]
+                  model2Prop2: 4,
+                },
+              ],
             },
             {
               id: 2,
@@ -947,19 +947,19 @@ module.exports = session => {
                 {
                   idCol: 4,
                   model2Prop1: 'text 4',
-                  model2Prop2: 3
+                  model2Prop2: 3,
                 },
                 {
                   idCol: 5,
                   model2Prop1: 'text 5',
-                  model2Prop2: 2
+                  model2Prop2: 2,
                 },
                 {
                   idCol: 6,
                   model2Prop1: 'text 6',
-                  model2Prop2: 1
-                }
-              ]
+                  model2Prop2: 1,
+                },
+              ],
             },
             {
               id: 3,
@@ -968,10 +968,10 @@ module.exports = session => {
                 {
                   idCol: 7,
                   model2Prop1: 'text 7',
-                  model2Prop2: 0
-                }
-              ]
-            }
+                  model2Prop2: 0,
+                },
+              ],
+            },
           ]);
         });
 
@@ -979,11 +979,11 @@ module.exports = session => {
           return Model1.relatedQuery('model1Relation2')
             .for(1)
             .delete()
-            .then(numDeleted => {
+            .then((numDeleted) => {
               expect(numDeleted).to.equal(3);
               return session.knex('model2').orderBy('id_col');
             })
-            .then(rows => {
+            .then((rows) => {
               expect(rows).to.have.length(4);
               expectPartEql(rows[0], { id_col: 4, model2_prop1: 'text 4' });
               expectPartEql(rows[1], { id_col: 5, model2_prop1: 'text 5' });
@@ -1000,14 +1000,14 @@ module.exports = session => {
               .for(1)
               .delete()
               .returning('*')
-              .then(deletedObjects => {
+              .then((deletedObjects) => {
                 expect(deletedObjects).to.have.length(3);
                 child1 = _.find(deletedObjects, { idCol: 1 });
                 expect(child1).to.be.a(Model2);
                 expectPartEql(child1, { idCol: 1, model2Prop1: 'text 1' });
                 return session.knex('model2').orderBy('id_col');
               })
-              .then(rows => {
+              .then((rows) => {
                 expect(rows).to.have.length(4);
                 expectPartEql(rows[0], { id_col: 4, model2_prop1: 'text 4' });
                 expectPartEql(rows[1], { id_col: 5, model2_prop1: 'text 5' });
@@ -1022,11 +1022,11 @@ module.exports = session => {
             .for(1)
             .delete()
             .where('id_col', 2)
-            .then(numDeleted => {
+            .then((numDeleted) => {
               expect(numDeleted).to.equal(1);
               return session.knex('model2').orderBy('id_col');
             })
-            .then(rows => {
+            .then((rows) => {
               expect(rows).to.have.length(6);
               expectPartEql(rows[0], { id_col: 1, model2_prop1: 'text 1' });
               expectPartEql(rows[1], { id_col: 3, model2_prop1: 'text 3' });
@@ -1043,11 +1043,11 @@ module.exports = session => {
             .delete()
             .where('model2_prop2', '<', 6)
             .where('model2_prop1', 'like', 'text %')
-            .then(numDeleted => {
+            .then((numDeleted) => {
               expect(numDeleted).to.equal(5);
               return session.knex('model2').orderBy('id_col');
             })
-            .then(rows => {
+            .then((rows) => {
               expect(rows).to.have.length(2);
               expectPartEql(rows[0], { id_col: 1, model2_prop1: 'text 1' });
               expectPartEql(rows[1], { id_col: 7, model2_prop1: 'text 7' });
@@ -1069,21 +1069,21 @@ module.exports = session => {
                     {
                       id: 3,
                       model1Prop1: 'blaa 1',
-                      model1Prop2: 6
+                      model1Prop2: 6,
                     },
                     {
                       id: 4,
                       model1Prop1: 'blaa 2',
-                      model1Prop2: 5
+                      model1Prop2: 5,
                     },
                     {
                       id: 5,
                       model1Prop1: 'blaa 3',
-                      model1Prop2: 4
-                    }
-                  ]
-                }
-              ]
+                      model1Prop2: 4,
+                    },
+                  ],
+                },
+              ],
             },
             {
               id: 2,
@@ -1096,22 +1096,22 @@ module.exports = session => {
                     {
                       id: 6,
                       model1Prop1: 'blaa 4',
-                      model1Prop2: 3
+                      model1Prop2: 3,
                     },
                     {
                       id: 7,
                       model1Prop1: 'blaa 5',
-                      model1Prop2: 2
+                      model1Prop2: 2,
                     },
                     {
                       id: 8,
                       model1Prop1: 'blaa 6',
-                      model1Prop2: 1
-                    }
-                  ]
-                }
-              ]
-            }
+                      model1Prop2: 1,
+                    },
+                  ],
+                },
+              ],
+            },
           ]);
         });
 
@@ -1119,11 +1119,11 @@ module.exports = session => {
           return Model2.relatedQuery('model2Relation1')
             .for(1)
             .delete()
-            .then(numDeleted => {
+            .then((numDeleted) => {
               expect(numDeleted).to.equal(3);
               return session.knex('Model1').orderBy('Model1.id');
             })
-            .then(rows => {
+            .then((rows) => {
               expect(rows).to.have.length(5);
               expectPartEql(rows[0], { id: 1, model1Prop1: 'hello 1' });
               expectPartEql(rows[1], { id: 2, model1Prop1: 'hello 2' });
@@ -1138,11 +1138,11 @@ module.exports = session => {
             .for(1)
             .delete()
             .where('Model1.id', 5)
-            .then(numDeleted => {
+            .then((numDeleted) => {
               expect(numDeleted).to.equal(1);
               return session.knex('Model1').orderBy('Model1.id');
             })
-            .then(rows => {
+            .then((rows) => {
               expect(rows).to.have.length(7);
               expectPartEql(rows[0], { id: 1, model1Prop1: 'hello 1' });
               expectPartEql(rows[1], { id: 2, model1Prop1: 'hello 2' });
@@ -1158,11 +1158,11 @@ module.exports = session => {
           return Model2.relatedQuery('model2Relation1')
             .for(1)
             .deleteById(5)
-            .then(numDeleted => {
+            .then((numDeleted) => {
               expect(numDeleted).to.equal(1);
               return session.knex('Model1').orderBy('Model1.id');
             })
-            .then(rows => {
+            .then((rows) => {
               expect(rows).to.have.length(7);
               expectPartEql(rows[0], { id: 1, model1Prop1: 'hello 1' });
               expectPartEql(rows[1], { id: 2, model1Prop1: 'hello 2' });
@@ -1180,17 +1180,17 @@ module.exports = session => {
               .for(1)
               .returning('*')
               .deleteById(5)
-              .then(deletedRow => {
+              .then((deletedRow) => {
                 expect(deletedRow).to.eql({
                   id: 5,
                   model1Id: null,
                   model1Prop1: 'blaa 3',
-                  model1Prop2: 4
+                  model1Prop2: 4,
                 });
 
                 return session.knex('Model1').orderBy('Model1.id');
               })
-              .then(rows => {
+              .then((rows) => {
                 expect(rows).to.have.length(7);
                 expectPartEql(rows[0], { id: 1, model1Prop1: 'hello 1' });
                 expectPartEql(rows[1], { id: 2, model1Prop1: 'hello 2' });
@@ -1209,11 +1209,11 @@ module.exports = session => {
             .delete()
             .where('model1Prop1', 'like', 'blaa 4')
             .orWhere('model1Prop1', 'like', 'blaa 6')
-            .then(numDeleted => {
+            .then((numDeleted) => {
               expect(numDeleted).to.equal(2);
               return session.knex('Model1').orderBy('Model1.id');
             })
-            .then(rows => {
+            .then((rows) => {
               expect(rows).to.have.length(6);
               expectPartEql(rows[0], { id: 1, model1Prop1: 'hello 1' });
               expectPartEql(rows[1], { id: 2, model1Prop1: 'hello 2' });
@@ -1234,14 +1234,14 @@ module.exports = session => {
               .where('model1Prop1', 'like', 'blaa 4')
               .orWhere('model1Prop1', 'like', 'blaa 6')
               .returning('*')
-              .then(deletedObjects => {
+              .then((deletedObjects) => {
                 expect(deletedObjects).to.have.length(2);
                 child1 = _.find(deletedObjects, { id: 6 });
                 expect(child1).to.be.a(Model1);
                 expectPartEql(child1, { id: 6, model1Prop1: 'blaa 4' });
                 return session.knex('Model1').orderBy('Model1.id');
               })
-              .then(rows => {
+              .then((rows) => {
                 expect(rows).to.have.length(6);
                 expectPartEql(rows[0], { id: 1, model1Prop1: 'hello 1' });
                 expectPartEql(rows[1], { id: 2, model1Prop1: 'hello 2' });
@@ -1258,11 +1258,11 @@ module.exports = session => {
             .for(1)
             .delete()
             .where('model1Prop2', '<', 6)
-            .then(numDeleted => {
+            .then((numDeleted) => {
               expect(numDeleted).to.equal(2);
               return session.knex('Model1').orderBy('Model1.id');
             })
-            .then(rows => {
+            .then((rows) => {
               expect(rows).to.have.length(6);
               expectPartEql(rows[0], { id: 1, model1Prop1: 'hello 1' });
               expectPartEql(rows[1], { id: 2, model1Prop1: 'hello 2' });
@@ -1278,11 +1278,11 @@ module.exports = session => {
             .for([1, 2])
             .delete()
             .where('model1Prop2', '<', 6)
-            .then(numDeleted => {
+            .then((numDeleted) => {
               expect(numDeleted).to.equal(5);
               return session.knex('Model1').orderBy('Model1.id');
             })
-            .then(rows => {
+            .then((rows) => {
               expect(rows).to.have.length(3);
               expectPartEql(rows[0], { id: 1, model1Prop1: 'hello 1' });
               expectPartEql(rows[1], { id: 2, model1Prop1: 'hello 2' });
@@ -1295,11 +1295,11 @@ module.exports = session => {
             .for(Model2.query().findByIds([1, 2]))
             .delete()
             .where('model1Prop2', '<', 6)
-            .then(numDeleted => {
+            .then((numDeleted) => {
               expect(numDeleted).to.equal(5);
               return session.knex('Model1').orderBy('Model1.id');
             })
-            .then(rows => {
+            .then((rows) => {
               expect(rows).to.have.length(3);
               expectPartEql(rows[0], { id: 1, model1Prop1: 'hello 1' });
               expectPartEql(rows[1], { id: 2, model1Prop1: 'hello 2' });

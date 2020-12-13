@@ -1,7 +1,7 @@
 const { expect } = require('chai');
 const { Model } = require('../../../');
 
-module.exports = session => {
+module.exports = (session) => {
   describe('relation $beforeInsert not called when insertGraph is used #1627', () => {
     let knex = session.knex;
     let User;
@@ -15,19 +15,14 @@ module.exports = session => {
         .then(() => knex.schema.dropTableIfExists('roles'))
         .then(() => {
           return knex.schema
-            .createTable('users', table => {
+            .createTable('users', (table) => {
               table.increments('id');
               table.string('username');
             })
-            .createTable('roles', table => {
+            .createTable('roles', (table) => {
               table.increments('id');
               table.string('role');
-              table
-                .integer('userId')
-                .unsigned()
-                .references('users.id')
-                .notNullable()
-                .index();
+              table.integer('userId').unsigned().references('users.id').notNullable().index();
             });
         });
     });
@@ -56,12 +51,12 @@ module.exports = session => {
               modelClass: Role,
               join: {
                 from: 'users.id',
-                to: 'roles.userId'
+                to: 'roles.userId',
               },
               beforeInsert(model) {
                 model.$relationBeforeInsertCalled = (model.$relationBeforeInsertCalled || 0) + 1;
-              }
-            }
+              },
+            },
           };
         }
       };
@@ -72,11 +67,11 @@ module.exports = session => {
 
     it('test', async () => {
       const user = await User.query().insert({
-        username: 'user1'
+        username: 'user1',
       });
 
       const role = await user.$relatedQuery('roles').insertGraph({
-        role: 'admin'
+        role: 'admin',
       });
 
       expect(role.$relationBeforeInsertCalled).to.equal(1);

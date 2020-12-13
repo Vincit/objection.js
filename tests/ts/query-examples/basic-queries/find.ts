@@ -27,11 +27,7 @@ import { Person } from '../../fixtures/person';
     .select('persons.*', 'Parent.firstName as parentFirstName')
     .join('persons as parent', 'persons.parentId', 'parent.id')
     .where('persons.age', '<', Person.query().avg('persons.age'))
-    .whereExists(
-      Animal.query()
-        .select(1)
-        .whereColumn('persons.id', 'animals.ownerId')
-    )
+    .whereExists(Animal.query().select(1).whereColumn('persons.id', 'animals.ownerId'))
     .orderBy('persons.lastName');
 })();
 
@@ -43,7 +39,7 @@ import { Person } from '../../fixtures/person';
 
 (async () => {
   const nonMiddleAgedJennifers = await Person.query()
-    .where(builder => builder.where('age', '<', 4).orWhere('age', '>', 60))
+    .where((builder) => builder.where('age', '<', 4).orWhere('age', '>', 60))
     .where('firstName', 'Jennifer')
     .orderBy('lastName');
 })();

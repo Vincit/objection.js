@@ -9,8 +9,8 @@ import { Person } from '../fixtures/person';
     pets: true,
     children: {
       pets: true,
-      children: true
-    }
+      children: true,
+    },
   });
 
   await Person.query().eager('[pets, children.^]');
@@ -19,7 +19,7 @@ import { Person } from '../fixtures/person';
 
   await Person.query()
     .eager('[children.[pets, movies], movies]')
-    .modifyEager('children.pets', builder => {
+    .modifyEager('children.pets', (builder) => {
       // Only select pets older than 10 years old for children
       // and only return their names.
       builder.where('age', '>', 10).select('name');
@@ -28,15 +28,15 @@ import { Person } from '../fixtures/person';
   await Person.query().eager(
     '[pets(selectName, onlyDogs), children(orderByAge).[pets, children]]',
     {
-      selectName: builder => {
+      selectName: (builder) => {
         builder.select('name');
       },
-      orderByAge: builder => {
+      orderByAge: (builder) => {
         builder.orderBy('age');
       },
-      onlyDogs: builder => {
+      onlyDogs: (builder) => {
         builder.where('species', 'dog');
-      }
+      },
     }
   );
 
@@ -59,13 +59,9 @@ import { Person } from '../fixtures/person';
   ]`);
 
   const eager = `[]`;
-  await Person.query()
-    .allowEager('[pets, children.pets]')
-    .eager(eager);
+  await Person.query().allowEager('[pets, children.pets]').eager(eager);
 
-  await Person.query()
-    .eagerAlgorithm(Person.JoinEagerAlgorithm)
-    .eager('[pets, children.pets]');
+  await Person.query().eagerAlgorithm(Person.JoinEagerAlgorithm).eager('[pets, children.pets]');
 
   await Person.query().joinEager('[pets, children.pets]');
 })();

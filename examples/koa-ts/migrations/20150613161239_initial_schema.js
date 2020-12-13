@@ -1,6 +1,6 @@
-exports.up = knex => {
+exports.up = (knex) => {
   return knex.schema
-    .createTable('persons', table => {
+    .createTable('persons', (table) => {
       table.increments('id').primary()
 
       table
@@ -16,11 +16,11 @@ exports.up = knex => {
       table.integer('age')
       table.json('address')
     })
-    .createTable('movies', table => {
+    .createTable('movies', (table) => {
       table.increments('id').primary()
       table.string('name')
     })
-    .createTable('animals', table => {
+    .createTable('animals', (table) => {
       table.increments('id').primary()
 
       table
@@ -34,7 +34,7 @@ exports.up = knex => {
       table.string('name')
       table.string('species')
     })
-    .createTable('persons_movies', table => {
+    .createTable('persons_movies', (table) => {
       table.increments('id').primary()
 
       table
@@ -55,7 +55,7 @@ exports.up = knex => {
     })
 }
 
-exports.down = knex => {
+exports.down = (knex) => {
   return knex.schema
     .dropTableIfExists('persons_movies')
     .dropTableIfExists('animals')

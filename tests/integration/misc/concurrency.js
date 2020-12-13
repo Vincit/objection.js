@@ -2,7 +2,7 @@ const expect = require('expect.js');
 const mockKnexFactory = require('../../../testUtils/mockKnex');
 const { Model, snakeCaseMappers } = require('../../../');
 
-module.exports = session => {
+module.exports = (session) => {
   // TODO: Skipped for now for because a change in knex broke mockKnexFactory.
   describe.skip('Model.concurrency', () => {
     let knex;
@@ -26,8 +26,8 @@ module.exports = session => {
               modelClass: Model1,
               join: {
                 from: 'Model1.model1Id',
-                to: 'Model1.id'
-              }
+                to: 'Model1.id',
+              },
             },
 
             model1Relation1Inverse: {
@@ -35,8 +35,8 @@ module.exports = session => {
               modelClass: Model1,
               join: {
                 from: 'Model1.id',
-                to: 'Model1.model1Id'
-              }
+                to: 'Model1.model1Id',
+              },
             },
 
             model1Relation2: {
@@ -44,8 +44,8 @@ module.exports = session => {
               modelClass: models.Model2,
               join: {
                 from: 'Model1.id',
-                to: 'model2.model1_id'
-              }
+                to: 'model2.model1_id',
+              },
             },
 
             model1Relation3: {
@@ -56,11 +56,11 @@ module.exports = session => {
                 through: {
                   from: 'Model1Model2.model1Id',
                   to: 'Model1Model2.model2Id',
-                  extra: ['extra1', 'extra2']
+                  extra: ['extra1', 'extra2'],
                 },
-                to: 'model2.id_col'
-              }
-            }
+                to: 'model2.id_col',
+              },
+            },
           };
         }
       };
@@ -84,23 +84,23 @@ module.exports = session => {
         }
       };
 
-      knex = mockKnexFactory(session.knex, function(mock, oldImpl, args) {
+      knex = mockKnexFactory(session.knex, function (mock, oldImpl, args) {
         const runningQuery = {
-          sql: this.toString()
+          sql: this.toString(),
         };
 
         runningQueries.push(runningQuery);
         expect(runningQueries).to.have.length(1);
 
-        return oldImpl.apply(this, args).then(res => {
-          runningQueries = runningQueries.filter(it => it !== runningQuery);
+        return oldImpl.apply(this, args).then((res) => {
+          runningQueries = runningQueries.filter((it) => it !== runningQuery);
           return res;
         });
       });
 
       Object.keys(models)
-        .map(it => models[it])
-        .forEach(model => model.knex(knex));
+        .map((it) => models[it])
+        .forEach((model) => model.knex(knex));
     });
 
     it('insertGraph', () => {
@@ -110,26 +110,26 @@ module.exports = session => {
         model1Prop1: '1',
 
         model1Relation1: {
-          model1Prop1: '2'
+          model1Prop1: '2',
         },
 
         model1Relation2: [
           {
-            model2Prop1: '3'
+            model2Prop1: '3',
           },
           {
-            model2Prop1: '4'
-          }
+            model2Prop1: '4',
+          },
         ],
 
         model1Relation3: [
           {
-            model2Prop1: '5'
+            model2Prop1: '5',
           },
           {
-            model2Prop1: '6'
-          }
-        ]
+            model2Prop1: '6',
+          },
+        ],
       });
     });
   });

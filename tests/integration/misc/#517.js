@@ -1,7 +1,7 @@
 const expect = require('expect.js');
 const { Model } = require('../../../');
 
-module.exports = session => {
+module.exports = (session) => {
   describe('upsertGraph with compound key in relation #517', () => {
     let knex = session.knex;
     let Users;
@@ -11,10 +11,10 @@ module.exports = session => {
       return knex.schema
         .dropTableIfExists('Users')
         .dropTableIfExists('Preferences')
-        .createTable('Users', table => {
+        .createTable('Users', (table) => {
           table.integer('id').primary();
         })
-        .createTable('Preferences', table => {
+        .createTable('Preferences', (table) => {
           table.integer('userId');
           table.string('category', 16);
           table.string('setting');
@@ -39,9 +39,9 @@ module.exports = session => {
               modelClass: Preferences,
               join: {
                 from: 'Preferences.userId',
-                to: 'Users.id'
-              }
-            }
+                to: 'Users.id',
+              },
+            },
           };
         }
       };
@@ -62,7 +62,7 @@ module.exports = session => {
 
     before(() => {
       return Users.query().insert({
-        id: 1
+        id: 1,
       });
     });
 
@@ -70,12 +70,12 @@ module.exports = session => {
       const preferences = [
         {
           category: 'sms',
-          setting: 'off'
+          setting: 'off',
         },
         {
           category: 'sound',
-          setting: 'off'
-        }
+          setting: 'off',
+        },
       ];
 
       return Users.query()
@@ -83,9 +83,9 @@ module.exports = session => {
         .then(() => {
           return Users.query()
             .eager('preferences')
-            .modifyEager('preferences', qb => qb.orderBy('category'));
+            .modifyEager('preferences', (qb) => qb.orderBy('category'));
         })
-        .then(users => {
+        .then((users) => {
           expect(users).to.eql([
             {
               id: 1,
@@ -94,15 +94,15 @@ module.exports = session => {
                 {
                   category: 'sms',
                   setting: 'off',
-                  userId: 1
+                  userId: 1,
                 },
                 {
                   category: 'sound',
                   setting: 'off',
-                  userId: 1
-                }
-              ]
-            }
+                  userId: 1,
+                },
+              ],
+            },
           ]);
         });
     });

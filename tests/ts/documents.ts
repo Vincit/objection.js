@@ -8,8 +8,8 @@ import { Person } from './fixtures/person';
     address: {
       street: 'Somestreet 10',
       zipCode: '123456',
-      city: 'Tampere'
-    }
+      city: 'Tampere',
+    },
   });
 
   const jenniferFromDb = await Person.query().findById(jennifer.id);

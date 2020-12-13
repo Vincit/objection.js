@@ -1,7 +1,7 @@
 const { Model } = require('../../../');
 const { expect } = require('chai');
 
-module.exports = session => {
+module.exports = (session) => {
   describe(`joinRelated in filter in model relationMappings #1215`, () => {
     let knex = session.knex;
     let Person;
@@ -10,12 +10,12 @@ module.exports = session => {
       return knex.schema
         .dropTableIfExists('cousins')
         .dropTableIfExists('persons')
-        .createTable('persons', table => {
+        .createTable('persons', (table) => {
           table.increments('id').primary();
           table.integer('parentId');
           table.string('name');
         })
-        .createTable('cousins', table => {
+        .createTable('cousins', (table) => {
           table.integer('id1');
           table.integer('id2');
         });
@@ -38,8 +38,8 @@ module.exports = session => {
               relation: Model.BelongsToOneRelation,
               join: {
                 from: 'persons.parentId',
-                to: 'persons.id'
-              }
+                to: 'persons.id',
+              },
             },
 
             children: {
@@ -50,8 +50,8 @@ module.exports = session => {
               },
               join: {
                 from: 'persons.id',
-                to: 'persons.parentId'
-              }
+                to: 'persons.parentId',
+              },
             },
 
             cousins: {
@@ -64,11 +64,11 @@ module.exports = session => {
                 from: 'persons.id',
                 through: {
                   from: 'cousins.id1',
-                  to: 'cousins.id2'
+                  to: 'cousins.id2',
                 },
-                to: 'persons.id'
-              }
-            }
+                to: 'persons.id',
+              },
+            },
           };
         }
       };
@@ -83,30 +83,30 @@ module.exports = session => {
         name: 'Matti',
 
         parent: {
-          name: 'Samuel'
+          name: 'Samuel',
         },
 
         children: [
           {
-            name: 'Sami'
+            name: 'Sami',
           },
           {
-            name: 'Marika'
-          }
+            name: 'Marika',
+          },
         ],
 
         cousins: [
           {
-            name: 'Torsti'
+            name: 'Torsti',
           },
           {
             name: 'Taina',
 
             parent: {
-              name: 'Urpo'
-            }
-          }
-        ]
+              name: 'Urpo',
+            },
+          },
+        ],
       });
     });
 
@@ -116,21 +116,21 @@ module.exports = session => {
         .where('name', 'Matti')
         .eager({
           children: true,
-          cousins: true
+          cousins: true,
         })
-        .then(result => {
+        .then((result) => {
           expect(result).to.containSubset({
             name: 'Matti',
 
             children: [
               { name: 'Sami', parentName: 'Matti' },
-              { name: 'Marika', parentName: 'Matti' }
+              { name: 'Marika', parentName: 'Matti' },
             ],
 
             cousins: [
               { name: 'Torsti', parentName: null },
-              { name: 'Taina', parentName: 'Urpo' }
-            ]
+              { name: 'Taina', parentName: 'Urpo' },
+            ],
           });
         });
     });

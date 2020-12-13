@@ -2,13 +2,9 @@ import { Person } from '../fixtures/person';
 import { raw } from '../../..';
 
 (async () => {
-  await Person.query()
-    .joinRelated('pets')
-    .where('pets.species', 'dog');
+  await Person.query().joinRelated('pets').where('pets.species', 'dog');
 
-  await Person.query()
-    .joinRelated('pets', { alias: 'p' })
-    .where('p.species', 'dog');
+  await Person.query().joinRelated('pets', { alias: 'p' }).where('p.species', 'dog');
 
   await Person.query()
     .joinRelated('[pets, parent]')
@@ -18,7 +14,7 @@ import { raw } from '../../..';
   await Person.query()
     .joinRelated({
       pets: true,
-      parent: true
+      parent: true,
     })
     .where('pets.species', 'dog')
     .where('parent.name', 'Arnold');
@@ -33,8 +29,8 @@ import { raw } from '../../..';
     .joinRelated('[pets, parent.[pets, parent]]', {
       aliases: {
         parent: 'pr',
-        pets: 'pt'
-      }
+        pets: 'pt',
+      },
     })
     .where('pr:pt.species', 'dog');
 
@@ -63,5 +59,5 @@ import { raw } from '../../..';
 
   await Person.query().innerJoin('pets', 'pets.foo', 'persons.bar');
   await Person.query().innerJoin(Person.query(), 'persons.foo', 'persons.bar');
-  await Person.query().innerJoin(qb => qb.from('pets').as('pets'), 'pets.foo', 'persons.bar');
+  await Person.query().innerJoin((qb) => qb.from('pets').as('pets'), 'pets.foo', 'persons.bar');
 })();

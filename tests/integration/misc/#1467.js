@@ -1,7 +1,7 @@
 const { Model, snakeCaseMappers } = require('../../../');
 const chai = require('chai');
 
-module.exports = session => {
+module.exports = (session) => {
   describe('Not CamelCasing ref.column #1467', () => {
     let knex = session.knex;
     let Campaign, Deliverable;
@@ -15,24 +15,16 @@ module.exports = session => {
         .then(() => knex.schema.dropTableIfExists('deliverables'))
         .then(() => {
           return knex.schema
-            .createTable('campaigns', table => {
+            .createTable('campaigns', (table) => {
               table.increments('id').primary();
             })
-            .createTable('deliverables', table => {
+            .createTable('deliverables', (table) => {
               table.increments('id').primary();
             })
-            .createTable('cogs', table => {
+            .createTable('cogs', (table) => {
               table.increments('id').primary();
-              table
-                .integer('campaign_id')
-                .unsigned()
-                .references('id')
-                .inTable('campaigns');
-              table
-                .integer('deliverable_id')
-                .unsigned()
-                .references('id')
-                .inTable('deliverables');
+              table.integer('campaign_id').unsigned().references('id').inTable('campaigns');
+              table.integer('deliverable_id').unsigned().references('id').inTable('deliverables');
             });
         });
     });
@@ -58,9 +50,9 @@ module.exports = session => {
           return {
             type: 'object',
             properties: {
-              id: { type: 'integer' }
+              id: { type: 'integer' },
             },
-            additionalProperties: false
+            additionalProperties: false,
           };
         }
 
@@ -71,9 +63,9 @@ module.exports = session => {
               modelClass: Cog,
               join: {
                 from: 'campaigns.id',
-                to: 'cogs.campaign_id'
-              }
-            }
+                to: 'cogs.campaign_id',
+              },
+            },
           };
         }
       };
@@ -93,9 +85,9 @@ module.exports = session => {
             properties: {
               id: { type: 'integer' },
               campaignId: { type: ['integer', 'null'] },
-              deliverableId: { type: ['integer', 'null'] }
+              deliverableId: { type: ['integer', 'null'] },
             },
-            additionalProperties: false
+            additionalProperties: false,
           };
         }
 
@@ -117,9 +109,9 @@ module.exports = session => {
           return {
             type: 'object',
             properties: {
-              id: { type: 'integer' }
+              id: { type: 'integer' },
             },
-            additionalProperties: false
+            additionalProperties: false,
           };
         }
 
@@ -130,9 +122,9 @@ module.exports = session => {
               modelClass: Cog,
               join: {
                 from: 'deliverables.id',
-                to: 'cogs.deliverable_id'
-              }
-            }
+                to: 'cogs.deliverable_id',
+              },
+            },
           };
         }
       };
@@ -146,7 +138,7 @@ module.exports = session => {
         .then(() => {
           return Promise.all([
             Campaign.query().insertGraph({}),
-            Deliverable.query().insertGraph({})
+            Deliverable.query().insertGraph({}),
           ]);
         })
         .then(([campaign, deliverable]) => {
@@ -158,11 +150,9 @@ module.exports = session => {
               );
             })
             .then(() => {
-              return Campaign.query()
-                .findOne({})
-                .eager('cogs');
+              return Campaign.query().findOne({}).eager('cogs');
             })
-            .then(c1 => {
+            .then((c1) => {
               chai.expect(c1.cogs.length).to.equal(1);
             })
             .then(() => {
@@ -172,11 +162,9 @@ module.exports = session => {
               );
             })
             .then(() => {
-              return Campaign.query()
-                .findOne({})
-                .eager('cogs');
+              return Campaign.query().findOne({}).eager('cogs');
             })
-            .then(c2 => {
+            .then((c2) => {
               chai.expect(c2.cogs.length).to.equal(0);
             })
             .then(() => {
@@ -186,11 +174,9 @@ module.exports = session => {
               );
             })
             .then(() => {
-              return Deliverable.query()
-                .findOne({})
-                .eager('cogs');
+              return Deliverable.query().findOne({}).eager('cogs');
             })
-            .then(d1 => {
+            .then((d1) => {
               chai.expect(d1.cogs.length).to.equal(1);
             })
             .then(() => {
@@ -200,11 +186,9 @@ module.exports = session => {
               );
             })
             .then(() => {
-              return Deliverable.query()
-                .findOne({})
-                .eager('cogs');
+              return Deliverable.query().findOne({}).eager('cogs');
             })
-            .then(d2 => {
+            .then((d2) => {
               chai.expect(d2.cogs.length).to.equal(0);
             });
         });

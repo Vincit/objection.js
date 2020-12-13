@@ -4,10 +4,7 @@ import { Animal } from '../fixtures/animal';
 import { Model, transaction } from '../../../typings/objection';
 
 (async () => {
-  const debugResult = Person.query()
-    .joinRelation('children')
-    .where('age', '>', '21')
-    .debug();
+  const debugResult = Person.query().joinRelation('children').where('age', '>', '21').debug();
 
   const personId = 1;
   const pets = await Person.relatedQuery('pets').for(personId);
@@ -22,7 +19,7 @@ import { Model, transaction } from '../../../typings/objection';
     runAfter(result: any, builder: any) {
       return result;
     },
-    onBuild(builder: any) {}
+    onBuild(builder: any) {},
   });
 
   Person.query()
@@ -30,11 +27,11 @@ import { Model, transaction } from '../../../typings/objection';
     .context({
       onBuild(builder: any) {
         builder.withSchema('someSchema');
-      }
+      },
     });
 
   builder.mergeContext({
-    foo: 'bar'
+    foo: 'bar',
   });
 
   builder.tableNameFor(Person);
@@ -60,22 +57,22 @@ import { Model, transaction } from '../../../typings/objection';
   builder.clear('orderBy').has('orderBy');
 
   Person.query()
-    .runBefore(async result => {
+    .runBefore(async (result) => {
       console.log('hello 1');
 
       console.log('hello 2');
       return result;
     })
-    .runBefore(result => {
+    .runBefore((result) => {
       console.log('hello 3');
       return result;
     });
 
   Person.query()
-    .onBuild(builder => {
+    .onBuild((builder) => {
       builder.where('id', 1);
     })
-    .onBuild(builder => {
+    .onBuild((builder) => {
       builder.orWhere('id', 2);
     });
 
@@ -116,9 +113,7 @@ import { Model, transaction } from '../../../typings/objection';
 
   builder.toString();
 
-  Person.query()
-    .skipUndefined()
-    .where('firstName', 'something');
+  Person.query().skipUndefined().where('firstName', 'something');
 
   const trx = await transaction.start(Person);
   builder.transacting(trx);
@@ -138,7 +133,7 @@ import { Model, transaction } from '../../../typings/objection';
   // builder.map((obj) => obj);
   // builder.reduce()
 
-  builder.catch(error => {
+  builder.catch((error) => {
     console.log(error);
   });
 
@@ -150,28 +145,18 @@ import { Model, transaction } from '../../../typings/objection';
 
   const [total, models] = await Promise.all([query.resultSize(), query.offset(100).limit(50)]);
 
-  await Person.query()
-    .where('age', '>', 20)
-    .page(5, 100);
+  await Person.query().where('age', '>', 20).page(5, 100);
 
-  await Person.query()
-    .where('age', '>', 20)
-    .range(0, 100);
+  await Person.query().where('age', '>', 20).range(0, 100);
 
-  await Person.query()
-    .where('age', '>', 20)
-    .limit(10)
-    .range();
+  await Person.query().where('age', '>', 20).limit(10).range();
 
   await Person.query().first();
 
-  await Person.query()
-    .where('name', 'Java')
-    .andWhere('isModern', true)
-    .throwIfNotFound();
+  await Person.query().where('name', 'Java').andWhere('isModern', true).throwIfNotFound();
 
   builder.timeout(2000, {
-    cancel: true
+    cancel: true,
   });
 
   builder.connection(Person.knex());
@@ -187,11 +172,11 @@ import { Model, transaction } from '../../../typings/objection';
 
   await Person.query()
     .modifiers({
-      selectFields: query => query.select('id', 'name'),
+      selectFields: (query) => query.select('id', 'name'),
       // In the following modifier, `filterGender` is a modifier
       // registered in Person.modifiers object. Query modifiers
       // can be used to bind arguments to model modifiers like this.
-      filterWomen: query => query.modify('filterGender', 'female')
+      filterWomen: (query) => query.modify('filterGender', 'female'),
     })
     .modify('selectFields')
     .withGraphFetched('children(selectFields, filterWomen)');

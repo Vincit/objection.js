@@ -47,7 +47,7 @@ describe('jsonFieldExpressionParser', () => {
   testParsing('MyCupOfTeaTable.cupOfTea:I work too [100]', [
     'MyCupOfTeaTable.cupOfTea',
     'I work too ',
-    100
+    100,
   ]);
 
   // no column given

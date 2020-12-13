@@ -10,11 +10,11 @@ import { Person } from '../../fixtures/person';
     firstName: raw("'Jenni' || 'fer'"),
     lastName: 'Lawrence',
     age: Person.query().avg('age'),
-    oldLastName: ref('lastName')
+    oldLastName: ref('lastName'),
   });
 
   await Person.query().update({
     lastName: ref('someJsonColumn:mother.lastName').castText(),
-    'detailsJsonColumn:address.street': 'Elm street'
+    'detailsJsonColumn:address.street': 'Elm street',
   } as any);
 })();

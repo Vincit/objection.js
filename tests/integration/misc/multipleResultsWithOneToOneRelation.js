@@ -1,6 +1,6 @@
 const expect = require('expect.js');
 
-module.exports = session => {
+module.exports = (session) => {
   describe('multiple results with a one-to-one relation', () => {
     beforeEach(() => {
       // This tests insertGraph.
@@ -11,8 +11,8 @@ module.exports = session => {
 
           model1Relation1: {
             id: 2,
-            model1Prop1: 'hello 2'
-          }
+            model1Prop1: 'hello 2',
+          },
         },
         {
           id: 3,
@@ -20,9 +20,9 @@ module.exports = session => {
 
           model1Relation1: {
             id: 4,
-            model1Prop1: 'hello 2'
-          }
-        }
+            model1Prop1: 'hello 2',
+          },
+        },
       ]);
     });
 
@@ -30,7 +30,7 @@ module.exports = session => {
       return session.models.Model1.query()
         .whereIn('id', [1, 3])
         .eager('model1Relation1')
-        .then(models => {
+        .then((models) => {
           expect(models).to.eql([
             {
               id: 1,
@@ -43,8 +43,8 @@ module.exports = session => {
                 model1Id: null,
                 model1Prop1: 'hello 2',
                 model1Prop2: null,
-                $afterFindCalled: 1
-              }
+                $afterFindCalled: 1,
+              },
             },
             {
               id: 3,
@@ -57,9 +57,9 @@ module.exports = session => {
                 model1Id: null,
                 model1Prop1: 'hello 2',
                 model1Prop2: null,
-                $afterFindCalled: 1
-              }
-            }
+                $afterFindCalled: 1,
+              },
+            },
           ]);
         });
     });
@@ -68,7 +68,7 @@ module.exports = session => {
       return session.models.Model1.query()
         .whereIn('id', [2, 4])
         .eager('model1Relation1Inverse')
-        .then(models => {
+        .then((models) => {
           expect(models).to.eql([
             {
               id: 2,
@@ -81,8 +81,8 @@ module.exports = session => {
                 model1Id: 2,
                 model1Prop1: 'hello 1',
                 model1Prop2: null,
-                $afterFindCalled: 1
-              }
+                $afterFindCalled: 1,
+              },
             },
             {
               id: 4,
@@ -95,9 +95,9 @@ module.exports = session => {
                 model1Id: 4,
                 model1Prop1: 'hello 1',
                 model1Prop2: null,
-                $afterFindCalled: 1
-              }
-            }
+                $afterFindCalled: 1,
+              },
+            },
           ]);
         });
     });

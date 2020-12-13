@@ -2,7 +2,7 @@ const crypto = require('crypto');
 const { expect } = require('chai');
 const { Model, snakeCaseMappers } = require('../../../');
 
-module.exports = session => {
+module.exports = (session) => {
   if (!session.isMySql()) {
     return;
   }
@@ -20,16 +20,12 @@ module.exports = session => {
         .then(() => knex.schema.dropTableIfExists('roles'))
         .then(() => {
           return knex.schema
-            .createTable('users', table => {
+            .createTable('users', (table) => {
               table.binary('id', 16).primary();
             })
-            .createTable('roles', table => {
+            .createTable('roles', (table) => {
               table.binary('id', 16).primary();
-              table
-                .binary('user_id', 16)
-                .references('users.id')
-                .notNullable()
-                .index();
+              table.binary('user_id', 16).references('users.id').notNullable().index();
             });
         });
     });
@@ -66,9 +62,9 @@ module.exports = session => {
               modelClass: Role,
               join: {
                 from: 'users.id',
-                to: 'roles.user_id'
-              }
-            }
+                to: 'roles.user_id',
+              },
+            },
           };
         }
       };
@@ -81,12 +77,10 @@ module.exports = session => {
       const inserted = await User.query().insertGraph({
         id: crypto.randomBytes(16),
 
-        roles: [{ id: crypto.randomBytes(16) }]
+        roles: [{ id: crypto.randomBytes(16) }],
       });
 
-      const result = await User.query()
-        .findById(inserted.id)
-        .withGraphFetched('roles');
+      const result = await User.query().findById(inserted.id).withGraphFetched('roles');
 
       expect(result).to.eql(inserted);
     });
@@ -94,16 +88,14 @@ module.exports = session => {
       const ids = [
         Buffer.from('00000000000000000000000000007AAC', 'hex'),
         Buffer.from('00000000000000000000000000007AAD', 'hex'),
-        Buffer.from('00000000000000000000000000007AAE', 'hex')
+        Buffer.from('00000000000000000000000000007AAE', 'hex'),
       ];
-      const graph = ids.map(id => ({
+      const graph = ids.map((id) => ({
         id,
-        roles: [{ id: crypto.randomBytes(16) }]
+        roles: [{ id: crypto.randomBytes(16) }],
       }));
       const inserted = await User.query().insertGraph(graph);
-      const result = await User.query()
-        .findByIds(ids)
-        .withGraphFetched('roles');
+      const result = await User.query().findByIds(ids).withGraphFetched('roles');
       expect(result).to.eql(inserted);
     });
   });

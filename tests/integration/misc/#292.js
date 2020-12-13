@@ -2,7 +2,7 @@ const _ = require('lodash');
 const expect = require('expect.js');
 const { Model } = require('../../../');
 
-module.exports = session => {
+module.exports = (session) => {
   describe('Eagerly loaded empty relations seem to short-circuit conversion to internal structure #292', () => {
     class A extends Model {
       static get tableName() {
@@ -16,9 +16,9 @@ module.exports = session => {
             modelClass: B,
             join: {
               from: 'a.id',
-              to: 'b.aId'
-            }
-          }
+              to: 'b.aId',
+            },
+          },
         };
       }
     }
@@ -37,10 +37,10 @@ module.exports = session => {
               from: 'b.id',
               through: {
                 from: 'b_c.bId',
-                to: 'b_c.cId'
+                to: 'b_c.cId',
               },
-              to: 'c.id'
-            }
+              to: 'c.id',
+            },
           },
           Ds: {
             relation: Model.ManyToManyRelation,
@@ -49,11 +49,11 @@ module.exports = session => {
               from: 'b.id',
               through: {
                 from: 'b_d.bId',
-                to: 'b_d.dId'
+                to: 'b_d.dId',
               },
-              to: 'd.id'
-            }
-          }
+              to: 'd.id',
+            },
+          },
         };
       }
     }
@@ -78,44 +78,32 @@ module.exports = session => {
         .dropTableIfExists('a')
         .dropTableIfExists('c')
         .dropTableIfExists('d')
-        .createTable('a', table => {
+        .createTable('a', (table) => {
           table.integer('id').primary();
         })
-        .createTable('b', table => {
+        .createTable('b', (table) => {
           table.integer('id').primary();
           table.integer('aId').references('a.id');
         })
-        .createTable('c', table => {
+        .createTable('c', (table) => {
           table.integer('id').primary();
         })
-        .createTable('d', table => {
+        .createTable('d', (table) => {
           table.integer('id').primary();
         })
-        .createTable('b_c', table => {
-          table
-            .integer('bId')
-            .references('b.id')
-            .onDelete('CASCADE');
-          table
-            .integer('cId')
-            .references('c.id')
-            .onDelete('CASCADE');
+        .createTable('b_c', (table) => {
+          table.integer('bId').references('b.id').onDelete('CASCADE');
+          table.integer('cId').references('c.id').onDelete('CASCADE');
         })
-        .createTable('b_d', table => {
-          table
-            .integer('bId')
-            .references('b.id')
-            .onDelete('CASCADE');
-          table
-            .integer('dId')
-            .references('d.id')
-            .onDelete('CASCADE');
+        .createTable('b_d', (table) => {
+          table.integer('bId').references('b.id').onDelete('CASCADE');
+          table.integer('dId').references('d.id').onDelete('CASCADE');
         })
         .then(() => {
           return Promise.all([
             session.knex('a').insert({ id: 1 }),
             session.knex('d').insert({ id: 1 }),
-            session.knex('d').insert({ id: 2 })
+            session.knex('d').insert({ id: 2 }),
           ])
             .then(() => {
               return session.knex('b').insert({ id: 1, aId: 1 });
@@ -123,7 +111,7 @@ module.exports = session => {
             .then(() => {
               return Promise.all([
                 session.knex('b_d').insert({ bId: 1, dId: 1 }),
-                session.knex('b_d').insert({ bId: 1, dId: 2 })
+                session.knex('b_d').insert({ bId: 1, dId: 2 }),
               ]);
             });
         });
@@ -143,7 +131,7 @@ module.exports = session => {
       return A.query(session.knex)
         .eagerAlgorithm(Model.JoinEagerAlgorithm)
         .eager('Bs.[Cs, Ds]')
-        .then(results => {
+        .then((results) => {
           results[0].Bs[0].Ds = _.sortBy(results[0].Bs[0].Ds, 'id');
 
           expect(results).to.eql([
@@ -158,15 +146,15 @@ module.exports = session => {
 
                   Ds: [
                     {
-                      id: 1
+                      id: 1,
                     },
                     {
-                      id: 2
-                    }
-                  ]
-                }
-              ]
-            }
+                      id: 2,
+                    },
+                  ],
+                },
+              ],
+            },
           ]);
         });
     });

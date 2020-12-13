@@ -7,10 +7,10 @@ import Knex = require('knex');
   const knex = Person.knex();
 
   try {
-    const scrappy = await transaction(knex, async trx => {
+    const scrappy = await transaction(knex, async (trx) => {
       const jennifer = await Person.query(trx).insert({
         firstName: 'Jennifer',
-        lastName: 'Lawrence'
+        lastName: 'Lawrence',
       });
 
       const scrappy = await jennifer.$relatedQuery('pets', trx).insert({ name: 'Scrappy' });
@@ -43,7 +43,7 @@ import Knex = require('knex');
   await trx.commit();
 
   // 2.
-  await transaction(Person.knex(), async trx => {
+  await transaction(Person.knex(), async (trx) => {
     await insertPersonAndPet(personAttrs, petAttrs, trx);
   });
 
@@ -71,7 +71,7 @@ import Knex = require('knex');
   }
 
   try {
-    const scrappy = await transaction(Person, async Person => {
+    const scrappy = await transaction(Person, async (Person) => {
       const jennifer = await Person.query().insert({ firstName: 'Jennifer', lastName: 'Lawrence' });
 
       // This creates a query using the `Animal` model class but we
@@ -84,11 +84,11 @@ import Knex = require('knex');
     console.log('Something went wrong. Neither Jennifer nor Scrappy were inserted');
   }
 
-  await transaction(Person, async BoundPerson => {
+  await transaction(Person, async (BoundPerson) => {
     // This will be executed inside the transaction.
     const jennifer = await BoundPerson.query().insert({
       firstName: 'Jennifer',
-      lastName: 'Lawrence'
+      lastName: 'Lawrence',
     });
 
     // OH NO! This query is executed outside the transaction
@@ -112,14 +112,12 @@ import Knex = require('knex');
 
     const jennifer = await trx('persons').insert({ firstName: 'Jennifer', lastName: 'Lawrence' });
     const scrappy = await Animal.query(trx).insert({ name: 'Scrappy' });
-    const fluffy = await Animal.query()
-      .transacting(trx)
-      .insert({ name: 'Fluffy' });
+    const fluffy = await Animal.query().transacting(trx).insert({ name: 'Fluffy' });
 
     return {
       jennifer,
       scrappy,
-      fluffy
+      fluffy,
     };
   });
 })();

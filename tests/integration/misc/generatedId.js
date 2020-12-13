@@ -1,14 +1,14 @@
 const expect = require('expect.js');
 const { Model } = require('../../../');
 
-module.exports = session => {
+module.exports = (session) => {
   describe('generated id', () => {
     let TestModel;
 
     before(() => {
       return session.knex.schema
         .dropTableIfExists('generated_id_test')
-        .createTable('generated_id_test', table => {
+        .createTable('generated_id_test', (table) => {
           table.string('idCol', 32).primary();
           table.string('value');
         });
@@ -39,11 +39,11 @@ module.exports = session => {
     it('should return the generated id when inserted', () => {
       return TestModel.query()
         .insert({ value: 'hello' })
-        .then(ret => {
+        .then((ret) => {
           expect(ret.idCol).to.equal('someRandomId');
           return session.knex(TestModel.getTableName());
         })
-        .then(rows => {
+        .then((rows) => {
           expect(rows[0]).to.eql({ value: 'hello', idCol: 'someRandomId' });
         });
     });

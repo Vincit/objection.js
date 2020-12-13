@@ -21,7 +21,7 @@ describe('QueryBuilder', () => {
   before(() => {
     let knex = Knex({ client: 'pg' });
 
-    mockKnex = knexMocker(knex, function(mock, oldImpl, args) {
+    mockKnex = knexMocker(knex, function (mock, oldImpl, args) {
       executedQueries.push(this.toString());
 
       let result = mockKnexQueryResults[mockKnexQueryResultIndex++] || [];
@@ -45,14 +45,14 @@ describe('QueryBuilder', () => {
     TestModel.knex(mockKnex);
   });
 
-  it("should throw if model doesn't have a `tableName`", done => {
+  it("should throw if model doesn't have a `tableName`", (done) => {
     class TestModel extends Model {
       // no tableName
     }
 
     TestModel.query(mockKnex)
       .then(() => done(new Error('should not get here')))
-      .catch(err => {
+      .catch((err) => {
         expect(err.message).to.equal('Model TestModel must have a static property tableName');
         done();
       })
@@ -85,7 +85,7 @@ describe('QueryBuilder', () => {
       'listeners',
       'listenerCount',
       'eventNames',
-      'rawListeners'
+      'rawListeners',
     ];
 
     let builder = QueryBuilder.forClass(TestModel);
@@ -107,7 +107,7 @@ describe('QueryBuilder', () => {
     let builder = QueryBuilder.forClass(TestModel);
     let called = false;
 
-    builder.modify(function(b) {
+    builder.modify(function (b) {
       called = true;
       expect(b === builder).to.equal(true);
       expect(this === builder).to.equal(true);
@@ -152,7 +152,7 @@ describe('QueryBuilder', () => {
           expect(query === builder).to.equal(true);
           expect(arg1).to.equal('foo');
           expect(arg2).to.equal(1);
-        }
+        },
       ],
       'foo',
       1
@@ -181,7 +181,7 @@ describe('QueryBuilder', () => {
         expect(query === builder).to.equal(true);
         expect(arg1).to.equal('foo');
         expect(arg2).to.equal(1);
-      }
+      },
     };
 
     // Should accept a single modifier.
@@ -205,7 +205,7 @@ describe('QueryBuilder', () => {
 
     expect(() => {
       builder.applyModifier('unknown');
-    }).to.throwException(err => {
+    }).to.throwException((err) => {
       expect(err.message).to.equal(
         'Unable to determine modify function from provided value: "unknown".'
       );
@@ -221,7 +221,7 @@ describe('QueryBuilder', () => {
     expect(res === builder).to.equal(true);
   });
 
-  ['applyFilter', 'applyModifier', 'modify'].forEach(method => {
+  ['applyFilter', 'applyModifier', 'modify'].forEach((method) => {
     it(method + ' accept a list of strings and call the corresponding modifiers', () => {
       const builder = QueryBuilder.forClass(TestModel);
 
@@ -239,7 +239,7 @@ describe('QueryBuilder', () => {
 
         c: 'a',
 
-        d: ['c', 'b']
+        d: ['c', 'b'],
       };
 
       aCalled = false;
@@ -287,7 +287,7 @@ describe('QueryBuilder', () => {
       TestModel.modifiers = {
         c: 'a',
 
-        d: ['c', 'b']
+        d: ['c', 'b'],
       };
 
       caughtModifiers = [];
@@ -311,13 +311,13 @@ describe('QueryBuilder', () => {
   it('should still throw if modifierNotFound() delegate to the definition in the super class', () => {
     const builder = QueryBuilder.forClass(TestModel);
 
-    TestModel.modifierNotFound = function(builder, modifier) {
+    TestModel.modifierNotFound = function (builder, modifier) {
       Model.modifierNotFound(builder, modifier);
     };
 
     expect(() => {
       builder.applyModifier('unknown');
-    }).to.throwException(err => {
+    }).to.throwException((err) => {
       expect(err.message).to.equal(
         'Unable to determine modify function from provided value: "unknown".'
       );
@@ -338,13 +338,13 @@ describe('QueryBuilder', () => {
     expect(caughtModifier).to.equal('unknown');
   });
 
-  it('should call the callback passed to .then after execution', done => {
+  it('should call the callback passed to .then after execution', (done) => {
     mockKnexQueryResults = [[{ a: 1 }, { a: 2 }]];
     // Make sure the callback is called by not returning a promise from the test.
     // Instead call the `done` function so that the test times out if the callback
     // is not called.
     QueryBuilder.forClass(TestModel)
-      .then(result => {
+      .then((result) => {
         expect(result).to.eql(mockKnexQueryResults[0]);
         done();
       })
@@ -385,7 +385,7 @@ describe('QueryBuilder', () => {
       .where('id', 10)
       .where('height', '>', 180)
       .where({ name: 'test' })
-      .orWhere(function(builder) {
+      .orWhere(function (builder) {
         // The builder passed to these functions should be a QueryBuilderBase instead of
         // knex query builder.
         expect(this).to.equal(builder);
@@ -400,8 +400,8 @@ describe('QueryBuilder', () => {
             'where "id" = 10',
             'and "height" > 180',
             'and "name" = \'test\'',
-            'or ("age" < 10 and "eyeColor" = \'blue\')'
-          ].join(' ')
+            'or ("age" < 10 and "eyeColor" = \'blue\')',
+          ].join(' '),
         ]);
       });
   });
@@ -419,7 +419,7 @@ describe('QueryBuilder', () => {
         .where('SomeTable.someColumn', ref('SomeOtherTable.someOtherColumn'))
         .then(() => {
           expect(executedQueries).to.eql([
-            'select "Model".* from "Model" where "SomeTable"."someColumn" = "SomeOtherTable"."someOtherColumn"'
+            'select "Model".* from "Model" where "SomeTable"."someColumn" = "SomeOtherTable"."someOtherColumn"',
           ]);
         });
     });
@@ -429,7 +429,7 @@ describe('QueryBuilder', () => {
         .where('SomeTable.someColumn', '>', ref('SomeOtherTable.someOtherColumn'))
         .then(() => {
           expect(executedQueries).to.eql([
-            'select "Model".* from "Model" where "SomeTable"."someColumn" > "SomeOtherTable"."someOtherColumn"'
+            'select "Model".* from "Model" where "SomeTable"."someColumn" > "SomeOtherTable"."someOtherColumn"',
           ]);
         });
     });
@@ -440,7 +440,7 @@ describe('QueryBuilder', () => {
           .where('SomeTable.someColumn', 'lol', ref('SomeOtherTable.someOtherColumn'))
           .toKnexQuery()
           .toString();
-      }).to.throwException(err => {
+      }).to.throwException((err) => {
         expect(err.message).to.equal('The operator "lol" is not permitted');
       });
     });
@@ -451,7 +451,7 @@ describe('QueryBuilder', () => {
         .orWhere('SomeTable.someColumn', ref('SomeOtherTable.someOtherColumn'))
         .then(() => {
           expect(executedQueries).to.eql([
-            'select "Model".* from "Model" where "id" = 10 or "SomeTable"."someColumn" = "SomeOtherTable"."someOtherColumn"'
+            'select "Model".* from "Model" where "id" = 10 or "SomeTable"."someColumn" = "SomeOtherTable"."someOtherColumn"',
           ]);
         });
     });
@@ -463,7 +463,7 @@ describe('QueryBuilder', () => {
         .whereComposite(['A.a', 'B.b'], '>', [1, 2])
         .then(() => {
           expect(executedQueries).to.eql([
-            'select "Model".* from "Model" where ("A"."a" > 1 and "B"."b" > 2)'
+            'select "Model".* from "Model" where ("A"."a" > 1 and "B"."b" > 2)',
           ]);
         });
     });
@@ -474,7 +474,7 @@ describe('QueryBuilder', () => {
           .whereComposite('SomeTable.someColumn', 'lol', 'SomeOtherTable.someOtherColumn')
           .toKnexQuery()
           .toString();
-      }).to.throwException(err => {
+      }).to.throwException((err) => {
         expect(err.message).to.equal('The operator "lol" is not permitted');
       });
     });
@@ -484,7 +484,7 @@ describe('QueryBuilder', () => {
         .whereComposite(['A.a', 'B.b'], [1, 2])
         .then(() => {
           expect(executedQueries).to.eql([
-            'select "Model".* from "Model" where ("A"."a" = 1 and "B"."b" = 2)'
+            'select "Model".* from "Model" where ("A"."a" = 1 and "B"."b" = 2)',
           ]);
         });
     });
@@ -512,7 +512,7 @@ describe('QueryBuilder', () => {
         .whereInComposite(['A.a', 'B.b'], [1, 2])
         .then(() => {
           expect(executedQueries).to.eql([
-            'select "Model".* from "Model" where ("A"."a", "B"."b") in ((1, 2))'
+            'select "Model".* from "Model" where ("A"."a", "B"."b") in ((1, 2))',
           ]);
         });
     });
@@ -523,12 +523,12 @@ describe('QueryBuilder', () => {
           ['A.a', 'B.b'],
           [
             [1, 2],
-            [3, 4]
+            [3, 4],
           ]
         )
         .then(() => {
           expect(executedQueries).to.eql([
-            'select "Model".* from "Model" where ("A"."a", "B"."b") in ((1, 2), (3, 4))'
+            'select "Model".* from "Model" where ("A"."a", "B"."b") in ((1, 2), (3, 4))',
           ]);
         });
     });
@@ -562,7 +562,7 @@ describe('QueryBuilder', () => {
         .whereInComposite('A.a', TestModel.query().select('a'))
         .then(() => {
           expect(executedQueries).to.eql([
-            'select "Model".* from "Model" where "A"."a" in (select "a" from "Model")'
+            'select "Model".* from "Model" where "A"."a" in (select "a" from "Model")',
           ]);
         });
     });
@@ -580,7 +580,7 @@ describe('QueryBuilder', () => {
         .whereInComposite(['A.a', 'B.b'], TestModel.query().select('a', 'b'))
         .then(() => {
           expect(executedQueries).to.eql([
-            'select "Model".* from "Model" where ("A"."a","B"."b") in (select "a", "b" from "Model")'
+            'select "Model".* from "Model" where ("A"."a","B"."b") in (select "a", "b" from "Model")',
           ]);
         });
     });
@@ -589,7 +589,7 @@ describe('QueryBuilder', () => {
   it('should convert array query result into Model instances', () => {
     mockKnexQueryResults = [[{ a: 1 }, { a: 2 }]];
 
-    return QueryBuilder.forClass(TestModel).then(result => {
+    return QueryBuilder.forClass(TestModel).then((result) => {
       expect(result).to.have.length(2);
       expect(result[0]).to.be.a(TestModel);
       expect(result[1]).to.be.a(TestModel);
@@ -600,38 +600,38 @@ describe('QueryBuilder', () => {
   it('should convert an object query result into a Model instance', () => {
     mockKnexQueryResults = [{ a: 1 }];
 
-    return QueryBuilder.forClass(TestModel).then(result => {
+    return QueryBuilder.forClass(TestModel).then((result) => {
       expect(result).to.be.a(TestModel);
       expect(result.a).to.equal(1);
     });
   });
 
-  it('should pass the query builder as `this` and parameter for the hooks', done => {
+  it('should pass the query builder as `this` and parameter for the hooks', (done) => {
     let text = '';
 
     QueryBuilder.forClass(TestModel)
-      .runBefore(function(result, builder) {
+      .runBefore(function (result, builder) {
         expect(builder.constructor.name).to.equal('QueryBuilder');
         expect(this).to.equal(builder);
         text += 'a';
       })
-      .onBuild(function(builder) {
+      .onBuild(function (builder) {
         expect(builder.constructor.name).to.equal('QueryBuilder');
         expect(this).to.equal(builder);
         text += 'b';
       })
-      .onBuildKnex(function(knexBuilder, builder) {
+      .onBuildKnex(function (knexBuilder, builder) {
         expect(builder.constructor.name).to.equal('QueryBuilder');
         expect(knexUtils.isKnexQueryBuilder(knexBuilder)).to.equal(true);
         expect(this).to.equal(knexBuilder);
         text += 'c';
       })
-      .runAfter(function(data, builder) {
+      .runAfter(function (data, builder) {
         expect(builder.constructor.name).to.equal('QueryBuilder');
         expect(this).to.equal(builder);
         text += 'd';
       })
-      .runAfter(function(data, builder) {
+      .runAfter(function (data, builder) {
         expect(builder.constructor.name).to.equal('QueryBuilder');
         expect(this).to.equal(builder);
         text += 'e';
@@ -639,7 +639,7 @@ describe('QueryBuilder', () => {
       .runAfter(() => {
         throw new Error('abort');
       })
-      .onError(function(err, builder) {
+      .onError(function (err, builder) {
         expect(builder.constructor.name).to.equal('QueryBuilder');
         expect(this).to.equal(builder);
         expect(err.message).to.equal('abort');
@@ -649,47 +649,47 @@ describe('QueryBuilder', () => {
         expect(text).to.equal('abcdef');
         done();
       })
-      .catch(err => {
+      .catch((err) => {
         done(err);
       });
   });
 
-  it('throwing at any phase should call the onError hook', done => {
+  it('throwing at any phase should call the onError hook', (done) => {
     let called = false;
     QueryBuilder.forClass(TestModel)
-      .runBefore(function(result, builder) {
+      .runBefore(function (result, builder) {
         throw new Error();
       })
-      .onError(function(err, builder) {
+      .onError(function (err, builder) {
         called = true;
       })
       .then(() => {
         expect(called).to.equal(true);
         done();
       })
-      .catch(err => {
+      .catch((err) => {
         done(err);
       });
   });
 
-  it('any return value from onError should be the result of the query', done => {
+  it('any return value from onError should be the result of the query', (done) => {
     QueryBuilder.forClass(TestModel)
-      .runBefore(function(result, builder) {
+      .runBefore(function (result, builder) {
         throw new Error();
       })
-      .onError(function(err, builder) {
+      .onError(function (err, builder) {
         return 'my custom error';
       })
-      .then(result => {
+      .then((result) => {
         expect(result).to.equal('my custom error');
         done();
       })
-      .catch(err => {
+      .catch((err) => {
         done(err);
       });
   });
 
-  it('should call run* methods in the correct order', done => {
+  it('should call run* methods in the correct order', (done) => {
     mockKnexQueryResults = [0];
 
     // Again call `done` instead of returning a promise just to make sure the final
@@ -707,24 +707,24 @@ describe('QueryBuilder', () => {
         expect(mockKnexQueryResults[0]).to.equal(2);
         ++mockKnexQueryResults[0];
       })
-      .runAfter(res => {
+      .runAfter((res) => {
         expect(res).to.equal(3);
         return Bluebird.delay(1).then(() => {
           return ++res;
         });
       })
-      .runAfter(res => {
+      .runAfter((res) => {
         expect(res).to.equal(4);
         return ++res;
       })
-      .then(res => {
+      .then((res) => {
         expect(res).to.equal(5);
         done();
       })
       .catch(done);
   });
 
-  it('should not execute query if an error is thrown from runBefore', done => {
+  it('should not execute query if an error is thrown from runBefore', (done) => {
     QueryBuilder.forClass(TestModel)
       .runBefore(() => {
         throw new Error('some error');
@@ -738,14 +738,14 @@ describe('QueryBuilder', () => {
       .then(() => {
         done(new Error('should not get here'));
       })
-      .catch(err => {
+      .catch((err) => {
         expect(err.message).to.equal('some error');
         expect(executedQueries).to.have.length(0);
         done();
       });
   });
 
-  it('should reject promise if an error is throw from from runAfter', done => {
+  it('should reject promise if an error is throw from from runAfter', (done) => {
     QueryBuilder.forClass(TestModel)
       .runAfter(() => {
         throw new Error('some error');
@@ -753,7 +753,7 @@ describe('QueryBuilder', () => {
       .then(() => {
         done(new Error('should not get here'));
       })
-      .catch(err => {
+      .catch((err) => {
         expect(err.message).to.equal('some error');
         done();
       });
@@ -761,7 +761,7 @@ describe('QueryBuilder', () => {
 
   it('should call custom find implementation defined by findOperationFactory', () => {
     return QueryBuilder.forClass(TestModel)
-      .findOperationFactory(function(builder) {
+      .findOperationFactory(function (builder) {
         expect(builder).to.equal(this);
         return createFindOperation(builder, { a: 1 });
       })
@@ -773,7 +773,7 @@ describe('QueryBuilder', () => {
 
   it('should not call custom find implementation defined by findOperationFactory if insert is called', () => {
     return QueryBuilder.forClass(TestModel)
-      .findOperationFactory(builder => {
+      .findOperationFactory((builder) => {
         return createFindOperation(builder, { a: 1 });
       })
       .insert({ a: 1 })
@@ -785,7 +785,7 @@ describe('QueryBuilder', () => {
 
   it('should not call custom find implementation defined by findOperationFactory if update is called', () => {
     return QueryBuilder.forClass(TestModel)
-      .findOperationFactory(builder => {
+      .findOperationFactory((builder) => {
         return createFindOperation(builder, { a: 1 });
       })
       .update({ a: 1 })
@@ -797,7 +797,7 @@ describe('QueryBuilder', () => {
 
   it('should not call custom find implementation defined by findOperationFactory if delete is called', () => {
     return QueryBuilder.forClass(TestModel)
-      .findOperationFactory(builder => {
+      .findOperationFactory((builder) => {
         return createFindOperation(builder, { a: 1 });
       })
       .delete()
@@ -809,7 +809,7 @@ describe('QueryBuilder', () => {
 
   it('should call custom insert implementation defined by insertOperationFactory', () => {
     return QueryBuilder.forClass(TestModel)
-      .insertOperationFactory(builder => {
+      .insertOperationFactory((builder) => {
         return createInsertOperation(builder, { b: 2 });
       })
       .insert({ a: 1 })
@@ -821,7 +821,7 @@ describe('QueryBuilder', () => {
 
   it('should call custom update implementation defined by updateOperationFactory', () => {
     return QueryBuilder.forClass(TestModel)
-      .updateOperationFactory(builder => {
+      .updateOperationFactory((builder) => {
         return createUpdateOperation(builder, { b: 2 });
       })
       .update({ a: 1 })
@@ -833,7 +833,7 @@ describe('QueryBuilder', () => {
 
   it('should call custom patch implementation defined by patchOperationFactory', () => {
     return QueryBuilder.forClass(TestModel)
-      .patchOperationFactory(builder => {
+      .patchOperationFactory((builder) => {
         return createUpdateOperation(builder, { b: 2 });
       })
       .patch({ a: 1 })
@@ -845,7 +845,7 @@ describe('QueryBuilder', () => {
 
   it('should call custom delete implementation defined by deleteOperationFactory', () => {
     return QueryBuilder.forClass(TestModel)
-      .deleteOperationFactory(builder => {
+      .deleteOperationFactory((builder) => {
         return createDeleteOperation(builder, { id: 100 });
       })
       .delete()
@@ -857,7 +857,7 @@ describe('QueryBuilder', () => {
 
   it('should call custom relate implementation defined by relateOperationFactory', () => {
     return QueryBuilder.forClass(TestModel)
-      .relateOperationFactory(builder => {
+      .relateOperationFactory((builder) => {
         return createInsertOperation(builder, { b: 2 });
       })
       .relate({ a: 1 })
@@ -869,7 +869,7 @@ describe('QueryBuilder', () => {
 
   it('should call custom unrelate implementation defined by unrelateOperationFactory', () => {
     return QueryBuilder.forClass(TestModel)
-      .unrelateOperationFactory(builder => {
+      .unrelateOperationFactory((builder) => {
         return createDeleteOperation(builder, { id: 100 });
       })
       .unrelate()
@@ -881,7 +881,7 @@ describe('QueryBuilder', () => {
 
   it('should be able to execute same query multiple times', () => {
     let query = QueryBuilder.forClass(TestModel)
-      .updateOperationFactory(builder => {
+      .updateOperationFactory((builder) => {
         return createUpdateOperation(builder, { b: 2 });
       })
       .where('test', '<', 100)
@@ -915,7 +915,7 @@ describe('QueryBuilder', () => {
       });
   });
 
-  it('resultSize should create and execute a query that returns the size of the query', done => {
+  it('resultSize should create and execute a query that returns the size of the query', (done) => {
     mockKnexQueryResults = [[{ count: '123' }]];
     QueryBuilder.forClass(TestModel)
       .where('test', 100)
@@ -923,7 +923,7 @@ describe('QueryBuilder', () => {
       .limit(10)
       .offset(100)
       .resultSize()
-      .then(res => {
+      .then((res) => {
         expect(executedQueries).to.have.length(1);
         expect(res).to.equal(123);
         expect(executedQueries[0]).to.equal(
@@ -934,7 +934,7 @@ describe('QueryBuilder', () => {
       .catch(done);
   });
 
-  it('should consider withSchema when looking for column info', done => {
+  it('should consider withSchema when looking for column info', (done) => {
     class TestModelRelated extends Model {
       static get tableName() {
         return 'Related';
@@ -953,9 +953,9 @@ describe('QueryBuilder', () => {
             modelClass: TestModelRelated,
             join: {
               from: 'Model.id',
-              to: 'Related.id'
-            }
-          }
+              to: 'Related.id',
+            },
+          },
         };
       }
     }
@@ -966,11 +966,11 @@ describe('QueryBuilder', () => {
     QueryBuilder.forClass(TestModel)
       .withSchema('someSchema')
       .withGraphJoined('relatedModel')
-      .then(res => {
+      .then((res) => {
         expect(executedQueries).to.eql([
           "select * from information_schema.columns where table_name = 'Model' and table_catalog = NULL and table_schema = 'someSchema'",
           "select * from information_schema.columns where table_name = 'Related' and table_catalog = NULL and table_schema = 'someSchema'",
-          'select "Model"."0" as "0" from "someSchema"."Model" left join "someSchema"."Related" as "relatedModel" on "relatedModel"."id" = "Model"."id"'
+          'select "Model"."0" as "0" from "someSchema"."Model" left join "someSchema"."Related" as "relatedModel" on "relatedModel"."id" = "Model"."id"',
         ]);
         console.log(res);
         console.log(executedQueries);
@@ -979,17 +979,17 @@ describe('QueryBuilder', () => {
       .catch(done);
   });
 
-  it('range should return a range and the total count', done => {
+  it('range should return a range and the total count', (done) => {
     mockKnexQueryResults = [[{ a: '1' }], [{ count: '123' }]];
     QueryBuilder.forClass(TestModel)
       .where('test', 100)
       .orderBy('order')
       .range(100, 200)
-      .then(res => {
+      .then((res) => {
         expect(executedQueries).to.have.length(2);
         expect(executedQueries).to.eql([
           'select "Model".* from "Model" where "test" = 100 order by "order" asc limit 101 offset 100',
-          'select count(*) as "count" from (select "Model".* from "Model" where "test" = 100) as "temp"'
+          'select count(*) as "count" from (select "Model".* from "Model" where "test" = 100) as "temp"',
         ]);
         expect(res.total).to.equal(123);
         expect(res.results).to.eql([{ a: 1 }]);
@@ -998,17 +998,17 @@ describe('QueryBuilder', () => {
       .catch(done);
   });
 
-  it('page should return a page and the total count', done => {
+  it('page should return a page and the total count', (done) => {
     mockKnexQueryResults = [[{ a: '1' }], [{ count: '123' }]];
     QueryBuilder.forClass(TestModel)
       .where('test', 100)
       .orderBy('order')
       .page(10, 100)
-      .then(res => {
+      .then((res) => {
         expect(executedQueries).to.have.length(2);
         expect(executedQueries).to.eql([
           'select "Model".* from "Model" where "test" = 100 order by "order" asc limit 100 offset 1000',
-          'select count(*) as "count" from (select "Model".* from "Model" where "test" = 100) as "temp"'
+          'select count(*) as "count" from (select "Model".* from "Model" where "test" = 100) as "temp"',
         ]);
         expect(res.total).to.equal(123);
         expect(res.results).to.eql([{ a: 1 }]);
@@ -1024,9 +1024,9 @@ describe('QueryBuilder', () => {
         modelClass: TestModel,
         join: {
           from: 'Model.id',
-          to: 'Model.someRelId'
-        }
-      }
+          to: 'Model.someRelId',
+        },
+      },
     };
 
     const queries = {
@@ -1036,12 +1036,12 @@ describe('QueryBuilder', () => {
       patch: TestModel.query().patch(),
       delete: TestModel.query().delete(),
       relate: TestModel.relatedQuery('someRel').relate(1),
-      unrelate: TestModel.relatedQuery('someRel').unrelate()
+      unrelate: TestModel.relatedQuery('someRel').unrelate(),
     };
 
     // Check all types of operations, call all available checks for reach of them,
     // (e.g. isFind(), isUpdate(), etc) and see if they return the expected result.
-    const getMethodName = name => `is${_.capitalize(name === 'patch' ? 'update' : name)}`;
+    const getMethodName = (name) => `is${_.capitalize(name === 'patch' ? 'update' : name)}`;
 
     for (const name in queries) {
       const query = queries[name];
@@ -1090,7 +1090,7 @@ describe('QueryBuilder', () => {
       'orWhereColumn',
       'whereNotColumn',
       'andWhereNotColumn',
-      'orWhereNotColumn'
+      'orWhereNotColumn',
     ];
 
     for (let i = 0; i < wheres.length; i++) {
@@ -1113,7 +1113,7 @@ describe('QueryBuilder', () => {
       'sum',
       'sumDistinct',
       'avg',
-      'avgDistinct'
+      'avgDistinct',
     ];
 
     for (let i = 0; i < selects.length; i++) {
@@ -1132,9 +1132,9 @@ describe('QueryBuilder', () => {
         modelClass: TestModel,
         join: {
           from: 'Model.id',
-          to: 'Model.someRelId'
-        }
-      }
+          to: 'Model.someRelId',
+        },
+      },
     };
 
     const query = TestModel.query();
@@ -1161,7 +1161,7 @@ describe('QueryBuilder', () => {
       'union',
       'count',
       'avg',
-      'with'
+      'with',
     ];
     const test = (query, name, expected) => {
       const regexp = new RegExp(`^${name}$`);
@@ -1173,9 +1173,9 @@ describe('QueryBuilder', () => {
         .to.equal(expected);
     };
 
-    operations.forEach(operation => {
+    operations.forEach((operation) => {
       const query = TestModel.query()[operation]('arg');
-      operations.forEach(testOperation => {
+      operations.forEach((testOperation) => {
         test(query, testOperation, testOperation === operation);
       });
     });
@@ -1185,9 +1185,9 @@ describe('QueryBuilder', () => {
     // A bunch of random operations to test against.
     const operations = ['where', 'limit', 'offset', 'count'];
 
-    operations.forEach(operation => {
+    operations.forEach((operation) => {
       const query = TestModel.query();
-      operations.forEach(operation => query[operation]('arg'));
+      operations.forEach((operation) => query[operation]('arg'));
       chai.expect(query.has(operation), `query().has('${operation}')`).to.equal(true);
       chai
         .expect(
@@ -1195,7 +1195,7 @@ describe('QueryBuilder', () => {
           `query().clear('${operation}').has('${operation}')`
         )
         .to.equal(false);
-      operations.forEach(testOperation => {
+      operations.forEach((testOperation) => {
         chai
           .expect(query.has(testOperation), `query().has('${testOperation}')`)
           .to.equal(testOperation !== operation);
@@ -1203,12 +1203,12 @@ describe('QueryBuilder', () => {
     });
   });
 
-  it('update() should call $beforeUpdate on the model', done => {
-    TestModel.prototype.$beforeUpdate = function() {
+  it('update() should call $beforeUpdate on the model', (done) => {
+    TestModel.prototype.$beforeUpdate = function () {
       this.c = 'beforeUpdate';
     };
 
-    TestModel.prototype.$afterGet = function() {
+    TestModel.prototype.$afterGet = function () {
       throw new Error('$afterGet should not be called');
     };
 
@@ -1225,15 +1225,15 @@ describe('QueryBuilder', () => {
       .catch(done);
   });
 
-  it('update() should call $beforeUpdate on the model (async)', done => {
-    TestModel.prototype.$beforeUpdate = function() {
+  it('update() should call $beforeUpdate on the model (async)', (done) => {
+    TestModel.prototype.$beforeUpdate = function () {
       let self = this;
       return Bluebird.delay(5).then(() => {
         self.c = 'beforeUpdate';
       });
     };
 
-    TestModel.prototype.$afterGet = function() {
+    TestModel.prototype.$afterGet = function () {
       throw new Error('$afterGet should not be called');
     };
 
@@ -1250,12 +1250,12 @@ describe('QueryBuilder', () => {
       .catch(done);
   });
 
-  it('patch() should call $beforeUpdate on the model', done => {
-    TestModel.prototype.$beforeUpdate = function() {
+  it('patch() should call $beforeUpdate on the model', (done) => {
+    TestModel.prototype.$beforeUpdate = function () {
       this.c = 'beforeUpdate';
     };
 
-    TestModel.prototype.$afterGet = function() {
+    TestModel.prototype.$afterGet = function () {
       throw new Error('$afterGet should not be called');
     };
 
@@ -1272,15 +1272,15 @@ describe('QueryBuilder', () => {
       .catch(done);
   });
 
-  it('patch() should call $beforeUpdate on the model (async)', done => {
-    TestModel.prototype.$beforeUpdate = function() {
+  it('patch() should call $beforeUpdate on the model (async)', (done) => {
+    TestModel.prototype.$beforeUpdate = function () {
       let self = this;
       return Bluebird.delay(5).then(() => {
         self.c = 'beforeUpdate';
       });
     };
 
-    TestModel.prototype.$afterGet = function() {
+    TestModel.prototype.$afterGet = function () {
       throw new Error('$afterGet should not be called');
     };
 
@@ -1297,18 +1297,18 @@ describe('QueryBuilder', () => {
       .catch(done);
   });
 
-  it('insert() should call $beforeInsert on the model', done => {
-    TestModel.prototype.$beforeInsert = function() {
+  it('insert() should call $beforeInsert on the model', (done) => {
+    TestModel.prototype.$beforeInsert = function () {
       this.c = 'beforeInsert';
     };
 
-    TestModel.prototype.$afterGet = function() {
+    TestModel.prototype.$afterGet = function () {
       throw new Error('$afterGet should not be called');
     };
 
     QueryBuilder.forClass(TestModel)
       .insert(TestModel.fromJson({ a: 10, b: 'test' }))
-      .then(model => {
+      .then((model) => {
         expect(model.c).to.equal('beforeInsert');
         expect(executedQueries[0]).to.equal(
           'insert into "Model" ("a", "b", "c") values (10, \'test\', \'beforeInsert\') returning "id"'
@@ -1318,21 +1318,21 @@ describe('QueryBuilder', () => {
       .catch(done);
   });
 
-  it('insert() should call $beforeInsert on the model (async)', done => {
-    TestModel.prototype.$beforeInsert = function() {
+  it('insert() should call $beforeInsert on the model (async)', (done) => {
+    TestModel.prototype.$beforeInsert = function () {
       let self = this;
       return Bluebird.delay(5).then(() => {
         self.c = 'beforeInsert';
       });
     };
 
-    TestModel.prototype.$afterGet = function() {
+    TestModel.prototype.$afterGet = function () {
       throw new Error('$afterGet should not be called');
     };
 
     QueryBuilder.forClass(TestModel)
       .insert({ a: 10, b: 'test' })
-      .then(model => {
+      .then((model) => {
         expect(model.c).to.equal('beforeInsert');
         expect(executedQueries[0]).to.equal(
           'insert into "Model" ("a", "b", "c") values (10, \'test\', \'beforeInsert\') returning "id"'
@@ -1342,55 +1342,55 @@ describe('QueryBuilder', () => {
       .catch(done);
   });
 
-  it('should call $afterGet on the model if no write operation is specified', done => {
+  it('should call $afterGet on the model if no write operation is specified', (done) => {
     mockKnexQueryResults = [
       [
         {
-          a: 1
+          a: 1,
         },
         {
-          a: 2
-        }
-      ]
+          a: 2,
+        },
+      ],
     ];
 
-    TestModel.prototype.$afterGet = function(context) {
+    TestModel.prototype.$afterGet = function (context) {
       this.b = this.a * 2 + context.x;
     };
 
     QueryBuilder.forClass(TestModel)
       .context({ x: 10 })
-      .then(models => {
+      .then((models) => {
         expect(models[0]).to.be.a(TestModel);
         expect(models[1]).to.be.a(TestModel);
         expect(models).to.eql([
           {
             a: 1,
-            b: 12
+            b: 12,
           },
           {
             a: 2,
-            b: 14
-          }
+            b: 14,
+          },
         ]);
         done();
       })
       .catch(done);
   });
 
-  it('should call $afterGet on the model if no write operation is specified (async)', done => {
+  it('should call $afterGet on the model if no write operation is specified (async)', (done) => {
     mockKnexQueryResults = [
       [
         {
-          a: 1
+          a: 1,
         },
         {
-          a: 2
-        }
-      ]
+          a: 2,
+        },
+      ],
     ];
 
-    TestModel.prototype.$afterGet = function(context) {
+    TestModel.prototype.$afterGet = function (context) {
       let self = this;
       return Bluebird.delay(10).then(() => {
         self.b = self.a * 2 + context.x;
@@ -1399,37 +1399,37 @@ describe('QueryBuilder', () => {
 
     QueryBuilder.forClass(TestModel)
       .context({ x: 10 })
-      .then(models => {
+      .then((models) => {
         expect(models[0]).to.be.a(TestModel);
         expect(models[1]).to.be.a(TestModel);
         expect(models).to.eql([
           {
             a: 1,
-            b: 12
+            b: 12,
           },
           {
             a: 2,
-            b: 14
-          }
+            b: 14,
+          },
         ]);
         done();
       })
       .catch(done);
   });
 
-  it('should call $afterGet before any `runAfter` hooks', done => {
+  it('should call $afterGet before any `runAfter` hooks', (done) => {
     mockKnexQueryResults = [
       [
         {
-          a: 1
+          a: 1,
         },
         {
-          a: 2
-        }
-      ]
+          a: 2,
+        },
+      ],
     ];
 
-    TestModel.prototype.$afterGet = function(context) {
+    TestModel.prototype.$afterGet = function (context) {
       let self = this;
       return Bluebird.delay(10).then(() => {
         self.b = self.a * 2 + context.x;
@@ -1442,18 +1442,18 @@ describe('QueryBuilder', () => {
         builder.context().x = 666;
         return result;
       })
-      .then(models => {
+      .then((models) => {
         expect(models[0]).to.be.a(TestModel);
         expect(models[1]).to.be.a(TestModel);
         expect(models).to.eql([
           {
             a: 1,
-            b: 12
+            b: 12,
           },
           {
             a: 2,
-            b: 14
-          }
+            b: 14,
+          },
         ]);
         done();
       })
@@ -1463,15 +1463,15 @@ describe('QueryBuilder', () => {
   it('should not be able to call setQueryExecutor twice', () => {
     expect(() => {
       QueryBuilder.forClass(TestModel)
-        .setQueryExecutor(function() {})
-        .setQueryExecutor(function() {});
+        .setQueryExecutor(function () {})
+        .setQueryExecutor(function () {});
     }).to.throwException();
   });
 
   it('clearEager() should clear everything related to eager', () => {
     let builder = QueryBuilder.forClass(TestModel)
       .eager('a(f).b', {
-        f: _.noop
+        f: _.noop,
       })
       .filterEager('a', _.noop);
 
@@ -1491,7 +1491,7 @@ describe('QueryBuilder', () => {
     expect(builder._explicitRejectValue).to.equal(null);
   });
 
-  it('joinRelated should add join clause to correct place', done => {
+  it('joinRelated should add join clause to correct place', (done) => {
     class M1 extends Model {
       static get tableName() {
         return 'M1';
@@ -1510,9 +1510,9 @@ describe('QueryBuilder', () => {
             modelClass: M1,
             join: {
               from: 'M2.id',
-              to: 'M1.m2Id'
-            }
-          }
+              to: 'M1.m2Id',
+            },
+          },
         };
       }
     }
@@ -1534,44 +1534,32 @@ describe('QueryBuilder', () => {
 
   it('undefined values as query builder method arguments should raise an exception', () => {
     expect(() => {
-      QueryBuilder.forClass(TestModel)
-        .where('id', undefined)
-        .toKnexQuery();
-    }).to.throwException(err => {
+      QueryBuilder.forClass(TestModel).where('id', undefined).toKnexQuery();
+    }).to.throwException((err) => {
       expect(err.message).to.equal(
         "undefined passed as argument #1 for 'where' operation. Call skipUndefined() method to ignore the undefined values."
       );
     });
 
     expect(() => {
-      QueryBuilder.forClass(TestModel)
-        .orWhere('id', '<', undefined)
-        .toKnexQuery();
-    }).to.throwException(err => {
+      QueryBuilder.forClass(TestModel).orWhere('id', '<', undefined).toKnexQuery();
+    }).to.throwException((err) => {
       expect(err.message).to.equal(
         "undefined passed as argument #2 for 'orWhere' operation. Call skipUndefined() method to ignore the undefined values."
       );
     });
 
     expect(() => {
-      QueryBuilder.forClass(TestModel)
-        .orWhere('id', undefined, 10)
-        .toKnexQuery();
+      QueryBuilder.forClass(TestModel).orWhere('id', undefined, 10).toKnexQuery();
     }).to.throwException();
 
     expect(() => {
-      QueryBuilder.forClass(TestModel)
-        .delete()
-        .whereIn('id', undefined)
-        .toKnexQuery();
+      QueryBuilder.forClass(TestModel).delete().whereIn('id', undefined).toKnexQuery();
     }).to.throwException();
 
     expect(() => {
-      QueryBuilder.forClass(TestModel)
-        .delete()
-        .whereIn('id', [1, undefined, 3])
-        .toKnexQuery();
-    }).to.throwException(err => {
+      QueryBuilder.forClass(TestModel).delete().whereIn('id', [1, undefined, 3]).toKnexQuery();
+    }).to.throwException((err) => {
       expect(err.message).to.equal(
         "undefined passed as an item in argument #1 for 'whereIn' operation. Call skipUndefined() method to ignore the undefined values."
       );
@@ -1580,31 +1568,19 @@ describe('QueryBuilder', () => {
 
   it('undefined values as query builder method arguments should be ignored if `skipUndefined` is called', () => {
     expect(() => {
-      QueryBuilder.forClass(TestModel)
-        .skipUndefined()
-        .where('id', undefined)
-        .toKnexQuery();
+      QueryBuilder.forClass(TestModel).skipUndefined().where('id', undefined).toKnexQuery();
     }).to.not.throwException();
 
     expect(() => {
-      QueryBuilder.forClass(TestModel)
-        .skipUndefined()
-        .orWhere('id', '<', undefined)
-        .toKnexQuery();
+      QueryBuilder.forClass(TestModel).skipUndefined().orWhere('id', '<', undefined).toKnexQuery();
     }).to.not.throwException();
 
     expect(() => {
-      QueryBuilder.forClass(TestModel)
-        .skipUndefined()
-        .orWhere('id', undefined, 10)
-        .toKnexQuery();
+      QueryBuilder.forClass(TestModel).skipUndefined().orWhere('id', undefined, 10).toKnexQuery();
     }).to.not.throwException();
 
     expect(() => {
-      QueryBuilder.forClass(TestModel)
-        .skipUndefined()
-        .deleteById(undefined)
-        .toKnexQuery();
+      QueryBuilder.forClass(TestModel).skipUndefined().deleteById(undefined).toKnexQuery();
     }).to.not.throwException();
 
     expect(() => {
@@ -1631,24 +1607,18 @@ describe('QueryBuilder', () => {
       }
     }
 
-    expect(
-      UnboundModel.query(mockKnex)
-        .increment('foo', 10)
-        .toKnexQuery()
-        .toString()
-    ).to.equal('update "Bar" set "foo" = "foo" + 10');
-    expect(
-      UnboundModel.query(mockKnex)
-        .decrement('foo', 5)
-        .toKnexQuery()
-        .toString()
-    ).to.equal('update "Bar" set "foo" = "foo" - 5');
+    expect(UnboundModel.query(mockKnex).increment('foo', 10).toKnexQuery().toString()).to.equal(
+      'update "Bar" set "foo" = "foo" + 10'
+    );
+    expect(UnboundModel.query(mockKnex).decrement('foo', 5).toKnexQuery().toString()).to.equal(
+      'update "Bar" set "foo" = "foo" - 5'
+    );
   });
 
   it('first should not add limit(1) by default', () => {
     return TestModel.query()
       .first()
-      .then(model => {
+      .then((model) => {
         expect(executedQueries[0]).to.equal('select "Model".* from "Model"');
       });
   });
@@ -1658,7 +1628,7 @@ describe('QueryBuilder', () => {
 
     return TestModel.query()
       .first()
-      .then(model => {
+      .then((model) => {
         expect(executedQueries[0]).to.equal('select "Model".* from "Model" limit 1');
       });
   });
@@ -1690,22 +1660,22 @@ describe('QueryBuilder', () => {
     const checks = [];
 
     return TestModel.query()
-      .select('*', builder => {
+      .select('*', (builder) => {
         checks.push(builder instanceof CustomQueryBuilder);
       })
-      .where(builder => {
+      .where((builder) => {
         checks.push(builder instanceof CustomQueryBuilder);
 
-        builder.where(builder => {
+        builder.where((builder) => {
           checks.push(builder instanceof CustomQueryBuilder);
         });
       })
-      .modify(builder => {
+      .modify((builder) => {
         checks.push(builder instanceof CustomQueryBuilder);
       })
       .then(() => {
         expect(checks).to.have.length(4);
-        expect(checks.every(it => it)).to.equal(true);
+        expect(checks.every((it) => it)).to.equal(true);
       });
   });
 
@@ -1713,47 +1683,25 @@ describe('QueryBuilder', () => {
     expect(TestModel.query().hasSelectionAs('foo', 'foo')).to.equal(true);
     expect(TestModel.query().hasSelectionAs('foo', 'bar')).to.equal(false);
 
-    expect(
-      TestModel.query()
-        .select('foo as bar')
-        .hasSelectionAs('foo', 'bar')
-    ).to.equal(true);
+    expect(TestModel.query().select('foo as bar').hasSelectionAs('foo', 'bar')).to.equal(true);
+
+    expect(TestModel.query().select('foo').hasSelectionAs('foo', 'bar')).to.equal(false);
+
+    expect(TestModel.query().select('*').hasSelectionAs('foo', 'foo')).to.equal(true);
+
+    expect(TestModel.query().select('*').hasSelectionAs('foo', 'bar')).to.equal(false);
+
+    expect(TestModel.query().select('foo.*').hasSelectionAs('foo.anything', 'anything')).to.equal(
+      true
+    );
 
     expect(
-      TestModel.query()
-        .select('foo')
-        .hasSelectionAs('foo', 'bar')
+      TestModel.query().select('foo.*').hasSelectionAs('foo.anything', 'somethingElse')
     ).to.equal(false);
 
-    expect(
-      TestModel.query()
-        .select('*')
-        .hasSelectionAs('foo', 'foo')
-    ).to.equal(true);
-
-    expect(
-      TestModel.query()
-        .select('*')
-        .hasSelectionAs('foo', 'bar')
-    ).to.equal(false);
-
-    expect(
-      TestModel.query()
-        .select('foo.*')
-        .hasSelectionAs('foo.anything', 'anything')
-    ).to.equal(true);
-
-    expect(
-      TestModel.query()
-        .select('foo.*')
-        .hasSelectionAs('foo.anything', 'somethingElse')
-    ).to.equal(false);
-
-    expect(
-      TestModel.query()
-        .select('foo.*')
-        .hasSelectionAs('bar.anything', 'anything')
-    ).to.equal(false);
+    expect(TestModel.query().select('foo.*').hasSelectionAs('bar.anything', 'anything')).to.equal(
+      false
+    );
   });
 
   it('hasSelection', () => {
@@ -1764,153 +1712,61 @@ describe('QueryBuilder', () => {
     expect(TestModel.query().hasSelection('DifferentTable.foo')).to.equal(false);
     expect(TestModel.query().hasSelection(ref('DifferentTable.foo'))).to.equal(false);
 
-    expect(
-      TestModel.query()
-        .select('*')
-        .hasSelection('DifferentTable.anything')
-    ).to.equal(true);
+    expect(TestModel.query().select('*').hasSelection('DifferentTable.anything')).to.equal(true);
+
+    expect(TestModel.query().select('foo.*').hasSelection('bar.anything')).to.equal(false);
+
+    expect(TestModel.query().select('foo.*').hasSelection('foo.anything')).to.equal(true);
 
     expect(
-      TestModel.query()
-        .select('foo.*')
-        .hasSelection('bar.anything')
+      TestModel.query().select(ref('*')).hasSelection(ref('DifferentTable.anything'))
+    ).to.equal(true);
+
+    expect(TestModel.query().select('foo').hasSelection('foo')).to.equal(true);
+
+    expect(TestModel.query().select(ref('foo')).hasSelection(ref('foo'))).to.equal(true);
+
+    expect(TestModel.query().select('foo').hasSelection('Model.foo')).to.equal(true);
+
+    expect(TestModel.query().select(ref('foo')).hasSelection(ref('Model.foo'))).to.equal(true);
+
+    expect(TestModel.query().select('foo').hasSelection('DifferentTable.foo')).to.equal(false);
+
+    expect(TestModel.query().select(ref('foo')).hasSelection(ref('DifferentTable.foo'))).to.equal(
+      false
+    );
+
+    expect(TestModel.query().select('foo').hasSelection('bar')).to.equal(false);
+
+    expect(TestModel.query().select(ref('foo')).hasSelection(ref('bar'))).to.equal(false);
+
+    expect(TestModel.query().select('Model.foo').hasSelection('foo')).to.equal(true);
+
+    expect(TestModel.query().select(ref('Model.foo')).hasSelection(ref('foo'))).to.equal(true);
+
+    expect(TestModel.query().select('Model.foo').hasSelection('Model.foo')).to.equal(true);
+
+    expect(TestModel.query().select(ref('Model.foo')).hasSelection(ref('Model.foo'))).to.equal(
+      true
+    );
+
+    expect(TestModel.query().select('Model.foo').hasSelection('NotTestModel.foo')).to.equal(false);
+
+    expect(
+      TestModel.query().select(ref('Model.foo')).hasSelection(ref('NotTestModel.foo'))
     ).to.equal(false);
 
-    expect(
-      TestModel.query()
-        .select('foo.*')
-        .hasSelection('foo.anything')
-    ).to.equal(true);
+    expect(TestModel.query().select('Model.foo').hasSelection('bar')).to.equal(false);
 
-    expect(
-      TestModel.query()
-        .select(ref('*'))
-        .hasSelection(ref('DifferentTable.anything'))
-    ).to.equal(true);
+    expect(TestModel.query().select(ref('Model.foo')).hasSelection(ref('bar'))).to.equal(false);
 
-    expect(
-      TestModel.query()
-        .select('foo')
-        .hasSelection('foo')
-    ).to.equal(true);
+    expect(TestModel.query().alias('t').select('foo').hasSelection('t.foo')).to.equal(true);
 
-    expect(
-      TestModel.query()
-        .select(ref('foo'))
-        .hasSelection(ref('foo'))
-    ).to.equal(true);
+    expect(TestModel.query().alias('t').select('t.foo').hasSelection('foo')).to.equal(true);
 
-    expect(
-      TestModel.query()
-        .select('foo')
-        .hasSelection('Model.foo')
-    ).to.equal(true);
+    expect(TestModel.query().alias('t').select('t.foo').hasSelection('t.foo')).to.equal(true);
 
-    expect(
-      TestModel.query()
-        .select(ref('foo'))
-        .hasSelection(ref('Model.foo'))
-    ).to.equal(true);
-
-    expect(
-      TestModel.query()
-        .select('foo')
-        .hasSelection('DifferentTable.foo')
-    ).to.equal(false);
-
-    expect(
-      TestModel.query()
-        .select(ref('foo'))
-        .hasSelection(ref('DifferentTable.foo'))
-    ).to.equal(false);
-
-    expect(
-      TestModel.query()
-        .select('foo')
-        .hasSelection('bar')
-    ).to.equal(false);
-
-    expect(
-      TestModel.query()
-        .select(ref('foo'))
-        .hasSelection(ref('bar'))
-    ).to.equal(false);
-
-    expect(
-      TestModel.query()
-        .select('Model.foo')
-        .hasSelection('foo')
-    ).to.equal(true);
-
-    expect(
-      TestModel.query()
-        .select(ref('Model.foo'))
-        .hasSelection(ref('foo'))
-    ).to.equal(true);
-
-    expect(
-      TestModel.query()
-        .select('Model.foo')
-        .hasSelection('Model.foo')
-    ).to.equal(true);
-
-    expect(
-      TestModel.query()
-        .select(ref('Model.foo'))
-        .hasSelection(ref('Model.foo'))
-    ).to.equal(true);
-
-    expect(
-      TestModel.query()
-        .select('Model.foo')
-        .hasSelection('NotTestModel.foo')
-    ).to.equal(false);
-
-    expect(
-      TestModel.query()
-        .select(ref('Model.foo'))
-        .hasSelection(ref('NotTestModel.foo'))
-    ).to.equal(false);
-
-    expect(
-      TestModel.query()
-        .select('Model.foo')
-        .hasSelection('bar')
-    ).to.equal(false);
-
-    expect(
-      TestModel.query()
-        .select(ref('Model.foo'))
-        .hasSelection(ref('bar'))
-    ).to.equal(false);
-
-    expect(
-      TestModel.query()
-        .alias('t')
-        .select('foo')
-        .hasSelection('t.foo')
-    ).to.equal(true);
-
-    expect(
-      TestModel.query()
-        .alias('t')
-        .select('t.foo')
-        .hasSelection('foo')
-    ).to.equal(true);
-
-    expect(
-      TestModel.query()
-        .alias('t')
-        .select('t.foo')
-        .hasSelection('t.foo')
-    ).to.equal(true);
-
-    expect(
-      TestModel.query()
-        .alias('t')
-        .select('foo')
-        .hasSelection('Model.foo')
-    ).to.equal(false);
+    expect(TestModel.query().alias('t').select('foo').hasSelection('Model.foo')).to.equal(false);
   });
 
   it('parseRelationExpression', () => {
@@ -1927,7 +1783,7 @@ describe('QueryBuilder', () => {
         $modify: [],
         $recursive: false,
         $allRecursive: false,
-        $childNames: []
+        $childNames: [],
       },
       bar: {
         $name: 'bar',
@@ -1942,9 +1798,9 @@ describe('QueryBuilder', () => {
           $modify: [],
           $recursive: false,
           $allRecursive: false,
-          $childNames: []
-        }
-      }
+          $childNames: [],
+        },
+      },
     });
   });
 
@@ -1955,8 +1811,8 @@ describe('QueryBuilder', () => {
         modelClass: TestModel,
         join: {
           from: 'Model.foo',
-          to: 'Model.id'
-        }
+          to: 'Model.id',
+        },
       };
 
       TestModel.relationMappings = {
@@ -1964,11 +1820,11 @@ describe('QueryBuilder', () => {
         b: rel,
         c: rel,
         d: rel,
-        e: rel
+        e: rel,
       };
     });
 
-    it("allowEager('a').eager('a(f1)') should be ok", done => {
+    it("allowEager('a').eager('a(f1)') should be ok", (done) => {
       QueryBuilder.forClass(TestModel)
         .allowEager('a')
         .eager('a(f1)', { f1: _.noop })
@@ -1976,12 +1832,12 @@ describe('QueryBuilder', () => {
           expect(executedQueries).to.have.length(1);
           done();
         })
-        .catch(err => {
+        .catch((err) => {
           done(new Error('should not get here'));
         });
     });
 
-    it("eager('a(f1)').allowEager('a') should be ok", done => {
+    it("eager('a(f1)').allowEager('a') should be ok", (done) => {
       QueryBuilder.forClass(TestModel)
         .eager('a(f1)', { f1: _.noop })
         .allowEager('a')
@@ -1989,12 +1845,12 @@ describe('QueryBuilder', () => {
           expect(executedQueries).to.have.length(1);
           done();
         })
-        .catch(err => {
+        .catch((err) => {
           done(new Error('should not get here'));
         });
     });
 
-    it("allowEager('[a, b.c.[d, e]]').eager('a') should be ok", done => {
+    it("allowEager('[a, b.c.[d, e]]').eager('a') should be ok", (done) => {
       QueryBuilder.forClass(TestModel)
         .allowEager('[a, b.c.[d, e]]')
         .eager('a')
@@ -2003,7 +1859,7 @@ describe('QueryBuilder', () => {
         });
     });
 
-    it("allowEager('[a, b.c.[d, e]]').eager('b.c') should be ok", done => {
+    it("allowEager('[a, b.c.[d, e]]').eager('b.c') should be ok", (done) => {
       QueryBuilder.forClass(TestModel)
         .allowEager('[a, b.c.[d, e]]')
         .eager('b.c')
@@ -2016,7 +1872,7 @@ describe('QueryBuilder', () => {
         });
     });
 
-    it("allowEager('[a, b.c.[d, e]]').eager('b.c.e') should be ok", done => {
+    it("allowEager('[a, b.c.[d, e]]').eager('b.c.e') should be ok", (done) => {
       QueryBuilder.forClass(TestModel)
         .allowEager('[a, b.c.[d, e]]')
         .eager('b.c.e')
@@ -2029,7 +1885,7 @@ describe('QueryBuilder', () => {
         });
     });
 
-    it("mergeAllowEager('a').eager('a(f1)') should be ok", done => {
+    it("mergeAllowEager('a').eager('a(f1)') should be ok", (done) => {
       QueryBuilder.forClass(TestModel)
         .mergeAllowEager('a')
         .eager('a(f1)', { f1: _.noop })
@@ -2037,12 +1893,12 @@ describe('QueryBuilder', () => {
           expect(executedQueries).to.have.length(1);
           done();
         })
-        .catch(err => {
+        .catch((err) => {
           done(new Error('should not get here'));
         });
     });
 
-    it("allowEager('[a, b.c.[a, e]]').mergeAllowEager('b.c.[b, d]').eager('a') should be ok", done => {
+    it("allowEager('[a, b.c.[a, e]]').mergeAllowEager('b.c.[b, d]').eager('a') should be ok", (done) => {
       QueryBuilder.forClass(TestModel)
         .allowEager('[a, b.c.[a, e]]')
         .mergeAllowEager('b.c.[b, d]')
@@ -2052,7 +1908,7 @@ describe('QueryBuilder', () => {
         });
     });
 
-    it("allowEager('[a.[a, b], b.c.[a, e]]').mergeAllowEager('[a.[c, d], b.c.[b, d]]').eager('a.b') should be ok", done => {
+    it("allowEager('[a.[a, b], b.c.[a, e]]').mergeAllowEager('[a.[c, d], b.c.[b, d]]').eager('a.b') should be ok", (done) => {
       QueryBuilder.forClass(TestModel)
         .allowEager('[a.[a, b], b.c.[a, e]]')
         .mergeAllowEager('[a.[c, d], b.c.[b, d]]')
@@ -2066,7 +1922,7 @@ describe('QueryBuilder', () => {
         });
     });
 
-    it("allowEager('[a.[a, b], b.[a, c]]').mergeAllowEager('[a.[c, d], b.c.[b, d]]').eager('a.c') should be ok", done => {
+    it("allowEager('[a.[a, b], b.[a, c]]').mergeAllowEager('[a.[c, d], b.c.[b, d]]').eager('a.c') should be ok", (done) => {
       QueryBuilder.forClass(TestModel)
         .allowEager('[a.[a, b], b.[a, c]]')
         .mergeAllowEager('[a.[c, d], b.c.[b, d]]')
@@ -2080,7 +1936,7 @@ describe('QueryBuilder', () => {
         });
     });
 
-    it("allowEager('[a.[a, b], b.[a, c]]').mergeAllowEager('[a.[c, d], b.c.[b, d]]').eager('b.a') should be ok", done => {
+    it("allowEager('[a.[a, b], b.[a, c]]').mergeAllowEager('[a.[c, d], b.c.[b, d]]').eager('b.a') should be ok", (done) => {
       QueryBuilder.forClass(TestModel)
         .allowEager('[a.[a, b], b.[a, c]]')
         .mergeAllowEager('[a.[c, d], b.c.[b, d]]')
@@ -2094,7 +1950,7 @@ describe('QueryBuilder', () => {
         });
     });
 
-    it("allowEager('[a.[a, b], b.[a, c]]').mergeAllowEager('[a.[c, d], b.c.[b, d]]').eager('b.c') should be ok", done => {
+    it("allowEager('[a.[a, b], b.[a, c]]').mergeAllowEager('[a.[c, d], b.c.[b, d]]').eager('b.c') should be ok", (done) => {
       QueryBuilder.forClass(TestModel)
         .allowEager('[a.[a, b], b.[a, c]]')
         .mergeAllowEager('[a.[c, d], b.c.[b, d]]')
@@ -2108,7 +1964,7 @@ describe('QueryBuilder', () => {
         });
     });
 
-    it("allowEager('[a.[a, b], b.[a, c]]').mergeAllowEager('[a.[c, d], b.c.[b, d]]').eager('b.c.b') should be ok", done => {
+    it("allowEager('[a.[a, b], b.[a, c]]').mergeAllowEager('[a.[c, d], b.c.[b, d]]').eager('b.c.b') should be ok", (done) => {
       QueryBuilder.forClass(TestModel)
         .allowEager('[a.[a, b], b.[a, c]]')
         .mergeAllowEager('[a.[c, d], b.c.[b, d]]')
@@ -2122,7 +1978,7 @@ describe('QueryBuilder', () => {
         });
     });
 
-    it("allowEager('a').allowEager('b').eager('a') should fail", done => {
+    it("allowEager('a').allowEager('b').eager('a') should fail", (done) => {
       QueryBuilder.forClass(TestModel)
         .allowEager('a')
         .allowEager('b')
@@ -2130,7 +1986,7 @@ describe('QueryBuilder', () => {
         .then(() => {
           done(new Error('should not get here'));
         })
-        .catch(err => {
+        .catch((err) => {
           expect(err).to.be.a(objection.ValidationError);
           expect(err.type).to.equal('UnallowedRelation');
           expect(err.message).to.equal('eager expression not allowed');
@@ -2140,7 +1996,7 @@ describe('QueryBuilder', () => {
         .catch(done);
     });
 
-    it("allowEager('[a, b.c.[d, e]]').eager('a.b') should fail", done => {
+    it("allowEager('[a, b.c.[d, e]]').eager('a.b') should fail", (done) => {
       QueryBuilder.forClass(TestModel)
         .allowEager('[a, b.c.[d, e]]')
         .eager('a.b')
@@ -2153,7 +2009,7 @@ describe('QueryBuilder', () => {
         });
     });
 
-    it("allowEager('[a, b.c.[d, e]]').mergeAllowEager('a.[c, d]').eager('a.b') should fail", done => {
+    it("allowEager('[a, b.c.[d, e]]').mergeAllowEager('a.[c, d]').eager('a.b') should fail", (done) => {
       QueryBuilder.forClass(TestModel)
         .allowEager('[a, b.c.[d, e]]')
         .mergeAllowEager('a.[c, d]')
@@ -2167,7 +2023,7 @@ describe('QueryBuilder', () => {
         });
     });
 
-    it("eager('a.b').allowEager('[a, b.c.[d, e]]') should fail", done => {
+    it("eager('a.b').allowEager('[a, b.c.[d, e]]') should fail", (done) => {
       QueryBuilder.forClass(TestModel)
         .eager('a.b')
         .allowEager('[a, b.c.[d, e]]')
@@ -2180,7 +2036,7 @@ describe('QueryBuilder', () => {
         });
     });
 
-    it("eager('a.b').allowEager('[a, b.c.[d, e]]').mergeAllowEager('a.[c, d]') should fail", done => {
+    it("eager('a.b').allowEager('[a, b.c.[d, e]]').mergeAllowEager('a.[c, d]') should fail", (done) => {
       QueryBuilder.forClass(TestModel)
         .eager('a.b')
         .allowEager('[a, b.c.[d, e]]')
@@ -2194,7 +2050,7 @@ describe('QueryBuilder', () => {
         });
     });
 
-    it("eager('b.c.d.e').allowEager('[a, b.c.[d, e]]') should fail", done => {
+    it("eager('b.c.d.e').allowEager('[a, b.c.[d, e]]') should fail", (done) => {
       QueryBuilder.forClass(TestModel)
         .eager('b.c.d.e')
         .allowEager('[a, b.c.[d, e]]')
@@ -2207,7 +2063,7 @@ describe('QueryBuilder', () => {
         });
     });
 
-    it("eager('b.c.d.e').allowEager('[a, b.c.[d, e]]').mergeAllowEager('b.c.a') should fail", done => {
+    it("eager('b.c.d.e').allowEager('[a, b.c.[d, e]]').mergeAllowEager('b.c.a') should fail", (done) => {
       QueryBuilder.forClass(TestModel)
         .eager('b.c.d.e')
         .allowEager('[a, b.c.[d, e]]')
@@ -2237,7 +2093,7 @@ describe('QueryBuilder', () => {
           $modify: [],
           $recursive: false,
           $allRecursive: false,
-          $childNames: []
+          $childNames: [],
         },
         b: {
           $name: 'b',
@@ -2252,24 +2108,24 @@ describe('QueryBuilder', () => {
             $modify: ['foo'],
             $recursive: false,
             $allRecursive: false,
-            $childNames: []
-          }
-        }
+            $childNames: [],
+          },
+        },
       });
     });
 
     it("eagerModifiers() should return the eager expression's modifiers as an object", () => {
-      const foo = builder => builder.where('foo');
+      const foo = (builder) => builder.where('foo');
       const builder = QueryBuilder.forClass(TestModel).eager('[a, b.c(foo)]', {
-        foo
+        foo,
       });
 
       expect(builder.eagerModifiers()).to.eql({
-        foo
+        foo,
       });
     });
 
-    it('should use correct query builders', done => {
+    it('should use correct query builders', (done) => {
       class M1QueryBuilder extends QueryBuilder {}
       class M2QueryBuilder extends QueryBuilder {}
       class M3QueryBuilder extends QueryBuilder {}
@@ -2286,9 +2142,9 @@ describe('QueryBuilder', () => {
               modelClass: M2,
               join: {
                 from: 'M1.id',
-                to: 'M2.m1Id'
-              }
-            }
+                to: 'M2.m1Id',
+              },
+            },
           };
         }
 
@@ -2309,9 +2165,9 @@ describe('QueryBuilder', () => {
               modelClass: M3,
               join: {
                 from: 'M2.m3Id',
-                to: 'M3.id'
-              }
-            }
+                to: 'M3.id',
+              },
+            },
           };
         }
 
@@ -2337,7 +2193,7 @@ describe('QueryBuilder', () => {
       mockKnexQueryResults = [
         [{ id: 1, m1Id: 2, m3Id: 3 }],
         [{ id: 1, m1Id: 2, m3Id: 3 }],
-        [{ id: 1, m1Id: 2, m3Id: 3 }]
+        [{ id: 1, m1Id: 2, m3Id: 3 }],
       ];
 
       let filter1Check = false;
@@ -2345,17 +2201,17 @@ describe('QueryBuilder', () => {
 
       QueryBuilder.forClass(M1)
         .eager('m2.m3')
-        .filterEager('m2', builder => {
+        .filterEager('m2', (builder) => {
           filter1Check = builder instanceof M2QueryBuilder;
         })
-        .filterEager('m2.m3', builder => {
+        .filterEager('m2.m3', (builder) => {
           filter2Check = builder instanceof M3QueryBuilder;
         })
         .then(() => {
           expect(executedQueries).to.eql([
             'select "M1".* from "M1"',
             'select "M2".* from "M2" where "M2"."m1Id" in (1)',
-            'select "M3".* from "M3" where "M3"."id" in (3)'
+            'select "M3".* from "M3" where "M3"."id" in (3)',
           ]);
 
           expect(filter1Check).to.equal(true);
@@ -2366,7 +2222,7 @@ describe('QueryBuilder', () => {
         .catch(done);
     });
 
-    it('$afterGet should be called after relations have been fetched', done => {
+    it('$afterGet should be called after relations have been fetched', (done) => {
       class M1 extends Model {
         static get tableName() {
           return 'M1';
@@ -2383,9 +2239,9 @@ describe('QueryBuilder', () => {
               modelClass: M1,
               join: {
                 from: 'M1.id',
-                to: 'M1.m1Id'
-              }
-            }
+                to: 'M1.m1Id',
+              },
+            },
           };
         }
       }
@@ -2398,7 +2254,7 @@ describe('QueryBuilder', () => {
           { id: 3, m1Id: 1 },
           { id: 4, m1Id: 1 },
           { id: 5, m1Id: 2 },
-          { id: 6, m1Id: 2 }
+          { id: 6, m1Id: 2 },
         ],
         [
           { id: 7, m1Id: 3 },
@@ -2408,17 +2264,17 @@ describe('QueryBuilder', () => {
           { id: 11, m1Id: 5 },
           { id: 12, m1Id: 5 },
           { id: 13, m1Id: 6 },
-          { id: 14, m1Id: 6 }
-        ]
+          { id: 14, m1Id: 6 },
+        ],
       ];
 
       QueryBuilder.forClass(M1)
         .eager('someRel.someRel')
-        .then(x => {
+        .then((x) => {
           expect(executedQueries).to.eql([
             'select "M1".* from "M1"',
             'select "M1".* from "M1" where "M1"."m1Id" in (1, 2)',
-            'select "M1".* from "M1" where "M1"."m1Id" in (3, 4, 5, 6)'
+            'select "M1".* from "M1" where "M1"."m1Id" in (3, 4, 5, 6)',
           ]);
 
           expect(x).to.eql([
@@ -2432,8 +2288,8 @@ describe('QueryBuilder', () => {
                   ids: [7, 8],
                   someRel: [
                     { id: 7, m1Id: 3, ids: [] },
-                    { id: 8, m1Id: 3, ids: [] }
-                  ]
+                    { id: 8, m1Id: 3, ids: [] },
+                  ],
                 },
                 {
                   id: 4,
@@ -2441,10 +2297,10 @@ describe('QueryBuilder', () => {
                   ids: [9, 10],
                   someRel: [
                     { id: 9, m1Id: 4, ids: [] },
-                    { id: 10, m1Id: 4, ids: [] }
-                  ]
-                }
-              ]
+                    { id: 10, m1Id: 4, ids: [] },
+                  ],
+                },
+              ],
             },
             {
               id: 2,
@@ -2456,8 +2312,8 @@ describe('QueryBuilder', () => {
                   ids: [11, 12],
                   someRel: [
                     { id: 11, m1Id: 5, ids: [] },
-                    { id: 12, m1Id: 5, ids: [] }
-                  ]
+                    { id: 12, m1Id: 5, ids: [] },
+                  ],
                 },
                 {
                   id: 6,
@@ -2465,11 +2321,11 @@ describe('QueryBuilder', () => {
                   ids: [13, 14],
                   someRel: [
                     { id: 13, m1Id: 6, ids: [] },
-                    { id: 14, m1Id: 6, ids: [] }
-                  ]
-                }
-              ]
-            }
+                    { id: 14, m1Id: 6, ids: [] },
+                  ],
+                },
+              ],
+            },
           ]);
 
           done();
@@ -2485,14 +2341,14 @@ describe('QueryBuilder', () => {
       builder.context({ a: 1 });
 
       expect(builder.context()).to.eql({
-        a: 1
+        a: 1,
       });
 
       builder.context({ b: 2 });
 
       expect(builder.context()).to.eql({
         a: 1,
-        b: 2
+        b: 2,
       });
 
       expect(builder.context().transaction === mockKnex).to.equal(true);
@@ -2504,7 +2360,7 @@ describe('QueryBuilder', () => {
       builder.context({ a: 1 });
 
       expect(builder.context()).to.eql({
-        a: 1
+        a: 1,
       });
 
       const builder2 = builder.clearContext();
@@ -2522,11 +2378,11 @@ describe('QueryBuilder', () => {
 
       expect(builder.context()).to.eql({
         a: 1,
-        b: 2
+        b: 2,
       });
 
       expect(origContext).to.eql({
-        a: 1
+        a: 1,
       });
 
       expect(builder.context().transaction === mockKnex).to.equal(true);
@@ -2541,11 +2397,11 @@ describe('QueryBuilder', () => {
 
       expect(builder.context()).to.eql({
         a: 1,
-        b: 2
+        b: 2,
       });
 
       expect(origContext).to.eql({
-        a: 1
+        a: 1,
       });
 
       expect(builder.context().transaction === mockKnex).to.equal(true);
@@ -2561,16 +2417,16 @@ describe('QueryBuilder', () => {
       builder2.mergeContext({ b: 2 });
 
       expect(builder.context()).to.eql({
-        a: 1
+        a: 1,
       });
 
       expect(builder2.context()).to.eql({
         a: 1,
-        b: 2
+        b: 2,
       });
 
       expect(origContext).to.eql({
-        a: 1
+        a: 1,
       });
 
       expect(builder.context().transaction === mockKnex).to.equal(true);
@@ -2588,16 +2444,16 @@ describe('QueryBuilder', () => {
 
       expect(builder.context()).to.eql({
         a: 1,
-        b: 2
+        b: 2,
       });
 
       expect(builder2.context()).to.eql({
         a: 1,
-        b: 2
+        b: 2,
       });
 
       expect(origContext).to.eql({
-        a: 1
+        a: 1,
       });
 
       expect(builder.context().transaction === mockKnex).to.equal(true);
@@ -2614,16 +2470,16 @@ describe('QueryBuilder', () => {
       builder2.mergeContext({ b: 2 });
 
       expect(builder.context()).to.eql({
-        a: 1
+        a: 1,
       });
 
       expect(builder2.context()).to.eql({
         a: 1,
-        b: 2
+        b: 2,
       });
 
       expect(origContext).to.eql({
-        a: 1
+        a: 1,
       });
 
       expect(builder.context().transaction === mockKnex).to.equal(true);
@@ -2652,11 +2508,11 @@ describe('QueryBuilder', () => {
   });
 
   describe('omit', () => {
-    it('omit properties from model when ommiting an array', done => {
+    it('omit properties from model when ommiting an array', (done) => {
       mockKnexQueryResults = [[{ a: 1 }, { b: 2 }, { c: 3 }]];
       TestModel.query()
         .omit(['a', 'b'])
-        .then(result => {
+        .then((result) => {
           expect(result[0]).to.not.have.property('a');
           expect(result[1]).to.not.have.property('b');
           expect(result[2]).to.have.property('c');
@@ -2665,11 +2521,11 @@ describe('QueryBuilder', () => {
         });
     });
 
-    it('omit properties from model', done => {
+    it('omit properties from model', (done) => {
       mockKnexQueryResults = [[{ a: 1 }, { b: 2 }]];
       TestModel.query()
         .omit('b')
-        .then(result => {
+        .then((result) => {
           expect(result[0]).to.have.property('a');
           expect(result[0].a).to.be.equal(1);
           expect(result[1]).to.not.have.property('b');
@@ -2690,7 +2546,7 @@ function createFindOperation(builder, whereObj) {
 
     operation.onBefore2 = operation.onAfter2 = () => {};
 
-    operation.onBuildKnex = knexBuilder => {
+    operation.onBuildKnex = (knexBuilder) => {
       knexBuilder.where(whereObj);
     };
 
@@ -2712,12 +2568,12 @@ function createInsertOperation(builder, mergeWithModel) {
 
     operation.onBefore2 = operation.onBefore3 = operation.onAfter2 = () => {};
 
-    operation.onAdd = function(_, args) {
+    operation.onAdd = function (_, args) {
       this.models = [args[0]];
       return true;
     };
 
-    operation.onBuildKnex = function(knexBuilder) {
+    operation.onBuildKnex = function (knexBuilder) {
       let json = _.merge(this.models[0], mergeWithModel);
       knexBuilder.insert(json);
     };
@@ -2739,12 +2595,12 @@ function createUpdateOperation(builder, mergeWithModel) {
 
     operation.onBefore2 = operation.onBefore3 = operation.onAfter2 = () => {};
 
-    operation.onAdd = function(_, args) {
+    operation.onAdd = function (_, args) {
       this.model = args[0];
       return true;
     };
 
-    operation.onBuildKnex = function(knexBuilder) {
+    operation.onBuildKnex = function (knexBuilder) {
       let json = _.merge(this.model, mergeWithModel);
       knexBuilder.update(json);
     };
@@ -2766,7 +2622,7 @@ function createDeleteOperation(builder, whereObj) {
 
     operation.onBefore2 = operation.onAfter2 = () => {};
 
-    operation.onBuildKnex = knexBuilder => {
+    operation.onBuildKnex = (knexBuilder) => {
       knexBuilder.delete().where(whereObj);
     };
 

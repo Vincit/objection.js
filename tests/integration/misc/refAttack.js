@@ -1,7 +1,7 @@
 const { Model } = require('../../../');
 const { expect } = require('chai');
 
-module.exports = session => {
+module.exports = (session) => {
   const { knex } = session;
 
   describe('#ref attack', () => {
@@ -23,9 +23,9 @@ module.exports = session => {
             modelClass: Role,
             join: {
               from: 'users.id',
-              to: 'roles.userId'
-            }
-          }
+              to: 'roles.userId',
+            },
+          },
         };
       }
     }
@@ -34,13 +34,13 @@ module.exports = session => {
       return knex.schema
         .dropTableIfExists('users')
         .dropTableIfExists('roles')
-        .createTable('users', table => {
+        .createTable('users', (table) => {
           table.increments('id').primary();
           table.string('firstName');
           table.string('lastName');
           table.string('passwordHash');
         })
-        .createTable('roles', table => {
+        .createTable('roles', (table) => {
           table.increments('id').primary();
           table.string('name');
           table.integer('userId');
@@ -57,12 +57,12 @@ module.exports = session => {
         {
           id: 1,
           firstName: 'dork 1',
-          passwordHash: 'secret'
+          passwordHash: 'secret',
         },
         {
           id: 2,
-          firstName: 'dork 2'
-        }
+          firstName: 'dork 2',
+        },
       ]);
     });
 
@@ -71,7 +71,7 @@ module.exports = session => {
         {
           id: 1,
           firstName: 'updated dork',
-          '#id': 'id'
+          '#id': 'id',
         },
         {
           id: 2,
@@ -80,9 +80,9 @@ module.exports = session => {
 
           roles: [
             {
-              name: '#ref{id.passwordHash}'
-            }
-          ]
+              name: '#ref{id.passwordHash}',
+            },
+          ],
         },
         // This gets inserted.
         {
@@ -91,26 +91,20 @@ module.exports = session => {
 
           roles: [
             {
-              name: '#ref{id.passwordHash}'
-            }
-          ]
-        }
+              name: '#ref{id.passwordHash}',
+            },
+          ],
+        },
       ];
 
-      await User.query(knex)
-        .returning('*')
-        .upsertGraph(attackGraph, {
-          allowRefs: true,
-          insertMissing: true
-        });
+      await User.query(knex).returning('*').upsertGraph(attackGraph, {
+        allowRefs: true,
+        insertMissing: true,
+      });
 
-      const user2 = await User.query(knex)
-        .findById(2)
-        .withGraphFetched('roles');
+      const user2 = await User.query(knex).findById(2).withGraphFetched('roles');
 
-      const user3 = await User.query(knex)
-        .findById(3)
-        .withGraphFetched('roles');
+      const user3 = await User.query(knex).findById(3).withGraphFetched('roles');
 
       expect(user2.firstName).to.equal('dork 2');
       expect(user2.roles[0].name).to.equal(null);

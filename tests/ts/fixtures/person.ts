@@ -67,8 +67,8 @@ export class Person extends objection.Model {
         // modify ajvalidator
       },
       options: {
-        allErrors: false
-      }
+        allErrors: false,
+      },
     });
   }
 
@@ -87,7 +87,7 @@ export class Person extends objection.Model {
 
       orderByAge(builder: objection.QueryBuilder<Person>) {
         builder.orderBy('age');
-      }
+      },
     };
   }
 }

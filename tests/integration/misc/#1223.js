@@ -1,7 +1,7 @@
 const { Model } = require('../../../');
 const { expect } = require('chai');
 
-module.exports = session => {
+module.exports = (session) => {
   describe(`Recursive eagering with an alias doesn't work with 1-m or m-m relations #1223`, () => {
     let knex = session.knex;
     let Person;
@@ -10,12 +10,12 @@ module.exports = session => {
       return knex.schema
         .dropTableIfExists('cousins')
         .dropTableIfExists('persons')
-        .createTable('persons', table => {
+        .createTable('persons', (table) => {
           table.increments('id').primary();
           table.integer('parentId');
           table.string('name');
         })
-        .createTable('cousins', table => {
+        .createTable('cousins', (table) => {
           table.integer('id1');
           table.integer('id2');
         });
@@ -38,8 +38,8 @@ module.exports = session => {
               relation: Model.HasManyRelation,
               join: {
                 from: 'persons.id',
-                to: 'persons.parentId'
-              }
+                to: 'persons.parentId',
+              },
             },
 
             cousins: {
@@ -49,11 +49,11 @@ module.exports = session => {
                 from: 'persons.id',
                 through: {
                   from: 'cousins.id1',
-                  to: 'cousins.id2'
+                  to: 'cousins.id2',
                 },
-                to: 'persons.id'
-              }
-            }
+                to: 'persons.id',
+              },
+            },
           };
         }
       };
@@ -73,25 +73,25 @@ module.exports = session => {
 
             children: [
               {
-                name: 'Child 2'
+                name: 'Child 2',
               },
               {
-                name: 'Child 3'
-              }
-            ]
+                name: 'Child 3',
+              },
+            ],
           },
           {
             name: 'Child 4',
 
             children: [
               {
-                name: 'Child 5'
+                name: 'Child 5',
               },
               {
-                name: 'Child 6'
-              }
-            ]
-          }
+                name: 'Child 6',
+              },
+            ],
+          },
         ],
 
         cousins: [
@@ -100,26 +100,26 @@ module.exports = session => {
 
             cousins: [
               {
-                name: 'Cousin 2'
+                name: 'Cousin 2',
               },
               {
-                name: 'Cousin 3'
-              }
-            ]
+                name: 'Cousin 3',
+              },
+            ],
           },
           {
             name: 'Cousin 4',
 
             cousins: [
               {
-                name: 'Cousin 5'
+                name: 'Cousin 5',
               },
               {
-                name: 'Cousin 6'
-              }
-            ]
-          }
-        ]
+                name: 'Cousin 6',
+              },
+            ],
+          },
+        ],
       });
     });
 
@@ -129,15 +129,15 @@ module.exports = session => {
         .eager({
           alias1: {
             $relation: 'children',
-            $recursive: 10
+            $recursive: 10,
           },
 
           alias2: {
             $relation: 'cousins',
-            $recursive: 10
-          }
+            $recursive: 10,
+          },
         })
-        .then(result => {
+        .then((result) => {
           expect(result).to.containSubset({
             parentId: null,
             name: 'Root',
@@ -147,27 +147,27 @@ module.exports = session => {
                 alias1: [
                   {
                     name: 'Child 2',
-                    alias1: []
+                    alias1: [],
                   },
                   {
                     name: 'Child 3',
-                    alias1: []
-                  }
-                ]
+                    alias1: [],
+                  },
+                ],
               },
               {
                 name: 'Child 4',
                 alias1: [
                   {
                     name: 'Child 5',
-                    alias1: []
+                    alias1: [],
                   },
                   {
                     name: 'Child 6',
-                    alias1: []
-                  }
-                ]
-              }
+                    alias1: [],
+                  },
+                ],
+              },
             ],
             alias2: [
               {
@@ -175,28 +175,28 @@ module.exports = session => {
                 alias2: [
                   {
                     name: 'Cousin 2',
-                    alias2: []
+                    alias2: [],
                   },
                   {
                     name: 'Cousin 3',
-                    alias2: []
-                  }
-                ]
+                    alias2: [],
+                  },
+                ],
               },
               {
                 name: 'Cousin 4',
                 alias2: [
                   {
                     name: 'Cousin 5',
-                    alias2: []
+                    alias2: [],
                   },
                   {
                     name: 'Cousin 6',
-                    alias2: []
-                  }
-                ]
-              }
-            ]
+                    alias2: [],
+                  },
+                ],
+              },
+            ],
           });
         });
     });

@@ -21,7 +21,7 @@ async function main() {
   // Insert one row to the database.
   await Person.query().insert({
     firstName: 'Jennifer',
-    lastName: 'Aniston'
+    lastName: 'Aniston',
   });
 
   // Read all rows from the db.
@@ -32,7 +32,7 @@ async function main() {
 
 main()
   .then(() => knex.destroy())
-  .catch(err => {
+  .catch((err) => {
     console.error(err);
     return knex.destroy();
   });

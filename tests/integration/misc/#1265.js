@@ -1,36 +1,24 @@
 const { Model } = require('../../../');
 const { expect } = require('chai');
 
-module.exports = session => {
+module.exports = (session) => {
   describe(`upsertGraph with composite key relation doesn't copy foreign keys #1265`, () => {
     let knex = session.knex;
     let Person, Animal;
 
     before(() => {
       return knex.schema
-        .createTable('Person', table => {
+        .createTable('Person', (table) => {
           table.increments('id').primary();
-          table
-            .integer('userId')
-            .unsigned()
-            .notNullable();
-          table
-            .integer('projectId')
-            .unsigned()
-            .notNullable();
+          table.integer('userId').unsigned().notNullable();
+          table.integer('projectId').unsigned().notNullable();
           table.string('firstName');
           table.string('lastName');
         })
-        .createTable('Animal', table => {
+        .createTable('Animal', (table) => {
           table.increments('id').primary();
-          table
-            .integer('userId')
-            .unsigned()
-            .notNullable();
-          table
-            .integer('projectId')
-            .unsigned()
-            .notNullable();
+          table.integer('userId').unsigned().notNullable();
+          table.integer('projectId').unsigned().notNullable();
           table.string('name');
           table.string('species');
         });
@@ -53,9 +41,9 @@ module.exports = session => {
               modelClass: Person,
               join: {
                 from: ['Animal.userId', 'Animal.projectId'],
-                to: ['Person.userId', 'Person.projectId']
-              }
-            }
+                to: ['Person.userId', 'Person.projectId'],
+              },
+            },
           };
         }
       };
@@ -76,9 +64,9 @@ module.exports = session => {
               modelClass: Animal,
               join: {
                 from: ['Person.userId', 'Person.projectId'],
-                to: ['Animal.userId', 'Animal.projectId']
-              }
-            }
+                to: ['Animal.userId', 'Animal.projectId'],
+              },
+            },
           };
         }
       };
@@ -99,13 +87,13 @@ module.exports = session => {
         pets: [
           {
             name: 'Doggo',
-            species: 'dog'
+            species: 'dog',
           },
           {
             name: 'Grumpy',
-            species: 'cat'
-          }
-        ]
+            species: 'cat',
+          },
+        ],
       });
     });
 
@@ -117,32 +105,30 @@ module.exports = session => {
             pets: [
               {
                 name: 'Peppa',
-                species: 'pig'
-              }
-            ]
+                species: 'pig',
+              },
+            ],
           },
           { noDelete: true }
         )
         .then(() => {
-          return Person.query()
-            .findOne({ firstName: 'Jennifer' })
-            .eager('pets');
+          return Person.query().findOne({ firstName: 'Jennifer' }).eager('pets');
         })
-        .then(jennifer => {
+        .then((jennifer) => {
           expect(jennifer.pets).to.have.length(3);
           expect(jennifer.pets).to.containSubset([
             {
               name: 'Doggo',
-              species: 'dog'
+              species: 'dog',
             },
             {
               name: 'Grumpy',
-              species: 'cat'
+              species: 'cat',
             },
             {
               name: 'Peppa',
-              species: 'pig'
-            }
+              species: 'pig',
+            },
           ]);
         });
     });

@@ -2,7 +2,7 @@ const uuid = require('uuid');
 const { expect } = require('chai');
 const { Model, lit, raw } = require('../../../');
 
-module.exports = session => {
+module.exports = (session) => {
   if (!session.isPostgres()) {
     return;
   }
@@ -12,7 +12,7 @@ module.exports = session => {
     let Person;
 
     before(() => {
-      return knex.schema.dropTableIfExists('Person').createTable('Person', table => {
+      return knex.schema.dropTableIfExists('Person').createTable('Person', (table) => {
         table.increments('id').primary();
         table.string('name');
         table.specificType('uuids', 'uuid[]');
@@ -41,19 +41,17 @@ module.exports = session => {
       return Person.query()
         .insert({
           name: 'Margot',
-          uuids: lit(uuids)
-            .asArray()
-            .castTo('uuid[]')
+          uuids: lit(uuids).asArray().castTo('uuid[]'),
         })
         .then(() => {
           return Person.query();
         })
-        .then(people => {
+        .then((people) => {
           expect(people).to.containSubset([
             {
               name: 'Margot',
-              uuids
-            }
+              uuids,
+            },
           ]);
         });
     });
@@ -64,17 +62,17 @@ module.exports = session => {
       return Person.query()
         .insert({
           name: 'Margot',
-          uuids: lit(uuids.map(it => lit(it).castTo('uuid'))).asArray()
+          uuids: lit(uuids.map((it) => lit(it).castTo('uuid'))).asArray(),
         })
         .then(() => {
           return Person.query();
         })
-        .then(people => {
+        .then((people) => {
           expect(people).to.containSubset([
             {
               name: 'Margot',
-              uuids
-            }
+              uuids,
+            },
           ]);
         });
     });
@@ -85,17 +83,17 @@ module.exports = session => {
       return Person.query()
         .insert({
           name: 'Margot',
-          uuids: lit(uuids.map(it => raw('?::uuid', it))).asArray()
+          uuids: lit(uuids.map((it) => raw('?::uuid', it))).asArray(),
         })
         .then(() => {
           return Person.query();
         })
-        .then(people => {
+        .then((people) => {
           expect(people).to.containSubset([
             {
               name: 'Margot',
-              uuids
-            }
+              uuids,
+            },
           ]);
         });
     });

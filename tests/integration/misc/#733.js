@@ -1,13 +1,13 @@
 const { expect } = require('chai');
 const { Model } = require('../../../');
 
-module.exports = session => {
+module.exports = (session) => {
   describe(`select in modifier + joinEager #733`, () => {
     let knex = session.knex;
     let Person;
 
     before(() => {
-      return knex.schema.dropTableIfExists('Person').createTable('Person', table => {
+      return knex.schema.dropTableIfExists('Person').createTable('Person', (table) => {
         table.increments('id').primary();
         table.string('name');
         table.integer('parentId');
@@ -26,13 +26,13 @@ module.exports = session => {
 
         static get modifiers() {
           return {
-            aliasedProps: builder => {
+            aliasedProps: (builder) => {
               builder.select(['id as aliasedId', 'name as aliasedName']);
             },
 
-            aliasedPropsAndSelectAll: builder => {
+            aliasedPropsAndSelectAll: (builder) => {
               builder.select(['Person.*', 'id as aliasedId', 'name as aliasedName']);
-            }
+            },
           };
         }
 
@@ -43,9 +43,9 @@ module.exports = session => {
               modelClass: Person,
               join: {
                 from: 'Person.id',
-                to: 'Person.parentId'
-              }
-            }
+                to: 'Person.parentId',
+              },
+            },
           };
         }
       };
@@ -60,13 +60,13 @@ module.exports = session => {
         children: [
           {
             id: 2,
-            name: 'child 1'
+            name: 'child 1',
           },
           {
             id: 3,
-            name: 'child 2'
-          }
-        ]
+            name: 'child 2',
+          },
+        ],
       });
     });
 
@@ -74,7 +74,7 @@ module.exports = session => {
       return Person.query()
         .where('Person.id', 1)
         .joinEager('children(aliasedProps)')
-        .then(result => {
+        .then((result) => {
           expect(result).to.containSubset([
             {
               id: 1,
@@ -82,9 +82,9 @@ module.exports = session => {
               parentId: null,
               children: [
                 { aliasedId: 2, aliasedName: 'child 1' },
-                { aliasedId: 3, aliasedName: 'child 2' }
-              ]
-            }
+                { aliasedId: 3, aliasedName: 'child 2' },
+              ],
+            },
           ]);
         });
     });
@@ -93,7 +93,7 @@ module.exports = session => {
       return Person.query()
         .where('Person.id', 1)
         .joinEager('children(aliasedPropsAndSelectAll)')
-        .then(result => {
+        .then((result) => {
           expect(result).to.containSubset([
             {
               id: 1,
@@ -101,9 +101,9 @@ module.exports = session => {
               parentId: null,
               children: [
                 { id: 2, name: 'child 1', parentId: 1, aliasedId: 2, aliasedName: 'child 1' },
-                { id: 3, name: 'child 2', parentId: 1, aliasedId: 3, aliasedName: 'child 2' }
-              ]
-            }
+                { id: 3, name: 'child 2', parentId: 1, aliasedId: 3, aliasedName: 'child 2' },
+              ],
+            },
           ]);
         });
     });

@@ -2,7 +2,7 @@ const expect = require('expect.js');
 const Promise = require('bluebird');
 const { Model } = require('../../');
 
-module.exports = session => {
+module.exports = (session) => {
   // TODO igor PR test
 
   if (session.isPostgres()) {
@@ -19,8 +19,8 @@ module.exports = session => {
               modelClass: Animal,
               join: {
                 from: 'public.Person.id',
-                to: 'public.Animal.ownerId'
-              }
+                to: 'public.Animal.ownerId',
+              },
             },
 
             parents: {
@@ -30,11 +30,11 @@ module.exports = session => {
                 from: 'public.Person.id',
                 through: {
                   from: 'public.Relatives.childId',
-                  to: 'public.Relatives.parentId'
+                  to: 'public.Relatives.parentId',
                 },
-                to: 'public.Person.id'
-              }
-            }
+                to: 'public.Person.id',
+              },
+            },
           };
         }
       }
@@ -50,25 +50,19 @@ module.exports = session => {
           .dropTableIfExists('Relatives')
           .dropTableIfExists('Animal')
           .dropTableIfExists('Person')
-          .createTable('Person', table => {
+          .createTable('Person', (table) => {
             table.increments('id').primary();
             table.string('name');
           })
-          .createTable('Animal', table => {
+          .createTable('Animal', (table) => {
             table.increments('id').primary();
             table.string('name');
             table.integer('ownerId').references('Person.id');
           })
-          .createTable('Relatives', table => {
+          .createTable('Relatives', (table) => {
             table.increments('id').primary();
-            table
-              .integer('parentId')
-              .references('Person.id')
-              .onDelete('CASCADE');
-            table
-              .integer('childId')
-              .references('Person.id')
-              .onDelete('CASCADE');
+            table.integer('parentId').references('Person.id').onDelete('CASCADE');
+            table.integer('childId').references('Person.id').onDelete('CASCADE');
           });
       });
 
@@ -82,7 +76,7 @@ module.exports = session => {
       beforeEach(() => {
         const knex = session.knex;
 
-        return Promise.coroutine(function*() {
+        return Promise.coroutine(function* () {
           yield Animal.query(knex).delete();
           yield Person.query(knex).delete();
           yield Person.query(knex).insertGraph({
@@ -92,20 +86,20 @@ module.exports = session => {
             pets: [
               {
                 id: 1,
-                name: 'Fluffy'
-              }
+                name: 'Fluffy',
+              },
             ],
 
             parents: [
               {
                 id: 2,
-                name: 'Mom'
+                name: 'Mom',
               },
               {
                 id: 3,
-                name: 'Dad'
-              }
-            ]
+                name: 'Dad',
+              },
+            ],
           });
         })();
       });
@@ -113,20 +107,20 @@ module.exports = session => {
       it('simple find query', () => {
         return Person.query(session.knex)
           .orderBy('id')
-          .then(people => {
+          .then((people) => {
             expect(people).to.eql([
               {
                 id: 1,
-                name: 'Arnold'
+                name: 'Arnold',
               },
               {
                 id: 2,
-                name: 'Mom'
+                name: 'Mom',
               },
               {
                 id: 3,
-                name: 'Dad'
-              }
+                name: 'Dad',
+              },
             ]);
           });
       });
@@ -136,9 +130,9 @@ module.exports = session => {
           .where('Person.name', 'Arnold')
           .joinEager({
             pets: true,
-            parents: true
+            parents: true,
           })
-          .then(people => {
+          .then((people) => {
             expect(people).to.eql([
               {
                 id: 1,
@@ -148,21 +142,21 @@ module.exports = session => {
                   {
                     id: 1,
                     name: 'Fluffy',
-                    ownerId: 1
-                  }
+                    ownerId: 1,
+                  },
                 ],
 
                 parents: [
                   {
                     id: 2,
-                    name: 'Mom'
+                    name: 'Mom',
                   },
                   {
                     id: 3,
-                    name: 'Dad'
-                  }
-                ]
-              }
+                    name: 'Dad',
+                  },
+                ],
+              },
             ]);
           });
       });
@@ -170,21 +164,21 @@ module.exports = session => {
       it('columnInfo', () => {
         return Person.query(session.knex)
           .columnInfo()
-          .then(info => {
+          .then((info) => {
             expect(info instanceof Model).to.equal(false);
             expect(info).to.eql({
               id: {
                 type: 'integer',
                 maxLength: null,
                 nullable: false,
-                defaultValue: `nextval('"Person_id_seq"'::regclass)`
+                defaultValue: `nextval('"Person_id_seq"'::regclass)`,
               },
               name: {
                 type: 'character varying',
                 maxLength: 255,
                 nullable: true,
-                defaultValue: null
-              }
+                defaultValue: null,
+              },
             });
           });
       });
@@ -192,19 +186,19 @@ module.exports = session => {
       it('many-to-many $relatedQuery', () => {
         return Person.query(session.knex)
           .findOne('name', 'Arnold')
-          .then(arnold => {
+          .then((arnold) => {
             return arnold.$relatedQuery('parents', session.knex);
           })
-          .then(parents => {
+          .then((parents) => {
             expect(parents).to.eql([
               {
                 id: 2,
-                name: 'Mom'
+                name: 'Mom',
               },
               {
                 id: 3,
-                name: 'Dad'
-              }
+                name: 'Dad',
+              },
             ]);
           });
       });
@@ -223,9 +217,9 @@ module.exports = session => {
               modelClass: Animal,
               join: {
                 from: 'homoSapiens.Person.id',
-                to: 'canisFamiliar.Animal.ownerId'
-              }
-            }
+                to: 'canisFamiliar.Animal.ownerId',
+              },
+            },
           };
         }
       }
@@ -242,9 +236,9 @@ module.exports = session => {
               modelClass: Person,
               join: {
                 from: 'canisFamiliar.Animal.ownerId',
-                to: 'homoSapiens.Person.id'
-              }
-            }
+                to: 'homoSapiens.Person.id',
+              },
+            },
           };
         }
       }
@@ -259,7 +253,7 @@ module.exports = session => {
             return session.knex.schema
               .withSchema('homoSapiens')
               .dropTableIfExists('Person')
-              .createTable('Person', table => {
+              .createTable('Person', (table) => {
                 table.increments('id').primary();
                 table.string('name');
               });
@@ -268,13 +262,10 @@ module.exports = session => {
             return session.knex.schema
               .withSchema('canisFamiliar')
               .dropTableIfExists('Animal')
-              .createTable('Animal', table => {
+              .createTable('Animal', (table) => {
                 table.increments('id').primary();
                 table.string('name');
-                table
-                  .integer('ownerId')
-                  .references('id')
-                  .inTable('homoSapiens.Person');
+                table.integer('ownerId').references('id').inTable('homoSapiens.Person');
               });
           });
       });
@@ -297,7 +288,7 @@ module.exports = session => {
       beforeEach(() => {
         const knex = session.knex;
 
-        return Promise.coroutine(function*() {
+        return Promise.coroutine(function* () {
           yield Animal.query(knex).delete();
           yield Person.query(knex).delete();
           yield Person.query(knex).insertGraph({
@@ -307,32 +298,32 @@ module.exports = session => {
             pets: [
               {
                 id: 1,
-                name: 'Fluffy'
-              }
-            ]
+                name: 'Fluffy',
+              },
+            ],
           });
         })();
       });
 
       it('simple find query (parent)', () => {
-        return Person.query(session.knex).then(people => {
+        return Person.query(session.knex).then((people) => {
           expect(people).to.eql([
             {
               id: 1,
-              name: 'Arnold'
-            }
+              name: 'Arnold',
+            },
           ]);
         });
       });
 
       it('simple find query (child)', () => {
-        return Animal.query(session.knex).then(animals => {
+        return Animal.query(session.knex).then((animals) => {
           expect(animals).to.eql([
             {
               id: 1,
               name: 'Fluffy',
-              ownerId: 1
-            }
+              ownerId: 1,
+            },
           ]);
         });
       });
@@ -340,7 +331,7 @@ module.exports = session => {
       it('join eager', () => {
         return Person.query(session.knex)
           .joinEager('pets')
-          .then(people => {
+          .then((people) => {
             expect(people).to.eql([
               {
                 id: 1,
@@ -350,10 +341,10 @@ module.exports = session => {
                   {
                     id: 1,
                     name: 'Fluffy',
-                    ownerId: 1
-                  }
-                ]
-              }
+                    ownerId: 1,
+                  },
+                ],
+              },
             ]);
           });
       });
@@ -361,7 +352,7 @@ module.exports = session => {
       it('join eager (inverse)', () => {
         return Animal.query(session.knex)
           .joinEager('owner')
-          .then(animals => {
+          .then((animals) => {
             expect(animals).to.eql([
               {
                 id: 1,
@@ -370,9 +361,9 @@ module.exports = session => {
 
                 owner: {
                   id: 1,
-                  name: 'Arnold'
-                }
-              }
+                  name: 'Arnold',
+                },
+              },
             ]);
           });
       });
@@ -380,21 +371,21 @@ module.exports = session => {
       it('columnInfo', () => {
         return Person.query(session.knex)
           .columnInfo()
-          .then(info => {
+          .then((info) => {
             expect(info instanceof Model).to.equal(false);
             expect(info).to.eql({
               id: {
                 type: 'integer',
                 maxLength: null,
                 nullable: false,
-                defaultValue: `nextval('"homoSapiens"."Person_id_seq"'::regclass)`
+                defaultValue: `nextval('"homoSapiens"."Person_id_seq"'::regclass)`,
               },
               name: {
                 type: 'character varying',
                 maxLength: 255,
                 nullable: true,
-                defaultValue: null
-              }
+                defaultValue: null,
+              },
             });
           });
       });

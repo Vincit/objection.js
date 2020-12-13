@@ -28,10 +28,10 @@ class Person extends Model {
           properties: {
             street: { type: 'string' },
             city: { type: 'string' },
-            zipCode: { type: 'string' }
-          }
-        }
-      }
+            zipCode: { type: 'string' },
+          },
+        },
+      },
     }
   }
 
@@ -45,14 +45,14 @@ class Person extends Model {
       searchByName(query, name) {
         // This `where` simply creates parentheses so that other `where`
         // statements don't get mixed with the these.
-        query.where(query => {
+        query.where((query) => {
           for (const namePart of name.trim().split(/\s+/)) {
             for (const column of ['firstName', 'lastName']) {
               query.orWhereRaw('lower(??) like ?', [column, namePart.toLowerCase() + '%'])
             }
           }
         })
-      }
+      },
     }
   }
 
@@ -71,8 +71,8 @@ class Person extends Model {
         modelClass: Animal,
         join: {
           from: 'persons.id',
-          to: 'animals.ownerId'
-        }
+          to: 'animals.ownerId',
+        },
       },
 
       movies: {
@@ -83,10 +83,10 @@ class Person extends Model {
           // ManyToMany relation needs the `through` object to describe the join table.
           through: {
             from: 'persons_movies.personId',
-            to: 'persons_movies.movieId'
+            to: 'persons_movies.movieId',
           },
-          to: 'movies.id'
-        }
+          to: 'movies.id',
+        },
       },
 
       children: {
@@ -94,8 +94,8 @@ class Person extends Model {
         modelClass: Person,
         join: {
           from: 'persons.id',
-          to: 'persons.parentId'
-        }
+          to: 'persons.parentId',
+        },
       },
 
       parent: {
@@ -103,9 +103,9 @@ class Person extends Model {
         modelClass: Person,
         join: {
           from: 'persons.parentId',
-          to: 'persons.id'
-        }
-      }
+          to: 'persons.id',
+        },
+      },
     }
   }
 }

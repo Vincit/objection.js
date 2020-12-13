@@ -19,8 +19,8 @@ export default class Movie extends Model {
 
     properties: {
       id: { type: 'integer' },
-      name: { type: 'string', minLength: 1, maxLength: 255 }
-    }
+      name: { type: 'string', minLength: 1, maxLength: 255 },
+    },
   }
 
   // This object defines the relations to other models. The relationMappings
@@ -38,11 +38,11 @@ export default class Movie extends Model {
         // ManyToMany relation needs the `through` object to describe the join table.
         through: {
           from: 'persons_movies.movieId',
-          to: 'persons_movies.personId'
+          to: 'persons_movies.personId',
         },
 
-        to: 'persons.id'
-      }
-    }
+        to: 'persons.id',
+      },
+    },
   })
 }

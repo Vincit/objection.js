@@ -1,7 +1,7 @@
 const expect = require('expect.js');
 const { Model } = require('../../../');
 
-module.exports = session => {
+module.exports = (session) => {
   describe('zero value in relation column', () => {
     let Table1;
     let Table2;
@@ -10,11 +10,11 @@ module.exports = session => {
       return session.knex.schema
         .dropTableIfExists('table1')
         .dropTableIfExists('table2')
-        .createTable('table1', table => {
+        .createTable('table1', (table) => {
           table.increments('id').primary();
           table.integer('value').notNullable();
         })
-        .createTable('table2', table => {
+        .createTable('table2', (table) => {
           table.increments('id').primary();
           table.integer('value').notNullable();
         });
@@ -23,7 +23,7 @@ module.exports = session => {
     after(() => {
       return Promise.all([
         session.knex.schema.dropTableIfExists('table1'),
-        session.knex.schema.dropTableIfExists('table2')
+        session.knex.schema.dropTableIfExists('table2'),
       ]);
     });
 
@@ -40,9 +40,9 @@ module.exports = session => {
               modelClass: Table2,
               join: {
                 from: 'table1.value',
-                to: 'table2.value'
-              }
-            }
+                to: 'table2.value',
+              },
+            },
           };
         }
       };
@@ -62,17 +62,17 @@ module.exports = session => {
         Table1.query().insert({ id: 1, value: 0 }),
         Table1.query().insert({ id: 2, value: 1 }),
         Table2.query().insert({ id: 1, value: 0 }),
-        Table2.query().insert({ id: 2, value: 1 })
+        Table2.query().insert({ id: 2, value: 1 }),
       ]);
     });
 
     it('should work with zero value', () => {
       return Table1.query()
         .findById(1)
-        .then(model => {
+        .then((model) => {
           return model.$relatedQuery('relation');
         })
-        .then(models => {
+        .then((models) => {
           expect(models).to.eql([{ id: 1, value: 0 }]);
         });
     });

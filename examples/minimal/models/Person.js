@@ -10,5 +10,5 @@ class Person extends Model {
 }
 
 module.exports = {
-  Person
+  Person,
 };

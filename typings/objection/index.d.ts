@@ -624,9 +624,10 @@ declare namespace Objection {
   }
 
   interface ReturningMethod {
-    <QB extends AnyQueryBuilder>(this: QB, column: string | string[]): QB extends ArrayQueryBuilder<
-      QB
-    >
+    <QB extends AnyQueryBuilder>(
+      this: QB,
+      column: string | string[]
+    ): QB extends ArrayQueryBuilder<QB>
       ? ArrayQueryBuilder<QB>
       : QB extends NumberQueryBuilder<QB>
       ? ArrayQueryBuilder<QB>
@@ -1801,9 +1802,10 @@ declare namespace Objection {
       ) => Promise<ReturnValue>
     ): Promise<ReturnValue>;
 
-    <ReturnValue>(knex: Knex, callback: (trx: Transaction) => Promise<ReturnValue>): Promise<
-      ReturnValue
-    >;
+    <ReturnValue>(
+      knex: Knex,
+      callback: (trx: Transaction) => Promise<ReturnValue>
+    ): Promise<ReturnValue>;
   }
 
   interface initialize {

@@ -13,7 +13,7 @@ import { Person } from '../fixtures/person';
       // get inserted and related to Jennifer.
       id: 2,
       firstName: 'John',
-      lastName: 'Aniston'
+      lastName: 'Aniston',
     },
 
     // Notice that Kat the Cat is not listed in `pets`. It will get deleted.
@@ -22,13 +22,13 @@ import { Person } from '../fixtures/person';
         // Jennifer just got a new pet. Insert it and relate it to Jennifer. Notice
         // that there is no id!
         name: 'Wolfgang',
-        species: 'Dog'
+        species: 'Dog',
       },
       {
         // It turns out Doggo is a cat. Update it.
         id: 1,
-        species: 'Cat'
-      }
+        species: 'Cat',
+      },
     ],
 
     // Notice that Wanderlust is missing from the list. It will get deleted.
@@ -46,28 +46,28 @@ import { Person } from '../fixtures/person';
             // Update a review.
             id: 1,
             stars: 2,
-            text: 'Even more Meh'
+            text: 'Even more Meh',
           },
           {
             // And insert another one.
             stars: 5,
             title: 'Loved it',
-            text: 'Best movie ever'
+            text: 'Best movie ever',
           },
           {
             // And insert a third one.
             stars: 4,
             title: '4 / 5',
-            text: 'Would see again'
-          }
-        ]
-      }
-    ]
+            text: 'Would see again',
+          },
+        ],
+      },
+    ],
   });
 
   let options: UpsertGraphOptions = {
     relate: true,
-    unrelate: true
+    unrelate: true,
   };
 
   await Person.query().upsertGraph(
@@ -85,13 +85,13 @@ import { Person } from '../fixtures/person';
           // Jennifer just got a new pet. Insert it and relate it to Jennifer. Notice
           // that there is no id!
           name: 'Wolfgang',
-          species: 'Dog'
+          species: 'Dog',
         },
         {
           // It turns out Doggo is a cat. Update it.
           id: 1,
-          species: 'Cat'
-        }
+          species: 'Cat',
+        },
       ],
 
       // Notice that Wanderlust is missing from the list. It will get unrelated.
@@ -106,22 +106,22 @@ import { Person } from '../fixtures/person';
               // Update a review.
               id: 1,
               stars: 2,
-              text: 'Even more Meh'
+              text: 'Even more Meh',
             },
             {
               // And insert another one.
               stars: 5,
               title: 'Loved it',
-              text: 'Best movie ever'
-            }
-          ]
+              text: 'Best movie ever',
+            },
+          ],
         },
         {
           // This is some existing movie that isn't currently related to Jennifer.
           // It will get related.
-          id: 1253
-        }
-      ]
+          id: 1253,
+        },
+      ],
     },
     options
   );
@@ -132,7 +132,7 @@ import { Person } from '../fixtures/person';
     // Only enable `relate` functionality for 'movies' relation.
     relate: ['movies'],
     // Disable deleting for movies.
-    noDelete: ['movies']
+    noDelete: ['movies'],
   };
 
   await Person.query().upsertGraph(
@@ -148,8 +148,8 @@ import { Person } from '../fixtures/person';
         {
           // It turns out Doggo is a cat. Update it.
           id: 1,
-          species: 'Cat'
-        }
+          species: 'Cat',
+        },
       ],
 
       // Notice that Wanderlust is missing from the list. It will NOT get unrelated
@@ -166,22 +166,22 @@ import { Person } from '../fixtures/person';
               // Update a review.
               id: 1,
               stars: 2,
-              text: 'Even more Meh'
+              text: 'Even more Meh',
             },
             {
               // And insert another one.
               stars: 5,
               title: 'Loved it',
-              text: 'Best movie ever'
-            }
-          ]
+              text: 'Best movie ever',
+            },
+          ],
         },
         {
           // This is some existing movie that isn't currently related to Jennifer.
           // It will get related.
-          id: 1253
-        }
-      ]
+          id: 1253,
+        },
+      ],
     },
     options
   );

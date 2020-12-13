@@ -10,7 +10,7 @@ const qs = require('querystring')
 
 const req = axios.create({
   baseURL: 'http://localhost:8641/',
-  paramsSerializer: qs.stringify
+  paramsSerializer: qs.stringify,
 })
 
 ;(async () => {
@@ -23,13 +23,13 @@ const req = axios.create({
   const isabella = await insertChildForPerson(matt, {
     firstName: 'Isabella',
     lastName: 'Damon',
-    age: 13
+    age: 13,
   })
 
   await insertChildForPerson(matt.parent, {
     firstName: 'Kyle',
     lastName: 'Damon',
-    age: 52
+    age: 52,
   })
 
   await fetchChildren(matt.parent)
@@ -39,7 +39,7 @@ const req = axios.create({
   const departed = await insertMovie({ name: 'The Departed' })
   await addPersonToMovieAsActor(departed, matt)
   await removePersonFromMovie(departed, matt)
-})().catch(err => {
+})().catch((err) => {
   console.error('error:', err.response.status, err.response.data)
 })
 
@@ -58,36 +58,36 @@ async function inserPersonWithRelations() {
     parent: {
       firstName: 'Kent',
       lastName: 'Damon',
-      age: 70
+      age: 70,
     },
 
     pets: [
       {
         name: 'Doggo',
-        species: 'dog'
+        species: 'dog',
       },
       {
         name: 'Kat',
-        species: 'cat'
-      }
+        species: 'cat',
+      },
     ],
 
     movies: [
       {
-        name: 'The Martian'
+        name: 'The Martian',
       },
       {
-        name: 'Good Will Hunting'
-      }
+        name: 'Good Will Hunting',
+      },
     ],
 
     children: [
       {
         firstName: 'Isabella',
         lastName: 'Damon',
-        age: 13
-      }
-    ]
+        age: 13,
+      },
+    ],
   })
 
   console.dir(matt, { depth: null })
@@ -107,8 +107,8 @@ async function fetchPeople() {
       // Fuzzy name search. This should match to all the Damons.
       name: 'damo',
       withMovieCount: true,
-      withGraph: '[pets, children]'
-    }
+      withGraph: '[pets, children]',
+    },
   })
 
   console.dir(allPeople, { depth: null })
@@ -160,8 +160,8 @@ async function fetchChildren(person) {
 
   const { data } = await req.get(`persons/${person.id}/children`, {
     params: {
-      actorInMovie: 'Good Will Hunting'
-    }
+      actorInMovie: 'Good Will Hunting',
+    },
   })
 
   console.dir(data)
@@ -188,8 +188,8 @@ async function fetchPersonsHamsters(person) {
 
   const { data } = await req.get(`persons/${person.id}/pets`, {
     params: {
-      species: 'hamster'
-    }
+      species: 'hamster',
+    },
   })
 
   console.dir(data)

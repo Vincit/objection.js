@@ -14,17 +14,12 @@ import { Person } from '../../fixtures/person';
     .delete()
     .whereIn(
       'id',
-      Person.query()
-        .select('persons.id')
-        .joinRelated('pets')
-        .where('pets.name', 'Fluffy')
+      Person.query().select('persons.id').joinRelated('pets').where('pets.name', 'Fluffy')
     );
 
   await Person.query()
     .delete()
     .whereExists(Person.relatedQuery('pets').where('pets.name', 'Fluffy'));
 
-  await Person.fromJson({ firstName: 'Jennifer' })
-    .$query()
-    .delete();
+  await Person.fromJson({ firstName: 'Jennifer' }).$query().delete();
 })();

@@ -20,8 +20,8 @@ class Animal extends Model {
         id: { type: 'integer' },
         ownerId: { type: ['integer', 'null'] },
         name: { type: 'string', minLength: 1, maxLength: 255 },
-        species: { type: 'string', minLength: 1, maxLength: 255 }
-      }
+        species: { type: 'string', minLength: 1, maxLength: 255 },
+      },
     }
   }
 
@@ -41,9 +41,9 @@ class Animal extends Model {
 
         join: {
           from: 'animals.ownerId',
-          to: 'persons.id'
-        }
-      }
+          to: 'persons.id',
+        },
+      },
     }
   }
 }

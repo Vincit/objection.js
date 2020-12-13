@@ -16,46 +16,46 @@ describe('integration tests', () => {
       client: 'sqlite3',
       useNullAsDefault: true,
       connection: {
-        filename: path.join(os.tmpdir(), 'objection_test.db')
+        filename: path.join(os.tmpdir(), 'objection_test.db'),
       },
       pool: {
         afterCreate: (conn, cb) => {
           conn.run('PRAGMA foreign_keys = ON', cb);
-        }
-      }
+        },
+      },
     },
     {
       client: 'mysql',
       connection: {
         host: '127.0.0.1',
         user: 'objection',
-        database: 'objection_test'
+        database: 'objection_test',
       },
       pool: {
         min: 2,
         max: 10,
         afterCreate: (conn, cb) => {
-          conn.query(`SET SESSION sql_mode='NO_AUTO_VALUE_ON_ZERO'`, err => {
+          conn.query(`SET SESSION sql_mode='NO_AUTO_VALUE_ON_ZERO'`, (err) => {
             cb(err, conn);
           });
-        }
-      }
+        },
+      },
     },
     {
       client: 'postgres',
       connection: {
         host: '127.0.0.1',
         user: 'objection',
-        database: 'objection_test'
-      }
-    }
-  ].filter(it => {
+        database: 'objection_test',
+      },
+    },
+  ].filter((it) => {
     return DATABASES.length === 0 || DATABASES.includes(it.client);
   });
 
-  const sessions = testDatabaseConfigs.map(knexConfig => {
+  const sessions = testDatabaseConfigs.map((knexConfig) => {
     const session = new TestSession({
-      knexConfig
+      knexConfig,
     });
 
     describe(knexConfig.client, () => {
@@ -101,7 +101,7 @@ describe('integration tests', () => {
 
   after(() => {
     return Promise.all(
-      sessions.map(session => {
+      sessions.map((session) => {
         return session.destroy();
       })
     );

@@ -3,7 +3,7 @@ import { Person } from '../fixtures/person';
 
 (async () => {
   try {
-    const returnValue = await transaction(Person.knex(), async trx => {
+    const returnValue = await transaction(Person.knex(), async (trx) => {
       // Here you can use the transaction.
 
       // Whatever you return from the transaction callback gets returned

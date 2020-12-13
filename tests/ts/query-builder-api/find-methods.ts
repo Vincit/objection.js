@@ -5,19 +5,17 @@ import { Person } from '../fixtures/person';
 (async () => {
   const person = await Person.query().findById(1);
   await Person.query().findById([1, '10']);
-  await Person.query()
-    .findById(1)
-    .patch({ firstName: 'Jennifer' });
+  await Person.query().findById(1).patch({ firstName: 'Jennifer' });
 
   const [person1, person2] = await Person.query().findByIds([1, 2]);
   const [person3, person4] = await Person.query().findByIds([
     [1, '10'],
-    [2, '10']
+    [2, '10'],
   ]);
 
   await Person.query().findOne({
     firstName: 'Jennifer',
-    lastName: 'Lawrence'
+    lastName: 'Lawrence',
   });
   await Person.query().findOne('age', '>', 20);
   await Person.query().findOne(raw('random() < 0.5'));
@@ -31,56 +29,31 @@ import { Person } from '../fixtures/person';
     .aliasFor('persons_movies', 'pm')
     .joinRelated('movies')
     .where('pm.someProp', 100);
-  await Person.query()
-    .aliasFor(Movie, 'm')
-    .joinRelated('movies')
-    .where('m.name', 'The Room');
+  await Person.query().aliasFor(Movie, 'm').joinRelated('movies').where('m.name', 'The Room');
 
   await Person.query().select('id', 'name');
 
-  await Person.query()
-    .transacting(Person.knex())
-    .select('*');
+  await Person.query().transacting(Person.knex()).select('*');
 
-  await Person.query()
-    .forShare()
-    .select('*');
+  await Person.query().forShare().select('*');
 
-  await Person.query()
-    .select('name')
-    .as('person_name');
+  await Person.query().select('name').as('person_name');
 
-  await Person.query()
-    .columns('firstName', 'lastName')
-    .select();
-  await Person.query()
-    .columns(['firstName', 'lastName'])
-    .select();
-  await Person.query()
-    .columns('firstName', { last: 'lastName' }, 'age')
-    .select();
+  await Person.query().columns('firstName', 'lastName').select();
+  await Person.query().columns(['firstName', 'lastName']).select();
+  await Person.query().columns('firstName', { last: 'lastName' }, 'age').select();
 
-  await Person.query()
-    .column('firstName', 'lastName')
-    .select();
-  await Person.query()
-    .column(['firstName', 'lastName'])
-    .select();
-  await Person.query()
-    .column('firstName', { last: 'lastName' }, 'age')
-    .select();
+  await Person.query().column('firstName', 'lastName').select();
+  await Person.query().column(['firstName', 'lastName']).select();
+  await Person.query().column('firstName', { last: 'lastName' }, 'age').select();
 
-  await Person.query()
-    .select('*')
-    .from('employees');
+  await Person.query().select('*').from('employees');
 
   // No example available in Knex documentation
 
   await Person.query().with('young_adults', Person.query().where('age', '<', 30));
 
-  await Person.query()
-    .withSchema('legacy')
-    .select('*');
+  await Person.query().withSchema('legacy').select('*');
 
   // No example available in Knex documentation
 
@@ -88,17 +61,17 @@ import { Person } from '../fixtures/person';
 
   await Person.query().where('firstName', 'Will');
   await Person.query().where({
-    firstName: 'Will'
+    firstName: 'Will',
   });
   await Person.query()
-    .where(builder => {
+    .where((builder) => {
       builder.whereIn('id', [1, 11, 15]).whereNotIn('id', [17, 19]);
     })
-    .andWhere(function() {
+    .andWhere(function () {
       this.where('id', '>', 10);
     });
   await Person.query()
-    .where(function() {
+    .where(function () {
       this.where('id', 1).orWhere('id', '>', 10);
     })
     .orWhere({ name: 'Tester' });
@@ -110,19 +83,17 @@ import { Person } from '../fixtures/person';
     .orWhere('name', 'John')
     .select('id');
   await Person.query().where('id', 'in', subquery);
-  await Person.query()
-    .where('id', 1)
-    .orWhere({ votes: 100, user: 'knex' });
+  await Person.query().where('id', 1).orWhere({ votes: 100, user: 'knex' });
 
   await Person.query()
     .whereNot({
       firstName: 'Test',
-      lastName: 'User'
+      lastName: 'User',
     })
     .select('id');
   await Person.query().whereNot('id', 1);
   await Person.query()
-    .whereNot(function() {
+    .whereNot(function () {
       this.where('id', 1).orWhereNot('id', '>', 10);
     })
     .orWhereNot({ name: 'Tester' });
@@ -138,51 +109,34 @@ import { Person } from '../fixtures/person';
 
   // No example available in Knex documentation
 
-  await Person.query()
-    .groupBy('count')
-    .orderBy('name', 'desc')
-    .having('count', '>', 100);
+  await Person.query().groupBy('count').orderBy('name', 'desc').having('count', '>', 100);
 
-  await Person.query().whereExists(function() {
-    this.select('*')
-      .from('accounts')
-      .whereRaw('users.account_id = accounts.id');
+  await Person.query().whereExists(function () {
+    this.select('*').from('accounts').whereRaw('users.account_id = accounts.id');
   });
 
-  await Person.query().whereNotExists(function() {
-    this.select('*')
-      .from('accounts')
-      .whereRaw('users.account_id = accounts.id');
+  await Person.query().whereNotExists(function () {
+    this.select('*').from('accounts').whereRaw('users.account_id = accounts.id');
   });
-  await Person.query().orWhereNotExists(function() {
-    this.select('*')
-      .from('accounts')
-      .whereRaw('users.account_id = accounts.id');
+  await Person.query().orWhereNotExists(function () {
+    this.select('*').from('accounts').whereRaw('users.account_id = accounts.id');
   });
 
-  await Person.query()
-    .whereIn('id', [1, 2, 3])
-    .orWhereIn('id', [4, 5, 6]);
-  await Person.query().whereIn('account_id', function() {
+  await Person.query().whereIn('id', [1, 2, 3]).orWhereIn('id', [4, 5, 6]);
+  await Person.query().whereIn('account_id', function () {
     this.select('id').from('accounts');
   });
 
   await Person.query().whereNotIn('id', [1, 2, 3]);
-  await Person.query()
-    .where('name', 'like', '%Test%')
-    .orWhereNotIn('id', [1, 2, 3]);
+  await Person.query().where('name', 'like', '%Test%').orWhereNotIn('id', [1, 2, 3]);
 
   await Person.query().whereNull('updated_at');
   await Person.query().whereNotNull('created_at');
-  await Person.query().whereExists(function() {
-    this.select('*')
-      .from('accounts')
-      .whereRaw('users.account_id = accounts.id');
+  await Person.query().whereExists(function () {
+    this.select('*').from('accounts').whereRaw('users.account_id = accounts.id');
   });
-  await Person.query().whereNotExists(function() {
-    this.select('*')
-      .from('accounts')
-      .whereRaw('users.account_id = accounts.id');
+  await Person.query().whereNotExists(function () {
+    this.select('*').from('accounts').whereRaw('users.account_id = accounts.id');
   });
   await Person.query().whereBetween('votes', [1, 100]);
   await Person.query().whereNotBetween('votes', [1, 100]);
@@ -208,28 +162,21 @@ import { Person } from '../fixtures/person';
 
   await Person.query()
     .whereNull('last_name')
-    .union(function() {
-      this.select('*')
-        .from('users')
-        .whereNull('first_name');
+    .union(function () {
+      this.select('*').from('users').whereNull('first_name');
     });
   await Person.query()
     .whereNull('last_name')
     .union([Person.query().whereNull('first_name')]);
 
-  await Person.query().unionAll(function() {
-    this.select('*')
-      .from('users')
-      .whereNull('first_name');
+  await Person.query().unionAll(function () {
+    this.select('*').from('users').whereNull('first_name');
   });
   await Person.query()
     .whereNull('last_name')
     .unionAll([Person.query().whereNull('first_name')]);
 
-  await Person.query()
-    .groupBy('age')
-    .orderBy('firstName', 'desc')
-    .having('age', '>', 18);
+  await Person.query().groupBy('age').orderBy('firstName', 'desc').having('age', '>', 18);
 
   await Person.query().havingIn('id', [5, 3, 10, 17]);
 
@@ -242,9 +189,7 @@ import { Person } from '../fixtures/person';
 
   await Person.query().offset(10);
 
-  await Person.query()
-    .limit(100)
-    .offset(200);
+  await Person.query().limit(100).offset(200);
 
   await Person.query().count();
   await Person.query().resultSize();
@@ -259,7 +204,7 @@ import { Person } from '../fixtures/person';
 
   await Person.query()
     .insert({
-      firstName: 'Foo'
+      firstName: 'Foo',
     })
     .returning('*');
 
@@ -273,7 +218,7 @@ import { Person } from '../fixtures/person';
     [
       [1, 2],
       [3, 4],
-      [1, 4]
+      [1, 4],
     ]
   );
   await Person.query().whereInComposite('a', [[1], [3], [1]]);

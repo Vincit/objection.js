@@ -8,21 +8,21 @@
 //
 // If the plugin takes options the main module should be a factory function that returns a
 // mixin. This plugin is exactly the same as the `plugin` example, but adds a couple of options.
-module.exports = options => {
+module.exports = (options) => {
   // Provide good defaults for the options if possible.
   options = Object.assign(
     {
       setModifiedBy: true,
       setModifiedAt: true,
       setCreatedBy: true,
-      setCreatedAt: true
+      setCreatedAt: true,
     },
     options
   );
 
   // Return the mixin. If your plugin doesn't take options, you can simply export
   // the mixin. The factory function is not needed.
-  return Model => {
+  return (Model) => {
     // If your plugin extends the QueryBuilder, you need to extend `Model.QueryBuilder`
     // since it may have already been extended by other plugins.
     class SessionQueryBuilder extends Model.QueryBuilder {
@@ -34,7 +34,7 @@ module.exports = options => {
         // not a reserved word or some objection.js concept. You can store any data
         // to the query context.
         return this.mergeContext({
-          session: session
+          session: session,
         });
       }
     }

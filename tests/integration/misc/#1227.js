@@ -1,7 +1,7 @@
 const { Model } = require('../../../');
 const { expect } = require('chai');
 
-module.exports = session => {
+module.exports = (session) => {
   describe(`primary key to primary key relations with upsertGraph #1227`, () => {
     let knex = session.knex;
     let Person, Animal;
@@ -10,16 +10,12 @@ module.exports = session => {
       return knex.schema
         .dropTableIfExists('cousins')
         .dropTableIfExists('persons')
-        .createTable('persons', table => {
+        .createTable('persons', (table) => {
           table.increments('id').primary();
           table.string('name');
         })
-        .createTable('pets', table => {
-          table
-            .integer('id')
-            .unsigned()
-            .primary()
-            .references('persons.id');
+        .createTable('pets', (table) => {
+          table.integer('id').unsigned().primary().references('persons.id');
           table.string('name');
         });
     });
@@ -51,9 +47,9 @@ module.exports = session => {
               relation: Model.HasOneRelation,
               join: {
                 from: 'persons.id',
-                to: 'pets.id'
-              }
-            }
+                to: 'pets.id',
+              },
+            },
           };
         }
       };
@@ -69,20 +65,18 @@ module.exports = session => {
         .upsertGraph({
           name: 'person',
           pet: {
-            name: 'pet'
-          }
+            name: 'pet',
+          },
         })
-        .then(person => {
-          return Person.query()
-            .findById(person.id)
-            .eager('pet');
+        .then((person) => {
+          return Person.query().findById(person.id).eager('pet');
         })
-        .then(person => {
+        .then((person) => {
           expect(person).to.containSubset({
             name: 'person',
             pet: {
-              name: 'pet'
-            }
+              name: 'pet',
+            },
           });
         });
     });

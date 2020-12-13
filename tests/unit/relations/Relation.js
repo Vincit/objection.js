@@ -26,8 +26,8 @@ describe('Relation', () => {
       modelClass: RelatedModel,
       join: {
         from: 'OwnerModel.id',
-        to: 'RelatedModel.ownerId'
-      }
+        to: 'RelatedModel.ownerId',
+      },
     });
 
     expect(relation.ownerModelClass).to.equal(OwnerModel);
@@ -46,8 +46,8 @@ describe('Relation', () => {
       modelClass: () => RelatedModel,
       join: {
         from: 'OwnerModel.id',
-        to: 'RelatedModel.ownerId'
-      }
+        to: 'RelatedModel.ownerId',
+      },
     });
 
     expect(relation.ownerModelClass).to.equal(OwnerModel);
@@ -66,8 +66,8 @@ describe('Relation', () => {
       modelClass: __dirname + '/files/RelatedModel',
       join: {
         from: 'OwnerModel.id',
-        to: 'RelatedModel.ownerId'
-      }
+        to: 'RelatedModel.ownerId',
+      },
     });
 
     expect(relation.ownerModelClass).to.equal(OwnerModel);
@@ -87,8 +87,8 @@ describe('Relation', () => {
       modelClass: 'RelatedModel',
       join: {
         from: 'OwnerModel.id',
-        to: 'RelatedModel.ownerId'
-      }
+        to: 'RelatedModel.ownerId',
+      },
     });
 
     expect(relation.ownerModelClass).to.equal(OwnerModel);
@@ -109,8 +109,8 @@ describe('Relation', () => {
       modelClass: 'RelatedModel',
       join: {
         from: 'OwnerModel.id',
-        to: 'RelatedModel.ownerId'
-      }
+        to: 'RelatedModel.ownerId',
+      },
     });
 
     expect(relation.ownerModelClass).to.equal(OwnerModel);
@@ -129,8 +129,8 @@ describe('Relation', () => {
       modelClass: __dirname + '/files/RelatedModelNamedExport',
       join: {
         from: 'OwnerModel.id',
-        to: 'RelatedModel.ownerId'
-      }
+        to: 'RelatedModel.ownerId',
+      },
     });
 
     expect(relation.ownerModelClass).to.equal(OwnerModel);
@@ -149,8 +149,8 @@ describe('Relation', () => {
       modelClass: RelatedModel,
       join: {
         from: ['OwnerModel.name', 'OwnerModel.dateOfBirth'],
-        to: ['RelatedModel.ownerName', 'RelatedModel.ownerDateOfBirth']
-      }
+        to: ['RelatedModel.ownerName', 'RelatedModel.ownerDateOfBirth'],
+      },
     });
 
     expect(relation.ownerModelClass).to.equal(OwnerModel);
@@ -170,10 +170,10 @@ describe('Relation', () => {
         modelClass: RelatedModel,
         join: {
           from: 'OwnerModel.foo',
-          to: 'RelatedModel.ownerId'
-        }
+          to: 'RelatedModel.ownerId',
+        },
       });
-    }).to.throwException(err => {
+    }).to.throwException((err) => {
       expect(err.message).to.equal(
         "OwnerModel.relationMappings.foo: join: relation name and join property 'foo' cannot have the same name. If you cannot change one or the other, you can use $parseDatabaseJson and $formatDatabaseJson methods to convert the column name."
       );
@@ -186,8 +186,8 @@ describe('Relation', () => {
         enumerable: true,
         get() {
           throw new Error('whoops, invalid json shchema getter');
-        }
-      }
+        },
+      },
     });
 
     let relation = new Relation('testRelation', OwnerModel);
@@ -198,10 +198,10 @@ describe('Relation', () => {
         modelClass: RelatedModel,
         join: {
           from: 'OwnerModel.id',
-          to: 'RelatedModel.ownerId'
-        }
+          to: 'RelatedModel.ownerId',
+        },
       });
-    }).to.throwException(err => {
+    }).to.throwException((err) => {
       expect(err.message).to.equal('whoops, invalid json shchema getter');
     });
   });
@@ -215,10 +215,10 @@ describe('Relation', () => {
         modelClass: function SomeConstructor() {},
         join: {
           from: 'OwnerModel.id',
-          to: 'ownerId'
-        }
+          to: 'ownerId',
+        },
       });
-    }).to.throwException(err => {
+    }).to.throwException((err) => {
       expect(err.message).to.equal(
         'OwnerModel.relationMappings.testRelation: modelClass: is not a subclass of Model or a file path to a module that exports one. You may be dealing with a require loop. See the documentation section about require loops.'
       );
@@ -234,10 +234,10 @@ describe('Relation', () => {
         modelClass: __dirname + '/files/InvalidModelManyNamedModels',
         join: {
           from: 'OwnerModel.id',
-          to: 'ownerId'
-        }
+          to: 'ownerId',
+        },
       });
-    }).to.throwException(err => {
+    }).to.throwException((err) => {
       expect(err.message).to.match(
         /OwnerModel\.relationMappings\.testRelation: modelClass: path .*\/tests\/unit\/relations\/files\/InvalidModelManyNamedModels exports multiple models\. Don't know which one to choose\./
       );
@@ -253,10 +253,10 @@ describe('Relation', () => {
         modelClass: null,
         join: {
           from: 'OwnerModel.id',
-          to: 'ownerId'
-        }
+          to: 'ownerId',
+        },
       });
-    }).to.throwException(err => {
+    }).to.throwException((err) => {
       expect(err.message).to.equal(
         'OwnerModel.relationMappings.testRelation: modelClass is not defined'
       );
@@ -272,10 +272,10 @@ describe('Relation', () => {
         modelClass: 'blaa',
         join: {
           from: 'OwnerModel.id',
-          to: 'ownerId'
-        }
+          to: 'ownerId',
+        },
       });
-    }).to.throwException(err => {
+    }).to.throwException((err) => {
       expect(err.message).to.equal(
         'OwnerModel.relationMappings.testRelation: modelClass: could not resolve blaa using modelPaths'
       );
@@ -291,10 +291,10 @@ describe('Relation', () => {
         modelClass: __dirname + '/files/InvalidModel',
         join: {
           from: 'OwnerModel.id',
-          to: 'ownerId'
-        }
+          to: 'ownerId',
+        },
       });
-    }).to.throwException(err => {
+    }).to.throwException((err) => {
       expect(
         /^OwnerModel\.relationMappings\.testRelation: modelClass: (.+)\/InvalidModel is an invalid file path to a model class$/.test(
           err.message
@@ -311,10 +311,10 @@ describe('Relation', () => {
         modelClass: RelatedModel,
         join: {
           from: 'OwnerModel.id',
-          to: 'ownerId'
-        }
+          to: 'ownerId',
+        },
       });
-    }).to.throwException(err => {
+    }).to.throwException((err) => {
       expect(err.message).to.equal(
         'OwnerModel.relationMappings.testRelation: relation is not defined'
       );
@@ -326,14 +326,14 @@ describe('Relation', () => {
 
     expect(() => {
       relation.setMapping({
-        relation: function() {},
+        relation: function () {},
         modelClass: RelatedModel,
         join: {
           from: 'OwnerModel.id',
-          to: 'ownerId'
-        }
+          to: 'ownerId',
+        },
       });
-    }).to.throwException(err => {
+    }).to.throwException((err) => {
       expect(err.message).to.equal(
         'OwnerModel.relationMappings.testRelation: relation is not a subclass of Relation'
       );
@@ -349,10 +349,10 @@ describe('Relation', () => {
         modelClass: RelatedModel,
         join: {
           from: 'OwnerModel.id',
-          to: 'ownerId'
-        }
+          to: 'ownerId',
+        },
       });
-    }).to.throwException(err => {
+    }).to.throwException((err) => {
       expect(err.message).to.equal("Relation: Relation's owner is not a subclass of Model");
     });
   });
@@ -366,10 +366,10 @@ describe('Relation', () => {
         modelClass: RelatedModel,
         join: {
           from: 'OwnerModel.id',
-          to: 'ownerId'
-        }
+          to: 'ownerId',
+        },
       });
-    }).to.throwException(err => {
+    }).to.throwException((err) => {
       expect(err.message).to.equal(
         'OwnerModel.relationMappings.testRelation: join.to must have format TableName.columnName. For example "SomeTable.id" or in case of composite key ["SomeTable.a", "SomeTable.b"].'
       );
@@ -385,10 +385,10 @@ describe('Relation', () => {
         modelClass: RelatedModel,
         join: {
           from: 'SomeOtherModel.id',
-          to: 'RelatedModel.ownerId'
-        }
+          to: 'RelatedModel.ownerId',
+        },
       });
-    }).to.throwException(err => {
+    }).to.throwException((err) => {
       expect(err.message).to.equal(
         "OwnerModel.relationMappings.testRelation: join: either `from` or `to` must point to the owner model table and the other one to the related table. It might be that specified table 'SomeOtherModel' is not correct"
       );
@@ -404,10 +404,10 @@ describe('Relation', () => {
         modelClass: RelatedModel,
         join: {
           from: 'id',
-          to: 'RelatedModel.ownerId'
-        }
+          to: 'RelatedModel.ownerId',
+        },
       });
-    }).to.throwException(err => {
+    }).to.throwException((err) => {
       expect(err.message).to.equal(
         'OwnerModel.relationMappings.testRelation: join.from must have format TableName.columnName. For example "SomeTable.id" or in case of composite key ["SomeTable.a", "SomeTable.b"].'
       );
@@ -423,10 +423,10 @@ describe('Relation', () => {
         modelClass: RelatedModel,
         join: {
           from: 'OwnerModel.id',
-          to: 'SomeOtherModel.ownerId'
-        }
+          to: 'SomeOtherModel.ownerId',
+        },
       });
-    }).to.throwException(err => {
+    }).to.throwException((err) => {
       expect(err.message).to.equal(
         "OwnerModel.relationMappings.testRelation: join: either `from` or `to` must point to the owner model table and the other one to the related table. It might be that specified table 'SomeOtherModel' is not correct"
       );
@@ -439,9 +439,9 @@ describe('Relation', () => {
     expect(() => {
       relation.setMapping({
         relation: Relation,
-        modelClass: RelatedModel
+        modelClass: RelatedModel,
       });
-    }).to.throwException(err => {
+    }).to.throwException((err) => {
       expect(err.message).to.equal(
         'OwnerModel.relationMappings.testRelation: join must be an object that maps the columns of the related models together. For example: {from: "SomeTable.id", to: "SomeOtherTable.someModelId"}'
       );
@@ -456,10 +456,10 @@ describe('Relation', () => {
         relation: Relation,
         modelClass: RelatedModel,
         join: {
-          to: 'OwnerModel.id'
-        }
+          to: 'OwnerModel.id',
+        },
       });
-    }).to.throwException(err => {
+    }).to.throwException((err) => {
       expect(err.message).to.equal(
         'OwnerModel.relationMappings.testRelation: join must be an object that maps the columns of the related models together. For example: {from: "SomeTable.id", to: "SomeOtherTable.someModelId"}'
       );
@@ -474,10 +474,10 @@ describe('Relation', () => {
         relation: Relation,
         modelClass: RelatedModel,
         join: {
-          from: 'OwnerModel.id'
-        }
+          from: 'OwnerModel.id',
+        },
       });
-    }).to.throwException(err => {
+    }).to.throwException((err) => {
       expect(err.message).to.equal(
         'OwnerModel.relationMappings.testRelation: join must be an object that maps the columns of the related models together. For example: {from: "SomeTable.id", to: "SomeOtherTable.someModelId"}'
       );
@@ -492,8 +492,8 @@ describe('Relation', () => {
       modelClass: RelatedModel,
       join: {
         from: 'RelatedModel.ownerId',
-        to: 'OwnerModel.id'
-      }
+        to: 'OwnerModel.id',
+      },
     });
 
     expect(relation.ownerModelClass).to.equal(OwnerModel);
@@ -510,10 +510,10 @@ describe('Relation', () => {
     Object.defineProperty(OwnerModel, 'tableName', {
       get() {
         return 'owner_model';
-      }
+      },
     });
 
-    OwnerModel.prototype.$parseDatabaseJson = json => {
+    OwnerModel.prototype.$parseDatabaseJson = (json) => {
       return _.mapKeys(json, (value, key) => {
         return _.camelCase(key);
       });
@@ -522,10 +522,10 @@ describe('Relation', () => {
     Object.defineProperty(RelatedModel, 'tableName', {
       get() {
         return 'related-model';
-      }
+      },
     });
 
-    RelatedModel.prototype.$parseDatabaseJson = json => {
+    RelatedModel.prototype.$parseDatabaseJson = (json) => {
       return _.mapKeys(json, (value, key) => {
         return _.camelCase(key);
       });
@@ -536,8 +536,8 @@ describe('Relation', () => {
       modelClass: RelatedModel,
       join: {
         from: 'owner_model.id_col',
-        to: 'related-model.owner-id'
-      }
+        to: 'related-model.owner-id',
+      },
     });
 
     expect(relation.ownerModelClass).to.equal(OwnerModel);
@@ -554,13 +554,13 @@ describe('Relation', () => {
     Object.defineProperty(OwnerModel, 'tableName', {
       get() {
         return 'schema1.owner_model';
-      }
+      },
     });
 
     Object.defineProperty(RelatedModel, 'tableName', {
       get() {
         return 'schema2.related_model';
-      }
+      },
     });
 
     relation.setMapping({
@@ -568,8 +568,8 @@ describe('Relation', () => {
       modelClass: RelatedModel,
       join: {
         from: 'schema1.owner_model.id',
-        to: 'schema2.related_model.owner_id'
-      }
+        to: 'schema2.related_model.owner_id',
+      },
     });
 
     expect(relation.ownerModelClass).to.equal(OwnerModel);
@@ -588,8 +588,8 @@ describe('Relation', () => {
       modelClass: RelatedModel,
       join: {
         from: 'RelatedModel.ownerId',
-        to: 'OwnerModel.id'
-      }
+        to: 'OwnerModel.id',
+      },
     });
 
     const knex = Knex({ client: 'pg' });

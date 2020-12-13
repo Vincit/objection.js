@@ -1,7 +1,7 @@
 const { expect } = require('chai');
 const { Model } = require('../../../');
 
-module.exports = session => {
+module.exports = (session) => {
   describe('skipFetched not working for nested relation #1757', () => {
     let knex = session.knex;
 
@@ -17,8 +17,8 @@ module.exports = session => {
             modelClass: Animal,
             join: {
               from: 'Person.id',
-              to: 'Animal.ownerId'
-            }
+              to: 'Animal.ownerId',
+            },
           },
 
           children: {
@@ -26,8 +26,8 @@ module.exports = session => {
             modelClass: Person,
             join: {
               from: 'Person.id',
-              to: 'Person.parentId'
-            }
+              to: 'Person.parentId',
+            },
           },
 
           parent: {
@@ -35,9 +35,9 @@ module.exports = session => {
             modelClass: Person,
             join: {
               from: 'Person.parentId',
-              to: 'Person.id'
-            }
-          }
+              to: 'Person.id',
+            },
+          },
         };
       }
     }
@@ -54,9 +54,9 @@ module.exports = session => {
             modelClass: Person,
             join: {
               from: 'Animal.ownerId',
-              to: 'Person.id'
-            }
-          }
+              to: 'Person.id',
+            },
+          },
         };
       }
     }
@@ -68,25 +68,17 @@ module.exports = session => {
       await knex.schema.dropTableIfExists('Person');
 
       await knex.schema
-        .createTable('Person', table => {
+        .createTable('Person', (table) => {
           table.increments('id').primary();
-          table
-            .integer('parentId')
-            .unsigned()
-            .references('id')
-            .inTable('Person');
+          table.integer('parentId').unsigned().references('id').inTable('Person');
           table.string('firstName');
           table.string('lastName');
           table.integer('age');
           table.json('address');
         })
-        .createTable('Animal', table => {
+        .createTable('Animal', (table) => {
           table.increments('id').primary();
-          table
-            .integer('ownerId')
-            .unsigned()
-            .references('id')
-            .inTable('Person');
+          table.integer('ownerId').unsigned().references('id').inTable('Person');
           table.string('name');
           table.string('species');
         });
@@ -109,11 +101,11 @@ module.exports = session => {
             pets: [
               {
                 name: 'Doggo',
-                species: 'dog'
-              }
-            ]
-          }
-        ]
+                species: 'dog',
+              },
+            ],
+          },
+        ],
       });
 
       let doggo = await Animal.query(knex).findOne({ name: 'Doggo' });

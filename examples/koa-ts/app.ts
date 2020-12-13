@@ -42,18 +42,18 @@ async function errorHandler(ctx: Context, next: () => Promise<any>) {
       ctx.status = 400
       ctx.body = {
         error: 'ValidationError',
-        errors: err.data
+        errors: err.data,
       }
     } else if (err instanceof ForeignKeyViolationError) {
       ctx.status = 409
       ctx.body = {
-        error: 'ForeignKeyViolationError'
+        error: 'ForeignKeyViolationError',
       }
     } else {
       ctx.status = 500
       ctx.body = {
         error: 'InternalServerError',
-        message: err.message || {}
+        message: err.message || {},
       }
     }
   }

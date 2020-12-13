@@ -9,5 +9,5 @@ class RelatedModel extends Model {
 module.exports = {
   someCrap: 42,
   RelatedModel,
-  moreUselessShit: {}
+  moreUselessShit: {},
 };

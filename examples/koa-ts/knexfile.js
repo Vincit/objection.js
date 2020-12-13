@@ -3,23 +3,23 @@ module.exports = {
     client: 'sqlite3',
     useNullAsDefault: true,
     connection: {
-      filename: './example.db'
+      filename: './example.db',
     },
     pool: {
       afterCreate: (conn, cb) => {
         conn.run('PRAGMA foreign_keys = ON', cb)
-      }
-    }
+      },
+    },
   },
 
   production: {
     client: 'postgresql',
     connection: {
-      database: 'example'
+      database: 'example',
     },
     pool: {
       min: 2,
-      max: 10
-    }
-  }
+      max: 10,
+    },
+  },
 }
