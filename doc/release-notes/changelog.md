@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.2.4
+
+### What's new
+
+- Add support for onConflict, merge and ignore knex methods.
+
 ## 2.2.2
 
 ### What's new

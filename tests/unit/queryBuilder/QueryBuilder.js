@@ -966,14 +966,12 @@ describe('QueryBuilder', () => {
     QueryBuilder.forClass(TestModel)
       .withSchema('someSchema')
       .withGraphJoined('relatedModel')
-      .then((res) => {
+      .then(() => {
         expect(executedQueries).to.eql([
           "select * from information_schema.columns where table_name = 'Model' and table_catalog = NULL and table_schema = 'someSchema'",
           "select * from information_schema.columns where table_name = 'Related' and table_catalog = NULL and table_schema = 'someSchema'",
           'select "Model"."0" as "0" from "someSchema"."Model" left join "someSchema"."Related" as "relatedModel" on "relatedModel"."id" = "Model"."id"',
         ]);
-        console.log(res);
-        console.log(executedQueries);
         done();
       })
       .catch(done);
@@ -1050,14 +1048,53 @@ describe('QueryBuilder', () => {
         chai
           .expect(query[method](), `queries.${name}.${method}()`)
           .to.equal(method === getMethodName(name));
-        chai.expect(query.hasWheres(), `queries.${name}.hasWheres()`).to.equal(false);
+        chai.expect(query.hasWheres(), `queries.${name}.hasWheres()`).to.equal(name.includes('relate'));
         chai.expect(query.hasSelects(), `queries.${name}.hasSelects()`).to.equal(false);
       }
     }
   });
 
   it('hasWheres() should return true for all variants of where queries', () => {
+    TestModel.relationMappings = {
+      belongsToOneRelation: {
+        relation: Model.BelongsToOneRelation,
+        modelClass: TestModel,
+        join: {
+          from: 'Model.someId',
+          to: 'Model.id'
+        }
+      },
+      hasManyRelation: {
+        relation: Model.HasManyRelation,
+        modelClass: TestModel,
+        join: {
+          from: 'Model.id',
+          to: 'Model.someId'
+        }
+      },
+      manyToManyRelation: {
+        relation: Model.ManyToManyRelation,
+        modelClass: TestModel,
+        join: {
+          from: 'Model.id',
+          through: {
+            from: 'JoinTable.id1',
+            to: 'JoinTable.id2'
+          },
+          to: 'Model.id'
+        }
+      }
+    };
+
+    expect(TestModel.query().hasWheres()).to.equal(false);
+    expect(TestModel.query().insert({}).hasWheres()).to.equal(false);
+    expect(TestModel.query().update({}).hasWheres()).to.equal(false);
+    expect(TestModel.query().patch({}).hasWheres()).to.equal(false);
+    expect(TestModel.query().delete().hasWheres()).to.equal(false);
+
     const wheres = [
+      'findOne',
+      'findById',
       'where',
       'andWhere',
       'orWhere',
@@ -1095,9 +1132,22 @@ describe('QueryBuilder', () => {
 
     for (let i = 0; i < wheres.length; i++) {
       const name = wheres[i];
-      const query = TestModel.query()[name]();
+      const query = TestModel.query()[name](1, '=', 1);
       chai.expect(query.hasWheres(), `TestModel.query().${name}().hasWheres()`).to.equal(true);
     }
+
+    const model = TestModel.fromJson({ id: 1, someId: 1 });
+    let query = model.$query();
+    chai.expect(query.hasWheres()).to.equal(true);
+
+    query = model.$relatedQuery('belongsToOneRelation');
+    chai.expect(query.hasWheres()).to.equal(true);
+
+    query = model.$relatedQuery('hasManyRelation');
+    chai.expect(query.hasWheres()).to.equal(true);
+
+    query = model.$relatedQuery('manyToManyRelation');
+    chai.expect(query.hasWheres()).to.equal(true);
   });
 
   it('hasSelects() should return true for all variants of select queries', () => {
