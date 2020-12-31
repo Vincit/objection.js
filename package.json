@@ -1,12 +1,12 @@
 {
   "name": "objection",
-  "version": "2.2.3",
+  "version": "2.2.4",
   "description": "An SQL-friendly ORM for Node.js",
   "main": "lib/objection.js",
   "license": "MIT",
   "scripts": {
     "test": "npm run eslint && mocha --slow 10 --timeout 15000 --reporter spec --recursive tests --exclude \"tests/unit/relations/files/**\"",
-    "test-travis": "npm run eslint && nyc mocha --slow 100 --timeout 60000 --reporter spec --recursive tests --exclude \"tests/unit/relations/files/**\" && npm run test-typings",
+    "test-travis": "nyc mocha --slow 100 --timeout 60000 --reporter spec --recursive tests --exclude \"tests/unit/relations/files/**\" && npm run test-typings",
     "test-fast": "mocha --slow 10 --timeout 15000 --reporter spec --recursive tests --bail --exclude \"tests/unit/relations/files/**\"",
     "test-opt": "mocha --slow 10 --timeout 15000 --reporter spec --recursive tests --bail --trace_opt --trace_deopt --exclude \"tests/unit/relations/files/**\"",
     "test-debug": "mocha --slow 10 --timeout 15000 --reporter spec --recursive tests --inspect-brk --exclude \"tests/unit/relations/files/**\"",
@@ -79,7 +79,7 @@
     "fs-extra": "^9.0.1",
     "glob": "^7.1.6",
     "husky": "^4.3.6",
-    "knex": "0.21.6",
+    "knex": "0.21.15",
     "lint-staged": "^10.5.3",
     "mocha": "^8.2.1",
     "mysql": "^2.18.1",

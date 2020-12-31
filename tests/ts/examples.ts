@@ -786,6 +786,17 @@ const insertQb = Person.query().insert({});
 let insertPromise: Promise<Person> = insertQb;
 insertPromise = insertQb.execute();
 
+const insertConfclitQb = Person.query().insert({}).onConflict('id').ignore();
+let insertConflictPromise: Promise<Person> = insertConfclitQb;
+insertConflictPromise = insertConfclitQb.execute();
+
+const insertConfclitMergeQb = Person.query()
+  .insert({})
+  .onConflict('id')
+  .merge({ firstName: 'foo' });
+let insertConflictMergePromise: Promise<Person> = insertConfclitMergeQb;
+insertConflictMergePromise = insertConfclitMergeQb.execute();
+
 const deleteQb = Person.query().delete();
 let deletePromise: Promise<number> = deleteQb;
 deletePromise = deleteQb.execute();

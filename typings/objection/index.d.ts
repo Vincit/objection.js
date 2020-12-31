@@ -998,6 +998,10 @@ declare namespace Objection {
     insert(insert: PartialModelObject<M>[]): ArrayQueryBuilder<this>;
     insert(): SingleQueryBuilder<this>;
 
+    onConflict(column?: string | string[] | true): this;
+    ignore(): this;
+    merge(merge?: PartialModelObject<M>): this;
+
     insertAndFetch(insert: PartialModelObject<M>): SingleQueryBuilder<this>;
     insertAndFetch(insert: PartialModelObject<M>[]): ArrayQueryBuilder<this>;
     insertAndFetch(): SingleQueryBuilder<this>;

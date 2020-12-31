@@ -829,3 +829,33 @@ See [knex documentation](http://knexjs.org/#Builder-truncate)
 | Type                                | Description                        |
 | ----------------------------------- | ---------------------------------- |
 | [QueryBuilder](/api/query-builder/) | `this` query builder for chaining. |
+
+## onConflict()
+
+See [knex documentation](http://knexjs.org/#Builder-onConflict)
+
+##### Return value
+
+| Type                                | Description                        |
+| ----------------------------------- | ---------------------------------- |
+| [QueryBuilder](/api/query-builder/) | `this` query builder for chaining. |
+
+## ignore()
+
+See [knex documentation](http://knexjs.org/#Builder-ignore)
+
+##### Return value
+
+| Type                                | Description                        |
+| ----------------------------------- | ---------------------------------- |
+| [QueryBuilder](/api/query-builder/) | `this` query builder for chaining. |
+
+## merge()
+
+See [knex documentation](http://knexjs.org/#Builder-merge)
+
+##### Return value
+
+| Type                                | Description                        |
+| ----------------------------------- | ---------------------------------- |
+| [QueryBuilder](/api/query-builder/) | `this` query builder for chaining. |

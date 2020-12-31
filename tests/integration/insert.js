@@ -1642,6 +1642,43 @@ module.exports = (session) => {
       });
     });
 
+    describe('.query().insert().onConflict()', () => {
+      beforeEach(() => {
+        return session.populate([]);
+      });
+
+      describe('.ignore()', () => {
+        it('should silently ignore insert if id already exists', async () => {
+          await Model1.query().insert({ id: 1 });
+          const result = await Model1.query().insert({ id: 1 }).onConflict('id').ignore();
+          expect(result instanceof Model1).to.equal(true);
+
+          const rows = await Model1.query();
+          expect(rows).to.have.length(1);
+          expect(rows[0].id).to.equal(1);
+          expect(result.id).to.equal(rows[0].id);
+        });
+      });
+
+      describe('.merge()', () => {
+        it('should update the row instead if id already exists', async () => {
+          await Model1.query().insert({ id: 1 });
+          const result = await Model1.query()
+            .insert({ id: 1, model1Prop1: 'updated' })
+            .onConflict('id')
+            .merge();
+          expect(result instanceof Model1).to.equal(true);
+
+          const rows = await Model1.query();
+          expect(rows).to.have.length(1);
+          expect(rows[0].id).to.equal(1);
+          expect(rows[0].model1Prop1).to.equal('updated');
+          expect(result.id).to.equal(rows[0].id);
+          expect(result.model1Prop1).to.equal(rows[0].model1Prop1);
+        });
+      });
+    });
+
     function subClassWithSchema(Model, schema) {
       let SubModel = inheritModel(Model);
       SubModel.jsonSchema = schema;
