@@ -99,6 +99,7 @@ module.exports = {
             'static-properties',
             'static-methods',
             'instance-methods',
+            'instance-properties',
           ],
         },
       ],

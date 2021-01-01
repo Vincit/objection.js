@@ -1259,3 +1259,5 @@ async () => {
     ])
     .whereNotNull('interviewDate');
 };
+
+Person.fromJson({ id: 1 }).$modelClass.query();

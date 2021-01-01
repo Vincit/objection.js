@@ -1642,6 +1642,8 @@ declare namespace Objection {
     static beforeDelete(args: StaticHookArguments<any>): any;
     static afterDelete(args: StaticHookArguments<any>): any;
 
+    $modelClass: ModelClass<this>;
+
     $relatedQuery<K extends keyof this>(
       relationName: K,
       trxOrKnex?: TransactionOrKnex

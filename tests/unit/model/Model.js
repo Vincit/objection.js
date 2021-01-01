@@ -2188,6 +2188,12 @@ describe('Model', () => {
     expect(Model1.fromJson({}).$relatedQuery('someRelation')).to.be.a(MyQueryBuilder2);
   });
 
+  it('$modelClass should return this.constructor', () => {
+    let Model1 = modelClass('Model1');
+    let model = Model1.fromJson({ id: 1 });
+    expect(model.$modelClass === model.constructor).to.equal(true);
+  });
+
   describe('traverse() and $traverse()', () => {
     let Model1;
     let Model2;
