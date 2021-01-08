@@ -1119,6 +1119,7 @@ module.exports = (session) => {
               .select('name')
               .forUpdate()
               .then((moviesToBeUpdated) => {
+                chaiExpect(moviesToBeUpdated).to.have.length(1);
                 chaiExpect(moviesToBeUpdated).containSubset([
                   {
                     name: 'Hungergames',
@@ -1136,6 +1137,30 @@ module.exports = (session) => {
               expect(Movie.beforeUpdate.calls[0].queryWasAwaited).to.equal(true);
               expect(queries.length).to.equal(2);
             });
+        });
+
+        it('should be able to fetch the rows about to be updated when using pacthAndFetchById', async () => {
+          Movie.beforeUpdate = createHookSpy(async ({ asFindQuery }, call) => {
+            const moviesToBeUpdated = await asFindQuery().select('name').forUpdate();
+
+            chaiExpect(moviesToBeUpdated).to.have.length(1);
+            chaiExpect(moviesToBeUpdated).containSubset([
+              {
+                name: 'Hungergames',
+              },
+            ]);
+
+            call.queryWasAwaited = true;
+          });
+
+          const hungerGames = await Movie.query().findOne('name', 'like', '%gam%');
+          expect(queries.length).to.equal(1);
+
+          await Movie.query().patchAndFetchById(hungerGames.id, { name: 'Updated' });
+          expect(Movie.beforeUpdate.calls.length).to.equal(1);
+          expect(Movie.beforeUpdate.calls[0].queryWasAwaited).to.equal(true);
+          // findOne + patch + fetch + asFindQuery()
+          expect(queries.length).to.equal(4);
         });
 
         it('should be able to cancel the query', () => {
@@ -1206,6 +1231,7 @@ module.exports = (session) => {
                   .select('name')
                   .forUpdate()
                   .then((moviesToBeUpdated) => {
+                    chaiExpect(moviesToBeUpdated).to.have.length(1);
                     // Note: moviesToBeUpdated must be an array even though $query()
                     // would normally produce a single item.
                     chaiExpect(moviesToBeUpdated).containSubset([
@@ -1340,10 +1366,10 @@ module.exports = (session) => {
                   return asFindQuery()
                     .select('name')
                     .forUpdate()
-                    .then((moviesToBeUpdated) => {
-                      expect(moviesToBeUpdated.length).to.equal(2);
+                    .then((petsToBeUpdated) => {
+                      expect(petsToBeUpdated.length).to.equal(2);
 
-                      chaiExpect(moviesToBeUpdated).containSubset([
+                      chaiExpect(petsToBeUpdated).containSubset([
                         {
                           name: 'Doggo',
                         },
@@ -1364,6 +1390,60 @@ module.exports = (session) => {
                 expect(Pet.beforeUpdate.calls[0].queryWasAwaited).to.equal(true);
                 expect(queries.length).to.equal(2);
               });
+          });
+
+          it('should be able to fetch the rows about to be updated when relating', async () => {
+            Pet.beforeUpdate = createHookSpy(async ({ asFindQuery }, call) => {
+              const petsToBeRelated = await asFindQuery().select('name').forUpdate();
+
+              chaiExpect(petsToBeRelated).to.have.length(2);
+              chaiExpect(petsToBeRelated).containSubset([
+                {
+                  name: 'Hamsto',
+                },
+                {
+                  name: 'Croco',
+                },
+              ]);
+
+              call.queryWasAwaited = true;
+            });
+
+            const jennifer = await Person.query().findOne({ name: 'Jennifer' });
+            const hamsto = await Pet.query().insert({ name: 'Hamsto', species: 'Hamster' });
+            const croco = await Pet.query().insert({ name: 'Croco', species: 'Crocodile' });
+            queries = [];
+
+            await jennifer.$relatedQuery('pets').relate([hamsto.id, croco.id]);
+            expect(Pet.beforeUpdate.calls.length).to.equal(1);
+            expect(Pet.beforeUpdate.calls[0].queryWasAwaited).to.equal(true);
+            expect(queries.length).to.equal(2);
+          });
+
+          it('should be able to fetch the rows about to be updated when unrelating', async () => {
+            Pet.beforeUpdate = createHookSpy(async ({ asFindQuery }, call) => {
+              const petsToBeUnrelated = await asFindQuery().select('name').forUpdate();
+
+              chaiExpect(petsToBeUnrelated).to.have.length(2);
+              chaiExpect(petsToBeUnrelated).containSubset([
+                {
+                  name: 'Doggo',
+                },
+                {
+                  name: 'Cato',
+                },
+              ]);
+
+              call.queryWasAwaited = true;
+            });
+
+            const jennifer = await Person.query().findOne({ name: 'Jennifer' });
+            queries = [];
+
+            await jennifer.$relatedQuery('pets').unrelate();
+            expect(Pet.beforeUpdate.calls.length).to.equal(1);
+            expect(Pet.beforeUpdate.calls[0].queryWasAwaited).to.equal(true);
+            expect(queries.length).to.equal(2);
           });
         });
 
@@ -1837,6 +1917,7 @@ module.exports = (session) => {
               .select('name')
               .forUpdate()
               .then((moviesToBeDeleted) => {
+                chaiExpect(moviesToBeDeleted).to.have.length(1);
                 chaiExpect(moviesToBeDeleted).containSubset([
                   {
                     name: 'A Star is Born',
@@ -1942,6 +2023,7 @@ module.exports = (session) => {
                   .select('name')
                   .forUpdate()
                   .then((moviesToBeDeleted) => {
+                    chaiExpect(moviesToBeDeleted).to.have.length(1);
                     // Note: moviesToBeDeleted must be an array even though $query()
                     // would normally produce a single item.
                     chaiExpect(moviesToBeDeleted).containSubset([
@@ -2516,31 +2598,6 @@ module.exports = (session) => {
           expect(Movie.beforeInsert.calls.length).to.equal(2);
         });
 
-        it('should be able to fetch the rows about to be updated', () => {
-          Movie.beforeInsert = createHookSpy(({ asFindQuery }, call) => {
-            return asFindQuery()
-              .select('name')
-              .forUpdate()
-              .then((moviesToBeUpdated) => {
-                chaiExpect(moviesToBeUpdated).containSubset([
-                  {
-                    name: 'Hungergames',
-                  },
-                ]);
-                call.queryWasAwaited = true;
-              });
-          });
-
-          return Movie.query()
-            .insert({ name: 'Inserted' })
-            .where('name', 'like', '%gam%')
-            .then(() => {
-              expect(Movie.beforeInsert.calls.length).to.equal(1);
-              expect(Movie.beforeInsert.calls[0].queryWasAwaited).to.equal(true);
-              expect(queries.length).to.equal(2);
-            });
-        });
-
         it('should be able to cancel the query', () => {
           Movie.beforeInsert = createHookSpy(({ cancelQuery }) => {
             cancelQuery();
@@ -2692,6 +2749,15 @@ module.exports = (session) => {
             return Pet.query()
               .findOne({ name: 'Doggo' })
               .then((pet) => {
+                Pet.beforeUpdate = createHookSpy(async ({ asFindQuery }, call) => {
+                  const pets = await asFindQuery().select('name');
+
+                  expect(pets).to.have.length(1);
+                  expect(pets[0].name).to.equal('Doggo');
+
+                  call.queryWasAwaited = true;
+                });
+
                 Person.beforeInsert = createHookSpy(({ items, inputItems, relation }) => {
                   expect(items.length).to.equal(1);
                   expect(inputItems.length).to.equal(1);
@@ -2717,6 +2783,8 @@ module.exports = (session) => {
                 expect(inserted.id).to.be.a('number');
                 expect(inserted.name).to.equal('New Owner');
                 expect(Person.beforeInsert.calls.length).to.equal(1);
+                expect(Pet.beforeUpdate.calls.length).to.equal(1);
+                expect(Pet.beforeUpdate.calls[0].queryWasAwaited).to.equal(true);
               });
           });
 

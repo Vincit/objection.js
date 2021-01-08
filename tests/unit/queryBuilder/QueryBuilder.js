@@ -1048,7 +1048,9 @@ describe('QueryBuilder', () => {
         chai
           .expect(query[method](), `queries.${name}.${method}()`)
           .to.equal(method === getMethodName(name));
-        chai.expect(query.hasWheres(), `queries.${name}.hasWheres()`).to.equal(name.includes('relate'));
+        chai
+          .expect(query.hasWheres(), `queries.${name}.hasWheres()`)
+          .to.equal(name.includes('relate'));
         chai.expect(query.hasSelects(), `queries.${name}.hasSelects()`).to.equal(false);
       }
     }
@@ -1061,16 +1063,16 @@ describe('QueryBuilder', () => {
         modelClass: TestModel,
         join: {
           from: 'Model.someId',
-          to: 'Model.id'
-        }
+          to: 'Model.id',
+        },
       },
       hasManyRelation: {
         relation: Model.HasManyRelation,
         modelClass: TestModel,
         join: {
           from: 'Model.id',
-          to: 'Model.someId'
-        }
+          to: 'Model.someId',
+        },
       },
       manyToManyRelation: {
         relation: Model.ManyToManyRelation,
@@ -1079,11 +1081,11 @@ describe('QueryBuilder', () => {
           from: 'Model.id',
           through: {
             from: 'JoinTable.id1',
-            to: 'JoinTable.id2'
+            to: 'JoinTable.id2',
           },
-          to: 'Model.id'
-        }
-      }
+          to: 'Model.id',
+        },
+      },
     };
 
     expect(TestModel.query().hasWheres()).to.equal(false);
@@ -2582,6 +2584,95 @@ describe('QueryBuilder', () => {
           done();
         });
     });
+  });
+
+  describe('toFindQuery', () => {
+    class Person extends Model {
+      static get tableName() {
+        return 'person';
+      }
+
+      static get relationMappings() {
+        return {
+          pets: {
+            relation: this.HasManyRelation,
+            modelClass: Pet,
+            join: {
+              from: 'person.id',
+              to: 'pet.owner_id',
+            },
+          },
+          movies: {
+            relation: this.ManyToManyRelation,
+            modelClass: Movie,
+            join: {
+              from: 'person.id',
+              through: {
+                from: 'person_movie.person_id',
+                to: 'person_movie.movie_id',
+              },
+              to: 'movie.id',
+            },
+          },
+        };
+      }
+    }
+
+    class Pet extends Model {
+      static get tableName() {
+        return 'pet';
+      }
+
+      static get relationMappings() {
+        return {
+          owner: {
+            relation: this.BelongsToOneRelation,
+            modelClass: Person,
+            join: {
+              from: 'pet.owner_id',
+              to: 'person.id',
+            },
+          },
+        };
+      }
+    }
+
+    class Movie extends Model {
+      static get tableName() {
+        return 'movie';
+      }
+    }
+
+    it('query().update()', () => {
+      testToFindQuery(
+        Person.query(mockKnex).update({ foo: 'bar' }).where('name', 'like', '%foo'),
+        'select "person".* from "person" where "name" like ?'
+      );
+    });
+
+    it('query().relatedQuery("hasMany").update()', () => {
+      testToFindQuery(
+        Person.fromJson({ id: 1 })
+          .$relatedQuery('pets', mockKnex)
+          .update({ foo: 'bar' })
+          .where('name', 'like', '%foo'),
+        'select "pet".* from "pet" where "pet"."owner_id" in (?) and "name" like ?'
+      );
+    });
+
+    it('query().relatedQuery("belongsToOne").update()', () => {
+      testToFindQuery(
+        Pet.fromJson({ owner_id: 1 })
+          .$relatedQuery('owner', mockKnex)
+          .patch({ foo: 'bar' })
+          .where('name', 'like', '%foo'),
+        'select "person".* from "person" where "person"."id" in (?) and "name" like ?'
+      );
+    });
+
+    function testToFindQuery(query, sql) {
+      expect(query.toFindQuery().toKnexQuery().toSQL().sql).to.equal(sql);
+    }
   });
 });
 
