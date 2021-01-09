@@ -4,6 +4,7 @@ A curated list of plugins and modules for objection. Only plugins that follow [t
 
 ## 3rd party plugins
 
+- [objection-authorize](https://github.com/JaneJeon/objection-authorize) - integrate access control into Objection queries
 - [objection-dynamic-finder](https://github.com/snlamm/objection-dynamic-finder) - dynamic finders for your models
 - [objection-guid](https://github.com/seegno/objection-guid) - automatic guid for your models
 - [objection-password](https://github.com/scoutforpets/objection-password) - automatic password hashing for your models
