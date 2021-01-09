@@ -4,6 +4,7 @@ const expect = require('expect.js');
 const Promise = require('bluebird');
 const { inheritModel } = require('../../lib/model/inheritModel');
 const { ValidationError, UniqueViolationError } = require('../../');
+const { isPostgres } = require('../../lib/utils/knexUtils');
 
 module.exports = (session) => {
   let Model1 = session.models.Model1;
@@ -1662,20 +1663,39 @@ module.exports = (session) => {
 
       describe('.merge()', () => {
         it('should update the row instead if id already exists', async () => {
-          await Model1.query().insert({ id: 1 });
-          const result = await Model1.query()
-            .insert({ id: 1, model1Prop1: 'updated' })
-            .onConflict('id')
+          await Model2.query().insert({ idCol: 1 });
+          const result = await Model2.query()
+            .insert({ idCol: 1, model2Prop1: 'updated' })
+            .onConflict('id_col')
             .merge();
-          expect(result instanceof Model1).to.equal(true);
+          expect(result instanceof Model2).to.equal(true);
 
-          const rows = await Model1.query();
+          const rows = await Model2.query();
           expect(rows).to.have.length(1);
-          expect(rows[0].id).to.equal(1);
-          expect(rows[0].model1Prop1).to.equal('updated');
+          expect(rows[0].idCol).to.equal(1);
+          expect(rows[0].model2Prop1).to.equal('updated');
           expect(result.id).to.equal(rows[0].id);
-          expect(result.model1Prop1).to.equal(rows[0].model1Prop1);
+          expect(result.model2Prop1).to.equal(rows[0].model2Prop1);
         });
+
+        if (session.isPostgres()) {
+          it('should update the row with custom values instead if id already exists', async () => {
+            await Model2.query().insert({ idCol: 1 });
+            const result = await Model2.query()
+              .insert({ idCol: 1, model2Prop1: 'updated' })
+              .onConflict('id_col')
+              .merge({ model2Prop1: 'override updated' })
+              .returning('id_col', 'model2_prop1');
+            expect(result instanceof Model2).to.equal(true);
+
+            const rows = await Model2.query();
+            expect(rows).to.have.length(1);
+            expect(rows[0].idCol).to.equal(1);
+            expect(rows[0].model2Prop1).to.equal('override updated');
+            expect(result.id).to.equal(rows[0].id);
+            expect(result.model2Prop1).to.equal(rows[0].model2Prop1);
+          });
+        }
       });
     });
 
