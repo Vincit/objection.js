@@ -21,7 +21,8 @@ Update a single row by ID and return the updated Model instance in 1 query:
 const jennifer = await Person.query()
   .patch({ firstName: 'Jenn', lastName: 'Lawrence' })
   .where('id', 1234)
-  .returning('*');
+  .returning('*')
+  .first();
 
 console.log(jennifer.updatedAt); // NOW()-ish
 console.log(jennifer.firstName); // "Jenn"
