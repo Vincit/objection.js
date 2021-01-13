@@ -973,6 +973,7 @@ declare namespace Objection {
 
     execute(): Promise<R>;
     castTo<MC extends Model>(modelClass: ModelConstructor<MC>): QueryBuilderType<MC>;
+    castTo<R>(): QueryBuilder<M, R>;
 
     update(update: PartialModelObject<M>): NumberQueryBuilder<this>;
     update(): NumberQueryBuilder<this>;

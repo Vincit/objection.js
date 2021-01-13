@@ -2144,6 +2144,27 @@ module.exports = (session) => {
           });
       });
 
+      it('should be able to call castTo with no arguments', () => {
+        return Model1.query()
+          .joinRelated('model1Relation2.model2Relation1.model1Relation1')
+          .select([
+            'model1Relation2:model2Relation1:model1Relation1.id as someId',
+            'model1Relation2:model2Relation1.id as someOtherId',
+          ])
+          .castTo()
+          .then((models) => {
+            expect(models[0]).to.be.a(Model1);
+
+            expect(models).to.eql([
+              {
+                $afterFindCalled: 1,
+                someId: 8,
+                someOtherId: 7,
+              },
+            ]);
+          });
+      });
+
       it('should count related models', () => {
         return Model1.query()
           .leftJoinRelated('model1Relation2')

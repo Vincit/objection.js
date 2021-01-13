@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.2.7
+
+### What's new
+
+- `QueryBuilder.castTo` can now be used to cast query results to any typescript type.
+
 ## 2.2.6
 
 ### What's new

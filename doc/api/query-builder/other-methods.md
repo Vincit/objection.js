@@ -656,7 +656,12 @@ query
 queryBuilder = queryBuilder.castTo(ModelClass);
 ```
 
-Sets the model class of the result rows.
+```ts
+queryBuilder = queryBuilder.castTo<SomeType>();
+```
+
+Sets the model class of the result rows or if no arguments are provided, simply casts the
+result type to the provided type.
 
 ##### Return value
 
@@ -683,18 +688,19 @@ const animals = await Person.query()
   .castTo(Animal);
 ```
 
-If your result rows represent no actual model, you can use `objection.Model`
+If you don't provide any arguments for the method, but provide a generic type argument, the
+result is not changed but its typescript type is cast to the given generic type.
 
-```js
-const { Model } = require('objection');
+```ts
+interface Named {
+  name: string;
+}
 
-const models = await Person.query()
-  .joinRelated('children.pets')
-  .select([
-    'children:pets.id as animalId',
-    'children.firstName as childFirstName'
-  ])
-  .castTo(Model);
+const result = await Person.query()
+  .select('firstName as name')
+  .castTo<Named[]>();
+
+console.log(result[0].name);
 ```
 
 ## modelClass()
