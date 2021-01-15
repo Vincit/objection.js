@@ -1189,4 +1189,4 @@ Shortcut for `Person.knex().fn`
 
 ## `static` knexQuery()
 
-Shortcut for `Person.knex().table(Person.tableName)`
+Shortcut for `Person.knexQuery().table(Person.tableName)`
