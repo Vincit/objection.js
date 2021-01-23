@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.2.8
+
+### What's new
+
+- Fixes [#1982](https://github.com/Vincit/objection.js/issues/1982)
+- Fixes [#1983](https://github.com/Vincit/objection.js/issues/1983)
+
 ## 2.2.7
 
 ### What's new
