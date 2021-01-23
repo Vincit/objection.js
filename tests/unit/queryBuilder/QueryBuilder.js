@@ -1093,6 +1093,8 @@ describe('QueryBuilder', () => {
     expect(TestModel.query().update({}).hasWheres()).to.equal(false);
     expect(TestModel.query().patch({}).hasWheres()).to.equal(false);
     expect(TestModel.query().delete().hasWheres()).to.equal(false);
+    expect(TestModel.query().withGraphJoined('belongsToOneRelation').hasWheres()).to.equal(false);
+    expect(TestModel.query().withGraphFetched('belongsToOneRelation').hasWheres()).to.equal(false);
 
     const wheres = [
       'findOne',
