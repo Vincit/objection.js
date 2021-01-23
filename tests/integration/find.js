@@ -489,6 +489,47 @@ module.exports = (session) => {
                 expect(res[0].id).to.equal(3);
               });
           });
+
+          it('.distinctOn() many-to-many', async () => {
+            await session.populate([]);
+            await Model2.query().insertGraph([
+              {
+                idCol: 1,
+                model2Relation1: [{ id: 1 }, { id: 2 }],
+              },
+              {
+                idCol: 2,
+                model2Relation1: [{ id: 5 }, { id: 6 }],
+              },
+              {
+                idCol: 3,
+                model2Relation1: [{ id: 3 }, { id: 4 }],
+              },
+            ]);
+
+            const result = await Model2.query()
+              .distinctOn('id_col')
+              .joinRelated('model2Relation1')
+              .where('model2Relation1.id', '<', 5)
+              .orderBy('id_col');
+
+            expect(result).to.eql([
+              {
+                idCol: 1,
+                model1Id: null,
+                model2Prop1: null,
+                model2Prop2: null,
+                $afterFindCalled: 1,
+              },
+              {
+                idCol: 3,
+                model1Id: null,
+                model2Prop1: null,
+                model2Prop2: null,
+                $afterFindCalled: 1,
+              },
+            ]);
+          });
         }
 
         it('.count()', () => {

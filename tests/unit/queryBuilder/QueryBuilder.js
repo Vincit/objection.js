@@ -1142,6 +1142,9 @@ describe('QueryBuilder', () => {
     let query = model.$query();
     chai.expect(query.hasWheres()).to.equal(true);
 
+    query = model.$query().withGraphJoined('manyToManyRelation');
+    chai.expect(query.hasWheres()).to.equal(true);
+
     query = model.$relatedQuery('belongsToOneRelation');
     chai.expect(query.hasWheres()).to.equal(true);
 
