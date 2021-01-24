@@ -1050,6 +1050,7 @@ declare namespace Objection {
     forUpdate: IdentityMethod<this>;
     forShare: IdentityMethod<this>;
     skipLocked: IdentityMethod<this>;
+    noWait: IdentityMethod<this>;
     skipUndefined: IdentityMethod<this>;
     debug: IdentityMethod<this>;
     alias: OneArgMethod<string, this>;

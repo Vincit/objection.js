@@ -213,6 +213,26 @@ See [knex documentation](http://knexjs.org/#Builder-forShare)
 | ----------------------------------- | ---------------------------------- |
 | [QueryBuilder](/api/query-builder/) | `this` query builder for chaining. |
 
+## skipLocked()
+
+See [knex documentation](http://knexjs.org/#Builder-skipLocked)
+
+##### Return value
+
+| Type                                | Description                        |
+| ----------------------------------- | ---------------------------------- |
+| [QueryBuilder](/api/query-builder/) | `this` query builder for chaining. |
+
+## noWait()
+
+See [knex documentation](http://knexjs.org/#Builder-noWait)
+
+##### Return value
+
+| Type                                | Description                        |
+| ----------------------------------- | ---------------------------------- |
+| [QueryBuilder](/api/query-builder/) | `this` query builder for chaining. |
+
 ## as()
 
 See [knex documentation](http://knexjs.org/#Builder-as)

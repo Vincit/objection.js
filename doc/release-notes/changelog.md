@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.2.9
+
+### What's new
+
+- Add `noWait` query builder method.
+
 ## 2.2.8
 
 ### What's new
