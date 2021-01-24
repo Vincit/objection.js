@@ -373,7 +373,7 @@ and "animals"."ownerId" = 1
 order by "name" asc
 ```
 
-With `HasManyRelation`s the `relatedQuery` helper may just seem like unnecessary bloat. You can of course simply write the necessary SQL directly.
+With `HasManyRelation`s and `BelongsToOneRelation`s the `relatedQuery` helper may just seem like unnecessary bloat. You can of course simply write the SQL directly. The following code should be clear to anyone even without any objetion experience:
 
 ```js
 const dogs = await Pet.query()
@@ -382,7 +382,14 @@ const dogs = await Pet.query()
   .orderBy('name')
 ```
 
-The `relatedQuery` helper comes in handy with `ManyToManyRelation`s and provides a unified API for all kinds of relations. You can write the same code regardless of the relation type. Or you may simply prefer the `relatedQuery` style. Now back to the examples :)
+```sql
+select "animals".* from "animals"
+where "species" = 'dog'
+and "ownerId" = 1
+order by "name" asc
+```
+
+The `relatedQuery` helper comes in handy with `ManyToManyRelation` where the needed SQL is more  complex. it also provides a unified API for all kinds of relations. You can write the same code regardless of the relation type. Or you may simply prefer the `relatedQuery` style. Now back to the examples :)
 
 If you want to fetch dogs for multiple people in one query, you can pass an array of identifiers to the `for` method like this:
 
@@ -400,10 +407,11 @@ and "animals"."ownerId" in (1, 2)
 order by "name" asc
 ```
 
-You can even give it a subquery! The following example fetches all dogs of all people named Jennifer.
+You can even give it a subquery! The following example fetches all dogs of all people named Jennifer using one single query:
 
 ```js
 // Note that there is no `await` here. This query does not get executed.
+// jennifersSubQuery is of type QueryBuilder<Person>.
 const jennifersSubQuery = Person.query().where('name', 'Jennifer');
 
 // This is the only executed query in this example.

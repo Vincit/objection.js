@@ -68,7 +68,7 @@ console.log('person deleted');
 const builder = person.$relatedQuery(relationName, transactionOrKnex);
 ```
 
-Use this to build a query that only affects the items related to an instance through a relation. By default, any fetched or inserted items are also stored to the owner model’s property named after the relation. See [relatedFindQueryMutates](/api/model/static-properties.html#static-relatedfindquerymutates) or [relatedInsertQueryMutates](/api/model/static-properties.html#static-relatedinsertquerymutates) to change this behaviour.
+Use this to build a query that only affects items related through a relation.
 
 See the examples below and [here](/guide/query-examples.html#relation-queries).
 
@@ -98,16 +98,15 @@ const builder = Person.relatedQuery(relationName, transactionOrKnex).for(
 
 ##### Examples
 
-Fetch all items related to an item through a relation. The fetched items are also stored to the owner item's property named after the relation (by default):
+Fetch all items related to an item through a relation:
 
 ```js
 const pets = await jennifer.$relatedQuery('pets');
 
 console.log('jennifer has', pets.length, 'pets');
-console.log(jennifer.pets === pets); // --> true
 ```
 
-The related query is just like any other query. All knex methods are available:
+The related query is just like any other query. All knex and objection query builder methods are available:
 
 ```js
 const dogsAndCats = await jennifer
