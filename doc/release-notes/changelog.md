@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.2.10
+
+### What's new
+
+- Add `modelClass` property for `ValidationError` and `NotFoundError`.
+
 ## 2.2.9
 
 ### What's new
