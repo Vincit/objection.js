@@ -389,7 +389,7 @@ and "ownerId" = 1
 order by "name" asc
 ```
 
-The `relatedQuery` helper comes in handy with `ManyToManyRelation` where the needed SQL is more  complex. it also provides a unified API for all kinds of relations. You can write the same code regardless of the relation type. Or you may simply prefer the `relatedQuery` style. Now back to the examples :)
+The `relatedQuery` helper comes in handy with `ManyToManyRelation` where the needed SQL is more complex. it also provides a unified API for all kinds of relations. You can write the same code regardless of the relation type. Or you may simply prefer the `relatedQuery` style. Now back to the examples :)
 
 If you want to fetch dogs for multiple people in one query, you can pass an array of identifiers to the `for` method like this:
 

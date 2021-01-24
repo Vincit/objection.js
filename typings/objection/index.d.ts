@@ -1329,12 +1329,13 @@ declare namespace Objection {
     | 'InvalidGraph';
 
   export class ValidationError extends Error {
-    constructor(args: CreateValidationErrorArgs);
+    constructor(args: CreateValidationErrorArgs & { modelClass: ModelClass<Model> });
 
     statusCode: number;
     message: string;
     data?: ErrorHash | any;
     type: ValidationErrorType | string;
+    modelClass: ModelClass<Model>;
   }
 
   export interface ValidationErrorItem {
@@ -1357,11 +1358,19 @@ declare namespace Objection {
   }
 
   export class NotFoundError extends Error {
-    constructor(data?: any);
+    constructor(args: CreateNotFoundErrorArgs & { modelClass: ModelClass<Model> });
 
     statusCode: number;
     data?: any;
     type: 'NotFound';
+    modelClass: ModelClass<Model>;
+  }
+
+  export interface CreateNotFoundErrorArgs {
+    statusCode?: number;
+    message?: string;
+    data?: any;
+    [key: string]: any;
   }
 
   export interface TableMetadata {
@@ -1445,7 +1454,7 @@ declare namespace Objection {
 
     createValidator(): Validator;
     createValidationError(args: CreateValidationErrorArgs): Error;
-    createNotFoundError(): Error;
+    createNotFoundError(queryContext: QueryContext, args: CreateNotFoundErrorArgs): Error;
 
     tableMetadata(opt?: TableMetadataOptions): TableMetadata;
     fetchTableMetadata(opt?: FetchTableMetadataOptions): Promise<TableMetadata>;

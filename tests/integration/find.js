@@ -610,6 +610,7 @@ module.exports = (session) => {
             .catch((err) => {
               expect(err).to.be.a(Model1.NotFoundError);
               expect(err.type).to.equal('NotFound');
+              expect(err.modelClass).to.equal(Model1);
               done();
             })
             .catch(done);
@@ -625,6 +626,7 @@ module.exports = (session) => {
             .catch((err) => {
               expect(err).to.be.a(Model1.NotFoundError);
               expect(err.data.message).to.equal('customMessage');
+              expect(err.modelClass).to.equal(Model1);
               done();
             })
             .catch(done);

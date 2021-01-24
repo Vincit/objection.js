@@ -833,8 +833,8 @@ class Model {
 
 ```js
 class BaseModel extends Model {
-  static createNotFoundError(queryContext) {
-    return new MyCustomNotFoundError();
+  static createNotFoundError(queryContext, props) {
+    return new MyCustomNotFoundError({ ...props, modelClass: this });
   }
 }
 ```
@@ -847,6 +847,7 @@ to throw any error you want.
 | Argument     | Type   | Description                                                                                                               |
 | ------------ | ------ | ------------------------------------------------------------------------------------------------------------------------- |
 | queryContext | Object | The context object of query that produced the empty result. See [context](/api/query-builder/other-methods.html#context). |
+| props        | any    | Data passed to the error class constructor.
 
 ##### Return value
 
@@ -860,8 +861,8 @@ The default implementation:
 
 ```js
 class Model {
-  static createNotFoundError(queryContext) {
-    return new this.NotFoundError();
+  static createNotFoundError(queryContext, props) {
+    return new this.NotFoundError({ ...props, modelClass: this });
   }
 }
 ```
@@ -871,7 +872,7 @@ class Model {
 ```js
 class BaseModel extends Model {
   static createValidationError({ type, message, data }) {
-    return new MyCustomValidationError({ type, message, data });
+    return new MyCustomValidationError({ type, message, data, modelClass: this });
   }
 }
 ```

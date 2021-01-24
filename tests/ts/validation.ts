@@ -68,6 +68,7 @@ import { Person } from './fixtures/person';
       data: {
         supplied: '1234',
       },
+      modelClass: Person,
     });
   } catch (e) {
     if (e instanceof ValidationError) {

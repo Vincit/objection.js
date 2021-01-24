@@ -2101,6 +2101,7 @@ module.exports = (session) => {
           .catch((err) => {
             expect(err).to.be.a(ValidationError);
             expect(err.type).to.equal('RelationExpression');
+            expect(err.modelClass).to.equal(Model1);
             expect(err.message).to.equal(
               'identifier model1Relation1:model1Relation1:model1Relation1:model1Relation1:id is over 63 characters long and would be truncated by the database engine.'
             );
