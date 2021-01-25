@@ -1585,7 +1585,7 @@ declare namespace Objection {
 
     static createValidator(): Validator;
     static createValidationError(args: CreateValidationErrorArgs): Error;
-    static createNotFoundError(): Error;
+    static createNotFoundError(queryContext: QueryContext, args: CreateNotFoundErrorArgs): Error;
 
     static tableMetadata(opt?: TableMetadataOptions): TableMetadata;
     static fetchTableMetadata(opt?: FetchTableMetadataOptions): Promise<TableMetadata>;
