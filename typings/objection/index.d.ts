@@ -1329,7 +1329,7 @@ declare namespace Objection {
     | 'InvalidGraph';
 
   export class ValidationError extends Error {
-    constructor(args: CreateValidationErrorArgs & { modelClass: ModelClass<Model> });
+    constructor(args: CreateValidationErrorArgs & { modelClass?: ModelClass<Model> });
 
     statusCode: number;
     message: string;
@@ -1358,7 +1358,7 @@ declare namespace Objection {
   }
 
   export class NotFoundError extends Error {
-    constructor(args: CreateNotFoundErrorArgs & { modelClass: ModelClass<Model> });
+    constructor(args: CreateNotFoundErrorArgs & { modelClass?: ModelClass<Model> });
 
     statusCode: number;
     data?: any;

@@ -343,6 +343,20 @@ module.exports = (session) => {
                 expect(_.filter(rows, { model2Id: 2, model1Id: 6 })).to.have.length(1);
               });
           });
+
+          it('should relate with onConflict().ignore()', async () => {
+            const sql = await Model2.relatedQuery('model2Relation1')
+              .for(1)
+              .relate(3)
+              .onConflict('model1Id')
+              .ignore()
+              .toKnexQuery()
+              .toSQL().sql;
+
+            expect(sql).to.equal(
+              'insert into "Model1Model2" ("model1Id", "model2Id") values (?, ?) on conflict ("model1Id") do nothing returning "model1Id"'
+            );
+          });
         }
 
         it('should relate (object value)', () => {

@@ -4,7 +4,6 @@ const expect = require('expect.js');
 const Promise = require('bluebird');
 const { inheritModel } = require('../../lib/model/inheritModel');
 const { ValidationError, UniqueViolationError } = require('../../');
-const { isPostgres } = require('../../lib/utils/knexUtils');
 
 module.exports = (session) => {
   let Model1 = session.models.Model1;
@@ -995,6 +994,23 @@ module.exports = (session) => {
               ).to.have.length(1);
             });
         });
+
+        if (session.isPostgres()) {
+          it('should insert a related object with onConflict().ignore()', async () => {
+            const inserted = await Model2.relatedQuery('model2Relation1')
+              .for(parent1.idCol)
+              .insert({ id: 4 })
+              .onConflict('id')
+              .ignore();
+
+            expect(inserted.id).to.equal(4);
+            expect(inserted.$beforeInsertCalled).to.equal(1);
+            expect(inserted.$afterInsertCalled).to.equal(1);
+
+            const joinTableRows = await session.knex('Model1Model2');
+            chai.expect(joinTableRows).to.containSubset([{ model1Id: 4, model2Id: parent1.idCol }]);
+          });
+        }
 
         it('should accept json', () => {
           let inserted = null;
