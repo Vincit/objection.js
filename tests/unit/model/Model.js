@@ -2009,8 +2009,9 @@ describe('Model', () => {
 
     const model1 = Model1.fromJson({});
 
-    model1.$setRelated('hasMany', Model2.fromJson({ id: 1 }));
+    const setResult = model1.$setRelated('hasMany', Model2.fromJson({ id: 1 }));
     expect(model1.hasMany).to.eql([{ id: 1 }]);
+    expect(setResult === model1).to.equal(true);
 
     model1.$setRelated('hasMany', [Model2.fromJson({ id: 2 })]);
     expect(model1.hasMany).to.eql([{ id: 2 }]);
@@ -2065,8 +2066,9 @@ describe('Model', () => {
 
     const model1 = Model1.fromJson({});
 
-    model1.$appendRelated('hasMany', Model2.fromJson({ id: 1 }));
+    const appendResult = model1.$appendRelated('hasMany', Model2.fromJson({ id: 1 }));
     expect(model1.hasMany).to.eql([{ id: 1 }]);
+    expect(appendResult === model1).to.equal(true);
 
     model1.$appendRelated('hasMany', [Model2.fromJson({ id: 2 })]);
     expect(model1.hasMany).to.eql([{ id: 1 }, { id: 2 }]);
