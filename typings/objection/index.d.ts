@@ -752,8 +752,8 @@ declare namespace Objection {
   export interface GraphOptions {
     minimize?: boolean;
     separator?: string;
-    aliases?: string[];
-    joinOperation: string;
+    aliases?: {[key: string]: string};
+    joinOperation?: string;
     maxBatchSize?: number;
   }
 
