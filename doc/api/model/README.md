@@ -1,1 +1,0 @@
-../../guide/models.md
