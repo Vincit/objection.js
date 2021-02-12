@@ -58,7 +58,9 @@ declare namespace Objection {
     ): ValueBuilder;
   }
 
-  export interface ReferenceBuilder extends Castable {}
+  export interface ReferenceBuilder extends Castable {
+    from(tableReference: string): this;
+  }
   export interface ReferenceFunction {
     (expression: string): ReferenceBuilder;
   }
