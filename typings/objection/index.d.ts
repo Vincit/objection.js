@@ -1504,6 +1504,12 @@ declare namespace Objection {
       models: Model | Model[],
       traverser: TraverserFunction
     ): void;
+    traverseAsync(models: Model | Model[], traverser: TraverserFunction): Promise<void>;
+    traverseAsync(
+      filterConstructor: ModelConstructor<Model>,
+      models: Model | Model[],
+      traverser: TraverserFunction
+    ): Promise<void>;
 
     beforeFind(args: StaticHookArguments<any>): any;
     afterFind(args: StaticHookArguments<any>): any;
