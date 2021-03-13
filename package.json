@@ -1,6 +1,6 @@
 {
   "name": "objection",
-  "version": "2.2.14",
+  "version": "2.2.15",
   "description": "An SQL-friendly ORM for Node.js",
   "main": "lib/objection.js",
   "license": "MIT",
@@ -65,7 +65,7 @@
     "db-errors": "^0.2.3"
   },
   "peerDependencies": {
-    "knex": "0.x"
+    "knex": "<0.95.0"
   },
   "devDependencies": {
     "@types/node": "^14.14.13",
