@@ -58,7 +58,9 @@ declare namespace Objection {
     ): ValueBuilder;
   }
 
-  export interface ReferenceBuilder extends Castable {}
+  export interface ReferenceBuilder extends Castable {
+    from(tableReference: string): this;
+  }
   export interface ReferenceFunction {
     (expression: string): ReferenceBuilder;
   }
@@ -1080,11 +1082,6 @@ declare namespace Objection {
     // Deprecated
     omit(properties: string[]): this;
 
-    traverse(filterConstructor: typeof Model, traverser: TraverserFunction): R;
-    traverse(traverser: TraverserFunction): R;
-    traverseAsync(filterConstructor: typeof Model, traverser: TraverserFunction): Promise<R>;
-    traverseAsync(traverser: TraverserFunction): Promise<R>;
-
     page(page: number, pageSize: number): PageQueryBuilder<this>;
     range(): PageQueryBuilder<this>;
     range(start: number, end: number): PageQueryBuilder<this>;
@@ -1509,6 +1506,12 @@ declare namespace Objection {
       models: Model | Model[],
       traverser: TraverserFunction
     ): void;
+    traverseAsync(models: Model | Model[], traverser: TraverserFunction): Promise<void>;
+    traverseAsync(
+      filterConstructor: ModelConstructor<Model>,
+      models: Model | Model[],
+      traverser: TraverserFunction
+    ): Promise<void>;
 
     beforeFind(args: StaticHookArguments<any>): any;
     afterFind(args: StaticHookArguments<any>): any;
@@ -1644,6 +1647,12 @@ declare namespace Objection {
       models: Model | Model[],
       traverser: TraverserFunction
     ): void;
+    static traverseAsync(models: Model | Model[], traverser: TraverserFunction): Promise<void>;
+    static traverseAsync(
+      filterConstructor: typeof Model,
+      models: Model | Model[],
+      traverser: TraverserFunction
+    ): Promise<void>;
 
     static beforeFind(args: StaticHookArguments<any>): any;
     static afterFind(args: StaticHookArguments<any>): any;
