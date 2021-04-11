@@ -975,6 +975,27 @@ describe('Model', () => {
       expect(calls).to.equal(1);
     });
 
+    it('should call $formatJson with formatting options', () => {
+      let calls = 0;
+      let json = { a: 1 };
+      let opt = { c: 2 };
+
+      Model1.prototype.$formatJson = (jsn, o) => {
+        ++calls;
+        expect(jsn).to.eql(json);
+        expect(o).to.eql(opt);
+        jsn.b = 2;
+        return jsn;
+      };
+
+      let model = Model1.fromJson(json);
+      let output = model.$toJson({ format: opt });
+
+      expect(output.a).to.equal(1);
+      expect(output.b).to.equal(2);
+      expect(calls).to.equal(1);
+    });
+
     it('should call $toJson for properties of class Model', () => {
       let Model2 = createModelClass();
 
