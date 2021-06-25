@@ -138,7 +138,7 @@ class Person extends Model {
 
 Require loops (circular dependencies, circular requires) are a very common problem when defining relations. Whenever a module `A` imports module `B` that immediately (synchronously) imports module `A`, you create a require loop that node.js or objection cannot solve automatically. A require loop usually leads to the other imported value to be an empty object which causes all kinds of problems. Objection attempts to detect these situations and mention the words `require loop` in the thrown error. Objection offers multiple solutions to this problem. See the circular dependency solutions examples in this section. In addition to objection's solutions, you can always organize your code so that such loops are not created.
 
-Solutions to require loops
+### CommonJS
 
 ```js
 class Person extends Model {
@@ -207,4 +207,60 @@ class Person extends Model {
     };
   }
 }
+```
+
+### ESM
+
+`person.mjs`
+```js
+import { Model } from 'objection';
+import Animal from './animal.mjs';
+
+class Person extends Model {
+  static tableName = 'persons';
+
+  // relationMappings getter is accessed lazily when you execute your first
+  // query that needs it. Therefore if models import one another, and only
+  // reference each other in the relationMappings getter, you avoid the
+  // `ReferenceError: Cannot access '...' before initialization` error.
+  static get relationMappings() {
+    return {
+      pets: {
+        relation: Model.HasManyRelation,
+        modelClass: Animal,
+        join: {
+          from: 'persons.id',
+          to: 'animals.ownerId'
+        }
+      }
+    }
+  }
+}
+
+export default Person;
+```
+
+`animal.mjs`
+```js
+import { Model } from 'objection';
+import Person from './person.mjs';
+
+class Animal extends Model {
+  static tableName = 'animals';
+  
+  static get relationMappings() {
+    return {
+      owner: {
+        relation: Model.BelongsToOneRelation,
+        modelClass: Person,
+        join: {
+          from: 'animals.ownerId',
+          to: 'persons.id'
+        }
+      }
+    }
+  }
+}
+
+export default Animal;
 ```
