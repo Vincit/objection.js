@@ -37,11 +37,11 @@ export class Person extends objection.Model {
     return 100;
   }
 
-  petsWithId(petId: number): Promise<Animal[]> {
+  petsWithId(petId: number): PromiseLike<Animal[]> {
     return this.$relatedQuery('pets').where('id', petId);
   }
 
-  fetchMom(): Promise<Person | undefined> {
+  fetchMom(): PromiseLike<Person | undefined> {
     return this.$relatedQuery('mom');
   }
 

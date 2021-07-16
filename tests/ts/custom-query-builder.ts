@@ -34,25 +34,25 @@ class Person extends BaseModel {
   pets!: Animal[];
 }
 
-const people: Promise<Person[]> = Person.query()
+const people: CustomQueryBuilder<Person, Person[]> = Person.query()
   .someCustomMethod()
   .where('firstName', 'lol')
   .someCustomMethod()
   .with('someAlias', (qb) => qb.someCustomMethod().from('lol').select('id'))
   .modifyEager<Animal>('pets', (qb) => qb.someCustomMethod().where('id', 1).someCustomMethod());
 
-const pets: Promise<Animal> = new Person()
+const pets: CustomQueryBuilder<Animal, Animal> = new Person()
   .$relatedQuery('pets')
   .someCustomMethod()
   .where('id', 1)
   .first()
   .someCustomMethod();
 
-const numUpdated: Promise<number> = Person.query()
+const numUpdated: CustomQueryBuilder<Person, number> = Person.query()
   .someCustomMethod()
   .patch({ firstName: 'test' })
   .someCustomMethod();
 
-const allPets: Promise<Animal[]> = Person.relatedQuery('pets')
+const allPets: PromiseLike<Animal[]> = Person.relatedQuery('pets')
   .for(Person.query().select('id'))
   .someCustomMethod();

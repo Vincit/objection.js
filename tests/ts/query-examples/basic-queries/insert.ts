@@ -6,7 +6,7 @@ import { Person } from '../../fixtures/person';
     lastName: 'Lawrence',
   });
 
-  const personPromise: Promise<Person> = Person.fromJson({ firstName: 'Jennifer' })
+  const personPromise: PromiseLike<Person> = Person.fromJson({ firstName: 'Jennifer' })
     .$query()
     .insert();
 })();

@@ -798,7 +798,13 @@ declare namespace Objection {
     [key: string]: any;
   }
 
-  export class QueryBuilder<M extends Model, R = M[]> extends Promise<R> {
+  export interface CatchablePromiseLike<R> extends PromiseLike<R> {
+    catch<FR = never>(
+      onrejected?: ((reason: any) => FR | PromiseLike<FR>) | undefined | null
+    ): Promise<R | FR>;
+  }
+
+  export class QueryBuilder<M extends Model, R = M[]> implements CatchablePromiseLike<R> {
     static forClass: ForClassMethod;
 
     select: SelectMethod<this>;
@@ -1158,7 +1164,18 @@ declare namespace Objection {
     SingleQueryBuilderType: QueryBuilder<M, M>;
     NumberQueryBuilderType: QueryBuilder<M, number>;
     PageQueryBuilderType: QueryBuilder<M, Page<M>>;
+
+    then<R1 = R, R2 = never>(
+      onfulfilled?: ((value: R) => R1 | PromiseLike<R1>) | undefined | null,
+      onrejected?: ((reason: any) => R2 | PromiseLike<R2>) | undefined | null
+    ): Promise<R1 | R2>;
+
+    catch<FR = never>(
+      onrejected?: ((reason: any) => FR | PromiseLike<FR>) | undefined | null
+    ): Promise<R | FR>;
   }
+
+  type X<T> = Promise<T>;
 
   interface FetchGraphOptions {
     transaction?: TransactionOrKnex;
