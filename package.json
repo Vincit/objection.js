@@ -19,8 +19,7 @@
     "prettier": "prettier --write \"{examples,lib,tests,typings,doc}/**/*.{js,ts}\"",
     "eslint": "eslint --format codeframe \"examples/**/*.js\" \"lib/**/*.js\" \"tests/**/*.js\"",
     "docs:dev": "vuepress dev doc",
-    "docs:build": "vuepress build doc",
-    "prepare": "husky install"
+    "docs:build": "vuepress build doc"
   },
   "publishConfig": {
     "tag": "next"
@@ -80,7 +79,6 @@
     "fs-extra": "^10.0.0",
     "glob": "^7.1.7",
     "knex": "0.95.7",
-    "lint-staged": "^11.0.1",
     "mocha": "^9.0.2",
     "mysql": "^2.18.1",
     "nyc": "^15.1.0",
