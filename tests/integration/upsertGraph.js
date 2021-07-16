@@ -3478,7 +3478,7 @@ module.exports = (session) => {
               results.forEach((res, index) => {
                 expect(res.isRejected()).to.equal(true);
                 expect(res.reason().data[errorKeys[index]][0].message).to.equal(
-                  'should be string,null'
+                  'must be string,null'
                 );
               });
 
@@ -3753,7 +3753,7 @@ module.exports = (session) => {
             })
             .catch((err) => {
               expect(err.data['model1Relation2[0].model2Prop1'][0].message).to.equal(
-                'should be string,null'
+                'must be string,null'
               );
               done();
             })
@@ -3833,7 +3833,7 @@ module.exports = (session) => {
               results.forEach((res, index) => {
                 expect(res.isRejected()).to.equal(true);
                 expect(res.reason().data[errorKeys[index]][0].message).to.equal(
-                  'is a required property'
+                  "must have required property 'model1Prop2'"
                 );
               });
             })

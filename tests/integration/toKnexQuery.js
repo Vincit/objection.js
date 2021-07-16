@@ -82,8 +82,7 @@ module.exports = (session) => {
             raw('?', raw('?', val(1))),
             Person.relatedQuery('children').select('id').limit(1)
           ),
-          sql:
-            'select "persons".* from "persons" where ? = (select "id" from "persons" as "children" where "children"."parentId" = "persons"."id" limit ?)',
+          sql: 'select "persons".* from "persons" where ? = (select "id" from "persons" as "children" where "children"."parentId" = "persons"."id" limit ?)',
           bindings: [1, 1],
         });
       });
@@ -103,8 +102,7 @@ module.exports = (session) => {
 
         testSql({
           query: Person.query(knex).withGraphJoined('children'),
-          sql:
-            'select "persons"."id" as "id", "persons"."name" as "name", "persons"."parentId" as "parentId", "children"."id" as "children:id", "children"."name" as "children:name", "children"."parentId" as "children:parentId" from "persons" left join "persons" as "children" on "children"."parentId" = "persons"."id"',
+          sql: 'select "persons"."id" as "id", "persons"."name" as "name", "persons"."parentId" as "parentId", "children"."id" as "children:id", "children"."name" as "children:name", "children"."parentId" as "children:parentId" from "persons" left join "persons" as "children" on "children"."parentId" = "persons"."id"',
           bindings: [],
         });
       });
@@ -115,8 +113,7 @@ module.exports = (session) => {
 
         testSql({
           query: Person.query(knex).withGraphJoined('children'),
-          sql:
-            'select "persons"."id" as "id", "persons"."name" as "name", "persons"."parentId" as "parentId", "children"."id" as "children:id", "children"."name" as "children:name", "children"."parentId" as "children:parentId" from "persons" left join "persons" as "children" on "children"."parentId" = "persons"."id"',
+          sql: 'select "persons"."id" as "id", "persons"."name" as "name", "persons"."parentId" as "parentId", "children"."id" as "children:id", "children"."name" as "children:name", "children"."parentId" as "children:parentId" from "persons" left join "persons" as "children" on "children"."parentId" = "persons"."id"',
           bindings: [],
         });
       });

@@ -57,6 +57,7 @@ describe('Model', () => {
 
     it('should validate if jsonSchema is defined', () => {
       Model1.jsonSchema = {
+        type: 'object',
         required: ['a'],
         additionalProperties: false,
         properties: {
@@ -130,14 +131,14 @@ describe('Model', () => {
         Model1.fromJson({ a: 'a', c: { d: 'test', e: [{ f: 'not a number' }] } });
       }).to.throwException((exp) => {
         expect(exp).to.be.a(ValidationError);
-        expect(exp.data).to.have.property('c.e[0].f');
+        expect(exp.data).to.have.property('c.e.0.f');
       });
 
       expect(() => {
         Model1.fromJson({ a: 'a', c: { d: 'test', e: [{ additional: true }] } });
       }).to.throwException((exp) => {
         expect(exp).to.be.a(ValidationError);
-        expect(exp.data).to.have.property('c.e[0].additional');
+        expect(exp.data).to.have.property('c.e.0.additional');
       });
     });
 

@@ -262,7 +262,7 @@ module.exports = (session) => {
             expect(err.data).to.eql({
               model1Prop1: [
                 {
-                  message: 'should be string',
+                  message: 'must be string',
                   keyword: 'type',
                   params: {
                     type: 'string',

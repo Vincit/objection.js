@@ -128,6 +128,7 @@ This page contains the documentation of all other types and classes than [Model]
 | context     | object                                              | The context of the query. See [context](/api/query-builder/other-methods.html#context).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | relation    | [Relation](#class-relation)                         | If the query is for a relation, this property holds the [Relation](#class-relation) object. For example when you call `person.$relatedQuery('pets)` or `Person.relatedQuery('movies')` the `relation` will be a relation object for pets and movies relation of `Person` respectively.                                                                                                                                                                                                                                                                                               |
 | cancelQuery | function(any)                                       | Cancels the query being executed. You can pass an arugment for the function and that value will be the result of the query.                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| result      | any[]                                               | The result of the query. Only available in `after*` hooks.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 
 ## `type` FieldExpression
 
@@ -162,12 +163,8 @@ const { ref } = require('objection');
 await Person.query()
   .select([
     'id',
-    ref('persons.jsonColumn:details.name')
-      .castText()
-      .as('name'),
-    ref('persons.jsonColumn:details.age')
-      .castInt()
-      .as('age')
+    ref('persons.jsonColumn:details.name').castText().as('name'),
+    ref('persons.jsonColumn:details.age').castInt().as('age'),
   ])
   .join(
     'someTable',
@@ -480,9 +477,9 @@ class Person extends Model {
         modelClass: Animal,
         join: {
           from: 'persons.id',
-          to: 'animals.ownerId'
-        }
-      }
+          to: 'animals.ownerId',
+        },
+      },
     };
   }
 }
@@ -800,15 +797,15 @@ const { Model, AjvValidator } = require('objection');
 class BaseModel extends Model {
   static createValidator() {
     return new AjvValidator({
-      onCreateAjv: ajv => {
+      onCreateAjv: (ajv) => {
         // Here you can modify the `Ajv` instance.
       },
       options: {
         allErrors: true,
         validateSchema: false,
         ownProperties: true,
-        v5: true
-      }
+        v5: true,
+      },
     });
   }
 }

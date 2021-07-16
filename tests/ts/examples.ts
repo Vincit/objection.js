@@ -1153,8 +1153,8 @@ takesPerson(Person.fromDatabaseJson({ firstName: 'jennifer', lastName: 'Lawrence
 
 // plugin tests for mixin and compose:
 
-const plugin1 = ({} as any) as objection.Plugin;
-const plugin2 = ({} as any) as objection.Plugin;
+const plugin1 = {} as any as objection.Plugin;
+const plugin2 = {} as any as objection.Plugin;
 
 // DB errors
 () => {
