@@ -12,7 +12,7 @@
 // * Karl Blomster <https://github.com/kblomster>
 // * And many others: See <https://github.com/Vincit/objection.js/blob/master/typings/objection/index.d.ts>
 
-import * as ajv from 'ajv';
+import Ajv, { Options as AjvOptions } from 'ajv';
 import * as dbErrors from 'db-errors';
 import { Knex } from 'knex';
 
@@ -1287,8 +1287,8 @@ declare namespace Objection {
   }
 
   export interface AjvConfig {
-    onCreateAjv(ajv: ajv.Ajv): void;
-    options?: ajv.Options;
+    onCreateAjv(ajv: Ajv): void;
+    options?: AjvOptions;
   }
 
   export class AjvValidator extends Validator {

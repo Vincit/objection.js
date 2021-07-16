@@ -1,4 +1,4 @@
-import * as ajv from 'ajv';
+import Ajv from 'ajv';
 import * as objection from '../../../';
 import { Animal } from './animal';
 import { Movie } from './movie';
@@ -63,7 +63,7 @@ export class Person extends objection.Model {
 
   static createValidator() {
     return new objection.AjvValidator({
-      onCreateAjv(ajvalidator: ajv.Ajv) {
+      onCreateAjv(ajvalidator: Ajv) {
         // modify ajvalidator
       },
       options: {

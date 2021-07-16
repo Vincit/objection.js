@@ -1,4 +1,4 @@
-import * as ajv from 'ajv';
+import Ajv from 'ajv';
 import { Knex, knex } from 'knex';
 import * as objection from '../../';
 import {
@@ -125,7 +125,7 @@ class Person extends objection.Model {
 
   static createValidator() {
     return new objection.AjvValidator({
-      onCreateAjv(ajvalidator: ajv.Ajv) {
+      onCreateAjv(ajvalidator: Ajv) {
         // modify ajvalidator
       },
       options: {
@@ -1153,8 +1153,8 @@ takesPerson(Person.fromDatabaseJson({ firstName: 'jennifer', lastName: 'Lawrence
 
 // plugin tests for mixin and compose:
 
-const plugin1 = {} as any as objection.Plugin;
-const plugin2 = {} as any as objection.Plugin;
+const plugin1 = ({} as any) as objection.Plugin;
+const plugin2 = ({} as any) as objection.Plugin;
 
 // DB errors
 () => {
