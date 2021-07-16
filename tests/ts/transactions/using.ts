@@ -1,7 +1,7 @@
 import { transaction, Transaction } from '../../../';
 import { Animal } from '../fixtures/animal';
 import { Person } from '../fixtures/person';
-import Knex = require('knex');
+import { Knex } from 'knex';
 
 (async () => {
   const knex = Person.knex();

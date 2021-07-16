@@ -1,5 +1,5 @@
 import * as ajv from 'ajv';
-import * as knex from 'knex';
+import { Knex, knex } from 'knex';
 import * as objection from '../../';
 import {
   DBError,
@@ -13,7 +13,6 @@ import {
   QueryBuilder,
   StaticHookArguments,
 } from '../../';
-import Knex = require('knex');
 
 // This file exercises the Objection.js typings.
 
@@ -389,7 +388,7 @@ class Comment extends objection.Model {
 
 // !!! see examples/express-ts/src/app.ts for a valid knex setup. The following is bogus:
 
-const k: knex = knex({});
+const k: Knex = knex({});
 
 // bindKnex returns the proper Model subclass:
 
@@ -840,7 +839,7 @@ qb = qb.clearContext();
 
 qb = qb.runBefore(qbcb);
 qb = qb.onBuild(qbcb);
-qb = qb.onBuildKnex((knexBuilder: knex.QueryBuilder, builder: objection.QueryBuilder<Person>) => {
+qb = qb.onBuildKnex((knexBuilder: Knex.QueryBuilder, builder: objection.QueryBuilder<Person>) => {
   if (builder.hasWheres()) {
     knexBuilder.where('foo', 'bar');
   }

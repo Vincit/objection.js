@@ -14,7 +14,7 @@
 
 import * as ajv from 'ajv';
 import * as dbErrors from 'db-errors';
-import * as Knex from 'knex';
+import { Knex } from 'knex';
 
 // Export the entire Objection namespace.
 export = Objection;
@@ -754,7 +754,7 @@ declare namespace Objection {
   export interface GraphOptions {
     minimize?: boolean;
     separator?: string;
-    aliases?: {[key: string]: string};
+    aliases?: { [key: string]: string };
     joinOperation?: string;
     maxBatchSize?: number;
   }
