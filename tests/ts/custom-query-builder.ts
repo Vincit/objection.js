@@ -3,6 +3,7 @@ import { Model, QueryBuilder, Page, TransactionOrKnex } from '../../';
 class CustomQueryBuilder<M extends Model, R = M[]> extends QueryBuilder<M, R> {
   ArrayQueryBuilderType!: CustomQueryBuilder<M, M[]>;
   SingleQueryBuilderType!: CustomQueryBuilder<M, M>;
+  MaybeSingleQueryBuilderType!: CustomQueryBuilder<M, M | undefined>;
   NumberQueryBuilderType!: CustomQueryBuilder<M, number>;
   PageQueryBuilderType!: CustomQueryBuilder<M, Page<M>>;
 
@@ -41,7 +42,7 @@ const people: CustomQueryBuilder<Person, Person[]> = Person.query()
   .with('someAlias', (qb) => qb.someCustomMethod().from('lol').select('id'))
   .modifyEager<Animal>('pets', (qb) => qb.someCustomMethod().where('id', 1).someCustomMethod());
 
-const pets: CustomQueryBuilder<Animal, Animal> = new Person()
+const pets: CustomQueryBuilder<Animal, Animal | undefined> = new Person()
   .$relatedQuery('pets')
   .someCustomMethod()
   .where('id', 1)

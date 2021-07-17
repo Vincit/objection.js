@@ -26,10 +26,7 @@ class Person extends Model {
 Now you can do this:
 
 ```js
-await Person.query()
-  .where('id', 1)
-  .myCustomMethod(1)
-  .where('foo', 'bar');
+await Person.query().where('id', 1).myCustomMethod(1).where('foo', 'bar');
 ```
 
 If you want to set the custom query builder for all model classes you can just set the [QueryBuilder](/api/model/static-methods.html#static-querybuilder) property of the [Model](/api/model/) base class. A cleaner option would be to create your own Model subclass, set its [QueryBuilder](/api/query-builder/) property and inherit all your models from the custom Model class.
@@ -59,7 +56,7 @@ class BaseModel extends Model {
     const query = super.query(...args);
 
     // Somehow modify the query.
-    return query.runAfter(result => {
+    return query.runAfter((result) => {
       console.log(this.name, 'got result', result);
       return result;
     });
@@ -83,6 +80,7 @@ class MyQueryBuilder<M extends Model, R = M[]> extends QueryBuilder<M, R> {
   // name of the query builder class.
   ArrayQueryBuilderType!: MyQueryBuilder<M, M[]>;
   SingleQueryBuilderType!: MyQueryBuilder<M, M>;
+  MaybeSingleQueryBuilderType!: MyQueryBuilder<M, M | undefined>;
   NumberQueryBuilderType!: MyQueryBuilder<M, number>;
   PageQueryBuilderType!: MyQueryBuilder<M, Page<M>>;
 
@@ -106,10 +104,7 @@ class Person extends BaseModel {
   static tableName = 'persons';
 }
 
-await Person.query()
-  .where('id', 1)
-  .myCustomMethod(1)
-  .where('foo', 'bar');
+await Person.query().where('id', 1).myCustomMethod(1).where('foo', 'bar');
 ```
 
 ::: tip

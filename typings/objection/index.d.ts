@@ -307,6 +307,11 @@ declare namespace Objection {
   type SingleQueryBuilder<T extends { SingleQueryBuilderType: any }> = T['SingleQueryBuilderType'];
 
   /**
+   * Gets the single or undefined item query builder type for a query builder.
+   */
+  type MaybeSingleQueryBuilder<QB extends AnyQueryBuilder> = QB['MaybeSingleQueryBuilderType'];
+
+  /**
    * Gets the multi-item query builder type for a query builder.
    */
   type ArrayQueryBuilder<T extends { ArrayQueryBuilderType: any }> = T['ArrayQueryBuilderType'];
@@ -566,7 +571,7 @@ declare namespace Objection {
 
   interface FirstMethod {
     <QB extends AnyQueryBuilder>(this: QB): QB extends ArrayQueryBuilder<QB>
-      ? SingleQueryBuilder<QB>
+      ? MaybeSingleQueryBuilder<QB>
       : QB;
   }
 
@@ -587,10 +592,6 @@ declare namespace Objection {
 
   interface OneArgMethod<T, QB extends AnyQueryBuilder> {
     (arg: T): QB;
-  }
-
-  interface OptionalOneArgMethod<T, QB extends AnyQueryBuilder> {
-    (arg?: T): QB;
   }
 
   interface StringReturningMethod {
@@ -975,9 +976,9 @@ declare namespace Objection {
     groupBy: GroupByMethod<this>;
     groupByRaw: RawInterface<this>;
 
-    findById(id: MaybeCompositeId): SingleQueryBuilder<this>;
+    findById(id: MaybeCompositeId): MaybeSingleQueryBuilder<this>;
     findByIds(ids: MaybeCompositeId[]): this;
-    findOne: WhereMethod<SingleQueryBuilder<this>>;
+    findOne: WhereMethod<MaybeSingleQueryBuilder<this>>;
 
     execute(): Promise<R>;
     castTo<MC extends Model>(modelClass: ModelConstructor<MC>): QueryBuilderType<MC>;
@@ -1053,7 +1054,10 @@ declare namespace Objection {
     // Deprecated
     allowUpsert: AllowGraphMethod<this>;
 
-    throwIfNotFound: OptionalOneArgMethod<object, this>;
+    throwIfNotFound: (
+      arg?: any
+    ) => R extends Model | undefined ? SingleQueryBuilder<QueryBuilder<M, M>> : this;
+
     returning: ReturningMethod;
     forUpdate: IdentityMethod<this>;
     forShare: IdentityMethod<this>;
@@ -1162,6 +1166,7 @@ declare namespace Objection {
 
     ArrayQueryBuilderType: QueryBuilder<M, M[]>;
     SingleQueryBuilderType: QueryBuilder<M, M>;
+    MaybeSingleQueryBuilderType: QueryBuilder<M, M | undefined>;
     NumberQueryBuilderType: QueryBuilder<M, number>;
     PageQueryBuilderType: QueryBuilder<M, Page<M>>;
 

@@ -171,6 +171,14 @@ function takesModelSubclass<M extends objection.Model>(m: M) {}
 function takesModel(m: objection.Model) {}
 function takesModelClass(m: objection.ModelClass<any>) {}
 
+// Borrowed from https://github.com/TypeStrong/ts-expect/blob/39f04b5/src/index.ts
+type TypeEqual<T, U> = Exclude<T, U> extends never
+  ? Exclude<U, T> extends never
+    ? true
+    : false
+  : false;
+const expectsTrue = <T extends true>() => 1;
+
 const takesPerson = (person: Person) => {
   person.examplePersonMethod('');
 };
@@ -201,7 +209,9 @@ takesPersonQueryBuilder(Person.query());
 async () => {
   takesPeople(await Person.query().where('lastName', lastName));
   takesPeople(await Person.query().where({ lastName }));
-  takesMaybePerson(await Person.query().findById(123));
+  const person = await Person.query().findById(123);
+  expectsTrue<TypeEqual<Person | undefined, typeof person>>();
+  takesMaybePerson(person);
   takesMaybePerson(await Person.query().findById('uid'));
 };
 
@@ -210,12 +220,18 @@ async () => {
   takesMaybePerson(await Person.query().where(raw('raw SQL constraint')).first());
   takesMaybePerson(await Person.query().where('lastName', lastName).first());
   takesMaybePerson(await Person.query().where('lastName', '>', lastName).first());
-  takesMaybePerson(await Person.query().where({ lastName }).first());
+
+  const person = await Person.query().where({ lastName }).first();
+  expectsTrue<TypeEqual<Person | undefined, typeof person>>();
+  takesMaybePerson(person);
 
   takesMaybePerson(await Person.query().findOne(raw('raw SQL constraint')));
   takesMaybePerson(await Person.query().findOne('lastName', lastName));
   takesMaybePerson(await Person.query().findOne('lastName', '>', lastName));
-  takesMaybePerson(await Person.query().findOne({ lastName }));
+
+  const person2 = await Person.query().findOne({ lastName });
+  expectsTrue<TypeEqual<Person | undefined, typeof person2>>();
+  takesMaybePerson(person2);
 };
 
 // union/unionAll types
@@ -459,8 +475,8 @@ let qb: objection.QueryBuilder<Person> = BoundPerson.query().where('name', 'foo'
 
 async () => {
   const q = () => Person.query().findOne({ lastName });
-  takesMaybePerson(await q());
-  takesPerson(await q().throwIfNotFound());
+  const person = await q().throwIfNotFound();
+  takesPerson(person);
 };
 
 // QueryBuilder.throwIfNotFound does nothing for array results:
@@ -476,7 +492,7 @@ async () => {
 // (fewer characters than having each line `const qbNNN: QueryBuilder =`):
 
 const maybePerson: PromiseLike<Person | undefined> = qb.findById(1);
-const maybePerson2: PromiseLike<Person> = qb.findById([1, 2, 3]);
+const maybePerson2: PromiseLike<Person | undefined> = qb.findById([1, 2, 3]);
 
 // query builder knex-wrapping methods:
 
@@ -854,12 +870,12 @@ qb = qb.onBuildKnex((knexBuilder: Knex.QueryBuilder, builder: objection.QueryBui
 qb = qb.reject('fail');
 qb = qb.resolve('success');
 
-const trxRes1: Promise<Person> = Person.transaction(async (trx) => {
+const trxRes1: Promise<Person | undefined> = Person.transaction(async (trx) => {
   const person = await Person.query(trx).findById(1);
   return person;
 });
 
-const trxRes2: Promise<Person[]> = Person.transaction(Person.knex(), async (trx) => {
+const trxRes2: Promise<(Person | undefined)[]> = Person.transaction(Person.knex(), async (trx) => {
   const person = await Person.query(trx).findById(1);
   return [person];
 });
@@ -1105,7 +1121,7 @@ const deleteByIDThrow: PromiseLike<number> = qb.deleteById(32).throwIfNotFound()
 const whereFirst: PromiseLike<Person | undefined> = qb.where({ firstName: 'Mo' }).first();
 const firstWhere: PromiseLike<Person | undefined> = qb.first().where({ firstName: 'Mo' });
 const updateFirst: PromiseLike<number> = qb.update({}).first();
-const updateReturningFirst: PromiseLike<Person> = qb.update({}).returning('*').first();
+const updateReturningFirst: PromiseLike<Person | undefined> = qb.update({}).returning('*').first();
 
 // Returning restores the result to Model or Model[].
 

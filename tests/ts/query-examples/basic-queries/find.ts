@@ -4,7 +4,7 @@ import { Person } from '../../fixtures/person';
 (async () => {
   const person = await Person.query().findById(1);
 
-  console.log(person.firstName);
+  console.log(person!.firstName);
   console.log(person instanceof Person); // --> true
 
   const people = await Person.query();
