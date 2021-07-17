@@ -21,7 +21,7 @@ export = Objection;
 
 declare namespace Objection {
   const raw: RawFunction;
-  // Deprecated
+  /** @deprecated */
   const lit: ValueFunction;
   const val: ValueFunction;
   const ref: ReferenceFunction;
@@ -577,7 +577,7 @@ declare namespace Objection {
 
   type ForIdValue = MaybeCompositeId | AnyQueryBuilder;
 
-  // Deprecated
+  /** @deprecated */
   interface EagerMethod<QB extends AnyQueryBuilder> {
     (expr: RelationExpression<ModelType<QB>>, modifiers?: Modifiers): QB;
   }
@@ -736,15 +736,15 @@ declare namespace Objection {
     (): any;
   }
 
-  // Deprecated
+  /** @deprecated */
   export interface EagerAlgorithm {}
 
-  // Deprecated
+  /** @deprecated */
   interface EagerAlgorithmMethod<QB extends AnyQueryBuilder> {
     (algorithm: EagerAlgorithm): QB;
   }
 
-  // Deprecated
+  /** @deprecated */
   export interface EagerOptions {
     minimize?: boolean;
     separator?: string;
@@ -760,7 +760,7 @@ declare namespace Objection {
     maxBatchSize?: number;
   }
 
-  // Deprecated
+  /** @deprecated */
   interface EagerOptionsMethod<QB extends AnyQueryBuilder> {
     (options: EagerOptions): QB;
   }
@@ -790,7 +790,7 @@ declare namespace Objection {
     (): QB;
   }
 
-  // Deprecated
+  /** @deprecated */
   interface ApplyFilterMethod<QB extends AnyQueryBuilder> {
     (...filters: string[]): QB;
   }
@@ -921,21 +921,21 @@ declare namespace Objection {
     withRecursive: WithMethod<this>;
     withWrapped: WithMethod<this>;
 
-    // Deprecated
+    /** @deprecated */
     joinRelation: JoinRelatedMethod<this>;
-    // Deprecated
+    /** @deprecated */
     innerJoinRelation: JoinRelatedMethod<this>;
-    // Deprecated
+    /** @deprecated */
     outerJoinRelation: JoinRelatedMethod<this>;
-    // Deprecated
+    /** @deprecated */
     leftJoinRelation: JoinRelatedMethod<this>;
-    // Deprecated
+    /** @deprecated */
     leftOuterJoinRelation: JoinRelatedMethod<this>;
-    // Deprecated
+    /** @deprecated */
     rightJoinRelation: JoinRelatedMethod<this>;
-    // Deprecated
+    /** @deprecated */
     rightOuterJoinRelation: JoinRelatedMethod<this>;
-    // Deprecated
+    /** @deprecated */
     fullOuterJoinRelation: JoinRelatedMethod<this>;
 
     joinRelated: JoinRelatedMethod<this>;
@@ -1028,30 +1028,30 @@ declare namespace Objection {
 
     truncate(): Promise<void>;
 
-    // Deprecated
+    /** @deprecated */
     eager: EagerMethod<this>;
-    // Deprecated
+    /** @deprecated */
     mergeEager: EagerMethod<this>;
 
-    // Deprecated
+    /** @deprecated */
     joinEager: EagerMethod<this>;
-    // Deprecated
+    /** @deprecated */
     mergeJoinEager: EagerMethod<this>;
 
-    // Deprecated
+    /** @deprecated */
     naiveEager: EagerMethod<this>;
-    // Deprecated
+    /** @deprecated */
     mergeNaiveEager: EagerMethod<this>;
 
-    // Deprecated
+    /** @deprecated */
     allowEager: AllowGraphMethod<this>;
-    // Deprecated
+    /** @deprecated */
     mergeAllowEager: AllowGraphMethod<this>;
 
     allowGraph: AllowGraphMethod<this>;
-    // Deprecated
+    /** @deprecated */
     allowInsert: AllowGraphMethod<this>;
-    // Deprecated
+    /** @deprecated */
     allowUpsert: AllowGraphMethod<this>;
 
     throwIfNotFound: (
@@ -1081,15 +1081,15 @@ declare namespace Objection {
     toKnexQuery<T = ModelObject<M>>(): Knex.QueryBuilder<T, T[]>;
     clone(): this;
 
-    // Deprecated
+    /** @deprecated */
     pluck(property: string): this;
-    // Deprecated
+    /** @deprecated */
     pick(modelClass: typeof Model, properties: string[]): this;
-    // Deprecated
+    /** @deprecated */
     pick(properties: string[]): this;
-    // Deprecated
+    /** @deprecated */
     omit(modelClass: typeof Model, properties: string[]): this;
-    // Deprecated
+    /** @deprecated */
     omit(properties: string[]): this;
 
     page(page: number, pageSize: number): PageQueryBuilder<this>;
@@ -1116,24 +1116,24 @@ declare namespace Objection {
 
     graphExpressionObject: GraphExpressionObjectMethod<this>;
 
-    // Deprecated
+    /** @deprecated */
     eagerAlgorithm: EagerAlgorithmMethod<this>;
-    // Deprecated
+    /** @deprecated */
     eagerOptions: EagerOptionsMethod<this>;
-    // Deprecated
+    /** @deprecated */
     modifyEager: ModifyGraphMethod<this>;
-    // Deprecated
+    /** @deprecated */
     filterEager: ModifyGraphMethod<this>;
     modifyGraph: ModifyGraphMethod<this>;
 
     context: ContextMethod<this>;
     clearContext: ClearContextMethod<this>;
-    // Deprecated
+    /** @deprecated */
     mergeContext: ContextMethod<this>;
 
     modify: ModifyMethod<this>;
     modifiers: ModifiersMethod<this>;
-    // Deprecated
+    /** @deprecated */
     applyFilter: ApplyFilterMethod<this>;
 
     isFind: BooleanReturningMethod;
@@ -1146,7 +1146,7 @@ declare namespace Objection {
     isInternal: BooleanReturningMethod;
     hasWheres: BooleanReturningMethod;
     hasSelects: BooleanReturningMethod;
-    // Deprecated
+    /** @deprecated */
     hasEager: BooleanReturningMethod;
     hasWithGraph: BooleanReturningMethod;
 
@@ -1158,7 +1158,7 @@ declare namespace Objection {
     clearWhere: IdentityMethod<this>;
     clearWithGraph: IdentityMethod<this>;
     clearAllowGraph: IdentityMethod<this>;
-    // Deprecated
+    /** @deprecated */
     clearEager: IdentityMethod<this>;
 
     ModelType: M;
@@ -1444,16 +1444,16 @@ declare namespace Objection {
     HasOneThroughRelation: RelationType;
 
     defaultGraphOptions?: GraphOptions;
-    // Deprecated
+    /** @deprecated */
     defaultEagerAlgorithm?: EagerAlgorithm;
-    // Deprecated
+    /** @deprecated */
     defaultEagerOptions?: EagerOptions;
 
-    // Deprecated
+    /** @deprecated */
     WhereInEagerAlgorithm: EagerAlgorithm;
-    // Deprecated
+    /** @deprecated */
     NaiveEagerAlgorithm: EagerAlgorithm;
-    // Deprecated
+    /** @deprecated */
     JoinEagerAlgorithm: EagerAlgorithm;
 
     query(this: Constructor<M>, trxOrKnex?: TransactionOrKnex): QueryBuilderType<M>;
@@ -1491,7 +1491,7 @@ declare namespace Objection {
     bindKnex(trxOrKnex: TransactionOrKnex): this;
     bindTransaction(trxOrKnex: TransactionOrKnex): this;
 
-    // Deprecated
+    /** @deprecated */
     loadRelated(
       modelOrObject: PartialModelObject<M>,
       expression: RelationExpression<M>,
@@ -1499,7 +1499,7 @@ declare namespace Objection {
       trxOrKnex?: TransactionOrKnex
     ): SingleQueryBuilder<QueryBuilderType<M>>;
 
-    // Deprecated
+    /** @deprecated */
     loadRelated(
       modelOrObject: PartialModelObject<M>[],
       expression: RelationExpression<M>,
@@ -1577,16 +1577,16 @@ declare namespace Objection {
     static HasOneThroughRelation: RelationType;
 
     static defaultGraphOptions?: GraphOptions;
-    // Deprecated
+    /** @deprecated */
     static defaultEagerAlgorithm?: EagerAlgorithm;
-    // Deprecated
+    /** @deprecated */
     static defaultEagerOptions?: EagerOptions;
 
-    // Deprecated
+    /** @deprecated */
     static WhereInEagerAlgorithm: EagerAlgorithm;
-    // Deprecated
+    /** @deprecated */
     static NaiveEagerAlgorithm: EagerAlgorithm;
-    // Deprecated
+    /** @deprecated */
     static JoinEagerAlgorithm: EagerAlgorithm;
 
     static query<M extends Model>(
@@ -1628,7 +1628,7 @@ declare namespace Objection {
     static bindKnex<M>(this: M, trxOrKnex: TransactionOrKnex): M;
     static bindTransaction<M>(this: M, trxOrKnex: TransactionOrKnex): M;
 
-    // Deprecated
+    /** @deprecated */
     static loadRelated<M extends Model>(
       this: Constructor<M>,
       modelOrObject: PartialModelObject<M>,
@@ -1637,7 +1637,7 @@ declare namespace Objection {
       trxOrKnex?: TransactionOrKnex
     ): SingleQueryBuilder<QueryBuilderType<M>>;
 
-    // Deprecated
+    /** @deprecated */
     static loadRelated<M extends Model>(
       this: Constructor<M>,
       modelOrObject: PartialModelObject<M>[],
@@ -1702,7 +1702,7 @@ declare namespace Objection {
     $id(id: any): void;
     $id(): any;
 
-    // Deprecated
+    /** @deprecated */
     $loadRelated(
       expression: RelationExpression<this>,
       modifiers?: Modifiers<QueryBuilderType<this>>,
