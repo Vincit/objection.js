@@ -747,9 +747,9 @@ There are a couple of requirements for the implementation:
 
 ```js
 class Person extends Model {
-  $formatJson(json) {
+  $formatJson(json, options) {
     // Remember to call the super class's implementation.
-    json = super.$formatJson(json);
+    json = super.$formatJson(json, options);
     // Do your conversion here.
     return json;
   }
@@ -768,9 +768,10 @@ There are a couple of requirements for the implementation:
 
 ##### Arguments
 
-| Argument | Type   | Description                      |
-| -------- | ------ | -------------------------------- |
-| json     | Object | The JSON POJO in internal format |
+| Argument | Type   | Description                                              |
+| -------- | ------ | -------------------------------------------------------- |
+| json     | Object | The JSON POJO in internal format                         |
+| options  | Object | Formatting options from toJSON's options.format property |
 
 ##### Return value
 
