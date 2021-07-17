@@ -134,11 +134,36 @@ class Person extends Model {
 }
 ```
 
-## Require loops
+## Require loops (non ECMAScript modules only)
 
 Require loops (circular dependencies, circular requires) are a very common problem when defining relations. Whenever a module `A` imports module `B` that immediately (synchronously) imports module `A`, you create a require loop that node.js or objection cannot solve automatically. A require loop usually leads to the other imported value to be an empty object which causes all kinds of problems. Objection attempts to detect these situations and mention the words `require loop` in the thrown error. Objection offers multiple solutions to this problem. See the circular dependency solutions examples in this section. In addition to objection's solutions, you can always organize your code so that such loops are not created.
 
-Solutions to require loops
+If you are using [ECMAScript modules](https://nodejs.org/api/esm.html), circular imports are not a problem. You can just do:
+
+```js
+import Animal from "./Animal.js";
+
+class Person extends Model {
+  static get tableName() {
+    return "persons";
+  }
+
+  static get relationMappings() {
+    return {
+      pets: {
+        relation: Model.HasManyRelation,
+        modelClass: Animal,
+        join: {
+          from: "persons.id",
+          to: "animals.ownerId",
+        },
+      },
+    };
+  }
+}
+```
+
+However if you are not using ECMAScript modules, solutions to require loops are:
 
 ```js
 class Person extends Model {
@@ -208,3 +233,4 @@ class Person extends Model {
   }
 }
 ```
+
