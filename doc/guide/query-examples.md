@@ -373,7 +373,7 @@ and "animals"."ownerId" = 1
 order by "name" asc
 ```
 
-With `HasManyRelation`s and `BelongsToOneRelation`s the `relatedQuery` helper may just seem like unnecessary bloat. You can of course simply write the SQL directly. The following code should be clear to anyone even without any objetion experience:
+With `HasManyRelation`s and `BelongsToOneRelation`s the `relatedQuery` helper may just seem like unnecessary bloat. You can of course simply write the SQL directly. The following code should be clear to anyone even without any objection experience:
 
 ```js
 const dogs = await Pet.query()
