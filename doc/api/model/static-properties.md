@@ -669,7 +669,7 @@ class Person extends Model {
 }
 ```
 
-A relation type that can be used in [relationMappings](/api/model/static-properties.html#static-relationmappings) to create a has-may relationship. See [this section](/guide/relations.md) for more information about different relation types.
+A relation type that can be used in [relationMappings](/api/model/static-properties.html#static-relationmappings) to create a has-many relationship. See [this section](/guide/relations.md) for more information about different relation types.
 
 ## `static` ManyToManyRelation
 
