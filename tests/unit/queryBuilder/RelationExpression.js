@@ -878,9 +878,6 @@ describe('RelationExpression', () => {
       testParseFail('a asb');
       testParseFail('aas b');
       testParseFail('a asd b');
-      // TODO: enable for v2.0.
-      // testParseFail('[a.b, a.c]');
-      // testParseFail('a.[b.c, b.d]');
     });
 
     it('should accept single function or modifier name in $modifiers', () => {
