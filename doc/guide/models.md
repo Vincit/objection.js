@@ -89,7 +89,7 @@ class Person extends Model {
 
   // This object defines the relations to other models.
   static get relationMappings() {
-    // Importing models here is a one way to avoid require loops.
+    // Importing models here is one way to avoid require loops.
     const Animal = require('./Animal');
     const Movie = require('./Movie');
 
