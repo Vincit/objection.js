@@ -5,11 +5,11 @@ scratchpad.js
 testCoverage
 examples/*/*.db
 examples/express-es7/build
+examples/**/package-lock.json
 *.iml
 *.DS_Store
 profiling
 npm-debug.log*
 .vscode
 /**/yarn.lock
-/**/package-lock.json
 /**/.vuepress/dist
