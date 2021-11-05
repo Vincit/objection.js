@@ -966,8 +966,8 @@ describe('QueryBuilder', () => {
       .withGraphJoined('relatedModel')
       .then(() => {
         expect(executedQueries).to.eql([
-          "select * from information_schema.columns where table_name = 'Model' and table_catalog = NULL and table_schema = 'someSchema'",
-          "select * from information_schema.columns where table_name = 'Related' and table_catalog = NULL and table_schema = 'someSchema'",
+          "select * from information_schema.columns where table_name = 'Model' and table_catalog = current_database() and table_schema = 'someSchema'",
+          "select * from information_schema.columns where table_name = 'Related' and table_catalog = current_database() and table_schema = 'someSchema'",
           'select "Model"."0" as "0" from "someSchema"."Model" left join "someSchema"."Related" as "relatedModel" on "relatedModel"."id" = "Model"."id"',
         ]);
         done();
