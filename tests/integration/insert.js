@@ -1678,7 +1678,7 @@ module.exports = (session) => {
       });
 
       describe('.merge()', () => {
-        it('should update the row instead if id already exists', async () => {
+        it('should update the row if id already exists', async () => {
           await Model2.query().insert({ idCol: 1 });
           const result = await Model2.query()
             .insert({ idCol: 1, model2Prop1: 'updated' })
@@ -1694,8 +1694,26 @@ module.exports = (session) => {
           expect(result.model2Prop1).to.equal(rows[0].model2Prop1);
         });
 
+        it('should update some columns of the row if id already exists', async () => {
+          await Model2.query().insert({ idCol: 1 });
+          const result = await Model2.query()
+            .insert({ idCol: 1, model2Prop1: 'updated', model2Prop2: 123456 })
+            .onConflict('id_col')
+            .merge(['model2_prop1'])
+            .debug();
+          expect(result instanceof Model2).to.equal(true);
+
+          const rows = await Model2.query();
+          expect(rows).to.have.length(1);
+          expect(rows[0].idCol).to.equal(1);
+          expect(rows[0].model2Prop1).to.equal('updated');
+          expect(rows[0].model2Prop2).to.equal(null);
+          expect(result.id).to.equal(rows[0].id);
+          expect(result.model2Prop1).to.equal(rows[0].model2Prop1);
+        });
+
         if (session.isPostgres()) {
-          it('should update the row with custom values instead if id already exists', async () => {
+          it('should update the row with custom values if id already exists', async () => {
             await Model2.query().insert({ idCol: 1 });
             const result = await Model2.query()
               .insert({ idCol: 1, model2Prop1: 'updated' })

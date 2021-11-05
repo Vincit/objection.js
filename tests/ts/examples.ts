@@ -808,7 +808,8 @@ insertConflictPromise = insertConfclitQb.execute();
 const insertConfclitMergeQb = Person.query()
   .insert({})
   .onConflict('id')
-  .merge({ firstName: 'foo' });
+  .merge({ firstName: 'foo' })
+  .merge(['foo']);
 let insertConflictMergePromise: PromiseLike<Person> = insertConfclitMergeQb;
 insertConflictMergePromise = insertConfclitMergeQb.execute();
 

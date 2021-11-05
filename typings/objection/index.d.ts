@@ -960,7 +960,7 @@ declare namespace Objection {
 
     onConflict(column?: string | string[] | true): this;
     ignore(): this;
-    merge(merge?: PartialModelObject<M>): this;
+    merge(merge?: PartialModelObject<M> | string[]): this;
 
     insertAndFetch(insert: PartialModelObject<M>): SingleQueryBuilder<this>;
     insertAndFetch(insert: PartialModelObject<M>[]): ArrayQueryBuilder<this>;
