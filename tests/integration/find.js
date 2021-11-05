@@ -2410,6 +2410,18 @@ module.exports = (session) => {
           });
         });
 
+        it('should return undefined if the model has no parents', async () => {
+          const parent = await Model1.query().findById(2);
+
+          const result1 = await parent.$relatedQuery('model1Relation1').debug();
+          expect(result1).to.be.equal(undefined);
+
+          const result2 = await Model1.relatedQuery('model1Relation1')
+            .for(Model1.relatedQuery('model1Relation1').for(parent))
+            .debug();
+          expect(result2).to.eql([]);
+        });
+
         describe('knex methods', () => {
           it('.select()', () => {
             return parent1
