@@ -136,7 +136,7 @@ declare namespace Objection {
 
   type Expression<T> = T | Raw | ReferenceBuilder | ValueBuilder | AnyQueryBuilder;
 
-  type Id = string | number;
+  type Id = string | number | BigInt;
   type CompositeId = Id[];
   type MaybeCompositeId = Id | CompositeId;
 
