@@ -1,56 +1,71 @@
 const knex = require('knex');
 
 // DATABASES environment variable can contain a comma separated list
-// of databases to setup.
-const DATABASES = (process.env.DATABASES && process.env.DATABASES.split(',')) || [];
+// of databases to setup. Defaults to all databases.
+const DATABASES = (process.env.DATABASES && process.env.DATABASES.split(',')) || [
+  'postgres',
+  'mysql',
+];
 
-const knexes = [];
-const commands = [];
+async function setup() {
+  if (DATABASES.includes('postgres')) {
+    const postgres = await createKnex({
+      client: 'postgres',
 
-if (DATABASES.length === 0 || DATABASES.includes('postgres')) {
-  const postgres = knex({
-    client: 'postgres',
+      connection: {
+        user: 'postgres',
+        host: 'localhost',
+        database: 'postgres',
+      },
+    });
 
-    connection: {
-      user: 'postgres',
-      host: 'localhost',
-      database: 'postgres',
-    },
-  });
+    await postgres.raw('DROP DATABASE IF EXISTS objection_test');
+    await postgres.raw('DROP USER IF EXISTS objection');
+    await postgres.raw('CREATE USER objection SUPERUSER');
+    await postgres.raw('CREATE DATABASE objection_test');
 
-  knexes.push(postgres);
-  commands.push(
-    postgres.raw('DROP DATABASE IF EXISTS objection_test'),
-    postgres.raw('DROP USER IF EXISTS objection'),
-    postgres.raw('CREATE USER objection SUPERUSER'),
-    postgres.raw('CREATE DATABASE objection_test')
-  );
+    await postgres.destroy();
+  }
+
+  if (DATABASES.includes('mysql')) {
+    const mysql = await createKnex({
+      client: 'mysql',
+
+      connection: {
+        user: 'root',
+        host: 'localhost',
+      },
+    });
+
+    await mysql.raw('DROP DATABASE IF EXISTS objection_test');
+    await mysql.raw('DROP USER IF EXISTS objection');
+    await mysql.raw('CREATE USER objection');
+    await mysql.raw('GRANT ALL PRIVILEGES ON *.* TO objection');
+    await mysql.raw('CREATE DATABASE objection_test');
+
+    await mysql.destroy();
+  }
 }
 
-if (DATABASES.length === 0 || DATABASES.includes('mysql')) {
-  const mysql = knex({
-    client: 'mysql',
+async function createKnex(config) {
+  const startTime = new Date();
 
-    connection: {
-      user: 'root',
-      host: 'localhost',
-    },
-  });
+  while (true) {
+    try {
+      const knexInstance = knex(config);
+      await knexInstance.raw('SELECT 1');
+      return knexInstance;
+    } catch (err) {
+      const now = new Date();
 
-  knexes.push(mysql);
-  commands.push(
-    mysql.raw('DROP DATABASE IF EXISTS objection_test'),
-    mysql.raw('DROP USER IF EXISTS objection'),
-    mysql.raw('CREATE USER objection'),
-    mysql.raw('GRANT ALL PRIVILEGES ON *.* TO objection'),
-    mysql.raw('CREATE DATABASE objection_test')
-  );
+      if (now.getTime() - startTime.getTime() > 60000) {
+        process.exit(1);
+      } else {
+        console.log(`failed to connect to ${config.client}. Trying again soon`);
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+      }
+    }
+  }
 }
 
-commands
-  .reduce((promise, query) => {
-    return promise.then(() => query);
-  }, Promise.resolve())
-  .then(() => {
-    return Promise.all(knexes.map((it) => it.destroy()));
-  });
+setup();

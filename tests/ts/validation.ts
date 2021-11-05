@@ -38,25 +38,6 @@ import { Person } from './fixtures/person';
     await Person.query().insert({ firstName: 'jennifer' });
   } catch (err) {
     console.log(err instanceof ValidationError); // --> true
-    console.log(err.data); // --> {lastName: [{message: 'required property missing', ...}]}
-  }
-
-  try {
-    await Person.query().insert({ firstName: 'jennifer' });
-  } catch (err) {
-    let lastNameErrors = err.data.lastName;
-
-    for (let i = 0; i < lastNameErrors.length; ++i) {
-      let lastNameError = lastNameErrors[i];
-
-      if (lastNameError.keyword === 'required') {
-        console.log('This field is required!');
-      } else if (lastNameError.keyword === 'minLength') {
-        console.log('Must be longer than ' + lastNameError.params.limit);
-      } else {
-        console.log(lastNameError.message); // Fallback to default error message
-      }
-    }
   }
 
   // gh-1582

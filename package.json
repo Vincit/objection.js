@@ -6,11 +6,7 @@
   "license": "MIT",
   "scripts": {
     "test": "npm run eslint && mocha --slow 10 --timeout 15000 --reporter spec --recursive tests --exclude \"tests/unit/relations/files/**\"",
-    "test-travis": "nyc mocha --slow 100 --timeout 60000 --reporter spec --recursive tests --exclude \"tests/unit/relations/files/**\" && npm run test-typings",
     "test-fast": "mocha --slow 10 --timeout 15000 --reporter spec --recursive tests --bail --exclude \"tests/unit/relations/files/**\"",
-    "test-opt": "mocha --slow 10 --timeout 15000 --reporter spec --recursive tests --bail --trace_opt --trace_deopt --exclude \"tests/unit/relations/files/**\"",
-    "test-debug": "mocha --slow 10 --timeout 15000 --reporter spec --recursive tests --inspect-brk --exclude \"tests/unit/relations/files/**\"",
-    "test-sqlite": "cross-env DATABASES=sqlite3 mocha --slow 10 --timeout 15000 --reporter spec --recursive tests --exclude \"tests/unit/relations/files/**\"",
     "test-typings": "tsc",
     "coveralls": "cat ./testCoverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
     "perf": "mocha --slow 60000 --timeout 60000 --reporter spec --recursive perf",
@@ -85,7 +81,7 @@
     "pg": "^8.6.0",
     "prettier": "2.3.2",
     "sqlite3": "^5.0.2",
-    "typescript": "^4.3.5",
+    "typescript": "^4.4.4",
     "vuepress": "1.8.2"
   },
   "nyc": {
