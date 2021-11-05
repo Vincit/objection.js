@@ -173,7 +173,7 @@ module.exports = (session) => {
 
     describe('find', () => {
       beforeEach(() => {
-        return A.query().insertWithRelated([
+        return A.query().insertGraph([
           { id1: 1, id2: '1', aval: 'a' },
           { id1: 1, id2: '2', aval: 'b' },
           { id1: 2, id2: '2', aval: 'c' },
@@ -259,7 +259,7 @@ module.exports = (session) => {
 
     describe('update', () => {
       beforeEach(() => {
-        return A.query().insertWithRelated([
+        return A.query().insertGraph([
           { id1: 1, id2: '1', aval: 'a' },
           { id1: 1, id2: '2', aval: 'b' },
           { id1: 2, id2: '2', aval: 'c' },
@@ -439,9 +439,9 @@ module.exports = (session) => {
           .then(() => {
             return A.query()
               .findById([1, '1'])
-              .eager('[b.a, ba]')
-              .modifyEager('b.a', (qb) => qb.orderBy(['id1', 'id2']))
-              .modifyEager('ba', (qb) => qb.orderBy(['id3', 'id4']));
+              .withGraphFetched('[b.a, ba]')
+              .modifyGraph('b.a', (qb) => qb.orderBy(['id1', 'id2']))
+              .modifyGraph('ba', (qb) => qb.orderBy(['id3', 'id4']));
           })
           .then((model) => {
             expect(model).to.eql({
@@ -545,8 +545,8 @@ module.exports = (session) => {
           .then((model) => {
             return A.query()
               .findById([1, '1'])
-              .eager('ba')
-              .modifyEager('ba', (qb) => qb.orderBy(['id3', 'id4']));
+              .withGraphFetched('ba')
+              .modifyGraph('ba', (qb) => qb.orderBy(['id3', 'id4']));
           })
           .then((model) => {
             expect(model).to.eql({
@@ -575,7 +575,7 @@ module.exports = (session) => {
 
     describe('delete', () => {
       beforeEach(() => {
-        return A.query().insertWithRelated([
+        return A.query().insertGraph([
           { id1: 1, id2: '1', aval: 'a' },
           { id1: 1, id2: '2', aval: 'b' },
           { id1: 2, id2: '2', aval: 'c' },
@@ -609,7 +609,7 @@ module.exports = (session) => {
 
     describe('relations', () => {
       beforeEach(() => {
-        return B.query().insertWithRelated(
+        return B.query().insertGraph(
           [
             {
               id3: 1,
@@ -658,20 +658,11 @@ module.exports = (session) => {
       });
 
       describe('eager fetch', () => {
-        [
-          {
-            eagerAlgo: Model.WhereInEagerAlgorithm,
-            name: 'WhereInEagerAlgorithm',
-          },
-          {
-            eagerAlgo: Model.JoinEagerAlgorithm,
-            name: 'JoinEagerAlgorithm',
-          },
-        ].map((eager) => {
-          it('basic ' + eager.name, () => {
+        ['withGraphFetched', 'withGraphJoined'].map((method) => {
+          it('basic ' + method, () => {
             return B.query()
-              .eagerAlgorithm(eager.eagerAlgo)
-              .eager('[a(oa).b(ob), ab(oa)]', {
+              [method]('[a(oa).b(ob), ab(oa)]')
+              .modifiers({
                 oa: (builder) => {
                   builder.orderBy(['id1', 'id2']);
                 },
@@ -768,11 +759,11 @@ module.exports = (session) => {
               });
           });
 
-          it('belongs to one $relatedQuery and ' + eager.name, () => {
+          it('belongs to one $relatedQuery and ' + method, () => {
             return B.query()
               .findById([1, '1'])
               .then((b) => {
-                return b.$relatedQuery('a').eager('b').eagerAlgorithm(eager.eagerAlgo);
+                return b.$relatedQuery('a')[method]('b');
               })
               .then((b) => {
                 b = _.sortBy(b, ['id1', 'id2']);
@@ -806,11 +797,11 @@ module.exports = (session) => {
               });
           });
 
-          it('many to many $relatedQuery and ' + eager.name, () => {
+          it('many to many $relatedQuery and ' + method, () => {
             return B.query()
               .findById([1, '1'])
               .then((b) => {
-                return b.$relatedQuery('ab').eager('ba').eagerAlgorithm(eager.eagerAlgo);
+                return b.$relatedQuery('ab')[method]('ba');
               })
               .then((b) => {
                 b = _.sortBy(b, ['id1', 'id2']);

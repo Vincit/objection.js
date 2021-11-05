@@ -886,7 +886,7 @@ module.exports = (session) => {
     it('joinEager shorthand', () => {
       return Model1.query()
         .findById(1)
-        .joinEager('model1Relation1')
+        .withGraphJoined('model1Relation1')
         .modify((builder) => {
           expect(builder.findOperation('eager').constructor.name).to.equal('JoinEagerOperation');
         })
@@ -911,63 +911,13 @@ module.exports = (session) => {
     it('should fail fast on incorrect table name', function (done) {
       Model1.query()
         .findById(1)
-        .joinEager('model1Relation111')
+        .withGraphJoined('model1Relation111')
         .then(_.noop)
         .catch((err) => {
           expect(err.message).to.equal(
             'unknown relation "model1Relation111" in a relation expression'
           );
           done();
-        });
-    });
-
-    it('mergeJoinEager shorthand', () => {
-      return Model1.query()
-        .findById(1)
-        .mergeJoinEager('model1Relation1')
-        .modify((builder) => {
-          expect(builder.findOperation('eager').constructor.name).to.equal('JoinEagerOperation');
-        })
-        .then((model) => {
-          expect(model).to.eql({
-            id: 1,
-            model1Id: 2,
-            model1Prop1: 'hello 1',
-            model1Prop2: null,
-            $afterFindCalled: 1,
-            model1Relation1: {
-              id: 2,
-              model1Id: 3,
-              model1Prop1: 'hello 2',
-              model1Prop2: null,
-              $afterFindCalled: 1,
-            },
-          });
-        });
-    });
-
-    it('naiveEager shorthand', () => {
-      return Model1.query()
-        .findById(1)
-        .naiveEager('model1Relation1')
-        .modify((builder) => {
-          expect(builder.findOperation('eager').constructor.name).to.equal('NaiveEagerOperation');
-        })
-        .then((model) => {
-          expect(model).to.eql({
-            id: 1,
-            model1Id: 2,
-            model1Prop1: 'hello 1',
-            model1Prop2: null,
-            $afterFindCalled: 1,
-            model1Relation1: {
-              id: 2,
-              model1Id: 3,
-              model1Prop1: 'hello 2',
-              model1Prop2: null,
-              $afterFindCalled: 1,
-            },
-          });
         });
     });
 
@@ -1034,35 +984,10 @@ module.exports = (session) => {
         });
     });
 
-    it('mergeNaiveEager shorthand', () => {
-      return Model1.query()
-        .findById(1)
-        .mergeNaiveEager('model1Relation1')
-        .modify((builder) => {
-          expect(builder.findOperation('eager').constructor.name).to.equal('NaiveEagerOperation');
-        })
-        .then((model) => {
-          expect(model).to.eql({
-            id: 1,
-            model1Id: 2,
-            model1Prop1: 'hello 1',
-            model1Prop2: null,
-            $afterFindCalled: 1,
-            model1Relation1: {
-              id: 2,
-              model1Id: 3,
-              model1Prop1: 'hello 2',
-              model1Prop2: null,
-              $afterFindCalled: 1,
-            },
-          });
-        });
-    });
-
     it('should work with zero id', () => {
       return Promise.map(
-        [Model1.JoinEagerAlgorithm, Model1.NaiveEagerAlgorithm, Model1.WhereInEagerAlgorithm],
-        (algo) => {
+        ['withGraphFetched', 'withGraphJoined'],
+        (method) => {
           return session
             .populate([
               {
@@ -1092,8 +1017,7 @@ module.exports = (session) => {
             .then(() => {
               return Model1.query()
                 .where('Model1.id', 0)
-                .eager('[model1Relation1, model1Relation2.model2Relation1]')
-                .eagerAlgorithm(algo);
+                [method]('[model1Relation1, model1Relation2.model2Relation1]');
             })
             .then((models) => {
               expect(models).to.eql([
@@ -1144,11 +1068,11 @@ module.exports = (session) => {
       return Model1.query()
         .select('id')
         .findById(1)
-        .eager('[model1Relation1, model1Relation2.model2Relation1]')
+        .withGraphFetched('[model1Relation1, model1Relation2.model2Relation1]')
         .internalOptions({ keepImplicitJoinProps: true })
-        .modifyEager('model1Relation1', (qb) => qb.select('Model1.id'))
-        .modifyEager('model1Relation2', (qb) => qb.select('model2.id_col').orderBy('model2.id_col'))
-        .modifyEager('model1Relation2.model2Relation1', (qb) =>
+        .modifyGraph('model1Relation1', (qb) => qb.select('Model1.id'))
+        .modifyGraph('model1Relation2', (qb) => qb.select('model2.id_col').orderBy('model2.id_col'))
+        .modifyGraph('model1Relation2.model2Relation1', (qb) =>
           qb.select('Model1.id').orderBy('Model1.id')
         )
         .then((res) => {
@@ -1196,7 +1120,7 @@ module.exports = (session) => {
     it('range should work', () => {
       return Model1.query()
         .where('id', 1)
-        .eager('[model1Relation1, model1Relation2]')
+        .withGraphFetched('[model1Relation1, model1Relation2]')
         .range(0, 0)
         .then((res) => {
           expect(res.results[0].model1Relation1.id).to.equal(2);
@@ -1207,7 +1131,7 @@ module.exports = (session) => {
     it('range should work with joinEager', () => {
       return Model1.query()
         .where('Model1.id', 1)
-        .joinEager('model1Relation1')
+        .withGraphJoined('model1Relation1')
         .range(0, 0)
         .then((res) => {
           expect(res.results[0].model1Relation1.id).to.equal(2);
@@ -1219,7 +1143,7 @@ module.exports = (session) => {
     it('should be able to call eager from runBefore hook', () => {
       return Model1.query()
         .runBefore((_, builder) => {
-          builder.eager('model1Relation1');
+          builder.withGraphFetched('model1Relation1');
         })
         .findOne({ model1Prop1: 'hello 1' })
         .then((result) => {
@@ -1236,7 +1160,7 @@ module.exports = (session) => {
     it('should be able to call joinEager from runBefore hook', () => {
       return Model1.query()
         .runBefore((_, builder) => {
-          builder.joinEager('model1Relation1');
+          builder.withGraphJoined('model1Relation1');
         })
         .where('Model1.model1Prop1', 'hello 1')
         .first()
@@ -1253,17 +1177,7 @@ module.exports = (session) => {
 
     it('eager should not blow up with an empty eager operation', () => {
       return Model1.query()
-        .modifyEager('foo', () => {})
-        .findOne({ model1Prop1: 'hello 1' })
-        .then((result) => {
-          expect(result.model1Prop1).to.equal('hello 1');
-        });
-    });
-
-    it('joinEager should not blow up with an empty eager operation', () => {
-      return Model1.query()
-        .eagerAlgorithm(Model1.JoinEagerAlgorithm)
-        .modifyEager('foo', () => {})
+        .modifyGraph('foo', () => {})
         .findOne({ model1Prop1: 'hello 1' })
         .then((result) => {
           expect(result.model1Prop1).to.equal('hello 1');
@@ -1273,7 +1187,7 @@ module.exports = (session) => {
     it('should be able to order by ambiguous column (issue #1287 regression)', () => {
       return Model1.query()
         .findOne('Model1.model1Prop1', 'hello 1')
-        .joinEager('model1Relation1')
+        .withGraphJoined('model1Relation1')
         .orderBy('id')
         .execute();
     });
@@ -1401,7 +1315,7 @@ module.exports = (session) => {
     // TODO: enable for v2.0.
     it.skip('should fail with a clear error when a duplicate relation is detected', () => {
       expect(() => {
-        Model1.query().eager('[model1Relation1, model1Relation1.model1Relation2]');
+        Model1.query().withGraphFetched('[model1Relation1, model1Relation1.model1Relation2]');
       }).to.throwException((err) => {
         expect(err.message).to.equal(
           `Duplicate relation name "model1Relation1" in relation expression "[model1Relation1, model1Relation1.model1Relation2]". Use "a.[b, c]" instead of "[a.b, a.c]".`
@@ -1658,15 +1572,14 @@ module.exports = (session) => {
       });
     });
 
-    describe('JoinEagerAlgorithm', () => {
+    describe('withGraphJoined', () => {
       it('select should work', () => {
         return Model1.query()
           .select('Model1.id', 'Model1.model1Prop1')
           .where('Model1.id', 1)
           .where('model1Relation2.id_col', 2)
           .where('model1Relation2:model2Relation1.id', 6)
-          .eager('[model1Relation1, model1Relation2.model2Relation1]')
-          .eagerAlgorithm(Model1.JoinEagerAlgorithm)
+          .withGraphJoined('[model1Relation1, model1Relation2.model2Relation1]')
           .then((models) => {
             expect(models).to.eql([
               {
@@ -1718,8 +1631,7 @@ module.exports = (session) => {
             .where('Model1.id', 1)
             .where('model1Relation2.id_col', 2)
             .where('model1Relation2:model2Relation1.id', 6)
-            .eager('[model1Relation1, model1Relation2.model2Relation1]')
-            .eagerAlgorithm(Model1.JoinEagerAlgorithm)
+            .withGraphJoined('[model1Relation1, model1Relation2.model2Relation1]')
             .then((models) => {
               expect(models).to.eql([
                 {
@@ -1769,7 +1681,8 @@ module.exports = (session) => {
             .where('Model1.id', 1)
             .where('model1Relation2.id_col', 2)
             .where('model1Relation2:model2Relation1.id', 6)
-            .joinEager('[model1Relation1(rawStuff), model1Relation2.model2Relation1]', {
+            .withGraphJoined('[model1Relation1(rawStuff), model1Relation2.model2Relation1]')
+            .modifiers({
               rawStuff(builder) {
                 builder.select(
                   raw(`concat(??, ' - ', ?? * 2)`, 'model1Prop1', 'id').as('rawThingy')
@@ -1819,8 +1732,7 @@ module.exports = (session) => {
           .where('Model1.id', 1)
           .where('model1Relation2.id_col', 2)
           .where('model1Relation2:model2Relation1.id', 6)
-          .eager('[model1Relation1, model1Relation2.model2Relation1]')
-          .eagerAlgorithm(Model1.JoinEagerAlgorithm)
+          .withGraphJoined('[model1Relation1, model1Relation2.model2Relation1]')
           .then((models) => {
             expect(models).to.eql([
               {
@@ -1864,8 +1776,7 @@ module.exports = (session) => {
       it('should be able to change the join type', () => {
         return Model1.query()
           .select('Model1.id', 'Model1.model1Prop1')
-          .joinEager('model1Relation2')
-          .eagerOptions({ joinOperation: 'innerJoin' })
+          .withGraphJoined('model1Relation2', { joinOperation: 'innerJoin' })
           .orderBy(['Model1.id', 'model1Relation2.id_col'])
           .then((models) => {
             // With innerJoin we should only get `Model1` instances that have one
@@ -1930,8 +1841,9 @@ module.exports = (session) => {
           .where('Model1.id', 1)
           .where('model1Relation2.id_col', 2)
           .where('model1Relation2->model2Relation1.id', 6)
-          .joinEager('[model1Relation1, model1Relation2.model2Relation1]')
-          .eagerOptions({ separator: '->' })
+          .withGraphJoined('[model1Relation1, model1Relation2.model2Relation1]', {
+            separator: '->',
+          })
           .then((models) => {
             expect(models).to.eql([
               {
@@ -1976,9 +1888,8 @@ module.exports = (session) => {
         return Model1.query()
           .where('Model1.id', 1)
           .where('model1Relation2.id_col', 2)
-          .eager('[model1Relation1, model1Relation2.model2Relation1]')
+          .withGraphJoined('[model1Relation1, model1Relation2.model2Relation1]')
           .orderBy(['Model1.id', 'model1Relation2:model2Relation1.id'])
-          .eagerAlgorithm(Model1.JoinEagerAlgorithm)
           .then((models) => {
             expect(models).to.eql([
               {
@@ -2033,13 +1944,12 @@ module.exports = (session) => {
         return Model1.query()
           .where('Model1.id', 1)
           .where('mr2.id_col', 2)
-          .eager('[model1Relation1, model1Relation2.model2Relation1]')
-          .orderBy(['Model1.id', 'mr2:model2Relation1.id'])
-          .eagerAlgorithm(Model1.JoinEagerAlgorithm, {
+          .withGraphJoined('[model1Relation1, model1Relation2.model2Relation1]', {
             aliases: {
               model1Relation2: 'mr2',
             },
           })
+          .orderBy(['Model1.id', 'mr2:model2Relation1.id'])
           .then((models) => {
             expect(models).to.eql([
               {
@@ -2093,8 +2003,7 @@ module.exports = (session) => {
       it('relation references longer that 63 chars should throw an exception', (done) => {
         Model1.query()
           .where('Model1.id', 1)
-          .eager('[model1Relation1.model1Relation1.model1Relation1.model1Relation1]')
-          .eagerAlgorithm(Model1.JoinEagerAlgorithm)
+          .withGraphJoined('[model1Relation1.model1Relation1.model1Relation1.model1Relation1]')
           .then(() => {
             done(new Error('should not get here'));
           })
@@ -2113,13 +2022,8 @@ module.exports = (session) => {
       it('relation references longer that 63 chars should NOT throw an exception if minimize: true option is given', (done) => {
         Model1.query()
           .where('Model1.id', 1)
-          .eager('[model1Relation1.model1Relation1.model1Relation1.model1Relation1]')
-          .eagerAlgorithm(Model1.JoinEagerAlgorithm)
-          .eagerOptions({ minimize: false })
-          .runBefore((result, builder) => {
-            // Call in runBefore to test the EeagerOperation.clone method.
-            // This doesn't need to be called in a runBefore.
-            builder.eagerOptions({ minimize: true });
+          .withGraphJoined('[model1Relation1.model1Relation1.model1Relation1.model1Relation1]', {
+            minimize: true,
           })
           .then((models) => {
             expect(models).to.eql([
@@ -2162,8 +2066,7 @@ module.exports = (session) => {
       it('infinitely recursive expressions should fail', (done) => {
         Model1.query()
           .where('Model1.id', 1)
-          .eager('model1Relation1.^')
-          .eagerAlgorithm(Model1.JoinEagerAlgorithm)
+          .withGraphJoined('model1Relation1.^')
           .then(() => {
             done(new Error('should not get here'));
           })
@@ -2180,7 +2083,7 @@ module.exports = (session) => {
       it('should fail if given missing filter', (done) => {
         Model1.query()
           .where('id', 1)
-          .eager('model1Relation2(missingFilter)')
+          .withGraphFetched('model1Relation2(missingFilter)')
           .then(() => {
             done(new Error('should not get here'));
           })
@@ -2198,7 +2101,7 @@ module.exports = (session) => {
       it('should fail if given missing relation', (done) => {
         Model1.query()
           .where('id', 1)
-          .eager('invalidRelation')
+          .withGraphFetched('invalidRelation')
           .then(() => {
             throw new Error('should not get here');
           })
@@ -2216,7 +2119,7 @@ module.exports = (session) => {
       it('should fail if given invalid relation expression', (done) => {
         Model1.query()
           .where('id', 1)
-          .eager('invalidRelation')
+          .withGraphFetched('invalidRelation')
           .then(() => {
             throw new Error('should not get here');
           })
@@ -2232,94 +2135,17 @@ module.exports = (session) => {
       });
     });
 
-    describe('Model.defaultEagerOptions and Model.defaultEagerAlgorithm should be used if defined', () => {
-      let TestModel;
-
-      before(() => {
-        // Create a dummy mock so that we can bind Model1 to it.
-        TestModel = Model1.bindKnex(
-          mockKnexFactory(session.knex, function (mock, oldImpl, args) {
-            return oldImpl.apply(this, args);
-          })
-        );
-
-        TestModel.defaultEagerAlgorithm = TestModel.JoinEagerAlgorithm;
-        TestModel.defaultEagerOptions = {
-          aliases: {
-            model1Relation2: 'mr2',
-          },
-        };
-      });
-
-      it('options for JoinEagerAlgorithm', () => {
-        return TestModel.query()
-          .where('Model1.id', 1)
-          .where('mr2.id_col', 2)
-          .eager('[model1Relation1, model1Relation2.model2Relation1]')
-          .orderBy(['Model1.id', 'mr2:model2Relation1.id'])
-          .then((models) => {
-            expect(models).to.eql([
-              {
-                id: 1,
-                model1Id: 2,
-                model1Prop1: 'hello 1',
-                model1Prop2: null,
-                $afterFindCalled: 1,
-
-                model1Relation1: {
-                  id: 2,
-                  model1Id: 3,
-                  model1Prop1: 'hello 2',
-                  model1Prop2: null,
-                  $afterFindCalled: 1,
-                },
-
-                model1Relation2: [
-                  {
-                    idCol: 2,
-                    model1Id: 1,
-                    model2Prop1: 'hejsan 2',
-                    model2Prop2: null,
-                    $afterFindCalled: 1,
-
-                    model2Relation1: [
-                      {
-                        id: 5,
-                        model1Id: null,
-                        model1Prop1: 'hello 5',
-                        model1Prop2: null,
-                        aliasedExtra: 'extra 5',
-                        $afterFindCalled: 1,
-                      },
-                      {
-                        id: 6,
-                        model1Id: 7,
-                        model1Prop1: 'hello 6',
-                        model1Prop2: null,
-                        aliasedExtra: 'extra 6',
-                        $afterFindCalled: 1,
-                      },
-                    ],
-                  },
-                ],
-              },
-            ]);
-          });
-      });
-    });
-
-    describe('QueryBuilder.modifyEager', () => {
+    describe('QueryBuilder.modifyGraph', () => {
       it('should filter the eager query using relation expressions as paths', () => {
         return Promise.all(
-          [Model1.WhereInEagerAlgorithm, Model1.JoinEagerAlgorithm].map((eagerAlgo) => {
+          ['withGraphFetched', 'withGraphJoined'].map((method) => {
             return Model1.query()
-              .eagerAlgorithm(eagerAlgo)
               .where('Model1.id', 1)
-              .modifyEager('model1Relation2.model2Relation1', (builder) => {
+              .modifyGraph('model1Relation2.model2Relation1', (builder) => {
                 builder.where('Model1.id', 6);
               })
-              .eager('model1Relation2.model2Relation1.[model1Relation1, model1Relation2]')
-              .filterEager('model1Relation2', (builder) => {
+              [method]('model1Relation2.model2Relation1.[model1Relation1, model1Relation2]')
+              .modifyGraph('model1Relation2', (builder) => {
                 builder.where('model2_prop1', 'hejsan 2');
               })
               .then((models) => {
@@ -2335,12 +2161,11 @@ module.exports = (session) => {
 
       it('should accept a modifier name', () => {
         return Promise.all(
-          [Model1.WhereInEagerAlgorithm, Model1.JoinEagerAlgorithm].map((eagerAlgo) => {
+          ['withGraphFetched', 'withGraphJoined'].map((method) => {
             return Model1.query()
-              .eagerAlgorithm(eagerAlgo)
               .where('Model1.id', 1)
-              .eager('model1Relation2.model2Relation1')
-              .modifyEager('model1Relation2.model2Relation1', 'select:model1Prop1')
+              [method]('model1Relation2.model2Relation1')
+              .modifyGraph('model1Relation2.model2Relation1', 'select:model1Prop1')
               .then((models) => {
                 const model2 = models[0].model1Relation2.find((it) => it.idCol === 2);
                 expect(Object.keys(model2.model2Relation1[0])).to.eql([
@@ -2354,12 +2179,11 @@ module.exports = (session) => {
 
       it('should accept a list of modifier names', () => {
         return Promise.all(
-          [Model1.WhereInEagerAlgorithm, Model1.JoinEagerAlgorithm].map((eagerAlgo) => {
+          ['withGraphFetched', 'withGraphJoined'].map((method) => {
             return Model1.query()
-              .eagerAlgorithm(eagerAlgo)
               .where('Model1.id', 1)
-              .eager('model1Relation1')
-              .modifyEager('model1Relation1', ['select:id', 'select:model1Prop1'])
+              [method]('model1Relation1')
+              .modifyGraph('model1Relation1', ['select:id', 'select:model1Prop1'])
               .then((models) => {
                 expect(Object.keys(models[0].model1Relation1)).to.eql([
                   'id',
@@ -2371,24 +2195,23 @@ module.exports = (session) => {
         );
       });
 
-      it('should implicitly add selects for join columns if they are omitted in filterEager/modifyEager', () => {
+      it('should implicitly add selects for join columns if they are omitted in modifyGraph/modifyEager', () => {
         return Promise.all(
-          [Model1.WhereInEagerAlgorithm, Model1.JoinEagerAlgorithm].map((eagerAlgo) => {
+          ['withGraphFetched', 'withGraphJoined'].map((method) => {
             return Model1.query()
               .where('Model1.id', 1)
               .column('Model1.model1Prop1')
-              .eager('model1Relation2.model2Relation1.[model1Relation1, model1Relation2]')
-              .eagerAlgorithm(eagerAlgo)
-              .filterEager('model1Relation2', (builder) => {
+              [method]('model1Relation2.model2Relation1.[model1Relation1, model1Relation2]')
+              .modifyGraph('model1Relation2', (builder) => {
                 builder.select('model2_prop1');
               })
-              .filterEager('model1Relation2.model2Relation1', (builder) => {
+              .modifyGraph('model1Relation2.model2Relation1', (builder) => {
                 builder.distinct('model1Prop1');
               })
-              .filterEager('model1Relation2.model2Relation1.model1Relation1', (builder) => {
+              .modifyGraph('model1Relation2.model2Relation1.model1Relation1', (builder) => {
                 builder.select('model1Prop1');
               })
-              .filterEager('model1Relation2.model2Relation1.model1Relation2', (builder) => {
+              .modifyGraph('model1Relation2.model2Relation1.model1Relation2', (builder) => {
                 builder.select('model2_prop1');
               })
               .then((models) => {
@@ -2448,23 +2271,21 @@ module.exports = (session) => {
         );
       });
 
-      it('should implicitly add selects for join columns if they are aliased in filterEager/modifyEager', () => {
-        // Does not yet work for JoinEagerAlgorithm.
-
+      it('should implicitly add selects for join columns if they are aliased in modifyGraph', () => {
         return Model1.query()
           .where('Model1.id', 1)
           .column('Model1.model1Prop1')
-          .eager('model1Relation2.model2Relation1.[model1Relation1, model1Relation2]')
-          .filterEager('model1Relation2', (builder) => {
+          .withGraphFetched('model1Relation2.model2Relation1.[model1Relation1, model1Relation2]')
+          .modifyGraph('model1Relation2', (builder) => {
             builder.select('model2_prop1', 'id_col as x1', 'model1_id as x2');
           })
-          .filterEager('model1Relation2.model2Relation1', (builder) => {
+          .modifyGraph('model1Relation2.model2Relation1', (builder) => {
             builder.select('model1Prop1', 'Model1.id as y1', 'Model1.model1Id as y2');
           })
-          .filterEager('model1Relation2.model2Relation1.model1Relation1', (builder) => {
+          .modifyGraph('model1Relation2.model2Relation1.model1Relation1', (builder) => {
             builder.select('model1Prop1', 'Model1.id as y1', 'Model1.model1Id as y2');
           })
-          .filterEager('model1Relation2.model2Relation1.model1Relation2', (builder) => {
+          .modifyGraph('model1Relation2.model2Relation1.model1Relation2', (builder) => {
             builder.select('model2_prop1', 'id_col as x1', 'model1_id as x2');
           })
           .then((models) => {
@@ -2534,18 +2355,17 @@ module.exports = (session) => {
           });
       });
 
-      it('should filter the eager query using relation expressions as paths (JoinEagerAlgorithm)', () => {
+      it('should filter the eager query using relation expressions as paths (withGraphJoined)', () => {
         return Model1.query()
           .where('Model1.id', 1)
-          .eagerAlgorithm(Model1.JoinEagerAlgorithm)
-          .modifyEager('model1Relation2.model2Relation1', (builder) => {
+          .modifyGraph('model1Relation2.model2Relation1', (builder) => {
             builder.where('id', 6);
           })
-          .eager('model1Relation2.model2Relation1.[model1Relation1, model1Relation2]')
-          .modifyEager('model1Relation2', (builder) => {
+          .withGraphJoined('model1Relation2.model2Relation1.[model1Relation1, model1Relation2]')
+          .modifyGraph('model1Relation2', (builder) => {
             builder.where('model2_prop1', 'hejsan 2');
           })
-          .modifyEager('model1Relation2.model2Relation1', (builder) => {
+          .modifyGraph('model1Relation2.model2Relation1', (builder) => {
             builder.select('model1Prop1');
           })
           .then((models) => {
@@ -2597,349 +2417,149 @@ module.exports = (session) => {
       });
     });
 
-    describe('QueryBuilder.pick', () => {
-      it('pick(properties) should pick properties recursively', () => {
-        return Model1.query()
-          .where('id', 1)
-          .eager('model1Relation2.model2Relation1.[model1Relation1, model1Relation2]')
-          .first()
-          .pick(['id', 'idCol', 'model1Relation1', 'model1Relation2', 'model2Relation1'])
-          .filterEager('model1Relation2', (builder) => {
-            builder.orderBy('id_col');
-          })
-          .modifyEager('model1Relation2.model2Relation1', (builder) => {
-            builder.orderBy('id');
-          })
-          .then((model) => {
-            expect(model.toJSON()).to.eql({
-              id: 1,
-              model1Relation2: [
-                {
-                  idCol: 1,
-                  model2Relation1: [],
-                },
-                {
-                  idCol: 2,
-                  model2Relation1: [
-                    {
-                      id: 5,
-                      model1Relation1: null,
-                      model1Relation2: [],
+    it('should merge eager expressions', () => {
+      return Model1.query()
+        .where('id', 1)
+        .withGraphFetched('model1Relation2')
+        .withGraphFetched('model1Relation2.model2Relation1.model1Relation1')
+        .withGraphFetched('model1Relation2.model2Relation1.model1Relation2')
+        .first()
+        .modifyGraph('model1Relation2', (builder) => {
+          builder.orderBy('id_col');
+        })
+        .modifyGraph('model1Relation2.model2Relation1', (builder) => {
+          builder.orderBy('id');
+        })
+        .then((model) => {
+          chai.expect(model.toJSON()).to.containSubset({
+            id: 1,
+            model1Relation2: [
+              {
+                idCol: 1,
+                model2Relation1: [],
+              },
+              {
+                idCol: 2,
+                model2Relation1: [
+                  {
+                    id: 5,
+                    aliasedExtra: 'extra 5',
+                    model1Relation1: null,
+                    model1Relation2: [],
+                  },
+                  {
+                    id: 6,
+                    aliasedExtra: 'extra 6',
+                    model1Relation1: {
+                      id: 7,
                     },
-                    {
-                      id: 6,
-                      model1Relation1: {
-                        id: 7,
+                    model1Relation2: [
+                      {
+                        idCol: 3,
                       },
-                      model1Relation2: [
-                        {
-                          idCol: 3,
-                        },
-                      ],
-                    },
-                  ],
-                },
-              ],
-            });
+                    ],
+                  },
+                ],
+              },
+            ],
           });
-      });
-
-      it('pick(modelClass, properties) should pick properties recursively based on model class', () => {
-        return Model1.query()
-          .where('id', 1)
-          .eager('model1Relation2.model2Relation1.[model1Relation1, model1Relation2]')
-          .first()
-          .pick(Model1, ['id', 'model1Relation1', 'model1Relation2'])
-          .pick(Model2, ['idCol', 'model2Relation1'])
-          .filterEager('model1Relation2', (builder) => {
-            builder.orderBy('id_col');
-          })
-          .modifyEager('model1Relation2.model2Relation1', (builder) => {
-            builder.orderBy('id');
-          })
-          .then((model) => {
-            expect(model.toJSON()).to.eql({
-              id: 1,
-              model1Relation2: [
-                {
-                  idCol: 1,
-                  model2Relation1: [],
-                },
-                {
-                  idCol: 2,
-                  model2Relation1: [
-                    {
-                      id: 5,
-                      model1Relation1: null,
-                      model1Relation2: [],
-                    },
-                    {
-                      id: 6,
-                      model1Relation1: {
-                        id: 7,
-                      },
-                      model1Relation2: [
-                        {
-                          idCol: 3,
-                        },
-                      ],
-                    },
-                  ],
-                },
-              ],
-            });
-          });
-      });
+        });
     });
 
-    describe('QueryBuilder.omit', () => {
-      it('omit(properties) should omit properties recursively', () => {
-        return Model1.query()
-          .where('id', 1)
-          .eager('model1Relation2.model2Relation1.[model1Relation1, model1Relation2]')
-          .first()
-          .omit(['model1Id', 'model1Prop1', 'model1Prop2', 'model2Prop1', 'model2Prop2'])
-          .filterEager('model1Relation2', (builder) => {
+    it('should merge eager expressions and filters', () => {
+      return Model1.query()
+        .where('id', 1)
+        .withGraphFetched('model1Relation2')
+        .withGraphFetched('model1Relation2(f1).model2Relation1.model1Relation1')
+        .modifiers({
+          f1: (builder) => {
             builder.orderBy('id_col');
-          })
-          .modifyEager('model1Relation2.model2Relation1', (builder) => {
+          },
+        })
+        .withGraphFetched('model1Relation2.model2Relation1(f2).model1Relation2')
+        .modifiers({
+          f2: (builder) => {
             builder.orderBy('id');
-          })
-          .then((model) => {
-            expect(model.toJSON()).to.eql({
-              id: 1,
-              model1Relation2: [
-                {
-                  idCol: 1,
-                  model2Relation1: [],
-                },
-                {
-                  idCol: 2,
-                  model2Relation1: [
-                    {
-                      id: 5,
-                      aliasedExtra: 'extra 5',
-                      model1Relation1: null,
-                      model1Relation2: [],
+          },
+        })
+        .first()
+        .then((model) => {
+          chai.expect(model.toJSON()).to.containSubset({
+            id: 1,
+            model1Relation2: [
+              {
+                idCol: 1,
+                model2Relation1: [],
+              },
+              {
+                idCol: 2,
+                model2Relation1: [
+                  {
+                    id: 5,
+                    aliasedExtra: 'extra 5',
+                    model1Relation1: null,
+                    model1Relation2: [],
+                  },
+                  {
+                    id: 6,
+                    aliasedExtra: 'extra 6',
+                    model1Relation1: {
+                      id: 7,
                     },
-                    {
-                      id: 6,
-                      aliasedExtra: 'extra 6',
-                      model1Relation1: {
-                        id: 7,
+                    model1Relation2: [
+                      {
+                        idCol: 3,
                       },
-                      model1Relation2: [
-                        {
-                          idCol: 3,
-                        },
-                      ],
-                    },
-                  ],
-                },
-              ],
-            });
+                    ],
+                  },
+                ],
+              },
+            ],
           });
-      });
-
-      it('omit(modelClass, properties) should omit properties recursively based on model class', () => {
-        return Model1.query()
-          .where('id', 1)
-          .eager('model1Relation2.model2Relation1.[model1Relation1, model1Relation2]')
-          .first()
-          .omit(Model1, ['model1Id', 'model1Prop1', 'model1Prop2'])
-          .omit(Model2, ['model1Id', 'model2Prop1', 'model2Prop2'])
-          .filterEager('model1Relation2', (builder) => {
-            builder.orderBy('id_col');
-          })
-          .modifyEager('model1Relation2.model2Relation1', (builder) => {
-            builder.orderBy('id');
-          })
-          .then((model) => {
-            expect(model.toJSON()).to.eql({
-              id: 1,
-              model1Relation2: [
-                {
-                  idCol: 1,
-                  model2Relation1: [],
-                },
-                {
-                  idCol: 2,
-                  model2Relation1: [
-                    {
-                      id: 5,
-                      aliasedExtra: 'extra 5',
-                      model1Relation1: null,
-                      model1Relation2: [],
-                    },
-                    {
-                      id: 6,
-                      aliasedExtra: 'extra 6',
-                      model1Relation1: {
-                        id: 7,
-                      },
-                      model1Relation2: [
-                        {
-                          idCol: 3,
-                        },
-                      ],
-                    },
-                  ],
-                },
-              ],
-            });
-          });
-      });
-    });
-
-    describe('QueryBuilder.mergeEager', () => {
-      it('mergeEager should merge eager expressions', () => {
-        return Model1.query()
-          .where('id', 1)
-          .eager('model1Relation2')
-          .mergeEager('model1Relation2.model2Relation1.model1Relation1')
-          .mergeEager('model1Relation2.model2Relation1.model1Relation2')
-          .first()
-          .omit(['model1Id', 'model1Prop1', 'model1Prop2', 'model2Prop1', 'model2Prop2'])
-          .filterEager('model1Relation2', (builder) => {
-            builder.orderBy('id_col');
-          })
-          .modifyEager('model1Relation2.model2Relation1', (builder) => {
-            builder.orderBy('id');
-          })
-          .then((model) => {
-            expect(model.toJSON()).to.eql({
-              id: 1,
-              model1Relation2: [
-                {
-                  idCol: 1,
-                  model2Relation1: [],
-                },
-                {
-                  idCol: 2,
-                  model2Relation1: [
-                    {
-                      id: 5,
-                      aliasedExtra: 'extra 5',
-                      model1Relation1: null,
-                      model1Relation2: [],
-                    },
-                    {
-                      id: 6,
-                      aliasedExtra: 'extra 6',
-                      model1Relation1: {
-                        id: 7,
-                      },
-                      model1Relation2: [
-                        {
-                          idCol: 3,
-                        },
-                      ],
-                    },
-                  ],
-                },
-              ],
-            });
-          });
-      });
-
-      it('mergeEager should merge eager expressions and filters', () => {
-        return Model1.query()
-          .where('id', 1)
-          .eager('model1Relation2')
-          .mergeEager('model1Relation2(f1).model2Relation1.model1Relation1', {
-            f1: (builder) => {
-              builder.orderBy('id_col');
-            },
-          })
-          .mergeEager('model1Relation2.model2Relation1(f2).model1Relation2', {
-            f2: (builder) => {
-              builder.orderBy('id');
-            },
-          })
-          .first()
-          .omit(['model1Id', 'model1Prop1', 'model1Prop2', 'model2Prop1', 'model2Prop2'])
-          .then((model) => {
-            expect(model.toJSON()).to.eql({
-              id: 1,
-              model1Relation2: [
-                {
-                  idCol: 1,
-                  model2Relation1: [],
-                },
-                {
-                  idCol: 2,
-                  model2Relation1: [
-                    {
-                      id: 5,
-                      aliasedExtra: 'extra 5',
-                      model1Relation1: null,
-                      model1Relation2: [],
-                    },
-                    {
-                      id: 6,
-                      aliasedExtra: 'extra 6',
-                      model1Relation1: {
-                        id: 7,
-                      },
-                      model1Relation2: [
-                        {
-                          idCol: 3,
-                        },
-                      ],
-                    },
-                  ],
-                },
-              ],
-            });
-          });
-      });
+        });
     });
 
     describe('QueryBuilder.orderBy', () => {
       it('orderBy should work for the root query', () => {
-        return Promise.map(
-          [Model1.WhereInEagerAlgorithm, Model1.JoinEagerAlgorithm],
-          (eagerAlgorithm) => {
-            return Model1.query()
-              .select('Model1.model1Prop1')
-              .modifyEager('model1Relation1', (builder) => {
-                builder.select('model1Prop1');
-              })
-              .eager('model1Relation1')
-              .eagerAlgorithm(eagerAlgorithm)
-              .orderBy('Model1.model1Prop1', 'DESC')
-              .whereNotNull('Model1.model1Id')
-              .then((models) => {
-                expect(models).to.eql([
-                  {
-                    model1Prop1: 'hello 8',
-                    model1Relation1: { model1Prop1: 'hello 9', $afterFindCalled: 1 },
-                    $afterFindCalled: 1,
-                  },
-                  {
-                    model1Prop1: 'hello 6',
-                    model1Relation1: { model1Prop1: 'hello 7', $afterFindCalled: 1 },
-                    $afterFindCalled: 1,
-                  },
-                  {
-                    model1Prop1: 'hello 3',
-                    model1Relation1: { model1Prop1: 'hello 4', $afterFindCalled: 1 },
-                    $afterFindCalled: 1,
-                  },
-                  {
-                    model1Prop1: 'hello 2',
-                    model1Relation1: { model1Prop1: 'hello 3', $afterFindCalled: 1 },
-                    $afterFindCalled: 1,
-                  },
-                  {
-                    model1Prop1: 'hello 1',
-                    model1Relation1: { model1Prop1: 'hello 2', $afterFindCalled: 1 },
-                    $afterFindCalled: 1,
-                  },
-                ]);
-              });
-          }
-        );
+        return Promise.map(['withGraphFetched', 'withGraphJoined'], (method) => {
+          return Model1.query()
+            .select('Model1.model1Prop1')
+            .modifyGraph('model1Relation1', (builder) => {
+              builder.select('model1Prop1');
+            })
+            [method]('model1Relation1')
+            .orderBy('Model1.model1Prop1', 'DESC')
+            .whereNotNull('Model1.model1Id')
+            .then((models) => {
+              expect(models).to.eql([
+                {
+                  model1Prop1: 'hello 8',
+                  model1Relation1: { model1Prop1: 'hello 9', $afterFindCalled: 1 },
+                  $afterFindCalled: 1,
+                },
+                {
+                  model1Prop1: 'hello 6',
+                  model1Relation1: { model1Prop1: 'hello 7', $afterFindCalled: 1 },
+                  $afterFindCalled: 1,
+                },
+                {
+                  model1Prop1: 'hello 3',
+                  model1Relation1: { model1Prop1: 'hello 4', $afterFindCalled: 1 },
+                  $afterFindCalled: 1,
+                },
+                {
+                  model1Prop1: 'hello 2',
+                  model1Relation1: { model1Prop1: 'hello 3', $afterFindCalled: 1 },
+                  $afterFindCalled: 1,
+                },
+                {
+                  model1Prop1: 'hello 1',
+                  model1Relation1: { model1Prop1: 'hello 2', $afterFindCalled: 1 },
+                  $afterFindCalled: 1,
+                },
+              ]);
+            });
+        });
       });
     });
 
@@ -2979,12 +2599,12 @@ module.exports = (session) => {
         ]);
       });
 
-      it('should work with WhereInEagerAlgorithm', () => {
+      it('should work with withGraphFetched', () => {
         return Model2.query()
           .whereIn('id_col', [100, 200])
           .orderBy('id_col')
-          .eagerAlgorithm(Model2.WhereInEagerAlgorithm)
-          .eager('model2Relation1(select, orderById)', {
+          .withGraphFetched('model2Relation1(select, orderById)')
+          .modifiers({
             select: (b) => b.select('model1Prop1'),
           })
           .then((models) => {
@@ -3027,15 +2647,14 @@ module.exports = (session) => {
           });
       });
 
-      it('should work with JoinEagerAlgorithm', () => {
+      it('should work with withGraphJoined', () => {
         return Model2.query()
           .whereIn('id_col', [100, 200])
-          .eagerAlgorithm(Model2.JoinEagerAlgorithm)
           .orderBy(['id_col', 'model2Relation1.model1Prop1'])
           .modifiers({
             select: (b) => b.select('model1Prop1'),
           })
-          .eager('model2Relation1(select)')
+          .withGraphJoined('model2Relation1(select)')
           .then((models) => {
             expect(models).to.eql([
               {
@@ -3122,7 +2741,7 @@ module.exports = (session) => {
         return Model2.query()
           .whereIn('id_col', [100, 200])
           .orderBy('id_col')
-          .eager('model2Relation1(orderById)')
+          .withGraphFetched('model2Relation1(orderById)')
           .then((result) => {
             chai.expect(result).to.containSubset([
               {
@@ -3161,25 +2780,24 @@ module.exports = (session) => {
     describe('aliases', () => {
       it('aliases in eager expressions should work', () => {
         return Promise.map(
-          [Model1.WhereInEagerAlgorithm, Model1.JoinEagerAlgorithm],
-          (eagerAlgo) => {
+          ['withGraphFetched', 'withGraphJoined'],
+          (method) => {
             return Model1.query()
               .where('Model1.id', 1)
               .select('Model1.id')
-              .eagerAlgorithm(eagerAlgo)
-              .eager(
+              [method](
                 `[
               model1Relation1(f1) as a,
               model1Relation2(f2) as b .[
                 model2Relation1(f1) as c,
                 model2Relation1(f1) as d
               ]
-            ]`,
-                {
-                  f1: (builder) => builder.select('Model1.id'),
-                  f2: (builder) => builder.select('model2.id_col'),
-                }
+            ]`
               )
+              .modifiers({
+                f1: (builder) => builder.select('Model1.id'),
+                f2: (builder) => builder.select('model2.id_col'),
+              })
               .first()
               .then((model) => {
                 model.b = _.sortBy(model.b, 'idCol');
@@ -3237,23 +2855,23 @@ module.exports = (session) => {
         );
       });
 
-      it('aliases should alias the joined tables when using joinEager', () => {
+      it('aliases should alias the joined tables when using withGraphJoined', () => {
         return Model1.query()
           .findById(1)
           .select('Model1.id')
-          .joinEager(
+          .withGraphJoined(
             `[
             model1Relation1(f1) as a,
             model1Relation2(f2) as b .[
               model2Relation1(f1) as c,
               model2Relation1(f1) as d
             ]
-          ]`,
-            {
-              f1: (builder) => builder.select('Model1.id'),
-              f2: (builder) => builder.select('model2.id_col'),
-            }
+          ]`
           )
+          .modifiers({
+            f1: (builder) => builder.select('Model1.id'),
+            f2: (builder) => builder.select('model2.id_col'),
+          })
           .where('b:d.id', 6)
           .then((model) => {
             model.b = _.sortBy(model.b, 'idCol');
@@ -3299,13 +2917,13 @@ module.exports = (session) => {
 
       it('alias method should work', () => {
         return Promise.map(
-          [Model1.WhereInEagerAlgorithm, Model1.JoinEagerAlgorithm],
-          (eagerAlgo) => {
+          ['withGraphFetched', 'withGraphJoined'],
+          (method) => {
             return Model1.query()
               .alias('m1')
               .select('m1.id')
-              .eagerAlgorithm(eagerAlgo)
-              .eager(`[model1Relation1(f1) as a]`, {
+              [method](`[model1Relation1(f1) as a]`)
+              .modifiers({
                 f1: (builder) => builder.select('id'),
               })
               .findOne({ 'm1.id': 1 })
@@ -3342,13 +2960,13 @@ module.exports = (session) => {
           sql = [];
         });
 
-        it('check WhereInEageralgorithm generated SQL', () => {
+        it('check withGraphFetched generated SQL', () => {
           return Model1.bindKnex(mockKnex)
             .query()
-            .eager(
+            .withGraphFetched(
               '[model1Relation1, model1Relation1Inverse, model1Relation2.[model2Relation1, model2Relation2], model1Relation3]'
             )
-            .mergeContext({
+            .context({
               onBuild(builder) {
                 if (builder.modelClass().name === 'Model2') {
                   builder.orderBy('id_col');
@@ -3374,18 +2992,17 @@ module.exports = (session) => {
           return Model1.bindKnex(mockKnex)
             .query()
             .findById(4)
-            .eager('model1Relation1')
+            .withGraphFetched('model1Relation1')
             .then((res) => {
               expect(sql).to.have.length(1);
               expect(res.id).to.equal(4);
             });
         });
 
-        it('check JoinEagerAlgorithm generated SQL', () => {
+        it('check withGraphJoined generated SQL', () => {
           return Model1.bindKnex(mockKnex)
             .query()
-            .eagerAlgorithm(Model1.JoinEagerAlgorithm)
-            .eager(
+            .withGraphJoined(
               '[model1Relation1, model1Relation1Inverse, model1Relation2.[model2Relation1, model2Relation2], model1Relation3]'
             )
             .then(() => {
@@ -3512,15 +3129,14 @@ module.exports = (session) => {
           this.timeout(30000);
 
           return Promise.map(
-            [/*Model1.WhereInEagerAlgorithm*/ Model1.JoinEagerAlgorithm],
-            (eagerAlgorithm) => {
+            ['withGraphFecthed', 'withGraphJoined'],
+            (method) => {
               let t1 = Date.now();
               return Model1.query()
                 .where('Model1.model1Prop1', 'like', 'hello%')
-                .eager(
+                [method](
                   '[model1Relation1.model1Relation1, model1Relation1Inverse, model1Relation2.[model2Relation1, model2Relation2], model1Relation3]'
                 )
-                .eagerAlgorithm(eagerAlgorithm)
                 .then((res) => {
                   console.log('query time', Date.now() - t1);
 
@@ -3591,43 +3207,16 @@ module.exports = (session) => {
           .then(tester);
       });
 
-      testFn(testName + ' (QueryBuilder.eager)', () => {
-        return opt.Model.query()
-          .where(idCol, opt.id)
-          .eager(expr, opt.filters)
-          .then(sortRelations(opt.disableSort))
-          .then(tester);
-      });
-
-      testFn(testName + ' (Model.loadRelated)', () => {
+      testFn(testName + ' (Model.$fetchGraph)', () => {
         return opt.Model.query()
           .where(idCol, opt.id)
           .then((models) => {
-            return opt.Model.loadRelated(models, expr, opt.filters);
-          })
-          .then(sortRelations(opt.disableSort))
-          .then(tester);
-      });
-
-      testFn(testName + ' (Model.$loadRelated)', () => {
-        return opt.Model.query()
-          .where(idCol, opt.id)
-          .then((models) => {
-            return models[0].$loadRelated(expr, opt.filters);
+            return models[0].$fetchGraph(expr).modifiers(opt.filters);
           })
           .then(sortRelations(opt.disableSort))
           .then((result) => {
             tester([result]);
           });
-      });
-
-      testFn(testName + ' (NaiveEagerAlgorithm)', () => {
-        return opt.Model.query()
-          .where(idCol, opt.id)
-          .eagerAlgorithm(Model1.NaiveEagerAlgorithm)
-          .eager(expr, opt.filters)
-          .then(sortRelations(opt.disableSort))
-          .then(tester);
       });
     }
 
@@ -3637,15 +3226,6 @@ module.exports = (session) => {
           .where(idCol, opt.id)
           .withGraphJoined(expr, opt.eagerOptions)
           .modifiers(opt.filters)
-          .then(sortRelations(opt.disableSort))
-          .then(tester);
-      });
-
-      testFn(testName + ' (JoinEagerAlgorithm)', () => {
-        return opt.Model.query()
-          .where(idCol, opt.id)
-          .eagerAlgorithm(Model1.JoinEagerAlgorithm, opt.eagerOptions)
-          .eager(expr, opt.filters)
           .then(sortRelations(opt.disableSort))
           .then(tester);
       });

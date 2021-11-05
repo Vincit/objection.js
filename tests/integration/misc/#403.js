@@ -117,11 +117,11 @@ module.exports = (session) => {
       it('test 1', () => {
         return Page.query()
           .findById(1)
-          .eager('parents.parents')
-          .modifyEager('parents', (builder) => {
+          .withGraphFetched('parents.parents')
+          .modifyGraph('parents', (builder) => {
             builder.select('page_id as id', ref('object_data:name').as('name')).orderBy('page_id');
           })
-          .modifyEager('parents.parents', (builder) => {
+          .modifyGraph('parents.parents', (builder) => {
             builder.select('page_id as id', ref('object_data:name').as('name')).orderBy('page_id');
           })
           .select('page_id as id', ref('object_data:name').as('name'))

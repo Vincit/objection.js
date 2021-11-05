@@ -150,7 +150,7 @@ module.exports = (session) => {
               );
             })
             .then(() => {
-              return Campaign.query().findOne({}).eager('cogs');
+              return Campaign.query().findOne({}).withGraphFetched('cogs');
             })
             .then((c1) => {
               chai.expect(c1.cogs.length).to.equal(1);
@@ -162,7 +162,7 @@ module.exports = (session) => {
               );
             })
             .then(() => {
-              return Campaign.query().findOne({}).eager('cogs');
+              return Campaign.query().findOne({}).withGraphFetched('cogs');
             })
             .then((c2) => {
               chai.expect(c2.cogs.length).to.equal(0);
@@ -174,7 +174,7 @@ module.exports = (session) => {
               );
             })
             .then(() => {
-              return Deliverable.query().findOne({}).eager('cogs');
+              return Deliverable.query().findOne({}).withGraphFetched('cogs');
             })
             .then((d1) => {
               chai.expect(d1.cogs.length).to.equal(1);
@@ -186,7 +186,7 @@ module.exports = (session) => {
               );
             })
             .then(() => {
-              return Deliverable.query().findOne({}).eager('cogs');
+              return Deliverable.query().findOne({}).withGraphFetched('cogs');
             })
             .then((d2) => {
               chai.expect(d2.cogs.length).to.equal(0);

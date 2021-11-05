@@ -219,13 +219,13 @@ module.exports = (session) => {
         it('should work with eager', () => {
           return Person.query()
             .findOne('name', 'Jennifer')
-            .eager({
+            .withGraphFetched({
               movies: true,
               pets: {
                 owner: true,
               },
             })
-            .modifyEager('pets', (query) => query.orderBy('name', 'desc'))
+            .modifyGraph('pets', (query) => query.orderBy('name', 'desc'))
             .then((result) => {
               expect(result).to.eql({
                 name: 'Jennifer',
@@ -255,7 +255,7 @@ module.exports = (session) => {
         it('should work with joinEager', () => {
           return Person.query()
             .findOne('people.name', 'Jennifer')
-            .joinEager({
+            .withGraphJoined({
               movies: true,
               pets: {
                 owner: true,
@@ -623,7 +623,7 @@ module.exports = (session) => {
           });
 
           return Person.query()
-            .eager({
+            .withGraphFetched({
               movies: true,
               pets: {
                 owner: true,
@@ -967,7 +967,7 @@ module.exports = (session) => {
           });
 
           return Person.query()
-            .eager({
+            .withGraphFetched({
               movies: true,
               pets: {
                 owner: true,

@@ -152,7 +152,7 @@ module.exports = (session) => {
           ],
         })
         .then(() => {
-          return T1.query().eager('manyT2').select('objection_test_2.t1.*');
+          return T1.query().withGraphFetched('manyT2').select('objection_test_2.t1.*');
         })
         .then((models) => {
           expect(models).to.eql([
@@ -171,9 +171,9 @@ module.exports = (session) => {
         })
         .then(() => {
           return T1.query()
-            .eager('manyT2')
+            .withGraphFetched('manyT2')
             .select('objection_test_2.t1.foo')
-            .modifyEager('manyT2', (builder) => {
+            .modifyGraph('manyT2', (builder) => {
               builder.select('bar');
             });
         })

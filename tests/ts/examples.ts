@@ -4,7 +4,7 @@ import * as objection from '../../';
 import {
   DBError,
   fn,
-  lit,
+  val,
   raw,
   ref,
   RelationMappings,
@@ -301,7 +301,7 @@ async () => {
 async () => {
   const person = new Person();
 
-  takesPerson(await person.$loadRelated('movies'));
+  takesPerson(await person.$fetchGraph('movies'));
   takesPerson(await person.$query());
   takesPerson(
     await person.$query().patchAndFetch({
@@ -436,8 +436,8 @@ const appendRelatedPerson: Person = examplePerson.$appendRelated('pets', [
 ]);
 
 // static methods from Model should return the subclass type
-const personQB: objection.QueryBuilder<Person, Person> = Person.loadRelated(new Person(), 'movies');
-const peopleQB: objection.QueryBuilder<Person> = Person.loadRelated([new Person()], 'movies');
+const personQB: objection.QueryBuilder<Person, Person> = Person.fetchGraph(new Person(), 'movies');
+const peopleQB: objection.QueryBuilder<Person> = Person.fetchGraph([new Person()], 'movies');
 
 const person: PromiseLike<Person> = personQB;
 const people: PromiseLike<Person[]> = peopleQB;
@@ -565,7 +565,7 @@ const rowsInserted: PromiseLike<Person[]> = qb.insert([
   { firstName: 'alice' },
   { firstName: 'bob' },
 ]);
-const rowsInsertedWithRelated: PromiseLike<Person> = qb.insertWithRelated({});
+const rowsInsertedWithRelated: PromiseLike<Person> = qb.insertGraph({});
 const rowsInsertGraph1: PromiseLike<Person> = qb.insertGraph({
   '#id': 'root',
   firstName: 'Name',
@@ -668,9 +668,6 @@ const insertedGraphAndFetchSome: PromiseLike<Person[]> = Person.query().insertGr
   new Person(),
   new Person(),
 ]);
-const insertedRelatedAndFetch: PromiseLike<Person> = Person.query().insertWithRelatedAndFetch(
-  new Person()
-);
 const updatedModel: PromiseLike<Person> = Person.query().updateAndFetch({});
 const updatedModelById: PromiseLike<Person> = Person.query().updateAndFetchById(123, {});
 const patchedModel: PromiseLike<Person> = Person.query().patchAndFetch({});
@@ -700,14 +697,11 @@ const patchedModels: PromiseLike<Person>[] = [
   qb.patchAndFetchById(123, { firstName: qb.select('lastname') }),
 ];
 
-const rowsEager: PromiseLike<Person[]> = Person.query()
-  .eagerAlgorithm(Person.NaiveEagerAlgorithm)
-  .eagerAlgorithm(Person.JoinEagerAlgorithm)
-  .eagerAlgorithm(Person.WhereInEagerAlgorithm)
-  .eagerOptions({ joinOperation: 'innerJoin' })
-  .eager('foo.bar');
+const rowsEager: PromiseLike<Person[]> = Person.query().withGraphFetched('foo.bar', {
+  joinOperation: 'innerJoin',
+});
 
-const rowsEager2: PromiseLike<Person[]> = Person.query().eager({
+const rowsEager2: PromiseLike<Person[]> = Person.query().withGraphFetched({
   pets: {
     owner: {
       movies: {
@@ -725,32 +719,32 @@ const rowsEager3: PromiseLike<Person[]> = Person.query().withGraphFetched({
 
 const children: PromiseLike<Person[]> = Person.query()
   .skipUndefined()
-  .allowEager('[pets, parent, children.[pets, movies.actors], movies.actors.pets]')
-  .allowEager({ pets: true })
-  .mergeAllowEager({ parent: true })
-  .eager('children')
+  .allowGraph('[pets, parent, children.[pets, movies.actors], movies.actors.pets]')
+  .allowGraph({ pets: true })
+  .allowGraph({ parent: true })
+  .withGraphFetched('children')
   .where('age', '>=', 42);
 
 const childrenAndPets: PromiseLike<Person[]> = Person.query()
-  .eager('children')
+  .withGraphFetched('children')
   .where('age', '>=', 42)
-  .modifyEager('[pets, children.pets]', (qb) => qb.orderBy('name'))
-  .modifyEager('[pets, children.pets]', 'orderByName')
-  .modifyEager('[pets, children.pets]', ['orderByName', 'orderBySomethingElse']);
+  .modifyGraph('[pets, children.pets]', (qb) => qb.orderBy('name'))
+  .modifyGraph('[pets, children.pets]', 'orderByName')
+  .modifyGraph('[pets, children.pets]', ['orderByName', 'orderBySomethingElse']);
 
 const childrenAndPets2: PromiseLike<Person[]> = Person.query()
   .withGraphFetched('children')
   .where('age', '>=', 42)
-  .modifyEager('[pets, children.pets]', (qb) => qb.orderBy('name'))
-  .modifyEager('[pets, children.pets]', 'orderByName')
-  .modifyEager('[pets, children.pets]', ['orderByName', 'orderBySomethingElse']);
+  .modifyGraph('[pets, children.pets]', (qb) => qb.orderBy('name'))
+  .modifyGraph('[pets, children.pets]', 'orderByName')
+  .modifyGraph('[pets, children.pets]', ['orderByName', 'orderBySomethingElse']);
 
 const childrenAndPets3: PromiseLike<Person[]> = Person.query()
   .withGraphJoined('children')
   .where('age', '>=', 42)
-  .modifyEager('[pets, children.pets]', (qb) => qb.orderBy('name'))
-  .modifyEager('[pets, children.pets]', 'orderByName')
-  .modifyEager('[pets, children.pets]', ['orderByName', 'orderBySomethingElse']);
+  .modifyGraph('[pets, children.pets]', (qb) => qb.orderBy('name'))
+  .modifyGraph('[pets, children.pets]', 'orderByName')
+  .modifyGraph('[pets, children.pets]', ['orderByName', 'orderBySomethingElse']);
 
 const rowsPage: PromiseLike<{
   total: number;
@@ -853,7 +847,7 @@ qb = qb.context({
 
 const trx: objection.Transaction = qb.context().transaction;
 
-qb = qb.mergeContext({
+qb = qb.context({
   foo: 'bar',
 });
 
@@ -956,7 +950,7 @@ objection.transaction(Person.knex(), async (trx) => {
 objection.transaction<Person>(Person.knex(), async (trx) => {
   const person = await Person.query(trx).insert({ firstName: 'Name' });
   await Movie.query(trx).insert({ title: 'Total Recall' });
-  await person.$loadRelated('movies', {}, trx);
+  await person.$fetchGraph('movies', { transaction: trx });
 
   return person;
 });
@@ -967,7 +961,7 @@ objection.transaction.start(Person).then((trx) => {
     .catch(() => trx.rollback());
 });
 
-// Vefiry where methods take a queryBuilder of any.
+// Verify where methods take a queryBuilder of any.
 const whereSubQuery = Movie.query().select('name');
 
 Person.query().whereIn('firstName', whereSubQuery);
@@ -998,9 +992,8 @@ const relQueryResult6: PromiseLike<Animal[]> = Person.relatedQuery('pets').for(
 const relQueryResult7: PromiseLike<Movie[]> = Person.relatedQuery('movies').for(1);
 const relQueryResult8: PromiseLike<Person[]> = Person.relatedQuery('mom').for(1);
 const relQueryResult9: PromiseLike<Person[]> = Person.relatedQuery('children').for(1);
-const relQueryResult10: PromiseLike<Movie[]> = Person.relatedQuery<Movie>(
-  'nonExistentRelation'
-).for(1);
+const relQueryResult10: PromiseLike<Movie[]> =
+  Person.relatedQuery<Movie>('nonExistentRelation').for(1);
 
 /**
  * http://knexjs.org/#Builder-count
@@ -1033,9 +1026,9 @@ Person.query()
   .where('age', '>', ref('OtherModel.ageLimit'));
 
 // LiteralBuilder:
-Person.query().where(ref('Model.jsonColumn:details'), '=', lit({ name: 'Jennifer', age: 29 }));
-Person.query().where('age', '>', lit(10));
-Person.query().where('firstName', lit('Jennifer').castText());
+Person.query().where(ref('Model.jsonColumn:details'), '=', val({ name: 'Jennifer', age: 29 }));
+Person.query().where('age', '>', val(10));
+Person.query().where('firstName', val('Jennifer').castText());
 
 // Preserving result type after result type changing methods.
 
@@ -1186,8 +1179,8 @@ takesPerson(Person.fromDatabaseJson({ firstName: 'jennifer', lastName: 'Lawrence
 
 // plugin tests for mixin and compose:
 
-const plugin1 = ({} as any) as objection.Plugin;
-const plugin2 = ({} as any) as objection.Plugin;
+const plugin1 = {} as any as objection.Plugin;
+const plugin2 = {} as any as objection.Plugin;
 
 // DB errors
 () => {

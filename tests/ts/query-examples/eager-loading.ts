@@ -1,11 +1,11 @@
 import { Person } from '../fixtures/person';
 
 (async () => {
-  await Person.query().eager('pets');
+  await Person.query().withGraphFetched('pets');
 
-  await Person.query().eager('[pets, children.[pets, children]]');
+  await Person.query().withGraphFetched('[pets, children.[pets, children]]');
 
-  await Person.query().eager({
+  await Person.query().withGraphFetched({
     pets: true,
     children: {
       pets: true,
@@ -13,21 +13,21 @@ import { Person } from '../fixtures/person';
     },
   });
 
-  await Person.query().eager('[pets, children.^]');
+  await Person.query().withGraphFetched('[pets, children.^]');
 
-  await Person.query().eager('[pets, children.^3]');
+  await Person.query().withGraphFetched('[pets, children.^3]');
 
   await Person.query()
-    .eager('[children.[pets, movies], movies]')
-    .modifyEager('children.pets', (builder) => {
+    .withGraphFetched('[children.[pets, movies], movies]')
+    .modifyGraph('children.pets', (builder) => {
       // Only select pets older than 10 years old for children
       // and only return their names.
       builder.where('age', '>', 10).select('name');
     });
 
-  await Person.query().eager(
-    '[pets(selectName, onlyDogs), children(orderByAge).[pets, children]]',
-    {
+  await Person.query()
+    .withGraphFetched('[pets(selectName, onlyDogs), children(orderByAge).[pets, children]]')
+    .modifiers({
       selectName: (builder) => {
         builder.select('name');
       },
@@ -37,17 +37,16 @@ import { Person } from '../fixtures/person';
       onlyDogs: (builder) => {
         builder.where('species', 'dog');
       },
-    }
-  );
+    });
 
-  await Person.query().eager(`
+  await Person.query().withGraphFetched(`
     children(defaultSelects, orderByAge).[
       pets(onlyDogs, orderByName),
       movies
     ]
   `);
 
-  await Person.query().eager(`[
+  await Person.query().withGraphFetched(`[
     children(orderByAge) as kids .[
       pets(filterDogs) as dogs,
       pets(filterCats) as cats
@@ -59,9 +58,9 @@ import { Person } from '../fixtures/person';
   ]`);
 
   const eager = `[]`;
-  await Person.query().allowEager('[pets, children.pets]').eager(eager);
+  await Person.query().allowGraph('[pets, children.pets]').withGraphFetched(eager);
 
-  await Person.query().eagerAlgorithm(Person.JoinEagerAlgorithm).eager('[pets, children.pets]');
+  await Person.query().withGraphFetched('[pets, children.pets]');
 
-  await Person.query().joinEager('[pets, children.pets]');
+  await Person.query().withGraphJoined('[pets, children.pets]');
 })();

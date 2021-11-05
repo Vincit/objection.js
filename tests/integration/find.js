@@ -4,7 +4,7 @@ const expect = require('expect.js');
 const Promise = require('bluebird');
 
 const { KnexTimeoutError } = require('knex');
-const { raw, ref, lit, val, fn, Model, QueryBuilderOperation } = require('../..');
+const { raw, ref, val, fn, Model, QueryBuilderOperation } = require('../..');
 
 module.exports = (session) => {
   let Model1 = session.models.Model1;
@@ -422,16 +422,6 @@ module.exports = (session) => {
             });
         });
 
-        it('.pluck()', () => {
-          return Model2.query()
-            .where('model2_prop2', '>', 15)
-            .orderBy('model2_prop2')
-            .pluck('model2Prop2')
-            .then((values) => {
-              expect(values).to.eql([20, 30]);
-            });
-        });
-
         it('.join()', () => {
           return Model2.query()
             .select('model2.*', 'Model1.model1Prop1')
@@ -713,7 +703,7 @@ module.exports = (session) => {
 
           TestModel.query()
             .where('model1Prop1', 'There is no value like me')
-            .mergeContext({ foo: 'bar' })
+            .context({ foo: 'bar' })
             .throwIfNotFound()
             .then(() => {
               done(new Error('should not get here'));
@@ -1018,7 +1008,7 @@ module.exports = (session) => {
                 .where((builder) => {
                   // The two nested grouping where's are relevant here.
                   builder.where((builder) => {
-                    builder.where(lit(2), Model1.relatedQuery('model1Relation1').select('id'));
+                    builder.where(val(2), Model1.relatedQuery('model1Relation1').select('id'));
                   });
                 });
             })
@@ -1140,7 +1130,7 @@ module.exports = (session) => {
             .where((builder) => {
               builder.whereExists(Model1.relatedQuery('model1Relation2'));
             })
-            .eager('model1Relation2')
+            .withGraphFetched('model1Relation2')
             .then((results) => {
               expect(results.length).to.equal(1);
               expect(results[0].model1Prop1).to.equal('hello 1');
@@ -1402,7 +1392,7 @@ module.exports = (session) => {
 
       it('should work in where', () => {
         return Model1.query()
-          .where(lit(3), Model1.relatedQuery('model1Relation1').select('id'))
+          .where(val(3), Model1.relatedQuery('model1Relation1').select('id'))
           .first()
           .then((res) => {
             expect(res.id).to.equal(1);
@@ -2234,7 +2224,7 @@ module.exports = (session) => {
         return Model2.query()
           .joinRelated('model2Relation1(idGreaterThan)')
           .select('model2Relation1.id', 'model2.*')
-          .mergeContext({
+          .context({
             filterArgs: [5],
           })
           .then((models) => {
@@ -2614,34 +2604,12 @@ module.exports = (session) => {
               });
           });
 
-          it('.pluck() array', () => {
-            return parent2
-              .$relatedQuery('model1Relation2')
-              .orderBy('id_col')
-              .pluck('idCol')
-              .then((values) => {
-                expect(values).to.eql([4, 5, 6]);
-              });
-          });
-
-          it('.pluck() object', () => {
-            return parent2
-              .$relatedQuery('model1Relation2')
-              .orderBy('id_col')
-              .first()
-              .pluck('idCol')
-              .then((values) => {
-                expect(values).to.eql(4);
-              });
-          });
-
           it('.first()', () => {
             return parent2
               .$relatedQuery('model1Relation2')
               .orderBy('id_col')
-              .pluck('idCol')
               .first()
-              .then((value) => {
+              .then(({ idCol: value }) => {
                 expect(value).to.eql(4);
               });
           });
@@ -2883,23 +2851,12 @@ module.exports = (session) => {
               });
           });
 
-          it('.pluck()', () => {
-            return parent2
-              .$relatedQuery('model2Relation1')
-              .orderBy('Model1.id', 'desc')
-              .pluck('id')
-              .then((values) => {
-                expect(values).to.eql([8, 7, 6]);
-              });
-          });
-
           it('.first()', () => {
             return parent1
               .$relatedQuery('model2Relation1')
               .orderBy('Model1.id')
-              .pluck('id')
               .first()
-              .then((value) => {
+              .then(({ id: value }) => {
                 expect(value).to.eql(3);
               });
           });

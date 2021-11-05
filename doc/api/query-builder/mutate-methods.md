@@ -131,37 +131,9 @@ See the [section about graph inserts](/guide/query-examples.html#graph-inserts).
 | ----------------------------------- | ---------------------------------- |
 | [QueryBuilder](/api/query-builder/) | `this` query builder for chaining. |
 
-## allowInsert()
-
-::: warning
-Deprecated! Will be removed in version 3.0. Use [allowGraph](/api/query-builder/eager-methods.html#allowgraph) instead. Note that you may need to add [clearAllowGraph](/api/query-builder/eager-methods.html#clearallowgraph) call too. `allowInsert` cleared any old expressions automatically, while `allowGraph` merges them.
-
-[v1 documentation](https://github.com/Vincit/objection.js/blob/v1/doc/api/query-builder/mutate-methods.md#allowinsert)
-:::
-
 ## insertGraphAndFetch()
 
 Exactly like [insertGraph](/api/query-builder/mutate-methods.html#insertgraph) but also fetches the graph from the db after insert. Note that on postgres, you can simply chain [returning('\*')](/api/query-builder/find-methods.html#returning) to the normal `insertGraph` query to get the same result without additional queries.
-
-## insertWithRelated()
-
-::: warning
-Deprecated! Will be removed in version 2.0.
-
-[v1 documentation](https://github.com/Vincit/objection.js/blob/v1/doc/api/query-builder/mutate-methods.md#insertwithrelated)
-:::
-
-Alias for [insertGraph](/api/query-builder/mutate-methods.html#insertgraph).
-
-## insertWithRelatedAndFetch()
-
-::: warning
-Deprecated! Will be removed in version 2.0.
-
-[v1 documentation](https://github.com/Vincit/objection.js/blob/v1/doc/api/query-builder/mutate-methods.md#insertwithrelatedandfetch)
-:::
-
-Alias for [insertGraphAndFetch](/api/query-builder/mutate-methods.html#insertgraphandfetch).
 
 ## patch()
 
@@ -448,14 +420,6 @@ It's also really easy to create a server that doesn't work well with multiple us
 | Type                                | Description                        |
 | ----------------------------------- | ---------------------------------- |
 | [QueryBuilder](/api/query-builder/) | `this` query builder for chaining. |
-
-## allowUpsert()
-
-::: warning
-Deprecated! Will be removed in version 3.0. Use [allowGraph](/api/query-builder/eager-methods.html#allowgraph) instead. Note that you may need to add [clearAllowGraph](/api/query-builder/eager-methods.html#clearallowgraph) call too. `allowUpsert` cleared any old expressions automatically, while `allowGraph` merges them.
-
-[v1 documentation](https://github.com/Vincit/objection.js/blob/v1/doc/api/query-builder/mutate-methods.md#allowupsert)
-:::
 
 ## upsertGraphAndFetch()
 

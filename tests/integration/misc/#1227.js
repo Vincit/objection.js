@@ -69,7 +69,7 @@ module.exports = (session) => {
           },
         })
         .then((person) => {
-          return Person.query().findById(person.id).eager('pet');
+          return Person.query().findById(person.id).withGraphFetched('pet');
         })
         .then((person) => {
           expect(person).to.containSubset({

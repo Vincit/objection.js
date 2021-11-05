@@ -204,7 +204,7 @@ describe('QueryBuilder', () => {
     TestModel.modifiers = {};
 
     expect(() => {
-      builder.applyModifier('unknown');
+      builder.modify('unknown');
     }).to.throwException((err) => {
       expect(err.message).to.equal(
         'Unable to determine modify function from provided value: "unknown".'
@@ -221,91 +221,89 @@ describe('QueryBuilder', () => {
     expect(res === builder).to.equal(true);
   });
 
-  ['applyFilter', 'applyModifier', 'modify'].forEach((method) => {
-    it(method + ' accept a list of strings and call the corresponding modifiers', () => {
-      const builder = QueryBuilder.forClass(TestModel);
+  it('modify accept a list of strings and call the corresponding modifiers', () => {
+    const builder = QueryBuilder.forClass(TestModel);
 
-      let aCalled = false;
-      let bCalled = false;
+    let aCalled = false;
+    let bCalled = false;
 
-      TestModel.modifiers = {
-        a(qb) {
-          aCalled = qb === builder;
-        },
+    TestModel.modifiers = {
+      a(qb) {
+        aCalled = qb === builder;
+      },
 
-        b(qb) {
-          bCalled = qb === builder;
-        },
+      b(qb) {
+        bCalled = qb === builder;
+      },
 
-        c: 'a',
+      c: 'a',
 
-        d: ['c', 'b'],
-      };
+      d: ['c', 'b'],
+    };
 
-      aCalled = false;
-      bCalled = false;
-      builder[method]('a');
-      expect(aCalled).to.equal(true);
-      expect(bCalled).to.equal(false);
+    aCalled = false;
+    bCalled = false;
+    builder.modify('a');
+    expect(aCalled).to.equal(true);
+    expect(bCalled).to.equal(false);
 
-      aCalled = false;
-      bCalled = false;
-      builder[method]('b');
-      expect(aCalled).to.equal(false);
-      expect(bCalled).to.equal(true);
+    aCalled = false;
+    bCalled = false;
+    builder.modify('b');
+    expect(aCalled).to.equal(false);
+    expect(bCalled).to.equal(true);
 
-      aCalled = false;
-      bCalled = false;
-      builder[method](['a', 'b']);
-      expect(aCalled).to.equal(true);
-      expect(bCalled).to.equal(true);
+    aCalled = false;
+    bCalled = false;
+    builder.modify(['a', 'b']);
+    expect(aCalled).to.equal(true);
+    expect(bCalled).to.equal(true);
 
-      aCalled = false;
-      bCalled = false;
-      builder[method]([['a', [[['b']]]]]);
-      expect(aCalled).to.equal(true);
-      expect(bCalled).to.equal(true);
+    aCalled = false;
+    bCalled = false;
+    builder.modify([['a', [[['b']]]]]);
+    expect(aCalled).to.equal(true);
+    expect(bCalled).to.equal(true);
 
-      aCalled = false;
-      bCalled = false;
-      builder[method]('d');
-      expect(aCalled).to.equal(true);
-      expect(bCalled).to.equal(true);
-    });
+    aCalled = false;
+    bCalled = false;
+    builder.modify('d');
+    expect(aCalled).to.equal(true);
+    expect(bCalled).to.equal(true);
+  });
 
-    it(method + ' calls the modifierNotFound() hook for unknown modifiers', () => {
-      const builder = QueryBuilder.forClass(TestModel);
+  it('modify calls the modifierNotFound() hook for unknown modifiers', () => {
+    const builder = QueryBuilder.forClass(TestModel);
 
-      let caughtModifiers = [];
+    let caughtModifiers = [];
 
-      TestModel.modifierNotFound = (qb, modifier) => {
-        if (qb === builder) {
-          caughtModifiers.push(modifier);
-        }
-      };
+    TestModel.modifierNotFound = (qb, modifier) => {
+      if (qb === builder) {
+        caughtModifiers.push(modifier);
+      }
+    };
 
-      TestModel.modifiers = {
-        c: 'a',
+    TestModel.modifiers = {
+      c: 'a',
 
-        d: ['c', 'b'],
-      };
+      d: ['c', 'b'],
+    };
 
-      caughtModifiers = [];
-      builder[method]('a');
-      expect(caughtModifiers).to.eql(['a']);
+    caughtModifiers = [];
+    builder.modify('a');
+    expect(caughtModifiers).to.eql(['a']);
 
-      caughtModifiers = [];
-      builder[method]('b');
-      expect(caughtModifiers).to.eql(['b']);
+    caughtModifiers = [];
+    builder.modify('b');
+    expect(caughtModifiers).to.eql(['b']);
 
-      caughtModifiers = [];
-      builder[method]('c');
-      expect(caughtModifiers).to.eql(['a']);
+    caughtModifiers = [];
+    builder.modify('c');
+    expect(caughtModifiers).to.eql(['a']);
 
-      caughtModifiers = [];
-      builder[method]('d');
-      expect(caughtModifiers).to.eql(['a', 'b']);
-    });
+    caughtModifiers = [];
+    builder.modify('d');
+    expect(caughtModifiers).to.eql(['a', 'b']);
   });
 
   it('should still throw if modifierNotFound() delegate to the definition in the super class', () => {
@@ -316,7 +314,7 @@ describe('QueryBuilder', () => {
     };
 
     expect(() => {
-      builder.applyModifier('unknown');
+      builder.modify('unknown');
     }).to.throwException((err) => {
       expect(err.message).to.equal(
         'Unable to determine modify function from provided value: "unknown".'
@@ -333,7 +331,7 @@ describe('QueryBuilder', () => {
     };
 
     expect(() => {
-      builder.applyModifier('unknown');
+      builder.modify('unknown');
     }).to.not.throwException();
     expect(caughtModifier).to.equal('unknown');
   });
@@ -1180,7 +1178,7 @@ describe('QueryBuilder', () => {
     }
   });
 
-  it('hasEager() should return true for queries with eager statements', () => {
+  it('hasWithGraph() should return true for queries with eager statements', () => {
     TestModel.relationMappings = {
       someRel: {
         relation: Model.HasManyRelation,
@@ -1193,11 +1191,11 @@ describe('QueryBuilder', () => {
     };
 
     const query = TestModel.query();
-    expect(query.hasEager(), false);
-    query.eager('someRel');
-    expect(query.hasEager(), true);
-    query.clearEager();
-    expect(query.hasEager(), false);
+    expect(query.hasWithGraph(), false);
+    query.withGraphFetched('someRel');
+    expect(query.hasWithGraph(), true);
+    query.clearWithGraph();
+    expect(query.hasWithGraph(), false);
   });
 
   it('has() should match defined query operations', () => {
@@ -1523,15 +1521,15 @@ describe('QueryBuilder', () => {
     }).to.throwException();
   });
 
-  it('clearEager() should clear everything related to eager', () => {
+  it('clearWithGraph() should clear everything related to eager', () => {
     let builder = QueryBuilder.forClass(TestModel)
-      .eager('a(f).b', {
+      .withGraphFetched('a(f).b', {
         f: _.noop,
       })
-      .filterEager('a', _.noop);
+      .modifyGraph('a', _.noop);
 
     expect(builder.findOperation('eager')).to.not.equal(null);
-    builder.clearEager();
+    builder.clearWithGraph();
 
     expect(builder.findOperation('eager')).to.equal(null);
   });
@@ -1859,7 +1857,7 @@ describe('QueryBuilder', () => {
     });
   });
 
-  describe('eager, allowEager, and mergeAllowEager', () => {
+  describe('eager, allowGraph, and allowGraph', () => {
     beforeEach(() => {
       const rel = {
         relation: TestModel.BelongsToOneRelation,
@@ -1879,10 +1877,10 @@ describe('QueryBuilder', () => {
       };
     });
 
-    it("allowEager('a').eager('a(f1)') should be ok", (done) => {
+    it("allowGraph('a').withGraphFetched('a(f1)') should be ok", (done) => {
       QueryBuilder.forClass(TestModel)
-        .allowEager('a')
-        .eager('a(f1)', { f1: _.noop })
+        .allowGraph('a')
+        .withGraphFetched('a(f1)', { f1: _.noop })
         .then(() => {
           expect(executedQueries).to.have.length(1);
           done();
@@ -1892,10 +1890,10 @@ describe('QueryBuilder', () => {
         });
     });
 
-    it("eager('a(f1)').allowEager('a') should be ok", (done) => {
+    it("withGraphFetched('a(f1)').allowGraph('a') should be ok", (done) => {
       QueryBuilder.forClass(TestModel)
-        .eager('a(f1)', { f1: _.noop })
-        .allowEager('a')
+        .withGraphFetched('a(f1)', { f1: _.noop })
+        .allowGraph('a')
         .then(() => {
           expect(executedQueries).to.have.length(1);
           done();
@@ -1905,32 +1903,19 @@ describe('QueryBuilder', () => {
         });
     });
 
-    it("allowEager('[a, b.c.[d, e]]').eager('a') should be ok", (done) => {
+    it("allowGraph('[a, b.c.[d, e]]').withGraphFetched('a') should be ok", (done) => {
       QueryBuilder.forClass(TestModel)
-        .allowEager('[a, b.c.[d, e]]')
-        .eager('a')
+        .allowGraph('[a, b.c.[d, e]]')
+        .withGraphFetched('a')
         .then(() => {
           done();
         });
     });
 
-    it("allowEager('[a, b.c.[d, e]]').eager('b.c') should be ok", (done) => {
+    it("allowGraph('[a, b.c.[d, e]]').withGraphFetched('b.c') should be ok", (done) => {
       QueryBuilder.forClass(TestModel)
-        .allowEager('[a, b.c.[d, e]]')
-        .eager('b.c')
-        .then(() => {
-          expect(executedQueries).to.have.length(1);
-          done();
-        })
-        .catch(() => {
-          done(new Error('should not get here'));
-        });
-    });
-
-    it("allowEager('[a, b.c.[d, e]]').eager('b.c.e') should be ok", (done) => {
-      QueryBuilder.forClass(TestModel)
-        .allowEager('[a, b.c.[d, e]]')
-        .eager('b.c.e')
+        .allowGraph('[a, b.c.[d, e]]')
+        .withGraphFetched('b.c')
         .then(() => {
           expect(executedQueries).to.have.length(1);
           done();
@@ -1940,10 +1925,23 @@ describe('QueryBuilder', () => {
         });
     });
 
-    it("mergeAllowEager('a').eager('a(f1)') should be ok", (done) => {
+    it("allowGraph('[a, b.c.[d, e]]').withGraphFetched('b.c.e') should be ok", (done) => {
       QueryBuilder.forClass(TestModel)
-        .mergeAllowEager('a')
-        .eager('a(f1)', { f1: _.noop })
+        .allowGraph('[a, b.c.[d, e]]')
+        .withGraphFetched('b.c.e')
+        .then(() => {
+          expect(executedQueries).to.have.length(1);
+          done();
+        })
+        .catch(() => {
+          done(new Error('should not get here'));
+        });
+    });
+
+    it("allowGraph('a').withGraphFetched('a(f1)') should be ok", (done) => {
+      QueryBuilder.forClass(TestModel)
+        .allowGraph('a')
+        .withGraphFetched('a(f1)', { f1: _.noop })
         .then(() => {
           expect(executedQueries).to.have.length(1);
           done();
@@ -1953,21 +1951,21 @@ describe('QueryBuilder', () => {
         });
     });
 
-    it("allowEager('[a, b.c.[a, e]]').mergeAllowEager('b.c.[b, d]').eager('a') should be ok", (done) => {
+    it("allowGraph('[a, b.c.[a, e]]').allowGraph('b.c.[b, d]').withGraphFetched('a') should be ok", (done) => {
       QueryBuilder.forClass(TestModel)
-        .allowEager('[a, b.c.[a, e]]')
-        .mergeAllowEager('b.c.[b, d]')
-        .eager('a')
+        .allowGraph('[a, b.c.[a, e]]')
+        .allowGraph('b.c.[b, d]')
+        .withGraphFetched('a')
         .then(() => {
           done();
         });
     });
 
-    it("allowEager('[a.[a, b], b.c.[a, e]]').mergeAllowEager('[a.[c, d], b.c.[b, d]]').eager('a.b') should be ok", (done) => {
+    it("allowGraph('[a.[a, b], b.c.[a, e]]').allowGraph('[a.[c, d], b.c.[b, d]]').withGraphFetched('a.b') should be ok", (done) => {
       QueryBuilder.forClass(TestModel)
-        .allowEager('[a.[a, b], b.c.[a, e]]')
-        .mergeAllowEager('[a.[c, d], b.c.[b, d]]')
-        .eager('a.b')
+        .allowGraph('[a.[a, b], b.c.[a, e]]')
+        .allowGraph('[a.[c, d], b.c.[b, d]]')
+        .withGraphFetched('a.b')
         .then(() => {
           expect(executedQueries).to.have.length(1);
           done();
@@ -1977,11 +1975,11 @@ describe('QueryBuilder', () => {
         });
     });
 
-    it("allowEager('[a.[a, b], b.[a, c]]').mergeAllowEager('[a.[c, d], b.c.[b, d]]').eager('a.c') should be ok", (done) => {
+    it("allowGraph('[a.[a, b], b.[a, c]]').allowGraph('[a.[c, d], b.c.[b, d]]').withGraphFetched('a.c') should be ok", (done) => {
       QueryBuilder.forClass(TestModel)
-        .allowEager('[a.[a, b], b.[a, c]]')
-        .mergeAllowEager('[a.[c, d], b.c.[b, d]]')
-        .eager('a.c')
+        .allowGraph('[a.[a, b], b.[a, c]]')
+        .allowGraph('[a.[c, d], b.c.[b, d]]')
+        .withGraphFetched('a.c')
         .then(() => {
           expect(executedQueries).to.have.length(1);
           done();
@@ -1991,11 +1989,11 @@ describe('QueryBuilder', () => {
         });
     });
 
-    it("allowEager('[a.[a, b], b.[a, c]]').mergeAllowEager('[a.[c, d], b.c.[b, d]]').eager('b.a') should be ok", (done) => {
+    it("allowGraph('[a.[a, b], b.[a, c]]').allowGraph('[a.[c, d], b.c.[b, d]]').withGraphFetched('b.a') should be ok", (done) => {
       QueryBuilder.forClass(TestModel)
-        .allowEager('[a.[a, b], b.[a, c]]')
-        .mergeAllowEager('[a.[c, d], b.c.[b, d]]')
-        .eager('b.a')
+        .allowGraph('[a.[a, b], b.[a, c]]')
+        .allowGraph('[a.[c, d], b.c.[b, d]]')
+        .withGraphFetched('b.a')
         .then(() => {
           expect(executedQueries).to.have.length(1);
           done();
@@ -2005,11 +2003,11 @@ describe('QueryBuilder', () => {
         });
     });
 
-    it("allowEager('[a.[a, b], b.[a, c]]').mergeAllowEager('[a.[c, d], b.c.[b, d]]').eager('b.c') should be ok", (done) => {
+    it("allowGraph('[a.[a, b], b.[a, c]]').allowGraph('[a.[c, d], b.c.[b, d]]').withGraphFetched('b.c') should be ok", (done) => {
       QueryBuilder.forClass(TestModel)
-        .allowEager('[a.[a, b], b.[a, c]]')
-        .mergeAllowEager('[a.[c, d], b.c.[b, d]]')
-        .eager('b.c')
+        .allowGraph('[a.[a, b], b.[a, c]]')
+        .allowGraph('[a.[c, d], b.c.[b, d]]')
+        .withGraphFetched('b.c')
         .then(() => {
           expect(executedQueries).to.have.length(1);
           done();
@@ -2019,11 +2017,11 @@ describe('QueryBuilder', () => {
         });
     });
 
-    it("allowEager('[a.[a, b], b.[a, c]]').mergeAllowEager('[a.[c, d], b.c.[b, d]]').eager('b.c.b') should be ok", (done) => {
+    it("allowGraph('[a.[a, b], b.[a, c]]').allowGraph('[a.[c, d], b.c.[b, d]]').withGraphFetched('b.c.b') should be ok", (done) => {
       QueryBuilder.forClass(TestModel)
-        .allowEager('[a.[a, b], b.[a, c]]')
-        .mergeAllowEager('[a.[c, d], b.c.[b, d]]')
-        .eager('b.c.b')
+        .allowGraph('[a.[a, b], b.[a, c]]')
+        .allowGraph('[a.[c, d], b.c.[b, d]]')
+        .withGraphFetched('b.c.b')
         .then(() => {
           expect(executedQueries).to.have.length(1);
           done();
@@ -2033,28 +2031,10 @@ describe('QueryBuilder', () => {
         });
     });
 
-    it("allowEager('a').allowEager('b').eager('a') should fail", (done) => {
+    it("allowGraph('[a, b.c.[d, e]]').withGraphFetched('a.b') should fail", (done) => {
       QueryBuilder.forClass(TestModel)
-        .allowEager('a')
-        .allowEager('b')
-        .eager('a')
-        .then(() => {
-          done(new Error('should not get here'));
-        })
-        .catch((err) => {
-          expect(err).to.be.a(objection.ValidationError);
-          expect(err.type).to.equal('UnallowedRelation');
-          expect(err.message).to.equal('eager expression not allowed');
-          expect(executedQueries).to.have.length(0);
-          done();
-        })
-        .catch(done);
-    });
-
-    it("allowEager('[a, b.c.[d, e]]').eager('a.b') should fail", (done) => {
-      QueryBuilder.forClass(TestModel)
-        .allowEager('[a, b.c.[d, e]]')
-        .eager('a.b')
+        .allowGraph('[a, b.c.[d, e]]')
+        .withGraphFetched('a.b')
         .then(() => {
           done(new Error('should not get here'));
         })
@@ -2064,11 +2044,11 @@ describe('QueryBuilder', () => {
         });
     });
 
-    it("allowEager('[a, b.c.[d, e]]').mergeAllowEager('a.[c, d]').eager('a.b') should fail", (done) => {
+    it("allowGraph('[a, b.c.[d, e]]').allowGraph('a.[c, d]').withGraphFetched('a.b') should fail", (done) => {
       QueryBuilder.forClass(TestModel)
-        .allowEager('[a, b.c.[d, e]]')
-        .mergeAllowEager('a.[c, d]')
-        .eager('a.b')
+        .allowGraph('[a, b.c.[d, e]]')
+        .allowGraph('a.[c, d]')
+        .withGraphFetched('a.b')
         .then(() => {
           done(new Error('should not get here'));
         })
@@ -2078,10 +2058,10 @@ describe('QueryBuilder', () => {
         });
     });
 
-    it("eager('a.b').allowEager('[a, b.c.[d, e]]') should fail", (done) => {
+    it("eager('a.b').allowGraph('[a, b.c.[d, e]]') should fail", (done) => {
       QueryBuilder.forClass(TestModel)
-        .eager('a.b')
-        .allowEager('[a, b.c.[d, e]]')
+        .withGraphFetched('a.b')
+        .allowGraph('[a, b.c.[d, e]]')
         .then(() => {
           done(new Error('should not get here'));
         })
@@ -2091,11 +2071,11 @@ describe('QueryBuilder', () => {
         });
     });
 
-    it("eager('a.b').allowEager('[a, b.c.[d, e]]').mergeAllowEager('a.[c, d]') should fail", (done) => {
+    it("eager('a.b').allowGraph('[a, b.c.[d, e]]').allowGraph('a.[c, d]') should fail", (done) => {
       QueryBuilder.forClass(TestModel)
-        .eager('a.b')
-        .allowEager('[a, b.c.[d, e]]')
-        .mergeAllowEager('a.[c, d]')
+        .withGraphFetched('a.b')
+        .allowGraph('[a, b.c.[d, e]]')
+        .allowGraph('a.[c, d]')
         .then(() => {
           done(new Error('should not get here'));
         })
@@ -2105,10 +2085,10 @@ describe('QueryBuilder', () => {
         });
     });
 
-    it("eager('b.c.d.e').allowEager('[a, b.c.[d, e]]') should fail", (done) => {
+    it("eager('b.c.d.e').allowGraph('[a, b.c.[d, e]]') should fail", (done) => {
       QueryBuilder.forClass(TestModel)
-        .eager('b.c.d.e')
-        .allowEager('[a, b.c.[d, e]]')
+        .withGraphFetched('b.c.d.e')
+        .allowGraph('[a, b.c.[d, e]]')
         .then(() => {
           done(new Error('should not get here'));
         })
@@ -2118,11 +2098,11 @@ describe('QueryBuilder', () => {
         });
     });
 
-    it("eager('b.c.d.e').allowEager('[a, b.c.[d, e]]').mergeAllowEager('b.c.a') should fail", (done) => {
+    it("eager('b.c.d.e').allowGraph('[a, b.c.[d, e]]').allowGraph('b.c.a') should fail", (done) => {
       QueryBuilder.forClass(TestModel)
-        .eager('b.c.d.e')
-        .allowEager('[a, b.c.[d, e]]')
-        .mergeAllowEager('b.c.a')
+        .withGraphFetched('b.c.d.e')
+        .allowGraph('[a, b.c.[d, e]]')
+        .allowGraph('b.c.a')
         .then(() => {
           done(new Error('should not get here'));
         })
@@ -2132,10 +2112,10 @@ describe('QueryBuilder', () => {
         });
     });
 
-    it('eagerObject() should return the eager expression as an object', () => {
-      const builder = QueryBuilder.forClass(TestModel).eager('[a, b.c(foo)]');
+    it('graphExpressionObject() should return the eager expression as an object', () => {
+      const builder = QueryBuilder.forClass(TestModel).withGraphFetched('[a, b.c(foo)]');
 
-      expect(builder.eagerObject()).to.eql({
+      expect(builder.graphExpressionObject()).to.eql({
         $name: null,
         $relation: null,
         $modify: [],
@@ -2169,13 +2149,13 @@ describe('QueryBuilder', () => {
       });
     });
 
-    it("eagerModifiers() should return the eager expression's modifiers as an object", () => {
+    it("modifiers() should return the eager expression's modifiers as an object", () => {
       const foo = (builder) => builder.where('foo');
-      const builder = QueryBuilder.forClass(TestModel).eager('[a, b.c(foo)]', {
+      const builder = QueryBuilder.forClass(TestModel).withGraphFetched('[a, b.c(foo)]').modifiers({
         foo,
       });
 
-      expect(builder.eagerModifiers()).to.eql({
+      expect(builder.modifiers()).to.eql({
         foo,
       });
     });
@@ -2255,11 +2235,11 @@ describe('QueryBuilder', () => {
       let filter2Check = false;
 
       QueryBuilder.forClass(M1)
-        .eager('m2.m3')
-        .filterEager('m2', (builder) => {
+        .withGraphFetched('m2.m3')
+        .modifyGraph('m2', (builder) => {
           filter1Check = builder instanceof M2QueryBuilder;
         })
-        .filterEager('m2.m3', (builder) => {
+        .modifyGraph('m2.m3', (builder) => {
           filter2Check = builder instanceof M3QueryBuilder;
         })
         .then(() => {
@@ -2324,7 +2304,7 @@ describe('QueryBuilder', () => {
       ];
 
       QueryBuilder.forClass(M1)
-        .eager('someRel.someRel')
+        .withGraphFetched('someRel.someRel')
         .then((x) => {
           expect(executedQueries).to.eql([
             'select "M1".* from "M1"',
@@ -2424,12 +2404,12 @@ describe('QueryBuilder', () => {
       expect(builder.context()).to.eql({});
     });
 
-    it('`mergeContext` should merge context', () => {
+    it('`context` should merge context', () => {
       const builder = TestModel.query();
       const origContext = { a: 1 };
 
       builder.context(origContext);
-      builder.mergeContext({ b: 2 });
+      builder.context({ b: 2 });
 
       expect(builder.context()).to.eql({
         a: 1,
@@ -2443,12 +2423,12 @@ describe('QueryBuilder', () => {
       expect(builder.context().transaction === mockKnex).to.equal(true);
     });
 
-    it('`mergeContext` can be called without `context` having been called', () => {
+    it('`context` can be called without `context` having been called', () => {
       const builder = TestModel.query();
       const origContext = { a: 1 };
 
-      builder.mergeContext(origContext);
-      builder.mergeContext({ b: 2 });
+      builder.context(origContext);
+      builder.context({ b: 2 });
 
       expect(builder.context()).to.eql({
         a: 1,
@@ -2469,7 +2449,7 @@ describe('QueryBuilder', () => {
       builder.context(origContext);
 
       const builder2 = builder.clone();
-      builder2.mergeContext({ b: 2 });
+      builder2.context({ b: 2 });
 
       expect(builder.context()).to.eql({
         a: 1,
@@ -2495,7 +2475,7 @@ describe('QueryBuilder', () => {
       builder.context(origContext);
 
       const builder2 = TestModel.query().childQueryOf(builder);
-      builder2.mergeContext({ b: 2 });
+      builder2.context({ b: 2 });
 
       expect(builder.context()).to.eql({
         a: 1,
@@ -2522,7 +2502,7 @@ describe('QueryBuilder', () => {
       builder.context(origContext);
 
       const builder2 = TestModel.query().childQueryOf(builder, { fork: true });
-      builder2.mergeContext({ b: 2 });
+      builder2.context({ b: 2 });
 
       expect(builder.context()).to.eql({
         a: 1,
@@ -2558,33 +2538,6 @@ describe('QueryBuilder', () => {
         .patch({ a: 1 })
         .then(() => {
           expect(foo).to.equal(100);
-        });
-    });
-  });
-
-  describe('omit', () => {
-    it('omit properties from model when ommiting an array', (done) => {
-      mockKnexQueryResults = [[{ a: 1 }, { b: 2 }, { c: 3 }]];
-      TestModel.query()
-        .omit(['a', 'b'])
-        .then((result) => {
-          expect(result[0]).to.not.have.property('a');
-          expect(result[1]).to.not.have.property('b');
-          expect(result[2]).to.have.property('c');
-          expect(result[2].c).to.be.equal(3);
-          done();
-        });
-    });
-
-    it('omit properties from model', (done) => {
-      mockKnexQueryResults = [[{ a: 1 }, { b: 2 }]];
-      TestModel.query()
-        .omit('b')
-        .then((result) => {
-          expect(result[0]).to.have.property('a');
-          expect(result[0].a).to.be.equal(1);
-          expect(result[1]).to.not.have.property('b');
-          done();
         });
     });
   });

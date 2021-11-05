@@ -4,7 +4,7 @@ import { Animal } from '../fixtures/animal';
 import { Model, transaction } from '../../../typings/objection';
 
 (async () => {
-  const debugResult = Person.query().joinRelation('children').where('age', '>', '21').debug();
+  const debugResult = Person.query().joinRelated('children').where('age', '>', '21').debug();
 
   const personId = 1;
   const pets = await Person.relatedQuery('pets').for(personId);
@@ -30,7 +30,7 @@ import { Model, transaction } from '../../../typings/objection';
       },
     });
 
-  builder.mergeContext({
+  builder.context({
     foo: 'bar',
   });
 
@@ -100,12 +100,12 @@ import { Model, transaction } from '../../../typings/objection';
     .where('age', '>', 30);
 
   await Person.query()
-    .joinRelation('children.children.pets')
+    .joinRelated('children.children.pets')
     .select('children:children:pets.*')
     .castTo(Animal);
 
   await Person.query()
-    .joinRelation('children.pets')
+    .joinRelated('children.pets')
     .select(['children:pets.id as animalId', 'children.firstName as childFirstName'])
     .castTo(Model);
 

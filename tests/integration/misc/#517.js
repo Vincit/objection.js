@@ -82,8 +82,8 @@ module.exports = (session) => {
         .upsertGraph({ id: 1, preferences }, { insertMissing: true })
         .then(() => {
           return Users.query()
-            .eager('preferences')
-            .modifyEager('preferences', (qb) => qb.orderBy('category'));
+            .withGraphFetched('preferences')
+            .modifyGraph('preferences', (qb) => qb.orderBy('category'));
         })
         .then((users) => {
           expect(users).to.eql([

@@ -128,7 +128,7 @@ module.exports = (session) => {
       it('join eager', () => {
         return Person.query(session.knex)
           .where('Person.name', 'Arnold')
-          .joinEager({
+          .withGraphJoined({
             pets: true,
             parents: true,
           })
@@ -330,7 +330,7 @@ module.exports = (session) => {
 
       it('join eager', () => {
         return Person.query(session.knex)
-          .joinEager('pets')
+          .withGraphJoined('pets')
           .then((people) => {
             expect(people).to.eql([
               {
@@ -351,7 +351,7 @@ module.exports = (session) => {
 
       it('join eager (inverse)', () => {
         return Animal.query(session.knex)
-          .joinEager('owner')
+          .withGraphJoined('owner')
           .then((animals) => {
             expect(animals).to.eql([
               {

@@ -114,7 +114,7 @@ module.exports = (session) => {
       return Person.query()
         .first()
         .where('name', 'Matti')
-        .eager({
+        .withGraphFetched({
           children: true,
           cousins: true,
         })

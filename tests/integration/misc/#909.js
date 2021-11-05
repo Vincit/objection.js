@@ -1,6 +1,6 @@
 const uuid = require('uuid');
 const { expect } = require('chai');
-const { Model, lit, raw } = require('../../../');
+const { Model, val, raw } = require('../../../');
 
 module.exports = (session) => {
   if (!session.isPostgres()) {
@@ -41,7 +41,7 @@ module.exports = (session) => {
       return Person.query()
         .insert({
           name: 'Margot',
-          uuids: lit(uuids).asArray().castTo('uuid[]'),
+          uuids: val(uuids).asArray().castTo('uuid[]'),
         })
         .then(() => {
           return Person.query();
@@ -62,7 +62,7 @@ module.exports = (session) => {
       return Person.query()
         .insert({
           name: 'Margot',
-          uuids: lit(uuids.map((it) => lit(it).castTo('uuid'))).asArray(),
+          uuids: val(uuids.map((it) => val(it).castTo('uuid'))).asArray(),
         })
         .then(() => {
           return Person.query();
@@ -83,7 +83,7 @@ module.exports = (session) => {
       return Person.query()
         .insert({
           name: 'Margot',
-          uuids: lit(uuids.map((it) => raw('?::uuid', it))).asArray(),
+          uuids: val(uuids.map((it) => raw('?::uuid', it))).asArray(),
         })
         .then(() => {
           return Person.query();

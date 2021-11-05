@@ -112,7 +112,7 @@ module.exports = (session) => {
           { noDelete: true }
         )
         .then(() => {
-          return Person.query().findOne({ firstName: 'Jennifer' }).eager('pets');
+          return Person.query().findOne({ firstName: 'Jennifer' }).withGraphFetched('pets');
         })
         .then((jennifer) => {
           expect(jennifer.pets).to.have.length(3);

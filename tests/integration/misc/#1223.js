@@ -126,7 +126,7 @@ module.exports = (session) => {
     it('should allow recursive eagering with aliases for 1-m and m-m relations', () => {
       return Person.query()
         .findOne({ 'persons.name': 'Root' })
-        .eager({
+        .withGraphFetched({
           alias1: {
             $relation: 'children',
             $recursive: 10,

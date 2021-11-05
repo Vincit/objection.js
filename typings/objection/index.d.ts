@@ -21,8 +21,6 @@ export = Objection;
 
 declare namespace Objection {
   const raw: RawFunction;
-  // Deprecated
-  const lit: ValueFunction;
   const val: ValueFunction;
   const ref: ReferenceFunction;
   const fn: FunctionFunction;
@@ -577,11 +575,6 @@ declare namespace Objection {
 
   type ForIdValue = MaybeCompositeId | AnyQueryBuilder;
 
-  // Deprecated
-  interface EagerMethod<QB extends AnyQueryBuilder> {
-    (expr: RelationExpression<ModelType<QB>>, modifiers?: Modifiers): QB;
-  }
-
   interface AllowGraphMethod<QB extends AnyQueryBuilder> {
     (expr: RelationExpression<ModelType<QB>>): QB;
   }
@@ -736,33 +729,12 @@ declare namespace Objection {
     (): any;
   }
 
-  // Deprecated
-  export interface EagerAlgorithm {}
-
-  // Deprecated
-  interface EagerAlgorithmMethod<QB extends AnyQueryBuilder> {
-    (algorithm: EagerAlgorithm): QB;
-  }
-
-  // Deprecated
-  export interface EagerOptions {
-    minimize?: boolean;
-    separator?: string;
-    aliases?: string[];
-    joinOperation: string;
-  }
-
   export interface GraphOptions {
     minimize?: boolean;
     separator?: string;
     aliases?: { [key: string]: string };
     joinOperation?: string;
     maxBatchSize?: number;
-  }
-
-  // Deprecated
-  interface EagerOptionsMethod<QB extends AnyQueryBuilder> {
-    (options: EagerOptions): QB;
   }
 
   interface ModifyGraphMethod<QB extends AnyQueryBuilder> {
@@ -788,11 +760,6 @@ declare namespace Objection {
   interface ModifiersMethod<QB extends AnyQueryBuilder> {
     (modifiers: Modifiers): QB;
     (): QB;
-  }
-
-  // Deprecated
-  interface ApplyFilterMethod<QB extends AnyQueryBuilder> {
-    (...filters: string[]): QB;
   }
 
   export interface Pojo {
@@ -921,23 +888,6 @@ declare namespace Objection {
     withRecursive: WithMethod<this>;
     withWrapped: WithMethod<this>;
 
-    // Deprecated
-    joinRelation: JoinRelatedMethod<this>;
-    // Deprecated
-    innerJoinRelation: JoinRelatedMethod<this>;
-    // Deprecated
-    outerJoinRelation: JoinRelatedMethod<this>;
-    // Deprecated
-    leftJoinRelation: JoinRelatedMethod<this>;
-    // Deprecated
-    leftOuterJoinRelation: JoinRelatedMethod<this>;
-    // Deprecated
-    rightJoinRelation: JoinRelatedMethod<this>;
-    // Deprecated
-    rightOuterJoinRelation: JoinRelatedMethod<this>;
-    // Deprecated
-    fullOuterJoinRelation: JoinRelatedMethod<this>;
-
     joinRelated: JoinRelatedMethod<this>;
     innerJoinRelated: JoinRelatedMethod<this>;
     outerJoinRelated: JoinRelatedMethod<this>;
@@ -1027,32 +977,7 @@ declare namespace Objection {
     withGraphJoined(expr: RelationExpression<M>, options?: GraphOptions): this;
 
     truncate(): Promise<void>;
-
-    // Deprecated
-    eager: EagerMethod<this>;
-    // Deprecated
-    mergeEager: EagerMethod<this>;
-
-    // Deprecated
-    joinEager: EagerMethod<this>;
-    // Deprecated
-    mergeJoinEager: EagerMethod<this>;
-
-    // Deprecated
-    naiveEager: EagerMethod<this>;
-    // Deprecated
-    mergeNaiveEager: EagerMethod<this>;
-
-    // Deprecated
-    allowEager: AllowGraphMethod<this>;
-    // Deprecated
-    mergeAllowEager: AllowGraphMethod<this>;
-
     allowGraph: AllowGraphMethod<this>;
-    // Deprecated
-    allowInsert: AllowGraphMethod<this>;
-    // Deprecated
-    allowUpsert: AllowGraphMethod<this>;
 
     throwIfNotFound: (
       arg?: any
@@ -1081,17 +1006,6 @@ declare namespace Objection {
     toKnexQuery<T = ModelObject<M>>(): Knex.QueryBuilder<T, T[]>;
     clone(): this;
 
-    // Deprecated
-    pluck(property: string): this;
-    // Deprecated
-    pick(modelClass: typeof Model, properties: string[]): this;
-    // Deprecated
-    pick(properties: string[]): this;
-    // Deprecated
-    omit(modelClass: typeof Model, properties: string[]): this;
-    // Deprecated
-    omit(properties: string[]): this;
-
     page(page: number, pageSize: number): PageQueryBuilder<this>;
     range(): PageQueryBuilder<this>;
     range(start: number, end: number): PageQueryBuilder<this>;
@@ -1108,33 +1022,19 @@ declare namespace Objection {
 
     insertGraph: InsertGraphMethod<M>;
     insertGraphAndFetch: InsertGraphMethod<M>;
-    insertWithRelated: InsertGraphMethod<M>;
-    insertWithRelatedAndFetch: InsertGraphMethod<M>;
 
     upsertGraph: UpsertGraphMethod<M>;
     upsertGraphAndFetch: UpsertGraphMethod<M>;
 
     graphExpressionObject: GraphExpressionObjectMethod<this>;
 
-    // Deprecated
-    eagerAlgorithm: EagerAlgorithmMethod<this>;
-    // Deprecated
-    eagerOptions: EagerOptionsMethod<this>;
-    // Deprecated
-    modifyEager: ModifyGraphMethod<this>;
-    // Deprecated
-    filterEager: ModifyGraphMethod<this>;
     modifyGraph: ModifyGraphMethod<this>;
 
     context: ContextMethod<this>;
     clearContext: ClearContextMethod<this>;
-    // Deprecated
-    mergeContext: ContextMethod<this>;
 
     modify: ModifyMethod<this>;
     modifiers: ModifiersMethod<this>;
-    // Deprecated
-    applyFilter: ApplyFilterMethod<this>;
 
     isFind: BooleanReturningMethod;
     isExecutable: BooleanReturningMethod;
@@ -1146,8 +1046,6 @@ declare namespace Objection {
     isInternal: BooleanReturningMethod;
     hasWheres: BooleanReturningMethod;
     hasSelects: BooleanReturningMethod;
-    // Deprecated
-    hasEager: BooleanReturningMethod;
     hasWithGraph: BooleanReturningMethod;
 
     has: HasMethod;
@@ -1158,8 +1056,6 @@ declare namespace Objection {
     clearWhere: IdentityMethod<this>;
     clearWithGraph: IdentityMethod<this>;
     clearAllowGraph: IdentityMethod<this>;
-    // Deprecated
-    clearEager: IdentityMethod<this>;
 
     ModelType: M;
     ResultType: R;
@@ -1444,17 +1340,6 @@ declare namespace Objection {
     HasOneThroughRelation: RelationType;
 
     defaultGraphOptions?: GraphOptions;
-    // Deprecated
-    defaultEagerAlgorithm?: EagerAlgorithm;
-    // Deprecated
-    defaultEagerOptions?: EagerOptions;
-
-    // Deprecated
-    WhereInEagerAlgorithm: EagerAlgorithm;
-    // Deprecated
-    NaiveEagerAlgorithm: EagerAlgorithm;
-    // Deprecated
-    JoinEagerAlgorithm: EagerAlgorithm;
 
     query(this: Constructor<M>, trxOrKnex?: TransactionOrKnex): QueryBuilderType<M>;
 
@@ -1490,22 +1375,6 @@ declare namespace Objection {
 
     bindKnex(trxOrKnex: TransactionOrKnex): this;
     bindTransaction(trxOrKnex: TransactionOrKnex): this;
-
-    // Deprecated
-    loadRelated(
-      modelOrObject: PartialModelObject<M>,
-      expression: RelationExpression<M>,
-      modifiers?: Modifiers<QueryBuilderType<M>>,
-      trxOrKnex?: TransactionOrKnex
-    ): SingleQueryBuilder<QueryBuilderType<M>>;
-
-    // Deprecated
-    loadRelated(
-      modelOrObject: PartialModelObject<M>[],
-      expression: RelationExpression<M>,
-      modifiers?: Modifiers<QueryBuilderType<M>>,
-      trxOrKnex?: TransactionOrKnex
-    ): QueryBuilderType<M>;
 
     fetchGraph(
       modelOrObject: PartialModelObject<M>,
@@ -1577,17 +1446,6 @@ declare namespace Objection {
     static HasOneThroughRelation: RelationType;
 
     static defaultGraphOptions?: GraphOptions;
-    // Deprecated
-    static defaultEagerAlgorithm?: EagerAlgorithm;
-    // Deprecated
-    static defaultEagerOptions?: EagerOptions;
-
-    // Deprecated
-    static WhereInEagerAlgorithm: EagerAlgorithm;
-    // Deprecated
-    static NaiveEagerAlgorithm: EagerAlgorithm;
-    // Deprecated
-    static JoinEagerAlgorithm: EagerAlgorithm;
 
     static query<M extends Model>(
       this: Constructor<M>,
@@ -1627,24 +1485,6 @@ declare namespace Objection {
 
     static bindKnex<M>(this: M, trxOrKnex: TransactionOrKnex): M;
     static bindTransaction<M>(this: M, trxOrKnex: TransactionOrKnex): M;
-
-    // Deprecated
-    static loadRelated<M extends Model>(
-      this: Constructor<M>,
-      modelOrObject: PartialModelObject<M>,
-      expression: RelationExpression<M>,
-      modifiers?: Modifiers<QueryBuilderType<M>>,
-      trxOrKnex?: TransactionOrKnex
-    ): SingleQueryBuilder<QueryBuilderType<M>>;
-
-    // Deprecated
-    static loadRelated<M extends Model>(
-      this: Constructor<M>,
-      modelOrObject: PartialModelObject<M>[],
-      expression: RelationExpression<M>,
-      modifiers?: Modifiers<QueryBuilderType<M>>,
-      trxOrKnex?: TransactionOrKnex
-    ): QueryBuilderType<M>;
 
     static fetchGraph<M extends Model>(
       this: Constructor<M>,
@@ -1701,13 +1541,6 @@ declare namespace Objection {
 
     $id(id: any): void;
     $id(): any;
-
-    // Deprecated
-    $loadRelated(
-      expression: RelationExpression<this>,
-      modifiers?: Modifiers<QueryBuilderType<this>>,
-      trxOrKnex?: TransactionOrKnex
-    ): SingleQueryBuilder<QueryBuilderType<this>>;
 
     $fetchGraph(
       expression: RelationExpression<this>,

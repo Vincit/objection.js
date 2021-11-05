@@ -249,9 +249,9 @@ module.exports = (session) => {
       return Model.fromJson({ id: 1 })
         .$query()
         .context(context)
-        .mergeContext(merge1)
+        .context(merge1)
         .delete()
-        .mergeContext(merge2)
+        .context(merge2)
         .then(() => {
           expect(called).to.equal(true);
         });
@@ -382,7 +382,7 @@ module.exports = (session) => {
                 },
               ],
             })
-            .insertWithRelated({
+            .insertGraph({
               model1Prop1: 'new 1',
               model1Relation1: {
                 model1Prop1: 'new 2',
@@ -486,8 +486,10 @@ module.exports = (session) => {
               },
             })
             .where('id', 1)
-            .eager('[model1Relation1.[model1Relation1, model1Relation2.model2Relation1]]')
-            .modifyEager('model1Relation1.model1Relation2', (builder) => {
+            .withGraphFetched(
+              '[model1Relation1.[model1Relation1, model1Relation2.model2Relation1]]'
+            )
+            .modifyGraph('model1Relation1.model1Relation2', (builder) => {
               builder.orderBy('id_col');
             })
             .then((models) => {

@@ -85,7 +85,7 @@ module.exports = (session) => {
 
     it('test', () => {
       return Person.query()
-        .eager({ parent: true, cousins: true })
+        .withGraphFetched({ parent: true, cousins: true })
         .where('name', 'Matti')
         .then((result) => {
           expect(Object.keys(result[0].parent)).to.eql(['name']);

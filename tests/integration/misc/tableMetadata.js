@@ -190,11 +190,14 @@ module.exports = (session) => {
           },
         })
         .then(() => {
-          return OverriddenTable1.query(knex)
-            .joinEager('rel.rel')
-            .where('table1.value', '1')
-            .pick(['value', 'rel']);
+          return OverriddenTable1.query(knex).withGraphJoined('rel.rel').where('table1.value', '1');
         })
+        .then((res) =>
+          res.map((it) => ({
+            value: it.value,
+            rel: { value: it.rel.value, rel: { value: it.rel.rel.value } },
+          }))
+        )
         .then((res) => {
           if (session.isPostgres()) {
             expect(queries[queries.length - 1]).to.eql(

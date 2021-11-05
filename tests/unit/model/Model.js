@@ -1185,80 +1185,6 @@ describe('Model', () => {
     });
   });
 
-  describe('$pick', () => {
-    it('should pick only the given properties to be visible in JSON representations', () => {
-      let Model1 = createModelClass();
-
-      let model = Model1.fromJson({ a: 1, b: 2, c: 3, d: '4' });
-      model.$e = '5';
-
-      expect(model.$pick('a').toJSON()).to.eql({ a: 1 });
-      expect(model.$pick('a').$toDatabaseJson()).to.eql({ a: 1 });
-      expect(model.$pick('a').$e).to.eql('5');
-
-      model = Model1.fromJson({ a: 1, b: 2, c: 3, d: '4' });
-      model.$e = '5';
-
-      expect(model.$pick('a', 'c').toJSON()).to.eql({ a: 1, c: 3 });
-      expect(model.$pick('a', 'c').$toDatabaseJson()).to.eql({ a: 1, c: 3 });
-      expect(model.$pick('a', 'c').$e).to.eql('5');
-
-      model = Model1.fromJson({ a: 1, b: 2, c: 3, d: '4' });
-      model.$e = '5';
-
-      expect(model.$pick(['a', 'b']).toJSON()).to.eql({ a: 1, b: 2 });
-      expect(model.$pick(['a', 'b']).$toDatabaseJson()).to.eql({ a: 1, b: 2 });
-      expect(model.$pick(['a', 'b']).$e).to.eql('5');
-
-      model = Model1.fromJson({ a: 1, b: 2, c: 3, d: '4' });
-      model.$e = '5';
-
-      expect(model.$pick({ a: true, b: false, d: true }).toJSON()).to.eql({ a: 1, d: '4' });
-      expect(model.$pick({ a: true, b: false, d: true }).$toDatabaseJson()).to.eql({
-        a: 1,
-        d: '4',
-      });
-      expect(model.$pick({ a: true, b: false, d: true }).$e).to.eql('5');
-    });
-  });
-
-  describe('$omit', () => {
-    it('should omit the given properties from the JSON representations', () => {
-      let Model1 = createModelClass();
-
-      let model = Model1.fromJson({ a: 1, b: 2, c: 3, d: '4' });
-      model.$e = '5';
-
-      expect(model.$omit('a').toJSON()).to.eql({ b: 2, c: 3, d: '4' });
-      expect(model.$omit('a').$toDatabaseJson()).to.eql({ b: 2, c: 3, d: '4' });
-      expect(model.$omit('$e').$e).to.eql('5');
-
-      model = Model1.fromJson({ a: 1, b: 2, c: 3, d: '4' });
-      model.$e = '5';
-
-      expect(model.$omit('b', 'd').toJSON()).to.eql({ a: 1, c: 3 });
-      expect(model.$omit('b', 'd').$toDatabaseJson()).to.eql({ a: 1, c: 3 });
-      expect(model.$omit('b', 'd', '$e').$e).to.eql('5');
-
-      model = Model1.fromJson({ a: 1, b: 2, c: 3, d: '4' });
-      model.$e = '5';
-
-      expect(model.$omit(['c', 'd']).toJSON()).to.eql({ a: 1, b: 2 });
-      expect(model.$omit(['c', 'd']).$toDatabaseJson()).to.eql({ a: 1, b: 2 });
-      expect(model.$omit(['c', 'd', '$e']).$e).to.eql('5');
-
-      model = Model1.fromJson({ a: 1, b: 2, c: 3, d: '4' });
-      model.$e = '5';
-
-      expect(model.$omit({ a: false, b: true, c: true }).toJSON()).to.eql({ a: 1, d: '4' });
-      expect(model.$omit({ a: false, b: true, c: true }).$toDatabaseJson()).to.eql({
-        a: 1,
-        d: '4',
-      });
-      expect(model.$omit({ a: false, b: true, c: true, $e: true }).$e).to.eql('5');
-    });
-  });
-
   describe('virtualAttributes', () => {
     it('should include getters', () => {
       class Model1 extends Model {
@@ -2141,14 +2067,14 @@ describe('Model', () => {
     expect(Model.ensureModelArray(null)).to.eql([]);
   });
 
-  it('loadRelated should return a QueryBuilder', () => {
+  it('fetchGraph should return a QueryBuilder', () => {
     let Model = modelClass('Model1');
-    expect(Model.loadRelated([], '[]')).to.be.a(QueryBuilder);
+    expect(Model.fetchGraph([], '[]')).to.be.a(QueryBuilder);
   });
 
-  it('$loadRelated should return a QueryBuilder', () => {
+  it('$fetchGraph should return a QueryBuilder', () => {
     let Model = modelClass('Model1');
-    expect(Model.fromJson({}).$loadRelated('[]')).to.be.a(QueryBuilder);
+    expect(Model.fromJson({}).$fetchGraph('[]')).to.be.a(QueryBuilder);
   });
 
   it('loadRelated should throw if an invalid expression is given', () => {

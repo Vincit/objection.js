@@ -64,7 +64,7 @@ module.exports = (session) => {
           },
         })
         .then(() => {
-          return TestModel.query().findOne({ value: 'root' }).eager('previous.^');
+          return TestModel.query().findOne({ value: 'root' }).withGraphFetched('previous.^');
         })
         .then((result) => {
           // console.dir(result, { depth: null });

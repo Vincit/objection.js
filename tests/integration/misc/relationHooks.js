@@ -140,7 +140,7 @@ module.exports = (session) => {
           return root
             .$relatedQuery('model1Relation1')
             .insert({ model1Prop1: 'new' })
-            .mergeContext({ belongsToOneValue: 42 })
+            .context({ belongsToOneValue: 42 })
             .then((model) => {
               return session.knex(Model1.getTableName()).where({ model1Prop1: 'new' }).first();
             })
@@ -153,7 +153,7 @@ module.exports = (session) => {
           return root
             .$relatedQuery('model1Relation2')
             .insert({ model2Prop1: 'new' })
-            .mergeContext({ hasManyValue: 100 })
+            .context({ hasManyValue: 100 })
             .then((model) => {
               return session.knex(Model2.getTableName()).where({ model2_prop1: 'new' }).first();
             })
@@ -166,7 +166,7 @@ module.exports = (session) => {
           return root
             .$relatedQuery('model1Relation3')
             .insert({ model2Prop1: 'new' })
-            .mergeContext({
+            .context({
               manyToManyValue: 7,
               manyToManyJoinValue: 'Hello',
             })
@@ -187,7 +187,7 @@ module.exports = (session) => {
           return Model2.query()
             .insert({ model2Prop1: 'rel' })
             .then((model) => {
-              return root.$relatedQuery('model1Relation3').relate(model.idCol).mergeContext({
+              return root.$relatedQuery('model1Relation3').relate(model.idCol).context({
                 manyToManyJoinValue: 'Extra',
               });
             })
@@ -202,7 +202,7 @@ module.exports = (session) => {
 
         it('insertGraph', () => {
           return Model1.query()
-            .mergeContext({
+            .context({
               belongsToOneValue: 1,
               hasManyValue: 2,
               manyToManyValue: 3,
@@ -236,7 +236,7 @@ module.exports = (session) => {
             .then(() => {
               return Model1.query()
                 .findOne({ model1Prop1: 'parent' })
-                .eager('[model1Relation1, model1Relation2, model1Relation3]')
+                .withGraphFetched('[model1Relation1, model1Relation2, model1Relation3]')
                 .then((model) => {
                   expect(model).to.containSubset({
                     model1Prop1: 'parent',
@@ -295,7 +295,7 @@ module.exports = (session) => {
             })
             .then((model) => {
               return Model1.query()
-                .mergeContext({
+                .context({
                   belongsToOneValue: 1,
                   hasManyValue: 2,
                   manyToManyValue: 3,
@@ -333,7 +333,7 @@ module.exports = (session) => {
             .then(() => {
               return Model1.query()
                 .findOne({ model1Prop1: 'parent' })
-                .eager('[model1Relation1, model1Relation2, model1Relation3]')
+                .withGraphFetched('[model1Relation1, model1Relation2, model1Relation3]')
                 .then((model) => {
                   expect(model).to.containSubset({
                     model1Prop1: 'parent',

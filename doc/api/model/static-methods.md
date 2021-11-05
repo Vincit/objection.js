@@ -885,14 +885,6 @@ Creates an error thrown when validation fails for a model. You can override this
 | ------- | ----------------------------------------------------------------------------------- |
 | `Error` | The created error. [ValidationError](/api/types/#class-validationerror) by default. |
 
-## `static` loadRelated()
-
-::: warning
-Deprecated! Will be removed in version 3.0. Use [fetchGraph](#static-fetchgraph) instead.
-
-[v1 documentation](https://github.com/Vincit/objection.js/blob/v1/doc/api/model/static-methods.md#static-loadrelated)
-:::
-
 ## `static` fetchGraph()
 
 ```js

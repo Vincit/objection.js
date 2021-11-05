@@ -373,7 +373,7 @@ module.exports = (session) => {
             .then((models) => {
               return Model1.query(trx)
                 .findById(models[0].id)
-                .then((it) => it.$loadRelated('model1Relation1', null, trx))
+                .then((it) => it.$fetchGraph('model1Relation1', { transaction: trx }))
                 .then((it) => expect(it.model1Relation1.model1Prop1).to.equal('b'))
                 .then(() => models);
             })
@@ -385,6 +385,7 @@ module.exports = (session) => {
             });
         })
         .catch((err) => {
+          console.log(err);
           expect(err.message).to.equal('whoops');
 
           return Promise.all([
@@ -439,7 +440,7 @@ module.exports = (session) => {
           .then((models) => {
             return Model1.query(trx)
               .findById(models[0].id)
-              .then((it) => it.$loadRelated('model1Relation1', null, trx))
+              .then((it) => it.$fetchGraph('model1Relation1', { transaction: trx }))
               .then((it) => expect(it.model1Relation1.model1Prop1).to.equal('b'))
               .then(() => models);
           })

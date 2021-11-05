@@ -112,20 +112,20 @@ module.exports = (session) => {
         // Give connection after building the query.
         Model1.query()
           .findById(1)
-          .joinEager(
+          .withGraphJoined(
             '[model1Relation1, model1Relation2.model2Relation1.[model1Relation1, model1Relation2]]'
           )
           .knex(session.knex),
 
         Model1.query(session.knex)
           .findById(1)
-          .eager(
+          .withGraphFetched(
             '[model1Relation1, model1Relation2.model2Relation1.[model1Relation1, model1Relation2]]'
           ),
 
         Model1.query(session.knex)
           .findById(1)
-          .joinEager(
+          .withGraphJoined(
             '[model1Relation1, model1Relation2.model2Relation1.[model1Relation1, model1Relation2]]'
           ),
       ]).then((results) => {
@@ -405,7 +405,7 @@ module.exports = (session) => {
         Promise.try(() => {
           return Model1.query()
             .findById(1)
-            .eager(
+            .withGraphFetched(
               '[model1Relation1, model1Relation2.model2Relation1.[model1Relation1, model1Relation2]]'
             );
         }).catch((err) => createRejectionReflection(err)),
@@ -413,8 +413,7 @@ module.exports = (session) => {
         Promise.try(() => {
           return Model1.query()
             .findById(1)
-            .eagerAlgorithm(Model1.JoinEagerAlgorithm)
-            .eager(
+            .withGraphJoined(
               '[model1Relation1, model1Relation2.model2Relation1.[model1Relation1, model1Relation2]]'
             );
         }).catch((err) => createRejectionReflection(err)),

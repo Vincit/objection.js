@@ -503,14 +503,6 @@ class Person extends Model {
 }
 ```
 
-## $afterGet()
-
-::: warning
-Deprecated! Will be removed in version 3.0. Use [\$afterFind](#afterfind) instead.
-
-[v1 documentation](https://github.com/Vincit/objection.js/blob/v1/doc/api/model/instance-methods.md#afterget)
-:::
-
 ## $afterFind()
 
 ```js
@@ -911,14 +903,6 @@ person.$appendRelated('children', child2);
 child1 = person.children[person.children.length - 1];
 child2 = person.children[person.children.length - 2];
 ```
-
-## $loadRelated()
-
-::: warning
-Deprecated! Will be removed in version 3.0. Use [\$fetchGraph](#fetchgraph) instead.
-
-[v1 documentation](https://github.com/Vincit/objection.js/blob/v1/doc/api/model/instance-methods.md#loadrelated)
-:::
 
 ## $fetchGraph()
 

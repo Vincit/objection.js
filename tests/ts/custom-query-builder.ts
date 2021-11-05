@@ -40,7 +40,7 @@ const people: CustomQueryBuilder<Person, Person[]> = Person.query()
   .where('firstName', 'lol')
   .someCustomMethod()
   .with('someAlias', (qb) => qb.someCustomMethod().from('lol').select('id'))
-  .modifyEager<Animal>('pets', (qb) => qb.someCustomMethod().where('id', 1).someCustomMethod());
+  .modifyGraph<Animal>('pets', (qb) => qb.someCustomMethod().where('id', 1).someCustomMethod());
 
 const pets: CustomQueryBuilder<Animal, Animal | undefined> = new Person()
   .$relatedQuery('pets')

@@ -96,7 +96,7 @@ module.exports = (session) => {
     it('eager', () => {
       return Person.query()
         .where('Person.id', 1)
-        .eager('[relatives, goodRelatives]')
+        .withGraphFetched('[relatives, goodRelatives]')
         .then((result) => {
           expect(result).to.containSubset([
             {
@@ -132,7 +132,7 @@ module.exports = (session) => {
           ],
         })
         .then(() => {
-          return Person.query().findById(1).eager('relatives');
+          return Person.query().findById(1).withGraphFetched('relatives');
         })
         .then((result) => {
           expect(result).to.containSubset({
@@ -162,7 +162,7 @@ module.exports = (session) => {
           ],
         })
         .then(() => {
-          return Person.query().findById(1).eager('relatives');
+          return Person.query().findById(1).withGraphFetched('relatives');
         })
         .then((result) => {
           expect(result).to.containSubset({

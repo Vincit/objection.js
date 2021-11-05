@@ -123,7 +123,7 @@ module.exports = (session) => {
 
         queryOut: (query) =>
           query
-            .eager(
+            .withGraphFetched(
               '[pets.favoritePerson.relatives(orderByName), relatives(orderByName).relatives(orderByName)]'
             )
             .whereIn('name', ['Matti', 'Anja'])
@@ -228,7 +228,7 @@ module.exports = (session) => {
             ],
           },
 
-          queryOut: (query) => query.where('name', 'Liisa').eager('[relatives, pets]'),
+          queryOut: (query) => query.where('name', 'Liisa').withGraphFetched('[relatives, pets]'),
 
           graphOut: [
             {
@@ -306,7 +306,8 @@ module.exports = (session) => {
             ],
           },
 
-          queryOut: (query) => query.eager('[relatives, pets.favoritePerson]').findById(matti.id),
+          queryOut: (query) =>
+            query.withGraphFetched('[relatives, pets.favoritePerson]').findById(matti.id),
 
           graphOut: {
             id: matti.id,
@@ -352,7 +353,7 @@ module.exports = (session) => {
             },
           },
 
-          queryOut: (query) => query.eager('favoritePerson'),
+          queryOut: (query) => query.withGraphFetched('favoritePerson'),
 
           graphOut: [
             {
@@ -382,7 +383,7 @@ module.exports = (session) => {
             },
           },
 
-          queryOut: (query) => query.eager('favoritePerson'),
+          queryOut: (query) => query.withGraphFetched('favoritePerson'),
 
           graphOut: [
             {
@@ -419,7 +420,7 @@ module.exports = (session) => {
             ],
           },
 
-          queryOut: (query) => query.eager('pets.favoritePerson'),
+          queryOut: (query) => query.withGraphFetched('pets.favoritePerson'),
 
           graphOut: [
             {
@@ -469,7 +470,7 @@ module.exports = (session) => {
               relate: ['favoritePerson'],
             },
 
-            queryOut: (query) => query.eager('favoritePerson'),
+            queryOut: (query) => query.withGraphFetched('favoritePerson'),
 
             graphOut: [
               {
@@ -501,7 +502,7 @@ module.exports = (session) => {
               relate: true,
             },
 
-            queryOut: (query) => query.eager('favoritePerson'),
+            queryOut: (query) => query.withGraphFetched('favoritePerson'),
 
             graphOut: [
               {
@@ -538,7 +539,7 @@ module.exports = (session) => {
               },
             },
 
-            queryOut: (query) => query.eager('favoritePerson'),
+            queryOut: (query) => query.withGraphFetched('favoritePerson'),
 
             graphOut: [
               {
@@ -574,7 +575,7 @@ module.exports = (session) => {
             ],
           },
 
-          queryOut: (query) => query.eager('relatives').where('name', 'Brad'),
+          queryOut: (query) => query.withGraphFetched('relatives').where('name', 'Brad'),
 
           graphOut: [
             {
@@ -617,7 +618,7 @@ module.exports = (session) => {
             ],
           },
 
-          queryOut: (query) => query.eager('relatives').where('name', 'Brad'),
+          queryOut: (query) => query.withGraphFetched('relatives').where('name', 'Brad'),
 
           graphOut: [
             {
@@ -662,7 +663,7 @@ module.exports = (session) => {
             ],
           },
 
-          queryOut: (query) => query.eager('relatives').where('name', 'Brad'),
+          queryOut: (query) => query.withGraphFetched('relatives').where('name', 'Brad'),
 
           graphOut: [
             {
@@ -705,7 +706,7 @@ module.exports = (session) => {
             ],
           },
 
-          queryOut: (query) => query.eager('relatives').where('name', 'Brad'),
+          queryOut: (query) => query.withGraphFetched('relatives').where('name', 'Brad'),
 
           graphOut: [
             {
@@ -756,7 +757,8 @@ module.exports = (session) => {
               ],
             },
 
-            queryOut: (query) => query.eager('relatives(orderByName)').where('name', 'Brad'),
+            queryOut: (query) =>
+              query.withGraphFetched('relatives(orderByName)').where('name', 'Brad'),
 
             graphOut: [
               {
@@ -811,7 +813,8 @@ module.exports = (session) => {
               ],
             },
 
-            queryOut: (query) => query.eager('relatives(orderById)').where('name', 'Brad'),
+            queryOut: (query) =>
+              query.withGraphFetched('relatives(orderById)').where('name', 'Brad'),
 
             graphOut: [
               {
@@ -858,7 +861,8 @@ module.exports = (session) => {
               relate: ['relatives'],
             },
 
-            queryOut: (query) => query.eager('relatives(orderById)').where('name', 'Brad'),
+            queryOut: (query) =>
+              query.withGraphFetched('relatives(orderById)').where('name', 'Brad'),
 
             graphOut: [
               {
@@ -905,7 +909,8 @@ module.exports = (session) => {
               relate: true,
             },
 
-            queryOut: (query) => query.eager('relatives(orderById)').where('name', 'Brad'),
+            queryOut: (query) =>
+              query.withGraphFetched('relatives(orderById)').where('name', 'Brad'),
 
             graphOut: [
               {
@@ -949,7 +954,7 @@ module.exports = (session) => {
             ],
           },
 
-          queryOut: (query) => query.eager('pets').where('name', 'Matti'),
+          queryOut: (query) => query.withGraphFetched('pets').where('name', 'Matti'),
 
           graphOut: [
             {
@@ -990,7 +995,7 @@ module.exports = (session) => {
             ],
           },
 
-          queryOut: (query) => query.eager('pets').where('name', 'Matti'),
+          queryOut: (query) => query.withGraphFetched('pets').where('name', 'Matti'),
 
           graphOut: [
             {

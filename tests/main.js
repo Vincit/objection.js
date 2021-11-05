@@ -37,7 +37,6 @@ describe('main module', () => {
     expect(objection.transaction.start).to.equal(require('../lib/transaction').transaction.start);
     expect(objection.ref).to.equal(require('../lib/queryBuilder/ReferenceBuilder').ref);
     expect(objection.raw).to.equal(require('../lib/queryBuilder/RawBuilder').raw);
-    expect(objection.lit).to.equal(require('../lib/queryBuilder/ValueBuilder').val);
     expect(objection.val).to.equal(require('../lib/queryBuilder/ValueBuilder').val);
     expect(objection.mixin).to.equal(require('../lib/utils/mixin').mixin);
     expect(objection.compose).to.equal(require('../lib/utils/mixin').compose);

@@ -132,10 +132,10 @@ module.exports = (session) => {
 
     it('eager should only load relations in the expression', () => {
       return Person.query()
-        .eager('parent')
+        .withGraphFetched('parent')
         .then(() => {
           expect(loadedRelations).to.eql(['parent']);
-          return Person.query().eager('cousins');
+          return Person.query().withGraphFetched('cousins');
         })
         .then(() => {
           expect(loadedRelations).to.eql(['parent', 'cousins']);
@@ -144,10 +144,10 @@ module.exports = (session) => {
 
     it('joinEager should only load relations in the expression', () => {
       return Person.query()
-        .joinEager('parent')
+        .withGraphJoined('parent')
         .then(() => {
           expect(loadedRelations).to.eql(['parent']);
-          return Person.query().joinEager('cousins');
+          return Person.query().withGraphJoined('cousins');
         })
         .then(() => {
           expect(loadedRelations).to.eql(['parent', 'cousins']);

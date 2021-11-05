@@ -29,7 +29,7 @@ module.exports = (session) => {
     it('belongs to one relation', () => {
       return session.models.Model1.query()
         .whereIn('id', [1, 3])
-        .eager('model1Relation1')
+        .withGraphFetched('model1Relation1')
         .then((models) => {
           expect(models).to.eql([
             {
@@ -67,7 +67,7 @@ module.exports = (session) => {
     it('has one relation', () => {
       return session.models.Model1.query()
         .whereIn('id', [2, 4])
-        .eager('model1Relation1Inverse')
+        .withGraphFetched('model1Relation1Inverse')
         .then((models) => {
           expect(models).to.eql([
             {

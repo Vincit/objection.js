@@ -229,63 +229,60 @@ module.exports = (session) => {
           });
       });
 
-      [Model.WhereInEagerAlgorithm, Model.JoinEagerAlgorithm, Model.NaiveEagerAlgorithm].forEach(
-        (eagerAlgo) => {
-          it(`eager (${eagerAlgo.name})`, () => {
-            return Person.query(knex)
-              .select('person.fName as rootFirstName')
-              .modifyEager('parent', (qb) => qb.select('fName as parentFirstName'))
-              .modifyEager('parent.parent', (qb) => qb.select('fName as grandParentFirstName'))
-              .eager('[parent.parent, pets, movies]')
-              .eagerAlgorithm(eagerAlgo)
-              .orderBy('person.fName')
-              .then((people) => {
-                expect(people.length).to.equal(3);
-                expect(people).to.containSubset([
-                  {
-                    rootFirstName: 'Seppo',
+      ['withGraphFetched', 'withGraphJoined'].forEach((method) => {
+        it(`eager (${method})`, () => {
+          return Person.query(knex)
+            .select('person.fName as rootFirstName')
+            .modifyGraph('parent', (qb) => qb.select('fName as parentFirstName'))
+            .modifyGraph('parent.parent', (qb) => qb.select('fName as grandParentFirstName'))
+            [method]('[parent.parent, pets, movies]')
+            .orderBy('person.fName')
+            .then((people) => {
+              expect(people.length).to.equal(3);
+              expect(people).to.containSubset([
+                {
+                  rootFirstName: 'Seppo',
+
+                  parent: {
+                    parentFirstName: 'Teppo',
 
                     parent: {
-                      parentFirstName: 'Teppo',
-
-                      parent: {
-                        grandParentFirstName: 'Matti',
-                      },
-                    },
-
-                    pets: [
-                      {
-                        animalName: 'Hurtta',
-                      },
-                      {
-                        animalName: 'Katti',
-                      },
-                    ],
-
-                    movies: [
-                      {
-                        movieName: 'Salkkarit 2, the low quality continues',
-                      },
-                      {
-                        movieName: 'Salkkarit the movie',
-                      },
-                    ],
-                  },
-                  {
-                    rootFirstName: 'Teppo',
-
-                    parent: {
-                      parentFirstName: 'Matti',
+                      grandParentFirstName: 'Matti',
                     },
                   },
-                  {
-                    rootFirstName: 'Matti',
+
+                  pets: [
+                    {
+                      animalName: 'Hurtta',
+                    },
+                    {
+                      animalName: 'Katti',
+                    },
+                  ],
+
+                  movies: [
+                    {
+                      movieName: 'Salkkarit 2, the low quality continues',
+                    },
+                    {
+                      movieName: 'Salkkarit the movie',
+                    },
+                  ],
+                },
+                {
+                  rootFirstName: 'Teppo',
+
+                  parent: {
+                    parentFirstName: 'Matti',
                   },
-                ]);
-              });
-          });
-        }
-      );
+                },
+                {
+                  rootFirstName: 'Matti',
+                },
+              ]);
+            });
+        });
+      });
     });
 
     after(() => {

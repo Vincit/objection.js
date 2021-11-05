@@ -159,7 +159,7 @@ module.exports = (session) => {
     it('eager', async () => {
       const arnold = await Person.query()
         .findOne('name', 'Arnold')
-        .eager('[movies(goodMovies), pets(onlyDictators)]')
+        .withGraphFetched('[movies(goodMovies), pets(onlyDictators)]')
         .modifiers({
           goodMovies(query) {
             query.modify('atLeastStars', 3);
@@ -180,7 +180,7 @@ module.exports = (session) => {
     it('joinEager', async () => {
       const arnold = await Person.query()
         .findOne('person.name', 'Arnold')
-        .joinEager('[movies(goodMovies), pets(onlyDictators)]')
+        .withGraphJoined('[movies(goodMovies), pets(onlyDictators)]')
         .modifiers({
           goodMovies(query) {
             query.modify('atLeastStars', 3);

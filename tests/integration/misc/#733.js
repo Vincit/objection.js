@@ -73,7 +73,7 @@ module.exports = (session) => {
     it('aliased properties', () => {
       return Person.query()
         .where('Person.id', 1)
-        .joinEager('children(aliasedProps)')
+        .withGraphJoined('children(aliasedProps)')
         .then((result) => {
           expect(result).to.containSubset([
             {
@@ -92,7 +92,7 @@ module.exports = (session) => {
     it('aliased properties + select all', () => {
       return Person.query()
         .where('Person.id', 1)
-        .joinEager('children(aliasedPropsAndSelectAll)')
+        .withGraphJoined('children(aliasedPropsAndSelectAll)')
         .then((result) => {
           expect(result).to.containSubset([
             {

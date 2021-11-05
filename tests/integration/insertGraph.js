@@ -136,22 +136,7 @@ module.exports = (session) => {
           })
           .then((inserted) => {
             expect(inserted).to.not.have.property('model1Prop2');
-            return Model1.query().eager(eagerExpr).where('id', inserted.id).first();
-          })
-          .then((model) => {
-            return check(model);
-          });
-      });
-
-      it('should have alias `insertWithRelated`', () => {
-        return Model1.query()
-          .insertWithRelated(insertion, { allowRefs: true })
-          .then((inserted) => {
-            return check(inserted, true).then(() => inserted);
-          })
-          .then((inserted) => {
-            expect(inserted).to.not.have.property('model1Prop2');
-            return Model1.query().eager(eagerExpr).where('id', inserted.id).first();
+            return Model1.query().withGraphFetched(eagerExpr).where('id', inserted.id).first();
           })
           .then((model) => {
             return check(model);
@@ -196,7 +181,7 @@ module.exports = (session) => {
             })
             .then((inserted) => {
               expect(inserted).to.not.have.property('model1Prop2');
-              return Model1.query().eager(eagerExpr).where('id', inserted.id).first();
+              return Model1.query().withGraphFetched(eagerExpr).where('id', inserted.id).first();
             })
             .then((model) => {
               return check(model);
@@ -242,7 +227,7 @@ module.exports = (session) => {
               ],
             });
 
-            return Model1.query().eager('model1Relation2').where('id', inserted.id);
+            return Model1.query().withGraphFetched('model1Relation2').where('id', inserted.id);
           })
           .then((inserted) => {
             inserted[0].model1Relation2 = _.sortBy(inserted[0].model1Relation2, 'idCol');
@@ -386,7 +371,7 @@ module.exports = (session) => {
             })
             .then((inserted) => {
               expect(inserted).to.not.have.property('model1Prop2');
-              return Model1.query().eager(eagerExpr).where('id', inserted.id).first();
+              return Model1.query().withGraphFetched(eagerExpr).where('id', inserted.id).first();
             })
             .then((model) => {
               return check(model);
@@ -411,7 +396,7 @@ module.exports = (session) => {
             }
           )
           .then((model) => {
-            return Model2.query().findById(model.idCol).eager('model2Relation1');
+            return Model2.query().findById(model.idCol).withGraphFetched('model2Relation1');
           })
           .then((model) => {
             delete model.idCol;
@@ -503,7 +488,9 @@ module.exports = (session) => {
           .then((model) => {
             return Model1.query()
               .findById(model.id)
-              .eager('[model1Relation1, model1Relation2.model2Relation1, model1Relation3]');
+              .withGraphFetched(
+                '[model1Relation1, model1Relation2.model2Relation1, model1Relation3]'
+              );
           })
           .then((model) => {
             delete model.id;
@@ -568,7 +555,7 @@ module.exports = (session) => {
             })
             .then((inserted) => {
               expect(inserted).to.have.property('model1Prop2');
-              return Model1.query().eager(eagerExpr).where('id', inserted.id).first();
+              return Model1.query().withGraphFetched(eagerExpr).where('id', inserted.id).first();
             })
             .then((model) => {
               return check(model);
@@ -594,7 +581,7 @@ module.exports = (session) => {
           })
           .then((inserted) => {
             return Model1.query()
-              .eager(eagerExpr)
+              .withGraphFetched(eagerExpr)
               .findById(inserted.id)
               .then((fetched) => {
                 chai.expect(inserted.$toJson()).to.containSubset(fetched.$toJson());
@@ -620,7 +607,7 @@ module.exports = (session) => {
             }
           )
           .then((model) => {
-            return Model2.query().findById(model.idCol).eager('model2Relation1');
+            return Model2.query().findById(model.idCol).withGraphFetched('model2Relation1');
           })
           .then((model) => {
             delete model.idCol;
@@ -646,7 +633,7 @@ module.exports = (session) => {
       });
     });
 
-    describe('.query().insertGraph().allowInsert()', () => {
+    describe('.query().insertGraph().allowGraph()', () => {
       beforeEach(() => {
         return session.populate(population);
       });
@@ -654,7 +641,7 @@ module.exports = (session) => {
       it('should allow insert when the allowed relation expression is a superset', () => {
         return Model1.query()
           .insertGraph(insertion, { allowRefs: true })
-          .allowInsert(eagerExpr)
+          .allowGraph(eagerExpr)
           .then((inserted) => {
             return check(inserted, true).then(() => inserted);
           });
@@ -663,7 +650,7 @@ module.exports = (session) => {
       it('should not allow insert when the allowed relation expression is not a superset', (done) => {
         Model1.query()
           .insertGraph(insertion)
-          .allowInsert('[model1Relation1.model1Relation3, model1Relation2]')
+          .allowGraph('[model1Relation1.model1Relation3, model1Relation2]')
           .then(() => {
             done(new Error('should not get here'));
           })
@@ -690,7 +677,7 @@ module.exports = (session) => {
             return check(inserted, true).then(() => inserted);
           })
           .then((inserted) => {
-            return Model1.query().eager(eagerExpr).where('id', inserted.id).first();
+            return Model1.query().withGraphFetched(eagerExpr).where('id', inserted.id).first();
           })
           .then((model) => {
             return check(model);
@@ -734,7 +721,7 @@ module.exports = (session) => {
             })
             .then((insertion) => {
               expect(insertion.model2Prop1).to.equal('howdy');
-              return insertion.$relatedQuery('model2Relation1').eager(eagerExpr).first();
+              return insertion.$relatedQuery('model2Relation1').withGraphFetched(eagerExpr).first();
             })
             .then((model) => {
               return check(model);
@@ -777,7 +764,7 @@ module.exports = (session) => {
             })
             .then((models) => {
               let insertion = _.find(models, { model2Prop1: 'howdy' });
-              return insertion.$relatedQuery('model2Relation1').eager(eagerExpr);
+              return insertion.$relatedQuery('model2Relation1').withGraphFetched(eagerExpr);
             })
             .then((models) => {
               let model = _.find(models, { model1Prop1: 'root' });

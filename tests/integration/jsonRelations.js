@@ -170,7 +170,7 @@ module.exports = (session) => {
         return Person.query()
           .findOne({ 'Person.name': 'Arnold' })
           .select('Person.name')
-          .eager(
+          .withGraphFetched(
             `[
             movies(name),
             favoritePet(name).[
@@ -214,7 +214,7 @@ module.exports = (session) => {
         return Person.query()
           .findOne({ 'Person.name': 'Arnold' })
           .select('Person.name')
-          .joinEager(
+          .withGraphJoined(
             `[
             movies(name),
             favoritePet(name).[
@@ -261,7 +261,7 @@ module.exports = (session) => {
           return Person.query()
             .findOne({ name: 'Arnold' })
             .then((it) => it.$relatedQuery('favoritePet').insert({ name: 'Doggo' }))
-            .then(() => Person.query().findOne({ name: 'Arnold' }).eager('favoritePet'))
+            .then(() => Person.query().findOne({ name: 'Arnold' }).withGraphFetched('favoritePet'))
             .then((person) => {
               expect(person.json.stuff.favoritePetId).to.equal(person.favoritePet.id);
             });
@@ -303,7 +303,7 @@ module.exports = (session) => {
           return Person.query()
             .findOne({ name: 'Arnold' })
             .then((it) => it.$relatedQuery('favoritePet').relate(123))
-            .then(() => Person.query().eager('favoritePet').orderBy('name'))
+            .then(() => Person.query().withGraphFetched('favoritePet').orderBy('name'))
             .then((people) => {
               const brad = find(people, { name: 'Brad' });
               const ardnold = find(people, { name: 'Arnold' });
@@ -317,7 +317,7 @@ module.exports = (session) => {
           return Person.query()
             .findOne({ name: 'Arnold' })
             .then((it) => it.$relatedQuery('favoritePet').unrelate())
-            .then(() => Person.query().eager('favoritePet').orderBy('name'))
+            .then(() => Person.query().withGraphFetched('favoritePet').orderBy('name'))
             .then((people) => {
               const brad = find(people, { name: 'Brad' });
               const ardnold = find(people, { name: 'Arnold' });
@@ -336,7 +336,7 @@ module.exports = (session) => {
             .then(() =>
               Animal.query()
                 .findOne({ name: 'Fluffy' })
-                .eager('peopleWhoseFavoriteIAm(name)')
+                .withGraphFetched('peopleWhoseFavoriteIAm(name)')
                 .select('name')
             )
             .then(sortRelations)
@@ -394,7 +394,9 @@ module.exports = (session) => {
             .then((it) => Promise.all([it, Person.query().findOne({ name: 'Brad' })]))
             .then(([fluffy, brad]) => fluffy.$relatedQuery('peopleWhoseFavoriteIAm').relate(brad))
             .then(() =>
-              Animal.query().findOne({ name: 'Fluffy' }).eager('peopleWhoseFavoriteIAm(name)')
+              Animal.query()
+                .findOne({ name: 'Fluffy' })
+                .withGraphFetched('peopleWhoseFavoriteIAm(name)')
             )
             .then(sortRelations)
             .then((pet) => {
@@ -423,7 +425,9 @@ module.exports = (session) => {
               it.$relatedQuery('peopleWhoseFavoriteIAm').unrelate().where('name', 'Arnold')
             )
             .then(() =>
-              Animal.query().findOne({ name: 'Fluffy' }).eager('peopleWhoseFavoriteIAm(name)')
+              Animal.query()
+                .findOne({ name: 'Fluffy' })
+                .withGraphFetched('peopleWhoseFavoriteIAm(name)')
             )
             .then(sortRelations)
             .then((pet) => {
@@ -447,7 +451,10 @@ module.exports = (session) => {
             .findOne({ name: 'Brad' })
             .then((it) => it.$relatedQuery('movies').insert({ name: 'Seven years in Tibet' }))
             .then(() =>
-              Person.query().findOne({ name: 'Brad' }).eager('movies(name)').select('name')
+              Person.query()
+                .findOne({ name: 'Brad' })
+                .withGraphFetched('movies(name)')
+                .select('name')
             )
             .then(sortRelations)
             .then((pet) => {
@@ -508,7 +515,10 @@ module.exports = (session) => {
             .then((it) => Promise.all([it, Movie.query().findOne({ name: 'Inglorious bastards' })]))
             .then(([arnold, bastards]) => arnold.$relatedQuery('movies').relate(bastards.id))
             .then(() =>
-              Person.query().select('name').findOne({ name: 'Arnold' }).eager('movies(name)')
+              Person.query()
+                .select('name')
+                .findOne({ name: 'Arnold' })
+                .withGraphFetched('movies(name)')
             )
             .then(sortRelations)
             .then((person) => {
@@ -538,7 +548,10 @@ module.exports = (session) => {
             )
             .then((arnold) => arnold.$relatedQuery('movies').unrelate().where('name', 'Terminator'))
             .then(() =>
-              Person.query().select('name').findOne({ name: 'Arnold' }).eager('movies(name)')
+              Person.query()
+                .select('name')
+                .findOne({ name: 'Arnold' })
+                .withGraphFetched('movies(name)')
             )
             .then(sortRelations)
             .then((person) => {

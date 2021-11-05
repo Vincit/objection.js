@@ -186,10 +186,7 @@ module.exports = (session) => {
 
     before(() => {
       // This makes sure the columnInfo cache is populated.
-      return Model1.query()
-        .findById(1)
-        .eager('[model1Relation1, model1Relation2]')
-        .eagerAlgorithm(Model1.JoinEagerAlgorithm);
+      return Model1.query().findById(1).withGraphJoined('[model1Relation1, model1Relation2]');
     });
 
     describe('aliases', () => {
@@ -235,7 +232,7 @@ module.exports = (session) => {
         return Model1.query()
           .findById(1)
           .table('Model1 as someAlias')
-          .eager(fullEager)
+          .withGraphFetched(fullEager)
           .then(sortEager)
           .then((model) => {
             if (utils.isPostgres(session.knex)) {
@@ -263,7 +260,7 @@ module.exports = (session) => {
         return Model1.query()
           .findById(1)
           .alias('someAlias')
-          .eager(fullEager)
+          .withGraphFetched(fullEager)
           .then(sortEager)
           .then((model) => {
             if (utils.isPostgres(session.knex)) {
@@ -287,12 +284,11 @@ module.exports = (session) => {
           });
       });
 
-      it('should use alias for eager queries (JoinEagerAlgorithm)', () => {
+      it('should use alias for eager queries (withGraphJoined)', () => {
         return Model1.query()
           .findById(1)
           .table('Model1 as someAlias')
-          .eager(fullEager)
-          .eagerAlgorithm(Model1.JoinEagerAlgorithm)
+          .withGraphJoined(fullEager)
           .then(sortEager)
           .then((model) => {
             if (utils.isPostgres(session.knex)) {
@@ -369,8 +365,7 @@ module.exports = (session) => {
           return Model1.query()
             .findById(1)
             .table('someView')
-            .eager('[model1Relation1, model1Relation2]')
-            .eagerAlgorithm(Model1.JoinEagerAlgorithm);
+            .withGraphJoined('[model1Relation1, model1Relation2]');
         });
 
         it('swapping table into a view for a joinRelated query should work', () => {
@@ -399,7 +394,7 @@ module.exports = (session) => {
           return Model1.query()
             .where('someView.id', 1)
             .table('someView')
-            .eager(fullEager)
+            .withGraphFetched(fullEager)
             .then(sortEager)
             .then((model) => {
               queries.sort();
@@ -499,12 +494,11 @@ module.exports = (session) => {
             });
         });
 
-        it('swapping table into a view for an eager query should work (JoinEagerAlgorithm)', () => {
+        it('swapping table into a view for an eager query should work (withGraphJoined)', () => {
           return Model1.query()
             .where('someView.id', 1)
             .table('someView')
-            .eager(fullEager)
-            .eagerAlgorithm(Model1.JoinEagerAlgorithm)
+            .withGraphJoined(fullEager)
             .then(sortEager)
             .then((model) => {
               expect(queries.length).to.equal(1);
@@ -646,14 +640,13 @@ module.exports = (session) => {
             });
         });
 
-        it('swapping table into a view for an eager query with filters should work (JoinEagerAlgorithm)', () => {
+        it('swapping table into a view for an eager query with filters should work (withGraphJoined)', () => {
           return Model1.query()
             .where('someView.id', 1)
             .table('someView')
-            .eager(fullEager)
-            .eagerAlgorithm(Model1.JoinEagerAlgorithm)
-            .modifyEager('model1Relation1', (builder) => builder.select('someView.id'))
-            .modifyEager('model1Relation2.model2Relation1', (builder) =>
+            .withGraphJoined(fullEager)
+            .modifyGraph('model1Relation1', (builder) => builder.select('someView.id'))
+            .modifyGraph('model1Relation2.model2Relation1', (builder) =>
               builder.select('someView.id')
             )
             .then(sortEager)

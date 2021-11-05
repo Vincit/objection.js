@@ -131,14 +131,6 @@ Replaces the current context with an empty object.
 | ----------------------------------- | ---------------------------------- |
 | [QueryBuilder](/api/query-builder/) | `this` query builder for chaining. |
 
-## mergeContext()
-
-::: warning
-Deprecated! Will be removed in version 3.0. Use [context](#context) instead.
-
-[v1 documentation](https://github.com/Vincit/objection.js/blob/v1/doc/api/query-builder/other-methods.md#mergecontext)
-:::
-
 ## tableNameFor()
 
 ```js
@@ -369,14 +361,6 @@ Returns true if the query contains any specific select staments, such as:
 | Type    | Description                                              |
 | ------- | -------------------------------------------------------- |
 | boolean | true if the query contains any specific select staments. |
-
-## hasEager()
-
-::: warning
-Deprecated! Will be removed in version 3.0. Use [hasWithGraph](#haswithgraph) instead.
-
-[v1 documentation](https://github.com/Vincit/objection.js/blob/v1/doc/api/query-builder/other-methods.md#haseager)
-:::
 
 ## hasWithGraph()
 
@@ -959,14 +943,6 @@ console.log(result.results.length); // --> 101
 console.log(result.total); // --> 3341
 ```
 
-## pluck()
-
-::: warning
-Deprecated! Will be removed in version 3.0.
-
-[v1 documentation](https://github.com/Vincit/objection.js/blob/v1/doc/api/query-builder/other-methods.md#pluck)
-:::
-
 ## first()
 
 ```js
@@ -1032,30 +1008,6 @@ try {
 }
 ```
 
-## traverse()
-
-::: warning
-Deprecated! Will be removed in version 3.0.
-
-[v1 documentation](https://github.com/Vincit/objection.js/blob/v1/doc/api/query-builder/other-methods.md#traverse)
-:::
-
-## pick()
-
-::: warning
-Deprecated! Will be removed in version 3.0.
-
-[v1 documentation](https://github.com/Vincit/objection.js/blob/v1/doc/api/query-builder/other-methods.md#pick)
-:::
-
-## omit()
-
-::: warning
-Deprecated! Will be removed in version 3.0.
-
-[v1 documentation](https://github.com/Vincit/objection.js/blob/v1/doc/api/query-builder/other-methods.md#omit)
-:::
-
 ## timeout()
 
 See [knex documentation](http://knexjs.org/#Builder-timeout)
@@ -1118,39 +1070,6 @@ Person.query().modify(modifierFunc, 'foo', 1);
 | Type                                | Description                        |
 | ----------------------------------- | ---------------------------------- |
 | [QueryBuilder](/api/query-builder/) | `this` query builder for chaining. |
-
-## applyModifier()
-
-::: warning
-Deprecated! Will be removed in version 3.0. Use [modify](/api/query-builder/other-methods.html#modify) instead.
-
-[v1 documentation](https://github.com/Vincit/objection.js/blob/v1/doc/api/query-builder/other-methods.md#applymodifier)
-:::
-
-Applies modifiers to the query builder.
-
-##### Arguments
-
-| Argument    | Type   | Description                                                                                           |
-| ----------- | ------ | ----------------------------------------------------------------------------------------------------- |
-| modifier    | string | The name of the modifier, as found in [modifier](/api/model/static-properties.html#static-modifiers). |
-| \*arguments |        | When providing multiple arguments, all provided modifiers will be applied.                            |
-
-##### Return value
-
-| Type                                | Description                        |
-| ----------------------------------- | ---------------------------------- |
-| [QueryBuilder](/api/query-builder/) | `this` query builder for chaining. |
-
-## applyFilter()
-
-::: warning
-Deprecated! Will be removed in version 3.0. Use [modify](/api/query-builder/other-methods.html#modify) instead.
-
-[v1 documentation](https://github.com/Vincit/objection.js/blob/v1/doc/api/query-builder/other-methods.md#applyfilter)
-:::
-
-An alias for [applyModifier](/api/query-builder/other-methods.html#applymodifier)
 
 ## modifiers()
 

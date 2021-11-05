@@ -264,78 +264,6 @@ const people = await Person.query()
   .where('persons.id', '>', 100);
 ```
 
-## eager()
-
-::: warning
-Deprecated! Will be removed in version 3.0. Use [withGraphFetched](/api/query-builder/eager-methods.html#withgraphfetched) or [withGraphJoined](/api/query-builder/eager-methods.html#withgraphjoined) instead.
-
-[v1 documentation](https://github.com/Vincit/objection.js/blob/v1/doc/api/query-builder/eager-methods.md#eager)
-:::
-
-## eagerAlgorithm()
-
-::: warning
-Deprecated! Will be removed in version 3.0. Use [withGraphFetched](/api/query-builder/eager-methods.html#withgraphfetched) or [withGraphJoined](/api/query-builder/eager-methods.html#withgraphjoined) instead.
-
-[v1 documentation](https://github.com/Vincit/objection.js/blob/v1/doc/api/query-builder/eager-methods.md#eageralgorithm)
-:::
-
-## eagerOptions()
-
-::: warning
-Deprecated! Will be removed in version 3.0. Use [withGraphFetched](/api/query-builder/eager-methods.html#withgraphfetched) or [withGraphJoined](/api/query-builder/eager-methods.html#withgraphjoined) instead. You can pass options as the second argument for both methods.
-
-[v1 documentation](https://github.com/Vincit/objection.js/blob/v1/doc/api/query-builder/eager-methods.md#eageroptions)
-:::
-
-## joinEager()
-
-::: warning
-Deprecated! Will be removed in version 3.0. Use [withGraphJoined](/api/query-builder/eager-methods.html#withgraphjoined) instead.
-
-[v1 documentation](https://github.com/Vincit/objection.js/blob/v1/doc/api/query-builder/eager-methods.md#joineager)
-:::
-
-## naiveEager()
-
-::: warning
-Deprecated! Will be removed in version 3.0. Use [withGraphFetched](/api/query-builder/eager-methods.html#withgraphfetched) instead with [maxBatchSize: 1](/api/types/#type-graphoptions) option.
-
-[v1 documentation](https://github.com/Vincit/objection.js/blob/v1/doc/api/query-builder/eager-methods.md#naiveeager)
-:::
-
-## mergeEager()
-
-::: warning
-Deprecated! Will be removed in version 3.0. Use [withGraphFetched](/api/query-builder/eager-methods.html#withgraphfetched) or [withGraphJoined](/api/query-builder/eager-methods.html#withgraphjoined) instead. They merge the graphs by default.
-
-[v1 documentation](https://github.com/Vincit/objection.js/blob/v1/doc/api/query-builder/eager-methods.md#mergeeager)
-:::
-
-## mergeJoinEager()
-
-::: warning
-Deprecated! Will be removed in version 3.0. Use [withGraphFetched](/api/query-builder/eager-methods.html#withgraphfetched) or [withGraphJoined](/api/query-builder/eager-methods.html#withgraphjoined) instead. They merge the graphs by default.
-
-[v1 documentation](https://github.com/Vincit/objection.js/blob/v1/doc/api/query-builder/eager-methods.md#mergejoineager)
-:::
-
-## mergeNaiveEager()
-
-::: warning
-Deprecated! Will be removed in version 3.0. Use [withGraphFetched](/api/query-builder/eager-methods.html#withgraphfetched) or [withGraphJoined](/api/query-builder/eager-methods.html#withgraphjoined) instead. They merge the graphs by default.
-
-[v1 documentation](https://github.com/Vincit/objection.js/blob/v1/doc/api/query-builder/eager-methods.md#mergenaiveeager)
-:::
-
-## eagerObject()
-
-::: warning
-Deprecated! Will be removed in version 3.0. Use [graphExpressionObject](#graphexpressionobject) without arguments instead.
-
-[v1 documentation](https://github.com/Vincit/objection.js/blob/v1/doc/api/query-builder/eager-methods.md#eagerobject)
-:::
-
 ## graphExpressionObject()
 
 ```js
@@ -359,20 +287,6 @@ See [this section](/api/types/#relationexpression-object-notation) for more exam
 | Type   | Description                                                                                                        |
 | ------ | ------------------------------------------------------------------------------------------------------------------ |
 | object | Object representation of the current relation expression passed to either `withGraphFetched` or `withGraphJoined`. |
-
-## eagerModifiers()
-
-::: warning
-Deprecated! Will be removed in version 3.0. Use [modifiers](/api/query-builder/other-methods.html#modifiers) without arguments instead.
-
-[v1 documentation](https://github.com/Vincit/objection.js/blob/v1/doc/api/query-builder/eager-methods.md#eagermodifiers)
-:::
-
-##### Return value
-
-| Type   | Description                   |
-| ------ | ----------------------------- |
-| object | Eager modifiers of the query. |
 
 ## allowGraph()
 
@@ -490,30 +404,6 @@ Clears all calls to `allowGraph`.
 
 Clears all calls to `withGraphFetched` and `withGraphJoined`.
 
-## allowEager()
-
-::: warning
-Deprecated! Will be removed in version 3.0. Use [allowGraph](/api/query-builder/eager-methods.html#allowgraph) instead. Note that you may need to add [clearAllowGraph](/api/query-builder/eager-methods.html#clearallowgraph) call too. `allowEager` cleared any old expressions automatically, while `allowGraph` merges them.
-
-[v1 documentation](https://github.com/Vincit/objection.js/blob/v1/doc/api/query-builder/eager-methods.md#alloweager)
-:::
-
-## mergeAllowEager()
-
-::: warning
-Deprecated! Will be removed in version 3.0. Use [allowGraph](/api/query-builder/eager-methods.html#allowgraph) instead.
-
-[v1 documentation](https://github.com/Vincit/objection.js/blob/v1/doc/api/query-builder/eager-methods.md#mergealloweager)
-:::
-
-## modifyEager()
-
-::: warning
-Deprecated! Will be removed in version 3.0. Use [modifyGraph](#modifygraph) instead.
-
-[v1 documentation](https://github.com/Vincit/objection.js/blob/v1/doc/api/query-builder/eager-methods.md#modifyeager)
-:::
-
 ## modifyGraph()
 
 ```js
@@ -576,13 +466,3 @@ Person.query()
   .withGraphFetched('[children.[pets, movies], movies]')
   .modifyGraph('children.movies', 'selectId');
 ```
-
-## filterEager()
-
-::: warning
-Deprecated! Will be removed in version 3.0. Use [modifyGraph](#modifygraph) instead.
-
-[v1 documentation](https://github.com/Vincit/objection.js/blob/v1/doc/api/query-builder/eager-methods.md#filtereager)
-:::
-
-Alias for [modifyGraph](/api/query-builder/other-methods.html#modifygraph).

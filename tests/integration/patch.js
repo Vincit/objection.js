@@ -402,8 +402,8 @@ module.exports = (session) => {
 
         return Model1.query()
           .patchAndFetchById(1, model)
-          .eager('model1Relation2')
-          .modifyEager('model1Relation2', (qb) => qb.orderBy('id_col'))
+          .withGraphFetched('model1Relation2')
+          .modifyGraph('model1Relation2', (qb) => qb.orderBy('id_col'))
           .then((fetchedModel) => {
             expect(fetchedModel).eql({
               id: 1,
@@ -428,49 +428,6 @@ module.exports = (session) => {
                   model1Id: 1,
                   model2Prop1: 'text 2',
                   model2Prop2: 1,
-                  $afterFindCalled: 1,
-                },
-              ],
-            });
-
-            return session.knex('Model1').orderBy('id');
-          })
-          .then((rows) => {
-            expect(rows).to.have.length(3);
-            expectPartEql(rows[0], { id: 1, model1Prop1: 'updated text' });
-            expectPartEql(rows[1], { id: 2, model1Prop1: 'hello 2' });
-            expectPartEql(rows[2], { id: 3, model1Prop1: 'hello 3' });
-          });
-      });
-
-      it('should work with `pick` method', () => {
-        let model = Model1.fromJson({ model1Prop1: 'updated text' });
-
-        return Model1.query()
-          .patchAndFetchById(1, model)
-          .eager('model1Relation2')
-          .modifyEager('model1Relation2', (qb) => qb.orderBy('id_col'))
-          .pick(Model2, ['idCol', 'model1Id'])
-          .then((fetchedModel) => {
-            expect(fetchedModel).eql({
-              id: 1,
-              model1Prop1: 'updated text',
-              model1Prop2: null,
-              model1Id: null,
-              $beforeUpdateCalled: true,
-              $beforeUpdateOptions: { patch: true },
-              $afterUpdateCalled: true,
-              $afterUpdateOptions: { patch: true },
-
-              model1Relation2: [
-                {
-                  idCol: 1,
-                  model1Id: 1,
-                  $afterFindCalled: 1,
-                },
-                {
-                  idCol: 2,
-                  model1Id: 1,
                   $afterFindCalled: 1,
                 },
               ],
@@ -614,22 +571,6 @@ module.exports = (session) => {
             expect(patch.$beforeUpdateOptions).to.eql({ patch: true, old: { id: 1 } });
             expect(patch.$afterUpdateCalled).to.equal(1);
             expect(patch.$afterUpdateOptions).to.eql({ patch: true, old: { id: 1 } });
-            return session.knex('Model1').orderBy('id');
-          })
-          .then((rows) => {
-            expect(rows).to.have.length(2);
-            expectPartEql(rows[0], { id: 1, model1Prop1: 'updated text' });
-            expectPartEql(rows[1], { id: 2, model1Prop1: 'hello 2' });
-          });
-      });
-
-      it('omitting a field should remove it from the patch', () => {
-        return Model1.fromJson({ id: 1, model1Prop1: 'updated text', thisShouldBeRemoved: 1000 })
-          .$omit('thisShouldBeRemoved')
-          .$query()
-          .patch()
-          .then((numUpdated) => {
-            expect(numUpdated).to.equal(1);
             return session.knex('Model1').orderBy('id');
           })
           .then((rows) => {
@@ -1144,7 +1085,7 @@ module.exports = (session) => {
                 idCol: 4,
               });
 
-              return Model1.query().findById(1).eager('model1Relation3');
+              return Model1.query().findById(1).withGraphFetched('model1Relation3');
             })
             .then((model1) => {
               chai.expect(model1).to.containSubset({

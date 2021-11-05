@@ -163,7 +163,7 @@ module.exports = (session) => {
                     }
                   })
                   // Sort all result by id to make the SQL we test below consistent.
-                  .mergeContext({
+                  .context({
                     onBuild(builder) {
                       if (!builder.isFind()) {
                         return;
@@ -278,7 +278,7 @@ module.exports = (session) => {
                     // Fetch the graph from the database.
                     return Model1.query(trx)
                       .findById(2)
-                      .eager(
+                      .withGraphFetched(
                         '[model1Relation1, model1Relation2(orderById).model2Relation1(orderById)]'
                       );
                   })
@@ -395,7 +395,9 @@ module.exports = (session) => {
               // Fetch the graph from the database.
               return Model1.query(trx)
                 .findById(2)
-                .eager('[model1Relation1, model1Relation2(orderById).model2Relation1(orderById)]');
+                .withGraphFetched(
+                  '[model1Relation1, model1Relation2(orderById).model2Relation1(orderById)]'
+                );
             })
             .then(omitIrrelevantProps)
             .then((result) => {
@@ -505,7 +507,7 @@ module.exports = (session) => {
           Model1.query(trx).upsertGraph(upsert, { fetchStrategy })
         )
           .then((inserted) =>
-            Model1.query(session.knex).findById(inserted.id).eager('model1Relation1')
+            Model1.query(session.knex).findById(inserted.id).withGraphFetched('model1Relation1')
           )
           .then((model) => {
             chai.expect(model).to.containSubset({
@@ -528,7 +530,9 @@ module.exports = (session) => {
           Model1.query(trx).upsertGraph(upsert, { fetchStrategy })
         )
           .then((inserted) =>
-            Model1.query(session.knex).findById(inserted.id).eager('model1Relation1Inverse')
+            Model1.query(session.knex)
+              .findById(inserted.id)
+              .withGraphFetched('model1Relation1Inverse')
           )
           .then((model) => {
             chai.expect(model).to.containSubset({
@@ -587,9 +591,9 @@ module.exports = (session) => {
               // Fetch the graph from the database.
               return Model1.query(trx)
                 .findById(result.id)
-                .eager('model1Relation1')
+                .withGraphFetched('model1Relation1')
                 .select('model1Prop1')
-                .modifyEager('model1Relation1', (qb) => qb.select('model1Prop1'));
+                .modifyGraph('model1Relation1', (qb) => qb.select('model1Prop1'));
             })
             .then(omitIrrelevantProps)
             .then((result) => {
@@ -634,7 +638,7 @@ module.exports = (session) => {
           return Model1.query(trx).upsertGraphAndFetch(upsert, { fetchStrategy });
         }).then((upserted) => {
           return Model1.query(session.knex)
-            .eager('[model1Relation1, model1Relation2.model2Relation1]')
+            .withGraphFetched('[model1Relation1, model1Relation2.model2Relation1]')
             .findById(upserted.id)
             .then((fetched) => {
               expect(upserted.$toJson()).to.eql(fetched.$toJson());
@@ -699,7 +703,7 @@ module.exports = (session) => {
             Model1.query(trx)
               .upsertGraph(upsert, { unrelate: true, relate: true, fetchStrategy })
               // Sort all result by id to make the SQL we test below consistent.
-              .mergeContext({
+              .context({
                 onBuild(builder) {
                   if (!builder.isFind()) {
                     return;
@@ -746,7 +750,7 @@ module.exports = (session) => {
                 // Fetch the graph from the database.
                 return Model1.query(trx)
                   .findById(2)
-                  .eager(
+                  .withGraphFetched(
                     '[model1Relation1, model1Relation2(orderById).model2Relation1(orderById)]'
                   );
               })
@@ -849,7 +853,7 @@ module.exports = (session) => {
         return BoundModel1.query()
           .upsertGraph(upsert, { relate: true, fetchStrategy })
           .then(() => {
-            return BoundModel1.query().findById(1).eager('model1Relation2');
+            return BoundModel1.query().findById(1).withGraphFetched('model1Relation2');
           })
           .then((result) => {
             expect(result.model1Relation2).to.have.length(3);
@@ -903,7 +907,7 @@ module.exports = (session) => {
         return BoundModel1.query()
           .upsertGraph(upsert, { fetchStrategy, allowRefs: true })
           .then(() => {
-            return BoundModel1.query().findById(1).eager('model1Relation2');
+            return BoundModel1.query().findById(1).withGraphFetched('model1Relation2');
           })
           .then((result) => {
             expect(result.model1Relation2).to.have.length(3);
@@ -980,7 +984,7 @@ module.exports = (session) => {
               // Fetch the graph from the database.
               return Model1.query(trx)
                 .findById(2)
-                .eager('[model1Relation2(orderById).model2Relation1(orderById)]');
+                .withGraphFetched('[model1Relation2(orderById).model2Relation1(orderById)]');
             })
             .then(omitIrrelevantProps)
             .then((result) => {
@@ -1049,7 +1053,7 @@ module.exports = (session) => {
               // Fetch the graph from the database.
               return Model1.query(trx)
                 .findById(2)
-                .eager('[model1Relation2(orderById).model2Relation1(orderById)]');
+                .withGraphFetched('[model1Relation2(orderById).model2Relation1(orderById)]');
             })
             .then(omitIrrelevantProps)
             .then((result) => {
@@ -1103,7 +1107,7 @@ module.exports = (session) => {
               // Fetch the graph from the database.
               return Model1.query(trx)
                 .findById(2)
-                .eager('[model1Relation2(orderById).model2Relation1(orderById)]');
+                .withGraphFetched('[model1Relation2(orderById).model2Relation1(orderById)]');
             })
             .then(omitIrrelevantProps)
             .then((result) => {
@@ -1187,7 +1191,9 @@ module.exports = (session) => {
               // Fetch the graph from the database.
               return Model1.query(trx)
                 .findById(2)
-                .eager('[model1Relation1, model1Relation2(orderById).model2Relation1(orderById)]');
+                .withGraphFetched(
+                  '[model1Relation1, model1Relation2(orderById).model2Relation1(orderById)]'
+                );
             })
             .then(omitIrrelevantProps)
             .then((result) => {
@@ -1330,7 +1336,9 @@ module.exports = (session) => {
               // Fetch the graph from the database.
               return Model1.query(trx)
                 .findById(2)
-                .eager('[model1Relation1, model1Relation2(orderById).model2Relation1(orderById)]');
+                .withGraphFetched(
+                  '[model1Relation1, model1Relation2(orderById).model2Relation1(orderById)]'
+                );
             })
             .then(omitIrrelevantProps)
             .then((result) => {
@@ -1414,9 +1422,9 @@ module.exports = (session) => {
               // Fetch the graph from the database.
               return Model1.query(trx)
                 .findById(result.id)
-                .eager('model1Relation1')
+                .withGraphFetched('model1Relation1')
                 .select('id')
-                .modifyEager('model1Relation1', (qb) => qb.select('id'));
+                .modifyGraph('model1Relation1', (qb) => qb.select('id'));
             })
             .then(omitIrrelevantProps)
             .then((result) => {
@@ -1445,9 +1453,9 @@ module.exports = (session) => {
               // Fetch the graph from the database.
               return Model1.query(trx)
                 .findById(result.id)
-                .eager('model1Relation1')
+                .withGraphFetched('model1Relation1')
                 .select('id')
-                .modifyEager('model1Relation1', (qb) => qb.select('model1Prop1'));
+                .modifyGraph('model1Relation1', (qb) => qb.select('model1Prop1'));
             })
             .then(omitIrrelevantProps)
             .then((result) => {
@@ -1478,7 +1486,7 @@ module.exports = (session) => {
             .upsertGraph(upsert, { fetchStrategy })
             .then(() => {
               // Fetch the graph from the database.
-              return Model1.query(trx).findById(2).eager('model1Relation1');
+              return Model1.query(trx).findById(2).withGraphFetched('model1Relation1');
             })
             .then(omitIrrelevantProps)
             .then((result) => {
@@ -1519,7 +1527,7 @@ module.exports = (session) => {
             .upsertGraph(upsert, { fetchStrategy })
             .then(() => {
               // Fetch the graph from the database.
-              return Model1.query(trx).findById(2).eager('model1Relation1');
+              return Model1.query(trx).findById(2).withGraphFetched('model1Relation1');
             })
             .then(omitIrrelevantProps)
             .then((result) => {
@@ -1558,7 +1566,7 @@ module.exports = (session) => {
             .upsertGraph(upsert, { fetchStrategy })
             .then(() => {
               // Fetch the graph from the database.
-              return Model1.query(trx).findById(2).eager('model1Relation2');
+              return Model1.query(trx).findById(2).withGraphFetched('model1Relation2');
             })
             .then(omitIrrelevantProps)
             .then((result) => {
@@ -1625,7 +1633,7 @@ module.exports = (session) => {
               }
 
               // Fetch the graph from the database.
-              return Model1.query(trx).findById(2).eager('model1Relation1');
+              return Model1.query(trx).findById(2).withGraphFetched('model1Relation1');
             })
             .then(omitIrrelevantProps)
             .then((result) => {
@@ -1674,7 +1682,9 @@ module.exports = (session) => {
           })
           .then(() => {
             // Fetch the graph from the database.
-            return Model1.query(session.knex).findById(2).eager('model1Relation1.model1Relation1');
+            return Model1.query(session.knex)
+              .findById(2)
+              .withGraphFetched('model1Relation1.model1Relation1');
           })
           .then((result) => {
             chai.expect(result).to.containSubset({
@@ -1716,7 +1726,9 @@ module.exports = (session) => {
           })
           .then(() => {
             // Fetch the graph from the database.
-            return Model1.query(session.knex).findById(2).eager('model1Relation1.model1Relation1');
+            return Model1.query(session.knex)
+              .findById(2)
+              .withGraphFetched('model1Relation1.model1Relation1');
           })
           .then((result) => {
             chai.expect(result).to.containSubset({
@@ -1774,7 +1786,9 @@ module.exports = (session) => {
           })
           .then(() => {
             // Fetch the graph from the database.
-            return Model1.query(session.knex).findById(2).eager('model1Relation1.model1Relation1');
+            return Model1.query(session.knex)
+              .findById(2)
+              .withGraphFetched('model1Relation1.model1Relation1');
           })
           .then((result) => {
             chai.expect(result).to.containSubset({
@@ -1833,7 +1847,7 @@ module.exports = (session) => {
             // Fetch the graph from the database.
             return Model1.query(session.knex)
               .findById(2)
-              .eager('model1Relation2(orderById).model2Relation1(orderById)');
+              .withGraphFetched('model1Relation2(orderById).model2Relation1(orderById)');
           })
           .then(omitIrrelevantProps)
           .then((result) => {
@@ -1925,7 +1939,7 @@ module.exports = (session) => {
             // Fetch the graph from the database.
             return Model1.query(session.knex)
               .findById(2)
-              .eager('model1Relation2(orderById).model2Relation1(orderById)');
+              .withGraphFetched('model1Relation2(orderById).model2Relation1(orderById)');
           })
           .then(omitIrrelevantProps)
           .then((result) => {
@@ -1986,7 +2000,9 @@ module.exports = (session) => {
           })
             .then((result) => {
               // Fetch the graph from the database.
-              return Model1.query(session.knex).findById(NONEXISTENT_ID).eager('model1Relation1');
+              return Model1.query(session.knex)
+                .findById(NONEXISTENT_ID)
+                .withGraphFetched('model1Relation1');
             })
             .then(omitIrrelevantProps)
             .then((result) => {
@@ -2079,7 +2095,7 @@ module.exports = (session) => {
           .catch(done);
       });
 
-      it('allowUpsert should limit the relations that can be upserted', () => {
+      it('allowGraph should limit the relations that can be upserted', () => {
         const errors = [];
 
         const upsert = {
@@ -2128,14 +2144,14 @@ module.exports = (session) => {
         // This should fail.
         return Model1.query(session.knex)
           .upsertGraph(upsert, { unrelate: true, relate: true, fetchStrategy })
-          .allowUpsert('[model1Relation1, model1Relation2]')
+          .allowGraph('[model1Relation1, model1Relation2]')
           .catch((err) => {
             errors.push(err);
 
             // This should also fail.
             return Model1.query(session.knex)
               .upsertGraph(upsert, { unrelate: true, relate: true, fetchStrategy })
-              .allowUpsert('[model1Relation2.model2Relation1]');
+              .allowGraph('[model1Relation2.model2Relation1]');
           })
           .catch((err) => {
             errors.push(err);
@@ -2143,13 +2159,15 @@ module.exports = (session) => {
             // This should succeed.
             return Model1.query(session.knex)
               .upsertGraph(upsert, { unrelate: true, relate: true, fetchStrategy })
-              .allowUpsert('[model1Relation1, model1Relation2.model2Relation1]');
+              .allowGraph('[model1Relation1, model1Relation2.model2Relation1]');
           })
           .then(() => {
             // Fetch the graph from the database.
             return Model1.query(session.knex)
               .findById(2)
-              .eager('[model1Relation1, model1Relation2(orderById).model2Relation1(orderById)]');
+              .withGraphFetched(
+                '[model1Relation1, model1Relation2(orderById).model2Relation1(orderById)]'
+              );
           })
           .then(omitIrrelevantProps)
           .then((result) => {
@@ -2279,7 +2297,9 @@ module.exports = (session) => {
               // Fetch the graph from the database.
               return Model1.query(trx)
                 .findById(2)
-                .eager('[model1Relation1, model1Relation2(orderById).model2Relation1(orderById)]');
+                .withGraphFetched(
+                  '[model1Relation1, model1Relation2(orderById).model2Relation1(orderById)]'
+                );
             })
             .then(omitIrrelevantProps)
             .then((result) => {
@@ -2350,7 +2370,7 @@ module.exports = (session) => {
         return Model1.query(session.knex)
           .upsertGraph(upsert, { fetchStrategy })
           .then(() => {
-            return Model1.query(session.knex).findById(2).eager('model1Relation1');
+            return Model1.query(session.knex).findById(2).withGraphFetched('model1Relation1');
           })
           .then((result) => {
             expect(result.model1Relation1).to.equal(null);
@@ -2381,7 +2401,9 @@ module.exports = (session) => {
             },
           })
           .then(() => {
-            const fetchQuery = Model1.query(session.knex).findById(2).eager('model1Relation1');
+            const fetchQuery = Model1.query(session.knex)
+              .findById(2)
+              .withGraphFetched('model1Relation1');
 
             expect(findQueryCount).to.equal(2);
             expect(fetchQuery.isInternal()).to.equal(false);
@@ -2646,7 +2668,7 @@ module.exports = (session) => {
 
                   return Model1.query(trx)
                     .findById(2)
-                    .eager({
+                    .withGraphFetched({
                       model1Relation1: true,
                       model1Relation2: {
                         model2Relation1: true,
@@ -2665,7 +2687,7 @@ module.exports = (session) => {
 
                   return Model1.query(trx)
                     .findById(2)
-                    .eager({
+                    .withGraphFetched({
                       model1Relation1: true,
                       model1Relation2: {
                         model2Relation1: true,
@@ -2817,7 +2839,7 @@ module.exports = (session) => {
               .then(() => {
                 return Model1.query(trx)
                   .findById(2)
-                  .eager(
+                  .withGraphFetched(
                     '[model1Relation1.[model1Relation3(orderById).model2Relation3(orderById)]]'
                   );
               })
@@ -2883,7 +2905,7 @@ module.exports = (session) => {
               .then(() => {
                 return Model1.query(trx)
                   .findById(2)
-                  .eager(
+                  .withGraphFetched(
                     '[model1Relation3(orderById).[model2Relation2(orderById).model1Relation1]]'
                   );
               })
@@ -2951,7 +2973,7 @@ module.exports = (session) => {
               .then(() => {
                 return Model1.query(trx)
                   .findById(2)
-                  .eager(
+                  .withGraphFetched(
                     '[model1Relation2(orderById).[model2Relation2(orderById).model1Relation1]]'
                   );
               })
@@ -3014,7 +3036,7 @@ module.exports = (session) => {
               .then(() => {
                 return Model1.query(trx)
                   .findById(2)
-                  .eager('model1Relation3(orderById).model2Relation3(orderById)');
+                  .withGraphFetched('model1Relation3(orderById).model2Relation3(orderById)');
               })
               .then(omitIrrelevantProps)
               .then((result) => {
@@ -3485,7 +3507,9 @@ module.exports = (session) => {
               return Model1.query(session.knex)
                 .orderBy('id')
                 .whereIn('id', [1, 2])
-                .eager('[model1Relation1, model1Relation2(orderById).model2Relation1(orderById)]');
+                .withGraphFetched(
+                  '[model1Relation1, model1Relation2(orderById).model2Relation1(orderById)]'
+                );
             })
             .then((db) => {
               // Check that the transactions worked and the database was in no way modified.
@@ -3498,7 +3522,7 @@ module.exports = (session) => {
                     // Fetch the graph from the database.
                     return Model1.query(trx)
                       .findById(2)
-                      .eager(
+                      .withGraphFetched(
                         '[model1Relation1, model1Relation2(orderById).model2Relation1(orderById)]'
                       );
                   })
@@ -3597,7 +3621,9 @@ module.exports = (session) => {
             .then(() => {
               return Model1.query(session.knex)
                 .findByIds([1000, 1001])
-                .eager('[model1Relation1, model1Relation2(orderById), model1Relation3(orderById)]');
+                .withGraphFetched(
+                  '[model1Relation1, model1Relation2(orderById), model1Relation3(orderById)]'
+                );
             })
             .then((result) => {
               chai.expect(result).to.containSubset([
@@ -3674,7 +3700,9 @@ module.exports = (session) => {
             .then(() => {
               return Model1.query(session.knex)
                 .findByIds([1000, 1001])
-                .eager('[model1Relation1, model1Relation2(orderById), model1Relation3(orderById)]');
+                .withGraphFetched(
+                  '[model1Relation1, model1Relation2(orderById), model1Relation3(orderById)]'
+                );
             })
             .then((result) => {
               chai.expect(result).to.containSubset([
@@ -3843,7 +3871,7 @@ module.exports = (session) => {
                   .upsertGraph(success, { update: true, fetchStrategy })
                   .then((result) => {
                     // Fetch the graph from the database.
-                    return Model1.query(trx).findById(2).eager('model1Relation1');
+                    return Model1.query(trx).findById(2).withGraphFetched('model1Relation1');
                   })
                   .then(omitIrrelevantProps)
                   .then(omitIds)
@@ -3917,7 +3945,7 @@ module.exports = (session) => {
             .then(() => {
               return Model1.query(session.knex)
                 .findById(2)
-                .eager({
+                .withGraphFetched({
                   model1Relation1: {
                     model1Relation1: true,
                   },
@@ -3971,7 +3999,9 @@ module.exports = (session) => {
               });
           })
             .then(() => {
-              return Model2.query(session.knex).findById(2).eager('model2Relation1(orderById)');
+              return Model2.query(session.knex)
+                .findById(2)
+                .withGraphFetched('model2Relation1(orderById)');
             })
             .then((model) => {
               expect(model.model2Relation1[2].aliasedExtra).to.equal('foo');
@@ -4005,7 +4035,9 @@ module.exports = (session) => {
               });
           })
             .then(() => {
-              return Model2.query(session.knex).findById(2).eager('model2Relation1(orderById)');
+              return Model2.query(session.knex)
+                .findById(2)
+                .withGraphFetched('model2Relation1(orderById)');
             })
             .then((model) => {
               expect(model.model2Relation1[0].id).to.equal(5);
@@ -4038,7 +4070,9 @@ module.exports = (session) => {
               });
           })
             .then(() => {
-              return Model2.query(session.knex).findById(2).eager('model2Relation1(orderById)');
+              return Model2.query(session.knex)
+                .findById(2)
+                .withGraphFetched('model2Relation1(orderById)');
             })
             .then((model) => {
               expect(model.model2Relation1[0].aliasedExtra).to.equal('hello extra 1');

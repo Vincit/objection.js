@@ -359,7 +359,7 @@ module.exports = (session) => {
 
     it('eager', () => {
       return Person.query()
-        .eager({
+        .withGraphFetched({
           parent: true,
           pets: true,
           movies: true,
@@ -409,7 +409,7 @@ module.exports = (session) => {
 
     it('joinEager', () => {
       return Person.query()
-        .joinEager({
+        .withGraphJoined({
           parent: true,
           pets: true,
           movies: true,
@@ -973,7 +973,7 @@ module.exports = (session) => {
     }
 
     function findArnoldEagerly() {
-      return Person.query().findOne('name', 'Arnold').eager({
+      return Person.query().findOne('name', 'Arnold').withGraphFetched({
         parent: true,
         pets: true,
         movies: true,

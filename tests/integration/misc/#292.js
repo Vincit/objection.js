@@ -129,8 +129,7 @@ module.exports = (session) => {
 
     it('the test', () => {
       return A.query(session.knex)
-        .eagerAlgorithm(Model.JoinEagerAlgorithm)
-        .eager('Bs.[Cs, Ds]')
+        .withGraphJoined('Bs.[Cs, Ds]')
         .then((results) => {
           results[0].Bs[0].Ds = _.sortBy(results[0].Bs[0].Ds, 'id');
 

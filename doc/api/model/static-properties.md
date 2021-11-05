@@ -293,16 +293,6 @@ Person.query()
   .modifyGraph('pets', 'dogs');
 ```
 
-## `static` namedFilters
-
-::: warning
-Deprecated! Will be removed in version 3.0. Use [modifiers](/api/model/static-properties.html#static-modifiers) instead.
-
-[v1 documentation](https://github.com/Vincit/objection.js/blob/v1/doc/api/model/static-properties.md#static-namedfilters)
-:::
-
-An alias for [modifiers](/api/model/static-properties.html#static-modifiers)
-
 ## `static` modelPaths
 
 ```js
@@ -450,42 +440,6 @@ class Person extends Model {
 }
 ```
 
-## `static` relatedFindQueryMutates
-
-::: warning
-Deprecated! Will be removed in version 3.0.
-
-[v1 documentation](https://github.com/Vincit/objection.js/blob/v1/doc/api/model/static-properties.md#static-relatedfindquerymutates)
-:::
-
-```js
-class Person extends Model {
-  static get relatedFindQueryMutates() {
-    return false;
-  }
-}
-```
-
-If this config is set to false, calling `foo.$relatedQuery('bar')` doesn't assign the fetched related models to `foo.bar`. The default is false.
-
-## `static` relatedInsertQueryMutates
-
-::: warning
-Deprecated! Will be removed in version 3.0.
-
-[v1 documentation](https://github.com/Vincit/objection.js/blob/v1/doc/api/model/static-properties.md#static-relatedinsertquerymutates)
-:::
-
-```js
-class Person extends Model {
-  static get relatedInsertQueryMutates() {
-    return false;
-  }
-}
-```
-
-If this config is set to false, calling `foo.$relatedQuery('bar').insert(obj)` doesn't append the inserted related model to `foo.bar`. The default is false.
-
 ## `static` uidProp
 
 ```js
@@ -561,22 +515,6 @@ class Person extends Model {
 If this is true only properties in `jsonSchema` are picked when inserting or updating a row in the database.
 
 Defaults to false.
-
-## `static` defaultEagerAlgorithm
-
-::: warning
-Deprecated! Will be removed in version 3.0. Use [withGraphFetched](/api/query-builder/eager-methods.html#withgraphfetched) or [withGraphJoined](/api/query-builder/eager-methods.html#withgraphjoined) explicitly.
-
-[v1 documentation](https://github.com/Vincit/objection.js/blob/v1/doc/api/model/static-properties.md#static-defaulteageralgorithm)
-:::
-
-## `static` defaultEagerOptions
-
-::: warning
-Deprecated! Will be removed in version 3.0. Use `defaultGraphOptions` instead.
-
-[v1 documentation](https://github.com/Vincit/objection.js/blob/v1/doc/api/model/static-properties.md#static-defaulteageroptions)
-:::
 
 ## `static` defaultGraphOptions
 

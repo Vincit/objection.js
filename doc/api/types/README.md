@@ -602,14 +602,6 @@ Cast reference to sql type `real`.
 
 Cast reference to sql type `boolean`.
 
-#### castType()
-
-Give custom type to which referenced value is cast to.
-
-**DEPRECATED:** Use `castTo` instead. `castType` Will be removed in 2.0.
-
-`.castType('mytype') --> CAST(?? as mytype)`
-
 #### castTo()
 
 Give custom type to which referenced value is cast to.
