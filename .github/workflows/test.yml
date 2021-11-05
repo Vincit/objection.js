@@ -33,6 +33,3 @@ jobs:
 
       - name: Run tests
         run: npm test
-
-      - name: Run typing tests
-        run: npm run test:typings

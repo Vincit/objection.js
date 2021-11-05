@@ -5,7 +5,7 @@
   "main": "lib/objection.js",
   "license": "MIT",
   "scripts": {
-    "test": "npm run eslint && mocha --slow 10 --timeout 15000 --reporter spec --recursive tests --exclude \"tests/unit/relations/files/**\"",
+    "test": "npm run eslint && mocha --slow 10 --timeout 15000 --reporter spec --recursive tests --exclude \"tests/unit/relations/files/**\" && npm run test:typings",
     "test:fast": "mocha --slow 10 --timeout 15000 --reporter spec --recursive tests --bail --exclude \"tests/unit/relations/files/**\"",
     "test:typings": "tsc",
     "prettier": "prettier --write \"{examples,lib,tests,typings,doc}/**/*.{js,ts}\"",
