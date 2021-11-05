@@ -24,7 +24,7 @@ class TestSession {
     this.opt = opt;
     this.knex = this.createKnex(opt);
     this.unboundModels = this.createModels();
-    this.models = _.mapValues(this.unboundModels, model => model.bindKnex(this.knex));
+    this.models = _.mapValues(this.unboundModels, (model) => model.bindKnex(this.knex));
   }
 
   createKnex() {
@@ -42,14 +42,15 @@ class TestSession {
         return 'id';
       }
 
-      static get namedFilters() {
+      static get modifiers() {
         return {
-          orderById: builder => builder.orderBy('Model1.id'),
-          'select:id': builder => builder.select(this.ref('id')),
-          'select:model1Prop1': builder => builder.select('model1Prop1'),
-          'select:model1Prop1Aliased': builder => builder.select('model1Prop1 as aliasedInFilter'),
-          'orderBy:model1Prop1': builder => builder.orderBy('model1Prop1'),
-          idGreaterThan: builder => builder.where('id', '>', builder.context().filterArgs[0])
+          orderById: (builder) => builder.orderBy('Model1.id'),
+          'select:id': (builder) => builder.select(this.ref('id')),
+          'select:model1Prop1': (builder) => builder.select('model1Prop1'),
+          'select:model1Prop1Aliased': (builder) =>
+            builder.select('model1Prop1 as aliasedInFilter'),
+          'orderBy:model1Prop1': (builder) => builder.orderBy('model1Prop1'),
+          idGreaterThan: (builder) => builder.where('id', '>', builder.context().filterArgs[0]),
         };
       }
 
@@ -60,8 +61,8 @@ class TestSession {
             modelClass: Model1,
             join: {
               from: 'Model1.model1Id',
-              to: 'Model1.id'
-            }
+              to: 'Model1.id',
+            },
           },
 
           model1Relation1Inverse: {
@@ -69,8 +70,8 @@ class TestSession {
             modelClass: Model1,
             join: {
               from: 'Model1.id',
-              to: 'Model1.model1Id'
-            }
+              to: 'Model1.model1Id',
+            },
           },
 
           model1Relation2: {
@@ -78,8 +79,8 @@ class TestSession {
             modelClass: Model2,
             join: {
               from: 'Model1.id',
-              to: 'model2.model1_id'
-            }
+              to: 'model2.model1_id',
+            },
           },
 
           model1Relation3: {
@@ -90,11 +91,11 @@ class TestSession {
               through: {
                 from: 'Model1Model2.model1Id',
                 to: 'Model1Model2.model2Id',
-                extra: ['extra1', 'extra2']
+                extra: ['extra1', 'extra2'],
               },
-              to: 'model2.id_col'
-            }
-          }
+              to: 'model2.id_col',
+            },
+          },
         };
       }
     }
@@ -115,7 +116,7 @@ class TestSession {
 
       static get modifiers() {
         return {
-          orderById: builder => builder.orderBy('model2.id_col')
+          orderById: (builder) => builder.orderBy('model2.id_col'),
         };
       }
 
@@ -129,10 +130,10 @@ class TestSession {
               through: {
                 from: 'Model1Model2.model2Id',
                 to: 'Model1Model2.model1Id',
-                extra: { aliasedExtra: 'extra3' }
+                extra: { aliasedExtra: 'extra3' },
               },
-              to: 'Model1.id'
-            }
+              to: 'Model1.id',
+            },
           },
 
           model2Relation2: {
@@ -142,10 +143,10 @@ class TestSession {
               from: 'model2.id_col',
               through: {
                 from: 'Model1Model2One.model2Id',
-                to: 'Model1Model2One.model1Id'
+                to: 'Model1Model2One.model1Id',
               },
-              to: 'Model1.id'
-            }
+              to: 'Model1.id',
+            },
           },
 
           model2Relation3: {
@@ -155,11 +156,11 @@ class TestSession {
               from: 'model2.id_col',
               through: {
                 from: 'Model2Model3ManyToMany.model2Id',
-                to: 'Model2Model3ManyToMany.model3Id'
+                to: 'Model2Model3ManyToMany.model3Id',
               },
-              to: 'model3.id'
-            }
-          }
+              to: 'model3.id',
+            },
+          },
         };
       }
     }
@@ -180,7 +181,7 @@ class TestSession {
 
       static get modifiers() {
         return {
-          orderById: builder => builder.orderBy('model3.id')
+          orderById: (builder) => builder.orderBy('model3.id'),
         };
       }
     }
@@ -192,8 +193,8 @@ class TestSession {
       ['$afterDelete', 1],
       ['$beforeUpdate', 1, (self, args) => (self.$beforeUpdateOptions = _.cloneDeep(args[0]))],
       ['$afterUpdate', 1, (self, args) => (self.$afterUpdateOptions = _.cloneDeep(args[0]))],
-      ['$afterFind', 1]
-    ].forEach(hook => {
+      ['$afterFind', 1],
+    ].forEach((hook) => {
       Model1.prototype[hook[0]] = createHook(hook[0], hook[1], hook[2]);
       Model2.prototype[hook[0]] = createHook(hook[0], hook[1], hook[2]);
       Model3.prototype[hook[0]] = createHook(hook[0], hook[1], hook[2]);
@@ -202,7 +203,7 @@ class TestSession {
     return {
       Model1: Model1,
       Model2: Model2,
-      Model3: Model3
+      Model3: Model3,
     };
   }
 
@@ -219,7 +220,7 @@ class TestSession {
       .then(() => knex.schema.dropTableIfExists('model3'))
       .then(() => {
         return knex.schema
-          .createTable('Model1', table => {
+          .createTable('Model1', (table) => {
             table.increments('id').primary();
             table
               .integer('model1Id')
@@ -230,7 +231,7 @@ class TestSession {
             table.string('model1Prop1');
             table.integer('model1Prop2');
           })
-          .createTable('model2', table => {
+          .createTable('model2', (table) => {
             table.increments('id_col').primary();
             table
               .integer('model1_id')
@@ -241,12 +242,12 @@ class TestSession {
             table.string('model2_prop1');
             table.integer('model2_prop2');
           })
-          .createTable('model3', table => {
+          .createTable('model3', (table) => {
             table.increments('id').primary();
             table.string('model3Prop1');
             table.text('model3JsonProp');
           })
-          .createTable('Model1Model2', table => {
+          .createTable('Model1Model2', (table) => {
             table.increments('id').primary();
             table.string('extra1');
             table.string('extra2');
@@ -268,7 +269,7 @@ class TestSession {
               .onDelete('CASCADE')
               .index();
           })
-          .createTable('Model1Model2One', table => {
+          .createTable('Model1Model2One', (table) => {
             table
               .integer('model1Id')
               .unsigned()
@@ -286,7 +287,7 @@ class TestSession {
               .onDelete('CASCADE')
               .index();
           })
-          .createTable('Model2Model3ManyToMany', table => {
+          .createTable('Model2Model3ManyToMany', (table) => {
             table
               .integer('model2Id')
               .unsigned()
@@ -305,7 +306,7 @@ class TestSession {
               .index();
           });
       })
-      .catch(cause => {
+      .catch((cause) => {
         const err = new Error(
           'Could not connect to ' +
             opt.knexConfig.client +
@@ -320,8 +321,8 @@ class TestSession {
           stack: {
             get() {
               return oldStack + `\n\nCaused by:\n${cause.stack}`;
-            }
-          }
+            },
+          },
         });
 
         throw err;
@@ -329,7 +330,7 @@ class TestSession {
   }
 
   populate(data) {
-    return transaction(this.knex, trx => {
+    return transaction(this.knex, (trx) => {
       return trx('Model1Model2')
         .delete()
         .then(() => trx('Model1Model2One').delete())
@@ -339,14 +340,16 @@ class TestSession {
         .then(() => trx('model3').delete())
         .then(() => this.models.Model1.query(trx).insertGraph(data))
         .then(() => {
-          return Promise.resolve(['Model1', 'model2', 'model3', 'Model1Model2']).map(table => {
+          return Promise.resolve(['Model1', 'model2', 'model3', 'Model1Model2']).map((table) => {
             const idCol = (
-              _.find(this.models, it => it.getTableName() === table) || { getIdColumn: () => 'id' }
+              _.find(this.models, (it) => it.getTableName() === table) || {
+                getIdColumn: () => 'id',
+              }
             ).getIdColumn();
 
             return trx(table)
               .max(idCol)
-              .then(res => {
+              .then((res) => {
                 const maxId = parseInt(res[0][_.keys(res[0])[0]], 10) || 0;
 
                 // Reset sequence.
@@ -414,7 +417,7 @@ function createHook(name, delay, extraAction) {
     (extraAction || _.noop)(model, args);
   };
 
-  return function() {
+  return function () {
     const args = arguments;
 
     if (TestSession.hookCounter++ % 2 === 0) {
@@ -434,12 +437,12 @@ function inc(obj, key) {
 }
 
 function registerUnhandledRejectionHandler() {
-  Promise.onPossiblyUnhandledRejection(error => {
+  Promise.onPossiblyUnhandledRejection((error) => {
     if (_.isEmpty(TestSession.unhandledRejectionHandlers)) {
       console.error(error.stack);
     }
 
-    TestSession.unhandledRejectionHandlers.forEach(handler => {
+    TestSession.unhandledRejectionHandlers.forEach((handler) => {
       handler(error);
     });
   });
