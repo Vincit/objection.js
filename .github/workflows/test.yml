@@ -35,4 +35,4 @@ jobs:
         run: npm test
 
       - name: Run typing tests
-        run: npm run test-typings
+        run: npm run test:typings
