@@ -73,7 +73,7 @@ describe('integration tests', () => {
       require('./delete')(session);
       require('./relate')(session);
       require('./unrelate')(session);
-      require('./eager')(session);
+      require('./withGraph')(session);
       require('./transactions')(session);
       require('./queryContext')(session);
       require('./compositeKeys')(session);

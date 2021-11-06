@@ -2,14 +2,14 @@ const _ = require('lodash');
 const chai = require('chai');
 const expect = require('expect.js');
 const Promise = require('bluebird');
-const { ValidationError, raw } = require('../../');
+const { ValidationError, raw } = require('../..');
 const mockKnexFactory = require('../../testUtils/mockKnex');
 
 module.exports = (session) => {
   const Model1 = session.models.Model1;
   const Model2 = session.models.Model2;
 
-  describe('Model eager queries', () => {
+  describe('Model withGraph queries', () => {
     beforeEach(() => {
       return session.populate([
         {
@@ -883,31 +883,6 @@ module.exports = (session) => {
       }
     );
 
-    it('joinEager shorthand', () => {
-      return Model1.query()
-        .findById(1)
-        .withGraphJoined('model1Relation1')
-        .modify((builder) => {
-          expect(builder.findOperation('eager').constructor.name).to.equal('JoinEagerOperation');
-        })
-        .then((model) => {
-          expect(model).to.eql({
-            id: 1,
-            model1Id: 2,
-            model1Prop1: 'hello 1',
-            model1Prop2: null,
-            $afterFindCalled: 1,
-            model1Relation1: {
-              id: 2,
-              model1Id: 3,
-              model1Prop1: 'hello 2',
-              model1Prop2: null,
-              $afterFindCalled: 1,
-            },
-          });
-        });
-    });
-
     it('should fail fast on incorrect table name', function (done) {
       Model1.query()
         .findById(1)
@@ -1572,7 +1547,7 @@ module.exports = (session) => {
       });
     });
 
-    describe('withGraphJoined', () => {
+    describe('QueryBuilder.withGraphJoined', () => {
       it('select should work', () => {
         return Model1.query()
           .select('Model1.id', 'Model1.model1Prop1')
@@ -2195,7 +2170,7 @@ module.exports = (session) => {
         );
       });
 
-      it('should implicitly add selects for join columns if they are omitted in modifyGraph/modifyEager', () => {
+      it('should implicitly add selects for join columns if they are omitted in modifyGraph', () => {
         return Promise.all(
           ['withGraphFetched', 'withGraphJoined'].map((method) => {
             return Model1.query()
@@ -2466,7 +2441,7 @@ module.exports = (session) => {
         });
     });
 
-    it('should merge eager expressions and filters', () => {
+    it('should merge eager expressions and modifiers', () => {
       return Model1.query()
         .where('id', 1)
         .withGraphFetched('model1Relation2')
@@ -3221,7 +3196,7 @@ module.exports = (session) => {
     }
 
     if (!opt.disableJoin) {
-      testFn(testName + ' (withGraphJoined)', () => {
+      testFn(testName + ' (QueryBuilder.withGraphJoined)', () => {
         return opt.Model.query()
           .where(idCol, opt.id)
           .withGraphJoined(expr, opt.eagerOptions)
