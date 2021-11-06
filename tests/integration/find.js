@@ -2400,16 +2400,21 @@ module.exports = (session) => {
           });
         });
 
-        it('should return undefined if the model has no parents', async () => {
+        it('should return undefined if the result is empty', async () => {
           const parent = await Model1.query().findById(2);
 
           const result1 = await parent.$relatedQuery('model1Relation1');
           expect(result1).to.be.equal(undefined);
 
-          const result2 = await Model1.relatedQuery('model1Relation1').for(
-            Model1.relatedQuery('model1Relation1').for(parent)
+          const result2 = await Model1.query().from(
+            Model1.relatedQuery('model1Relation1').for(parent).as('model1')
           );
           expect(result2).to.eql([]);
+
+          const result3 = await Model1.query().from(
+            Model1.relatedQuery('model1Relation1').for(parent.id).as('model1')
+          );
+          expect(result3).to.eql([]);
         });
 
         describe('knex methods', () => {
