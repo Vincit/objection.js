@@ -435,6 +435,32 @@ describe('ManyToManyRelation', () => {
     });
   });
 
+  it('should accept a modifier in join.through', () => {
+    // modifier defined in join.through.modify
+    let modifier = (builder) => builder.where('someColumn', 'foo');
+    createJoinThroughModifiedRelation(modifier);
+
+    expect(relation.joinTableModify).to.be.a(Function);
+
+    // test also join.through.filter
+    let relationFilter = new ManyToManyRelation('testRelation', OwnerModel);
+    relationFilter.setMapping({
+      relation: ManyToManyRelation,
+      modelClass: RelatedModel,
+      join: {
+        from: 'OwnerModel.id',
+        through: {
+          from: 'JoinModel.ownerId',
+          to: 'JoinModel.relatedId',
+          filter: modifier,
+        },
+        to: 'RelatedModel.ownerId',
+      },
+    });
+
+    expect(relationFilter.joinTableModify).to.be.a(Function);
+  });
+
   describe('find', () => {
     it('should generate a find query', () => {
       let owner = OwnerModel.fromJson({ oid: 666 });
@@ -728,6 +754,30 @@ describe('ManyToManyRelation', () => {
             'and "filteredProperty" = true',
             'and "name" = \'Teppo\'',
             'or "age" > 60',
+          ].join(' ')
+        );
+      });
+    });
+
+    it('should support modifiers in join.through', () => {
+      createJoinThroughModifiedRelation((builder) => builder.where('someColumn', 'foo'));
+
+      let owner = OwnerModel.fromJson({ oid: 666 });
+
+      let builder = QueryBuilder.forClass(RelatedModel).findOperationFactory(function () {
+        return relation.find(this, RelationOwner.create(owner));
+      });
+
+      return builder.then(() => {
+        expect(executedQueries).to.have.length(1);
+        expect(executedQueries[0]).to.equal(builder.toKnexQuery().toString());
+        expect(executedQueries[0]).to.equal(
+          [
+            'select "RelatedModel".*, "JoinModel"."ownerId" as "objectiontmpjoin0"',
+            'from "RelatedModel"',
+            'inner join (select "JoinModel".* from "JoinModel" where "someColumn" = \'foo\') as "JoinModel"',
+            'on "RelatedModel"."rid" = "JoinModel"."relatedId"',
+            'where "JoinModel"."ownerId" in (666)',
           ].join(' ')
         );
       });
@@ -1556,6 +1606,23 @@ describe('ManyToManyRelation', () => {
         through: {
           from: 'JoinModel.ownerId',
           to: 'JoinModel.relatedId',
+        },
+        to: 'RelatedModel.rid',
+      },
+    });
+  }
+
+  function createJoinThroughModifiedRelation(modify) {
+    relation = new ManyToManyRelation('nameOfOurRelation', OwnerModel);
+    relation.setMapping({
+      modelClass: RelatedModel,
+      relation: ManyToManyRelation,
+      join: {
+        from: 'OwnerModel.oid',
+        through: {
+          from: 'JoinModel.ownerId',
+          to: 'JoinModel.relatedId',
+          modify: modify,
         },
         to: 'RelatedModel.rid',
       },
