@@ -1,3 +1,120 @@
+# Migration from objection 2.x to 3.0
+
+This document guides you through each breaking change in objection 3.0 and attempts to provide clear steps to follow. If you find something missing, please open an issue and we'll fix this guide ASAP.
+
+Here's a list of the breaking changes
+
+- [Dropped support for node < 12](#dropped-support-for-node-12)
+- [Dropped support for knex < 0.95](#dropped-support-for-knex-0-95)
+- [typescript: Methods like `findById` and `findOne` that return a single item are now typed correctly](#typescript-methods-like-findbyid-and-findone-that-return-a-single-item-are-now-typed-correctly)
+- [typescript: `QueryBuilder` now inherits `PromiseLike` instead of `Promise`](#typescript-querybuilder-now-inherits-promiselike-instead-of-promise)
+- [Dropped a bunch of deprecated methods and features](#dropped-a-bunch-of-deprecated-methods-and-features)
+
+## Dropped support for node < 12
+
+Objection 3.0 needs at least node 12 to work.
+
+## Dropped support for knex < 0.95
+
+Objection needs at least knex 0.95.0 to work.
+
+This is because knex introduced some breaking changes in 0.95.0.
+
+## typescript: Methods like `findById` and `findOne` that return a single item are now typed correctly
+
+In 2.0 methods like `findById`, `findOne` and `first` that return one item or undefined were incorrectly typed
+to always return a value. Now the return type of those methods is `SomeModel | undefined`.
+
+You'll get compilation errors in places where you've trusted the old typings. All you need to do is to add a
+check for undefined values to narrow down the type or chain the `throwIfNotFound` method that also narrows
+down the type back to `SomeModel`.
+
+Before:
+
+```ts
+const person = await Person.query().findById(id)
+console.log(person.id)
+```
+
+After:
+
+```ts
+const person = await Person.query().findById(id)
+
+if (!person) {
+  throw new Error('Person not found')
+}
+
+console.log(person.id)
+```
+
+Or
+
+```ts
+const person = await Person.query().findById(id).throwIfNotFound()
+console.log(person.id)
+```
+
+## typescript: `QueryBuilder` now inherits `PromiseLike` instead of `Promise`
+
+In 2.0 and before, the `QueryBuilder` class inherited `Promise` in the typings which made code like this possible
+
+```ts
+function findPerson(id: number): Promise<Person> {
+  return Person.query().findById(id);
+}
+```
+
+However, `QueryBuilder` doesn't actually inherit `Promise` but instead is "thenable". Typescript has the type
+`PromiseLike` for thenable objects which objection now correctly uses. There are couple of ways to fix the
+compilation errors this change causes:
+
+1. Chain `execute` to the query:
+
+```ts
+function findPerson(id: number): Promise<Person> {
+  return Person.query().findById(id).execute();
+}
+```
+
+2. Use `PromiseLike`:
+
+```ts
+function findPerson(id: number): PromiseLike<Person> {
+  return Person.query().findById(id);
+}
+```
+
+3. Make the functions `async`:
+
+```ts
+async function findPerson(id: number): Promise<Person> {
+  return Person.query().findById(id);
+}
+```
+
+## Dropped a bunch of deprecated methods and features
+
+All the methods that were marked deprecated (and printed a deprection message during runtime) in 2.0 have
+now been removed.
+
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
 # Migration from objection 1.x to 2.0
 
 Objection 2.0 brought a lot of great new features, but the main focus was in cleaning the API, which lead to a bunch of breaking changes. This document guides you through each change and attempts to provide clear steps to follow. If you find something missing, please open an issue and we'll fix this guide ASAP.
@@ -108,12 +225,12 @@ This change was made for security reasons. An attacker could, in theory, use a `
 const graphUpsertSentByTheAttacker = {
   user: {
     id: 13431,
-    '#id': 'user'
+    '#id': 'user',
   },
 
   movie: {
-    name: '#ref{user.passwordHash}'
-  }
+    name: '#ref{user.passwordHash}',
+  },
 };
 ```
 

@@ -53,8 +53,12 @@ module.exports = {
             link: '/release-notes/changelog.md',
           },
           {
-            text: 'Migration to 2.0',
+            text: 'Migration to 3.0',
             link: '/release-notes/migration.md',
+          },
+          {
+            text: 'v2.x documentation',
+            link: 'https://github.com/Vincit/objection.js/tree/v2/doc',
           },
           {
             text: 'v1.x documentation',

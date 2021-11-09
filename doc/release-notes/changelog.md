@@ -1,5 +1,25 @@
 # Changelog
 
+## 3.0.0
+
+### What's new
+
+- Fixes [#1986](https://github.com/Vincit/objection.js/issues/1986)
+- Fixes [#1987](https://github.com/Vincit/objection.js/issues/1987)
+- Fixes [#1954](https://github.com/Vincit/objection.js/issues/1954)
+- Fixes [#1993](https://github.com/Vincit/objection.js/issues/1993)
+- Fixes [#1688](https://github.com/Vincit/objection.js/issues/1688)
+- Fixes [#1651](https://github.com/Vincit/objection.js/issues/1651)
+- Fixes [#2135](https://github.com/Vincit/objection.js/issues/2135)
+- Fixes [#1936](https://github.com/Vincit/objection.js/issues/1936)
+- Fixes [#1905](https://github.com/Vincit/objection.js/issues/1905)
+- Fixes [#1997](https://github.com/Vincit/objection.js/issues/1997)
+- Fixes [#2024](https://github.com/Vincit/objection.js/issues/2024)
+
+### Breaking changes
+
+See the [migration guide](/release-notes/migration.md).
+
 ## 2.2.10
 
 ### What's new

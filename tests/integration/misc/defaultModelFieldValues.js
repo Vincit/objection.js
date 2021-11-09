@@ -225,6 +225,19 @@ module.exports = (session) => {
       });
     });
 
+    it('patch', async () => {
+      let toy = await Toy.query(knex).insert({ toyName: 'Bone' });
+      await Toy.query(knex).patch({ price: 100 }).findById(toy.id);
+      await toy.$query(knex).patch({ toyName: 'Wheel' });
+
+      toy = await Toy.query(knex).findById(toy.id);
+      expect(toy.price).to.equal(100);
+      expect(toy.toyName).to.equal('Wheel');
+
+      toy = await Toy.query(knex).insert({ toyName: 'Wheel' });
+      await toy.$query(knex).update();
+    });
+
     it('relatedQuery: find', async () => {
       const {
         id: personId,
@@ -248,6 +261,53 @@ module.exports = (session) => {
       const toys = await Pet.relatedQuery('toys', knex).for(doggo);
       expect(toys).to.have.length(1);
       expect(toys).to.containSubset([{ toyName: 'Bone' }]);
+    });
+
+    it('relatedQuery: insert', async () => {
+      // BelongsToOneRelation
+      const doggo = await Pet.query(knex).insert({ name: 'Doggo' });
+      const { id: arnoldId } = await Pet.relatedQuery('owner', knex)
+        .for(doggo)
+        .insert({ firstName: 'Arnold' });
+      let arnold = await Person.query(knex).withGraphFetched('pets').findById(arnoldId);
+      expect(arnold).to.containSubset({
+        firstName: 'Arnold',
+        pets: [{ name: 'Doggo' }],
+      });
+
+      // HasManyRelation
+      const catto = await Person.relatedQuery('pets', knex)
+        .for(arnold.id)
+        .insert({ name: 'Catto' });
+      arnold = await Person.query(knex).withGraphFetched('pets').findById(arnoldId);
+      expect(arnold).to.containSubset({
+        firstName: 'Arnold',
+        pets: [{ name: 'Doggo' }, { name: 'Catto' }],
+      });
+
+      // ManyToManyRelation
+      const toy = await Pet.relatedQuery('toys', knex).for(catto).insert({ toyName: 'Bone' });
+      expect(toy).to.containSubset({ toyName: 'Bone' });
+
+      const result = await Person.query(knex)
+        .findById(arnoldId)
+        .withGraphJoined({
+          pets: {
+            toys: true,
+          },
+        });
+
+      expect(result).to.containSubset({
+        firstName: 'Arnold',
+        pets: [
+          { name: 'Catto', owner: undefined, toys: [{ toyName: 'Bone' }] },
+          {
+            name: 'Doggo',
+            owner: undefined,
+            toys: [],
+          },
+        ],
+      });
     });
   });
 };
