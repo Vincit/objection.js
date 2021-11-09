@@ -1699,8 +1699,7 @@ module.exports = (session) => {
           const result = await Model2.query()
             .insert({ idCol: 1, model2Prop1: 'updated', model2Prop2: 123456 })
             .onConflict('id_col')
-            .merge(['model2_prop1'])
-            .debug();
+            .merge(['model2_prop1']);
           expect(result instanceof Model2).to.equal(true);
 
           const rows = await Model2.query();
