@@ -110,7 +110,7 @@ module.exports = (session) => {
         .createTable('pet', (table) => {
           table.increments('id').primary();
           table.string('name');
-          table.integer('ownerId').references('person.id').onDelete('cascade');
+          table.integer('ownerId').unsigned().references('person.id').onDelete('cascade');
         })
         .createTable('toy', (table) => {
           table.increments('id').primary();
@@ -118,8 +118,8 @@ module.exports = (session) => {
           table.float('price');
         })
         .createTable('petToy', (table) => {
-          table.integer('petId').references('pet.id').notNullable().onDelete('cascade');
-          table.integer('toyId').references('toy.id').notNullable().onDelete('cascade');
+          table.integer('petId').unsigned().references('pet.id').notNullable().onDelete('cascade');
+          table.integer('toyId').unsigned().references('toy.id').notNullable().onDelete('cascade');
         });
     });
 
@@ -146,6 +146,25 @@ module.exports = (session) => {
           {
             name: 'Doggo',
             owner: undefined,
+            toys: [{ toyName: 'Bone' }],
+          },
+        ],
+      });
+
+      const resultFromDb = await Person.query(knex)
+        .findById(result.id)
+        .withGraphFetched({
+          pets: {
+            toys: true,
+          },
+        });
+
+      expect(resultFromDb).to.containSubset({
+        firstName: 'Arnold',
+        pets: [
+          { name: 'Catto', owner: undefined, toys: [] },
+          {
+            name: 'Doggo',
             toys: [{ toyName: 'Bone' }],
           },
         ],
