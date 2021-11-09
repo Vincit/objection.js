@@ -3,7 +3,7 @@ const chai = require('chai');
 const utils = require('../../lib/utils/knexUtils');
 const expect = require('expect.js');
 const Promise = require('bluebird');
-const { transaction, ValidationError } = require('../../');
+const { transaction, ValidationError, Model } = require('../../');
 
 module.exports = (session) => {
   let Model1 = session.models.Model1;
@@ -543,6 +543,40 @@ module.exports = (session) => {
               ],
             });
           });
+      });
+
+      it('should work with a model class that has undefined values as defaults for each column and relation', async () => {
+        class TestModel extends Model {
+          id;
+          model1Id;
+          model1Prop1;
+          model1Prop2;
+          model1Relation1;
+
+          static tableName = 'Model1';
+          static relationMappings = {
+            model1Relation1: {
+              relation: TestModel.BelongsToOneRelation,
+              modelClass: TestModel,
+              join: {
+                from: 'Model1.model1Id',
+                to: 'Model1.id',
+              },
+            },
+          };
+        }
+
+        const result = await TestModel.query(session.knex).insertGraph({
+          model1Prop1: 'foo',
+          model1Relation1: {
+            model1Prop2: 100,
+          },
+        });
+
+        expect(result.id).to.be.a('number');
+        expect(result.model1Prop1).to.equal('foo');
+        expect(result.model1Relation1).to.be.a(TestModel);
+        expect(result.model1Relation1.model1Prop2).to.equal(100);
       });
 
       if (utils.isPostgres(session.knex)) {

@@ -1,0 +1,234 @@
+const { expect } = require('chai');
+const { Model } = require('../../../');
+
+module.exports = (session) => {
+  const { knex } = session;
+
+  // Typescript adds undefined default values for all declared class fields
+  // when the there's `target: 'esnext'` in tsconfig.json. This test set
+  // makes sure objection plays nice with those undefineds.
+  describe('default undefined model field values', () => {
+    class Person extends Model {
+      firstName;
+      pets;
+
+      static jsonSchema = {
+        type: 'object',
+        properties: {
+          firstName: {
+            type: 'string',
+          },
+        },
+      };
+
+      static tableName = 'person';
+      static relationMappings = () => ({
+        pets: {
+          modelClass: Pet,
+          relation: Model.HasManyRelation,
+          join: {
+            from: 'person.id',
+            to: 'pet.ownerId',
+          },
+        },
+      });
+    }
+
+    class Pet extends Model {
+      name;
+      ownerId;
+      owner;
+      toys;
+
+      static jsonSchema = {
+        type: 'object',
+        properties: {
+          name: {
+            type: 'string',
+          },
+          ownerId: {
+            type: 'integer',
+          },
+        },
+      };
+
+      static tableName = 'pet';
+      static relationMappings = () => ({
+        owner: {
+          modelClass: Person,
+          relation: Model.BelongsToOneRelation,
+          join: {
+            from: 'pet.ownerId',
+            to: 'person.id',
+          },
+        },
+
+        toys: {
+          modelClass: Toy,
+          relation: Model.ManyToManyRelation,
+          join: {
+            from: 'pet.id',
+            through: {
+              from: 'petToy.petId',
+              to: 'petToy.toyId',
+            },
+            to: 'toy.id',
+          },
+        },
+      });
+    }
+
+    class Toy extends Model {
+      toyName;
+      price;
+
+      static jsonSchema = {
+        type: 'object',
+        properties: {
+          toyName: {
+            type: 'string',
+          },
+          price: {
+            type: 'number',
+          },
+        },
+      };
+
+      static tableName = 'toy';
+    }
+
+    before(() => {
+      return knex.schema
+        .dropTableIfExists('petToy')
+        .dropTableIfExists('pet')
+        .dropTableIfExists('toy')
+        .dropTableIfExists('person')
+        .createTable('person', (table) => {
+          table.increments('id').primary();
+          table.string('firstName');
+        })
+        .createTable('pet', (table) => {
+          table.increments('id').primary();
+          table.string('name');
+          table.integer('ownerId').references('person.id').onDelete('cascade');
+        })
+        .createTable('toy', (table) => {
+          table.increments('id').primary();
+          table.string('toyName');
+          table.float('price');
+        })
+        .createTable('petToy', (table) => {
+          table.integer('petId').references('pet.id').notNullable().onDelete('cascade');
+          table.integer('toyId').references('toy.id').notNullable().onDelete('cascade');
+        });
+    });
+
+    after(() => {
+      return knex.schema
+        .dropTableIfExists('petToy')
+        .dropTableIfExists('pet')
+        .dropTableIfExists('toy')
+        .dropTableIfExists('person');
+    });
+
+    it('insertGraph', async () => {
+      const result = await Person.query(knex)
+        .allowGraph('pets.toys')
+        .insertGraph({
+          firstName: 'Arnold',
+          pets: [{ name: 'Catto' }, { name: 'Doggo', toys: [{ toyName: 'Bone' }] }],
+        });
+
+      expect(result).to.containSubset({
+        firstName: 'Arnold',
+        pets: [
+          { name: 'Catto', owner: undefined, toys: undefined },
+          {
+            name: 'Doggo',
+            owner: undefined,
+            toys: [{ toyName: 'Bone' }],
+          },
+        ],
+      });
+    });
+
+    it('withGraphFetched', async () => {
+      const { id } = await Person.query(knex).insertGraph({
+        firstName: 'Arnold',
+        pets: [{ name: 'Catto' }, { name: 'Doggo', toys: [{ toyName: 'Bone' }] }],
+      });
+
+      const result = await Person.query(knex)
+        .findById(id)
+        .withGraphFetched({
+          pets: {
+            toys: true,
+          },
+        });
+
+      expect(result).to.containSubset({
+        firstName: 'Arnold',
+        pets: [
+          { name: 'Catto', owner: undefined, toys: [] },
+          {
+            name: 'Doggo',
+            owner: undefined,
+            toys: [{ toyName: 'Bone' }],
+          },
+        ],
+      });
+    });
+
+    it('withGraphJoined', async () => {
+      const { id } = await Person.query(knex).insertGraph({
+        firstName: 'Arnold',
+        pets: [{ name: 'Catto' }, { name: 'Doggo', toys: [{ toyName: 'Bone' }] }],
+      });
+
+      const result = await Person.query(knex)
+        .findById(id)
+        .withGraphJoined({
+          pets: {
+            toys: true,
+          },
+        });
+
+      expect(result).to.containSubset({
+        firstName: 'Arnold',
+        pets: [
+          { name: 'Catto', owner: undefined, toys: [] },
+          {
+            name: 'Doggo',
+            owner: undefined,
+            toys: [{ toyName: 'Bone' }],
+          },
+        ],
+      });
+    });
+
+    it('relatedQuery: find', async () => {
+      const {
+        id: personId,
+        pets: [{ id: cattoId }, { id: doggoId }],
+      } = await Person.query(knex).insertGraph({
+        firstName: 'Arnold',
+        pets: [{ name: 'Catto' }, { name: 'Doggo', toys: [{ toyName: 'Bone' }] }],
+      });
+
+      // HasManyRelation
+      const catto = await Person.relatedQuery('pets', knex).for(personId).findById(cattoId);
+      expect(catto).to.containSubset({ name: 'Catto' });
+      const doggo = await Person.relatedQuery('pets', knex).for(personId).findById(doggoId);
+      expect(doggo).to.containSubset({ name: 'Doggo' });
+
+      // BelongsToOneRelation
+      const person = await doggo.$relatedQuery('owner', knex);
+      expect(person).to.containSubset({ firstName: 'Arnold' });
+
+      // ManyToManyRelation
+      const toys = await Pet.relatedQuery('toys', knex).for(doggo);
+      expect(toys).to.have.length(1);
+      expect(toys).to.containSubset([{ toyName: 'Bone' }]);
+    });
+  });
+};
