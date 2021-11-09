@@ -596,7 +596,7 @@ Model.extend(Person);
 
 Person.tableName = 'Person';
 
-Person.prototype.fullName = function() {
+Person.prototype.fullName = function () {
   return this.firstName + ' ' + this.lastName;
 };
 
@@ -610,7 +610,7 @@ class Person extends Model {}
 
 Person.tableName = 'Person';
 
-Person.prototype.fullName = function() {
+Person.prototype.fullName = function () {
   return this.firstName + ' ' + this.lastName;
 };
 
