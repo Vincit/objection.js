@@ -703,6 +703,17 @@ See [knex documentation](http://knexjs.org/#Builder-unionAll)
 | ----------------------------------- | ---------------------------------- |
 | [QueryBuilder](/api/query-builder/) | `this` query builder for chaining. |
 
+## intersect()
+
+See [knex documentation](http://knexjs.org/#Builder-unionAll)
+
+##### Return value
+
+| Type                                | Description                        |
+| ----------------------------------- | ---------------------------------- |
+| [QueryBuilder](/api/query-builder/) | `this` query builder for chaining. |
+
+
 ## having()
 
 See [knex documentation](http://knexjs.org/#Builder-having)
