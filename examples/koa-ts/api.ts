@@ -73,7 +73,7 @@ export default (router: KoaRouter) => {
     }
 
     if (ctx.query.orderBy) {
-      query.orderBy(ctx.query.orderBy)
+      query.orderBy(takeFirst(ctx.query.orderBy))
     }
 
     if (ctx.query.withPetCount) {
@@ -238,4 +238,8 @@ export default (router: KoaRouter) => {
     const actors = await Movie.relatedQuery('actors').for(ctx.params.id)
     ctx.body = actors
   })
+}
+
+function takeFirst<T>(item: T | ReadonlyArray<T>): T {
+  return Array.isArray(item) ? item[0] : item
 }

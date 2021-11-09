@@ -1,6 +1,6 @@
 {
   "name": "objection-example-koa",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "Objection.js koa example",
   "main": "app.js",
   "scripts": {
@@ -14,11 +14,11 @@
   "license": "MIT",
   "dependencies": {
     "axios": "^0.19.0",
-    "knex": "^0.20.3",
+    "knex": "^0.95.13",
     "koa": "^2.11.0",
     "koa-bodyparser": "^4.2.1",
     "koa-router": "^7.4.0",
-    "objection": "^2.1.0",
-    "sqlite3": "^4.1.0"
+    "objection": "3.0.0-rc.4",
+    "sqlite3": "^5.0.2"
   }
 }

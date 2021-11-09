@@ -4,7 +4,7 @@ node_modules
 scratchpad.js
 testCoverage
 examples/*/*.db
-examples/express-es7/build
+examples/*/dist
 examples/**/package-lock.json
 *.iml
 *.DS_Store

@@ -37,7 +37,7 @@ app.listen(port, () => {
 async function errorHandler(ctx: Context, next: () => Promise<any>) {
   try {
     await next()
-  } catch (err) {
+  } catch (err: any) {
     if (err instanceof ValidationError) {
       ctx.status = 400
       ctx.body = {

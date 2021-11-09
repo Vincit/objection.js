@@ -40,7 +40,11 @@ const req = axios.create({
   await addPersonToMovieAsActor(departed, matt)
   await removePersonFromMovie(departed, matt)
 })().catch((err) => {
-  console.error('error:', err.response.status, err.response.data)
+  if (err.response) {
+    console.error('error:', err.response.status, err.response.data)
+  } else {
+    console.error('error:', err)
+  }
 })
 
 async function inserPersonWithRelations() {
