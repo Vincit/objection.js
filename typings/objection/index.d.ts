@@ -687,15 +687,15 @@ declare namespace Objection {
   interface InsertGraphMethod<M extends Model> {
     <QB extends AnyQueryBuilder>(
       this: QB,
-      graph: PartialModelGraph<M>,
-      options?: InsertGraphOptions
-    ): SingleQueryBuilder<QB>;
-
-    <QB extends AnyQueryBuilder>(
-      this: QB,
       graph: PartialModelGraph<M>[],
       options?: InsertGraphOptions
     ): ArrayQueryBuilder<QB>;
+
+    <QB extends AnyQueryBuilder>(
+      this: QB,
+      graph: PartialModelGraph<M>,
+      options?: InsertGraphOptions
+    ): SingleQueryBuilder<QB>;
   }
 
   export interface UpsertGraphOptions {
