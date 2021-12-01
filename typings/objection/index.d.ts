@@ -324,8 +324,7 @@ declare namespace Objection {
    * and if this was converted to an array (via returning('*')), the JS would return a single
    * item instead of an array.
    */
-  type OneQueryBuilder<T extends { OneQueryBuilderType: any }> =
-    T['OneQueryBuilderType'];
+  type OneQueryBuilder<T extends { OneQueryBuilderType: any }> = T['OneQueryBuilderType'];
 
   /**
    * Gets the page query builder type for a query builder.
@@ -946,9 +945,7 @@ declare namespace Objection {
 
     update(
       update: PartialModelObject<M>
-    ): this extends SingleQueryBuilder<this>
-      ? OneQueryBuilder<this>
-      : NumberQueryBuilder<this>;
+    ): this extends SingleQueryBuilder<this> ? OneQueryBuilder<this> : NumberQueryBuilder<this>;
     update(): this extends SingleQueryBuilder<this>
       ? OneQueryBuilder<this>
       : NumberQueryBuilder<this>;
@@ -960,9 +957,7 @@ declare namespace Objection {
 
     patch(
       update: PartialModelObject<M>
-    ): this extends SingleQueryBuilder<this>
-      ? OneQueryBuilder<this>
-      : NumberQueryBuilder<this>;
+    ): this extends SingleQueryBuilder<this> ? OneQueryBuilder<this> : NumberQueryBuilder<this>;
     patch(): this extends SingleQueryBuilder<this>
       ? OneQueryBuilder<this>
       : NumberQueryBuilder<this>;
