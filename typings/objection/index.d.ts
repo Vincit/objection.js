@@ -320,6 +320,14 @@ declare namespace Objection {
   type NumberQueryBuilder<T extends { NumberQueryBuilderType: any }> = T['NumberQueryBuilderType'];
 
   /**
+   * This is basically the number query builder but we know the number would always be one
+   * and if this was converted to an array (via returning('*')), the JS would return a single
+   * item instead of an array.
+   */
+  type OneQueryBuilder<T extends { OneQueryBuilderType: any }> =
+    T['OneQueryBuilderType'];
+
+  /**
    * Gets the page query builder type for a query builder.
    */
   type PageQueryBuilder<T extends { PageQueryBuilderType: any }> = T['PageQueryBuilderType'];
@@ -625,6 +633,8 @@ declare namespace Objection {
       column: string | string[]
     ): QB extends ArrayQueryBuilder<QB>
       ? ArrayQueryBuilder<QB>
+      : QB extends OneQueryBuilder<QB>
+      ? SingleQueryBuilder<QB>
       : QB extends NumberQueryBuilder<QB>
       ? ArrayQueryBuilder<QB>
       : SingleQueryBuilder<QB>;
@@ -934,16 +944,28 @@ declare namespace Objection {
     castTo<MC extends Model>(modelClass: ModelConstructor<MC>): QueryBuilderType<MC>;
     castTo<R>(): QueryBuilder<M, R>;
 
-    update(update: PartialModelObject<M>): NumberQueryBuilder<this>;
-    update(): NumberQueryBuilder<this>;
+    update(
+      update: PartialModelObject<M>
+    ): this extends SingleQueryBuilder<this>
+      ? OneQueryBuilder<this>
+      : NumberQueryBuilder<this>;
+    update(): this extends SingleQueryBuilder<this>
+      ? OneQueryBuilder<this>
+      : NumberQueryBuilder<this>;
     updateAndFetch(update: PartialModelObject<M>): SingleQueryBuilder<this>;
     updateAndFetchById(
       id: MaybeCompositeId,
       update: PartialModelObject<M>
     ): SingleQueryBuilder<this>;
 
-    patch(update: PartialModelObject<M>): NumberQueryBuilder<this>;
-    patch(): NumberQueryBuilder<this>;
+    patch(
+      update: PartialModelObject<M>
+    ): this extends SingleQueryBuilder<this>
+      ? OneQueryBuilder<this>
+      : NumberQueryBuilder<this>;
+    patch(): this extends SingleQueryBuilder<this>
+      ? OneQueryBuilder<this>
+      : NumberQueryBuilder<this>;
     patchAndFetch(update: PartialModelObject<M>): SingleQueryBuilder<this>;
     patchAndFetchById(
       id: MaybeCompositeId,
@@ -1064,6 +1086,7 @@ declare namespace Objection {
     SingleQueryBuilderType: QueryBuilder<M, M>;
     MaybeSingleQueryBuilderType: QueryBuilder<M, M | undefined>;
     NumberQueryBuilderType: QueryBuilder<M, number>;
+    OneQueryBuilderType: QueryBuilder<M, 1>;
     PageQueryBuilderType: QueryBuilder<M, Page<M>>;
 
     then<R1 = R, R2 = never>(
