@@ -145,7 +145,7 @@ class Person extends Model {
   static async beforeDelete({ asFindQuery }) {
     // This query will automatically be executed in the same transaction
     // as the query we are hooking into.
-    await idsOfItemsToBeDeleted = await asFindQuery().select('id');
+    const idsOfItemsToBeDeleted = await asFindQuery().select('id');
     await doSomethingWithIds(idsOfItemsToBeDeleted);
   }
 }
