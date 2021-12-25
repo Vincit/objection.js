@@ -11,9 +11,10 @@ If you have a different database for each tenant, a useful pattern is to add a m
 ```js
 const Knex = require('knex');
 
-app.use((req, res, next) => {
-  const knexCache = new Map();
+const knexCache = new Map();
 
+app.use((req, res, next) => {
+  
   // Function that parses the tenant id from path, header, query parameter etc.
   // and returns an instance of knex. You should cache the knex instances and
   // not create a new one for each query. Knex takes care of connection pooling.
