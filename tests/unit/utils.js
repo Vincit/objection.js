@@ -129,6 +129,7 @@ describe('utils', () => {
       testUnderscoreBeforeNumbers('föö', 'föö');
       testUnderscoreBeforeNumbers('fööBär', 'föö_bär');
       testUnderscoreBeforeNumbers('föö1Bär2', 'föö_1_bär_2');
+      testUnderscoreBeforeNumbers('föö12Bär21', 'föö_12_bär_21');
       testUnderscoreBeforeNumbers('föö09Bär90', 'föö_09_bär_90');
       testUnderscoreBeforeNumbers('fööBÄR', 'föö_bär', 'fööBär');
       testUnderscoreBeforeNumbers('fööBäR', 'föö_bä_r');

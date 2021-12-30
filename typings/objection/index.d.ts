@@ -180,6 +180,11 @@ declare namespace Objection {
   type NonFunctionPropertyNames<T> = { [K in keyof T]: T[K] extends Function ? never : K }[keyof T];
 
   /**
+   * Type that attempts to only select the user-defined model properties.
+   */
+  type DataPropertyNames<T> = Exclude<NonFunctionPropertyNames<T>, 'QueryBuilderType'>;
+
+  /**
    * Removes `undefined` from a type.
    */
   type Defined<T> = Exclude<T, undefined>;
@@ -188,14 +193,14 @@ declare namespace Objection {
    * A Pojo version of model.
    */
   type ModelObject<T extends Model> = {
-    [K in Exclude<NonFunctionPropertyNames<T>, 'QueryBuilderType'>]: T[K];
+    [K in DataPropertyNames<T>]: T[K];
   };
 
   /**
    * Any object that has some of the properties of model class T match this type.
    */
   type PartialModelObject<T extends Model> = {
-    [K in NonFunctionPropertyNames<T>]?: Defined<T[K]> extends Model
+    [K in DataPropertyNames<T>]?: Defined<T[K]> extends Model
       ? T[K]
       : Defined<T[K]> extends Array<infer I>
       ? I extends Model
@@ -217,7 +222,7 @@ declare namespace Objection {
    * Just like PartialModelObject but this is applied recursively to relations.
    */
   type PartialModelGraph<M, T = M & GraphParameters> = {
-    [K in NonFunctionPropertyNames<T>]?: Defined<T[K]> extends Model
+    [K in DataPropertyNames<T>]?: Defined<T[K]> extends Model
       ? PartialModelGraph<Defined<T[K]>>
       : Defined<T[K]> extends Array<infer I>
       ? I extends Model

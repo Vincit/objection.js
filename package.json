@@ -1,6 +1,6 @@
 {
   "name": "objection",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "An SQL-friendly ORM for Node.js",
   "main": "lib/objection.js",
   "license": "MIT",
@@ -73,7 +73,7 @@
     "pg": "^8.7.1",
     "prettier": "2.4.1",
     "sqlite3": "^5.0.2",
-    "typescript": "^4.4.4",
+    "typescript": "^4.5.4",
     "vuepress": "1.8.2"
   }
 }
