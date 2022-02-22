@@ -780,6 +780,7 @@ declare namespace Objection {
   export class QueryBuilder<M extends Model, R = M[]> implements CatchablePromiseLike<R> {
     static forClass: ForClassMethod;
     new(...args: any[]): this;
+    constructor(...args: any[]): this;
 
     select: SelectMethod<this>;
     columns: SelectMethod<this>;
