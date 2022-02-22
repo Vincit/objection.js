@@ -42,14 +42,14 @@ declare namespace Objection {
   const ForeignKeyViolationError: typeof dbErrors.ForeignKeyViolationError;
   const NotNullViolationError: typeof dbErrors.NotNullViolationError;
 
-  export interface RawBuilder extends Aliasable {}
+  export interface RawBuilder extends Aliasable { }
 
-  export interface RawFunction extends RawInterface<RawBuilder> {}
+  export interface RawFunction extends RawInterface<RawBuilder> { }
   export interface RawInterface<R> {
     (sql: string, ...bindings: any[]): R;
   }
 
-  export interface ValueBuilder extends Castable {}
+  export interface ValueBuilder extends Castable { }
   export interface ValueFunction {
     (
       value: PrimitiveValue | PrimitiveValue[] | PrimitiveValueObject | PrimitiveValueObject[]
@@ -63,7 +63,7 @@ declare namespace Objection {
     (expression: string): ReferenceBuilder;
   }
 
-  export interface FunctionBuilder extends Castable {}
+  export interface FunctionBuilder extends Castable { }
   export interface SqlFunctionShortcut {
     (...args: any[]): FunctionBuilder;
   }
@@ -201,12 +201,12 @@ declare namespace Objection {
    */
   type PartialModelObject<T extends Model> = {
     [K in DataPropertyNames<T>]?: Defined<T[K]> extends Model
-      ? T[K]
-      : Defined<T[K]> extends Array<infer I>
-      ? I extends Model
-        ? I[]
-        : Expression<T[K]>
-      : Expression<T[K]>;
+    ? T[K]
+    : Defined<T[K]> extends Array<infer I>
+    ? I extends Model
+    ? I[]
+    : Expression<T[K]>
+    : Expression<T[K]>;
   };
 
   /**
@@ -223,12 +223,12 @@ declare namespace Objection {
    */
   type PartialModelGraph<M, T = M & GraphParameters> = {
     [K in DataPropertyNames<T>]?: Defined<T[K]> extends Model
-      ? PartialModelGraph<Defined<T[K]>>
-      : Defined<T[K]> extends Array<infer I>
-      ? I extends Model
-        ? PartialModelGraph<I>[]
-        : Expression<T[K]>
-      : Expression<T[K]>;
+    ? PartialModelGraph<Defined<T[K]>>
+    : Defined<T[K]> extends Array<infer I>
+    ? I extends Model
+    ? PartialModelGraph<I>[]
+    : Expression<T[K]>
+    : Expression<T[K]>;
   };
 
   /**
@@ -237,14 +237,14 @@ declare namespace Objection {
   type ModelProps<T extends Model> = Exclude<
     {
       [K in keyof T]?: Defined<T[K]> extends Model
-        ? never
-        : Defined<T[K]> extends Array<infer I>
-        ? I extends Model
-          ? never
-          : K
-        : T[K] extends Function
-        ? never
-        : K;
+      ? never
+      : Defined<T[K]> extends Array<infer I>
+      ? I extends Model
+      ? never
+      : K
+      : T[K] extends Function
+      ? never
+      : K;
     }[keyof T],
     undefined | 'QueryBuilderType'
   >;
@@ -255,12 +255,12 @@ declare namespace Objection {
   type ModelRelations<T extends Model> = Defined<
     {
       [K in keyof T]?: Defined<T[K]> extends Model
-        ? K
-        : Defined<T[K]> extends Array<infer I>
-        ? I extends Model
-          ? K
-          : never
-        : never;
+      ? K
+      : Defined<T[K]> extends Array<infer I>
+      ? I extends Model
+      ? K
+      : never
+      : never;
     }[keyof T]
   >;
 
@@ -272,8 +272,8 @@ declare namespace Objection {
     ? SingleQueryBuilder<QueryBuilderType<T>>
     : T extends Array<infer I>
     ? I extends Model
-      ? QueryBuilderType<I>
-      : never
+    ? QueryBuilderType<I>
+    : never
     : never;
 
   /**
@@ -285,8 +285,8 @@ declare namespace Objection {
     ? QueryBuilderType<T>
     : T extends Array<infer I>
     ? I extends Model
-      ? QueryBuilderType<I>
-      : never
+    ? QueryBuilderType<I>
+    : never
     : never;
 
   /**
@@ -387,7 +387,7 @@ declare namespace Objection {
     (obj: object): QB;
   }
 
-  interface WhereRawMethod<QB extends AnyQueryBuilder> extends RawInterface<QB> {}
+  interface WhereRawMethod<QB extends AnyQueryBuilder> extends RawInterface<QB> { }
 
   interface WhereWrappedMethod<QB extends AnyQueryBuilder> {
     (cb: CallbackVoid<QB>): QB;
@@ -537,7 +537,7 @@ declare namespace Objection {
     (raw: Raw): QB;
   }
 
-  interface JoinRawMethod<QB extends AnyQueryBuilder> extends RawInterface<QB> {}
+  interface JoinRawMethod<QB extends AnyQueryBuilder> extends RawInterface<QB> { }
 
   interface IncrementDecrementMethod<QB extends AnyQueryBuilder> {
     (column: string, amount?: number): QB;
@@ -570,7 +570,7 @@ declare namespace Objection {
     (columns: ColumnRefOrOrderByDescriptor[]): QB;
   }
 
-  interface OrderByRawMethod<QB extends AnyQueryBuilder> extends RawInterface<QB> {}
+  interface OrderByRawMethod<QB extends AnyQueryBuilder> extends RawInterface<QB> { }
 
   interface FirstMethod {
     <QB extends AnyQueryBuilder>(this: QB): QB extends ArrayQueryBuilder<QB>
@@ -779,6 +779,7 @@ declare namespace Objection {
 
   export class QueryBuilder<M extends Model, R = M[]> implements CatchablePromiseLike<R> {
     static forClass: ForClassMethod;
+    new(...args: any[]): this;
 
     select: SelectMethod<this>;
     columns: SelectMethod<this>;
@@ -1148,7 +1149,7 @@ declare namespace Objection {
     beforeInsert?: RelationMappingHook<M>;
   }
 
-  export interface RelationType extends Constructor<Relation> {}
+  export interface RelationType extends Constructor<Relation> { }
 
   export interface Relation {
     name: string;
@@ -1308,10 +1309,10 @@ declare namespace Objection {
   }
 
   export interface Constructor<T> {
-    new (): T;
+    new(): T;
   }
 
-  export interface ModelConstructor<M extends Model> extends Constructor<M> {}
+  export interface ModelConstructor<M extends Model> extends Constructor<M> { }
 
   export interface ModelClass<M extends Model> extends ModelConstructor<M> {
     QueryBuilder: typeof QueryBuilder;
@@ -1634,7 +1635,7 @@ declare namespace Objection {
       MC2 extends AnyModelConstructor,
       MC3 extends AnyModelConstructor,
       ReturnValue
-    >(
+      >(
       modelClass1: MC1,
       modelClass2: MC2,
       modelClass3: MC3,
@@ -1652,7 +1653,7 @@ declare namespace Objection {
       MC3 extends AnyModelConstructor,
       MC4 extends AnyModelConstructor,
       ReturnValue
-    >(
+      >(
       modelClass1: MC1,
       modelClass2: MC2,
       modelClass3: MC3,
@@ -1673,7 +1674,7 @@ declare namespace Objection {
       MC4 extends AnyModelConstructor,
       MC5 extends AnyModelConstructor,
       ReturnValue
-    >(
+      >(
       modelClass1: MC1,
       modelClass2: MC2,
       modelClass3: MC3,
@@ -1733,7 +1734,7 @@ declare namespace Objection {
 
   // Workaround for infinite type recursion
   // https://github.com/Microsoft/TypeScript/issues/3496#issuecomment-128553540
-  export interface JSONSchemaArray extends Array<JSONSchemaType> {}
+  export interface JSONSchemaArray extends Array<JSONSchemaType> { }
 
   /**
    * Meta schema
