@@ -460,7 +460,7 @@ declare namespace Objection {
     <QBP extends QB>(col: ModelProps<ModelType<QBP>>, cb: CallbackVoid<QB>): QB;
     <QBP extends QB>(col: ModelProps<ModelType<QBP>>, qb: AnyQueryBuilder): QB;
 
-    (col: ColumnRef | ColumnRef[], expr: Expression<PrimitiveValue>[]): QB;
+    (col: ColumnRef | ColumnRef[], expr: readonly Expression<PrimitiveValue>[]): QB;
     (col: ColumnRef | ColumnRef[], cb: CallbackVoid<QB>): QB;
     (col: ColumnRef | ColumnRef[], qb: AnyQueryBuilder): QB;
   }
@@ -525,17 +525,17 @@ declare namespace Objection {
   }
 
   interface WhereCompositeMethod<QB extends AnyQueryBuilder> {
-    (column: ColumnRef[], op: Operator, expr: Expression<PrimitiveValue>[]): QB;
-    (column: ColumnRef, expr: Expression<PrimitiveValue>): QB;
+    (column: ColumnRef[], op: Operator, expr: readonly Expression<PrimitiveValue>[]): QB;
+    (column: ColumnRef, expr: readonly Expression<PrimitiveValue>): QB;
     (column: ColumnRef, op: Operator, expr: Expression<PrimitiveValue>): QB;
-    (column: ColumnRef[], expr: Expression<PrimitiveValue>[]): QB;
+    (column: ColumnRef[], expr: readonly Expression<PrimitiveValue>[]): QB;
     (column: ColumnRef[], qb: AnyQueryBuilder): QB;
   }
 
   interface WhereInCompositeMethod<QB extends AnyQueryBuilder> {
-    (column: ColumnRef, expr: Expression<PrimitiveValue>[]): QB;
+    (column: ColumnRef, expr: readonly Expression<PrimitiveValue>[]): QB;
     (column: ColumnRef, qb: AnyQueryBuilder): QB;
-    (column: ColumnRef[], expr: Expression<PrimitiveValue>[][]): QB;
+    (column: ColumnRef[], expr: readonly Expression<PrimitiveValue>[][]): QB;
     (column: ColumnRef[], qb: AnyQueryBuilder): QB;
   }
 
