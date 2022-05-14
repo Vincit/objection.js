@@ -192,9 +192,7 @@ declare namespace Objection {
   /**
    * A Pojo version of model.
    */
-  type ModelObject<T extends Model> = {
-    [K in DataPropertyNames<T>]: T[K];
-  };
+  type ModelObject<T extends Model> = Pick<T, DataPropertyNames<T>>;
 
   /**
    * Any object that has some of the properties of model class T match this type.
