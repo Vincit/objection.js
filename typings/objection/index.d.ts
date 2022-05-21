@@ -628,11 +628,9 @@ declare namespace Objection {
     <QB extends AnyQueryBuilder>(
       this: QB,
       column: string | string[]
-    ): QB extends ArrayQueryBuilder<QB>
+    ): QB extends NumberQueryBuilder<QB>
       ? ArrayQueryBuilder<QB>
-      : QB extends NumberQueryBuilder<QB>
-      ? ArrayQueryBuilder<QB>
-      : SingleQueryBuilder<QB>;
+      : QB;
   }
 
   interface TimeoutOptions {
