@@ -197,6 +197,26 @@ declare namespace Objection {
   };
 
   /**
+   * Returns keys that have function as their type.
+   */
+  type KeysWithFunctionType<T> = {
+    [K in keyof T]: T[K] extends Function ? K : never;
+  }[keyof T];
+
+  /**
+   * Like ModelObject, but preserves information about optionality.
+   *
+   * Removes keys that:
+   * - start with '$'
+   * - are 'QueryBuilderType'
+   * - have function type
+   */
+  export type ModelProperties<T extends Model> = Pick<
+    T,
+    Exclude<keyof T, `$${string}` | 'QueryBuilderType' | KeysWithFunctionType<T>>
+  >;
+
+  /**
    * Any object that has some of the properties of model class T match this type.
    */
   type PartialModelObject<T extends Model> = {
