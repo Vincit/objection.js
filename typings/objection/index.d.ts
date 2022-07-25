@@ -1008,7 +1008,7 @@ declare namespace Objection {
     timeout: TimeoutMethod<this>;
     columnInfo: ColumnInfoMethod<this>;
 
-    toKnexQuery<T = ModelObject<M>>(): Knex.QueryBuilder<T, T[]>;
+    toKnexQuery<T extends {} = ModelObject<M>>(): Knex.QueryBuilder<T, T[]>;
     clone(): this;
 
     page(page: number, pageSize: number): PageQueryBuilder<this>;
