@@ -1107,7 +1107,7 @@ declare namespace Objection {
     result?: R;
   }
 
-  export type Transaction = Knex.Transaction;
+  export interface Transaction extends Knex.Transaction {}
   export type TransactionOrKnex = Transaction | Knex;
 
   export interface RelationMappings {
