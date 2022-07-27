@@ -174,7 +174,7 @@ class Person extends Model {
   static async beforeDelete({ asFindQuery, cancelQuery }) {
     // Even though `asFindQuery` returns a `select` query by default, you
     // can turn it into an update, insert, delete or whatever you want.
-    const [numAffectedItems] = await asFindQuery().patch({ deleted: true });
+    const numAffectedItems = await asFindQuery().patch({ deleted: true });
 
     // Cancel the query being executed with `numAffectedItems`
     // as the return value. No need to `await` this one.
