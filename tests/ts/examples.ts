@@ -833,6 +833,7 @@ const modelFromQuery = qb.modelClass();
 const knexQuery = qb.toKnexQuery().toSQL();
 const tableName: string = qb.tableNameFor(Person);
 const tableRef: string = qb.tableRefFor(Person);
+const tableRefModelClass: string = qb.tableRefFor(modelFromQuery);
 
 function noop() {
   // no-op
