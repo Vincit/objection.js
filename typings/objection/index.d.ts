@@ -613,7 +613,7 @@ declare namespace Objection {
   }
 
   interface TableRefForMethod {
-    (modelClass: typeof Model): string;
+    (modelClass: ModelClass<Model> | typeof Model): string;
   }
 
   interface AliasForMethod<QB extends AnyQueryBuilder> {
