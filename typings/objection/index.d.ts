@@ -1095,6 +1095,8 @@ declare namespace Objection {
     returning: ReturningMethod;
     forUpdate: IdentityMethod<this>;
     forShare: IdentityMethod<this>;
+    forNoKeyUpdate: IdentityMethod<this>;
+    forKeyShare: IdentityMethod<this>;
     skipLocked: IdentityMethod<this>;
     noWait: IdentityMethod<this>;
     skipUndefined: IdentityMethod<this>;

@@ -36,6 +36,8 @@ import { Person } from '../fixtures/person';
   await Person.query().transacting(Person.knex()).select('*');
 
   await Person.query().forShare().select('*');
+  await Person.query().forNoKeyUpdate().select('*');
+  await Person.query().forKeyShare().select('*');
 
   await Person.query().select('name').as('person_name');
 

@@ -213,6 +213,26 @@ See [knex documentation](https://knexjs.org/guide/query-builder.html#forshare)
 | ----------------------------------- | ---------------------------------- |
 | [QueryBuilder](/api/query-builder/) | `this` query builder for chaining. |
 
+## forNoKeyUpdate()
+
+See [knex documentation](http://knexjs.org/#Builder-forNoKeyUpdate)
+
+##### Return value
+
+| Type                                | Description                        |
+| ----------------------------------- | ---------------------------------- |
+| [QueryBuilder](/api/query-builder/) | `this` query builder for chaining. |
+
+## forKeyShare()
+
+See [knex documentation](http://knexjs.org/#Builder-forKeyShare)
+
+##### Return value
+
+| Type                                | Description                        |
+| ----------------------------------- | ---------------------------------- |
+| [QueryBuilder](/api/query-builder/) | `this` query builder for chaining. |
+
 ## skipLocked()
 
 See [knex documentation](https://knexjs.org/guide/query-builder.html#skiplocked)
