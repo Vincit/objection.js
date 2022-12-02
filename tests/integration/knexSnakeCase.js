@@ -4,7 +4,7 @@ const { Model, knexSnakeCaseMappers } = require('../../');
 const { expect } = require('chai');
 
 module.exports = (session) => {
-  describe.only('knexSnakeCaseMappers', () => {
+  describe('knexSnakeCaseMappers', () => {
     let knex;
 
     class Person extends Model {
@@ -185,9 +185,9 @@ module.exports = (session) => {
         return knex.schema
           .dropTableIfExists('emptyConstraintName')
           .createTable('emptyConstraintName', (table) => {
-            table.integer('id').primary()
-          })
-      })
+            table.integer('id').primary();
+          });
+      });
     });
 
     describe('queries', () => {
