@@ -178,6 +178,16 @@ module.exports = (session) => {
           expect(hasTable).to.equal(false);
         });
       });
+
+      // test for the error: 2192
+      // TypeError: Cannot read properties of undefined (reading 'lastIndexOf')
+      it('createTable with empty constraintName', () => {
+        return knex.schema
+          .dropTableIfExists('emptyConstraintName')
+          .createTable('emptyConstraintName', (table) => {
+            table.integer('id').primary();
+          });
+      });
     });
 
     describe('queries', () => {
