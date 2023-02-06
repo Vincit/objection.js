@@ -1296,6 +1296,136 @@ module.exports = (session) => {
         });
       });
 
+      it('should respect noDelete flag and special #unrelate and #delete model props', () => {
+        const upsert = {
+          // the root gets updated because it has an id
+          id: 2,
+          model1Prop1: 'updated root 2',
+
+          // unrelate
+          model1Relation1: null,
+
+          // update idCol=1
+          // delete idCol=2 with `#delete: true` special prop
+          // and insert one new
+          model1Relation2: [
+            {
+              idCol: 1,
+              model2Prop1: 'updated hasMany 1',
+
+              // unrelate id=4 with `#unrelate: true` special prop
+              // don't unrelate id=5 because of `noUnrelate`
+              // relate id=6
+              // and insert one new
+              model2Relation1: [
+                {
+                  id: 4,
+                  '#unrelate': true,
+                },
+                {
+                  // This is the new row.
+                  model1Prop1: 'inserted manyToMany',
+                },
+                {
+                  id: 6,
+                },
+              ],
+            },
+            {
+              idCol: 2,
+              '#delete': true,
+            },
+            {
+              // This is the new row.
+              model2Prop1: 'inserted hasMany',
+            },
+          ],
+        };
+
+        return transaction(session.knex, (trx) => {
+          return Model1.query(trx)
+            .upsertGraph(upsert, {
+              fetchStrategy,
+              relate: true,
+              noDelete: true,
+              unrelate: ['model1Relation1'],
+            })
+            .then((result) => {
+              // Fetch the graph from the database.
+              return Model1.query(trx)
+                .findById(2)
+                .withGraphFetched(
+                  '[model1Relation1, model1Relation2(orderById).model2Relation1(orderById)]'
+                );
+            })
+            .then(omitIrrelevantProps)
+            .then((result) => {
+              expect(result).to.eql({
+                id: 2,
+                model1Id: null,
+                model1Prop1: 'updated root 2',
+
+                model1Relation1: null,
+
+                model1Relation2: [
+                  {
+                    idCol: 1,
+                    model1Id: 2,
+                    model2Prop1: 'updated hasMany 1',
+
+                    model2Relation1: [
+                      {
+                        id: 5,
+                        model1Id: null,
+                        model1Prop1: 'manyToMany 2',
+                      },
+                      {
+                        id: 6,
+                        model1Id: null,
+                        model1Prop1: 'manyToMany 3',
+                      },
+                      {
+                        id: 8,
+                        model1Id: null,
+                        model1Prop1: 'inserted manyToMany',
+                      },
+                    ],
+                  },
+                  {
+                    idCol: 3,
+                    model1Id: 2,
+                    model2Prop1: 'inserted hasMany',
+                    model2Relation1: [],
+                  },
+                ],
+              });
+
+              return Promise.all([trx('Model1'), trx('model2')]).then(
+                ([model1Rows, model2Rows]) => {
+                  // Row 3 should NOT be deleted.
+                  expect(model1Rows.find((it) => it.id == 3)).to.eql({
+                    id: 3,
+                    model1Id: null,
+                    model1Prop1: 'belongsToOne',
+                    model1Prop2: null,
+                  });
+
+                  // Row 4 should NOT be deleted.
+                  expect(model1Rows.find((it) => it.id == 4)).to.eql({
+                    id: 4,
+                    model1Id: null,
+                    model1Prop1: 'manyToMany 1',
+                    model1Prop2: null,
+                  });
+
+                  // Row 2 should be deleted.
+                  expect(model2Rows.find((it) => it.id_col == 2)).to.equal(undefined);
+                }
+              );
+            });
+        });
+      });
+
       it('should relate and unrelate some models if `unrelate` and `relate` are arrays of relation paths', () => {
         const upsert = {
           // the root gets updated because it has an id
