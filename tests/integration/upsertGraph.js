@@ -1426,6 +1426,99 @@ module.exports = (session) => {
         });
       });
 
+      it('should not fail when trying to #unrelate or #delete a model which either does not exist or is linked elsewhere', () => {
+        const upsert = {
+          id: 2,
+          model1Relation2: [
+            {
+              idCol: 1,
+              model2Relation1: [
+                // ignore unrelating/deleting models which are linked to a different base model
+                // id 6&7 are linked to model1Relation2.idCol=2
+                { id: 6, '#unrelate': true },
+                { id: 7, '#delete': true },
+                // ignore unrelating/deleting non-existing models
+                { id: 900, '#unrelate': true },
+                { id: 901, '#delete': true },
+                // add new model
+                { model1Prop1: 'inserted manyToMany' },
+              ],
+            },
+            // ignore delete (non-existing) idCol=3 with `#delete: true` special prop
+            // ignore unrelate (non-existing) idCol=4 with `#unrelate: true` special prop
+            { idCol: 3, '#delete': true },
+            { idCol: 4, '#unrelate': true },
+          ],
+        };
+
+        return transaction(session.knex, (trx) => {
+          return Model1.query(trx)
+            .upsertGraph(upsert, {
+              fetchStrategy,
+              relate: true,
+              noDelete: true,
+            })
+            .then((result) => {
+              // Fetch the graph from the database.
+              return Model1.query(trx)
+                .findById(2)
+                .withGraphFetched('[model1Relation2(orderById).model2Relation1(orderById)]');
+            })
+            .then(omitIrrelevantProps)
+            .then((result) => {
+              expect(result).to.eql({
+                id: 2,
+                model1Id: 3,
+                model1Prop1: 'root 2',
+
+                model1Relation2: [
+                  {
+                    idCol: 1,
+                    model1Id: 2,
+                    model2Prop1: 'hasMany 1',
+
+                    model2Relation1: [
+                      {
+                        id: 4,
+                        model1Id: null,
+                        model1Prop1: 'manyToMany 1',
+                      },
+                      {
+                        id: 5,
+                        model1Id: null,
+                        model1Prop1: 'manyToMany 2',
+                      },
+                      {
+                        id: 8,
+                        model1Id: null,
+                        model1Prop1: 'inserted manyToMany',
+                      },
+                    ],
+                  },
+                  {
+                    idCol: 2,
+                    model1Id: 2,
+                    model2Prop1: 'hasMany 2',
+
+                    model2Relation1: [
+                      {
+                        id: 6,
+                        model1Id: null,
+                        model1Prop1: 'manyToMany 3',
+                      },
+                      {
+                        id: 7,
+                        model1Id: null,
+                        model1Prop1: 'manyToMany 4',
+                      },
+                    ],
+                  },
+                ],
+              });
+            });
+        });
+      });
+
       it('should relate and unrelate some models if `unrelate` and `relate` are arrays of relation paths', () => {
         const upsert = {
           // the root gets updated because it has an id
