@@ -78,14 +78,14 @@ module.exports = (session) => {
         .knex('persons')
         .insert({ name: 'Meinhart ' })
         .returning('id')
-        .then(([id]) => {
+        .then(([{ id }]) => {
           return session.knex('persons').insert({ name: 'Arnold', parentId: id }).returning('id');
         })
-        .then(([arnoldId]) => {
+        .then(([{ id: arnoldId }]) => {
           return Promise.all([
             session.knex('persons').insert({ name: 'Hans' }).returning('id'),
             session.knex('persons').insert({ name: 'Urs' }).returning('id'),
-          ]).then(([[hansId], [ursId]]) => {
+          ]).then(([[{ id: hansId }], [{ id: ursId }]]) => {
             return Promise.all([
               session.knex('cousins').insert({ id1: arnoldId, id2: hansId }),
               session.knex('cousins').insert({ id1: arnoldId, id2: ursId }),
