@@ -61,17 +61,6 @@ describe('QueryBuilder', () => {
 
   it('should have knex methods', () => {
     let ignore = [
-      'and',
-      'toSQL',
-      'bind',
-      'timeout',
-      'connection',
-      'stream',
-      'finally',
-      'yield',
-      'ensure',
-      'reflect',
-      'domain',
       'setMaxListeners',
       'getMaxListeners',
       'emit',
@@ -86,10 +75,13 @@ describe('QueryBuilder', () => {
       'listenerCount',
       'eventNames',
       'rawListeners',
+      'pluck', // not supported anymore in objection v3+
+      'queryBuilder', // this method is added to the knex mock, but should not available on objection's QueryBuilder
+      'raw', // this method is added to the knex mock, but should not available on objection's QueryBuilder
     ];
 
     let builder = QueryBuilder.forClass(TestModel);
-    for (let name in mockKnex.queryBuilder()) {
+    for (let name in mockKnex) {
       let func = mockKnex[name];
       if (typeof func === 'function' && name.charAt(0) !== '_' && ignore.indexOf(name) === -1) {
         if (typeof builder[name] !== 'function') {

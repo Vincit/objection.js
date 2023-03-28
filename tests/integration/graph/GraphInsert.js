@@ -1154,7 +1154,7 @@ module.exports = (session) => {
           for (const prop of Object.keys(jsonSchemaProps)) {
             const propSchema = jsonSchemaProps[prop];
 
-            if (propSchema.type === 'boolean') {
+            if (propSchema.type === 'boolean' && prop in json) {
               json[prop] = !!json[prop];
             }
           }

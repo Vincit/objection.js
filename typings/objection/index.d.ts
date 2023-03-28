@@ -362,6 +362,59 @@ declare namespace Objection {
     (table: TableRef<QB>): QB;
   }
 
+  interface FromRawMethod<QB extends AnyQueryBuilder> extends RawInterface<QB> {}
+
+  interface JsonExtraction {
+    column: string | Raw | Knex.QueryBuilder;
+    path: string;
+    alias?: string;
+    singleValue?: boolean;
+  }
+
+  interface JsonExtract<QB extends AnyQueryBuilder> {
+    // These must come first so that we get autocomplete.
+    <QBP extends QB>(
+      column: ModelProps<ModelType<QBP>>,
+      path: string,
+      alias?: string,
+      singleValue?: boolean
+    ): QB;
+
+    (column: ColumnRef, path: string, alias?: string, singleValue?: boolean): QB;
+    (column: JsonExtraction[] | any[][], singleValue?: boolean): QB;
+  }
+
+  interface JsonSet<QB extends AnyQueryBuilder> {
+    // These must come first so that we get autocomplete.
+    <QBP extends QB>(
+      column: ModelProps<ModelType<QBP>>,
+      path: string,
+      value: any,
+      alias?: string
+    ): QB;
+
+    (column: ColumnRef, path: string, value: any, alias?: string): QB;
+  }
+
+  interface JsonInsert<QB extends AnyQueryBuilder> {
+    // These must come first so that we get autocomplete.
+    <QBP extends QB>(
+      column: ModelProps<ModelType<QBP>>,
+      path: string,
+      value: any,
+      alias?: string
+    ): QB;
+
+    (column: ColumnRef, path: string, value: any, alias?: string): QB;
+  }
+
+  interface JsonRemove<QB extends AnyQueryBuilder> {
+    // These must come first so that we get autocomplete.
+    <QBP extends QB>(column: ModelProps<ModelType<QBP>>, path: string, alias?: string): QB;
+
+    (column: ColumnRef, path: string, alias?: string): QB;
+  }
+
   interface WhereMethod<QB extends AnyQueryBuilder> {
     // These must come first so that we get autocomplete.
     <QBP extends QB>(
@@ -425,6 +478,25 @@ declare namespace Objection {
 
     (col1: ColumnRef, op: Operator, col2: ColumnRef): QB;
     (col1: ColumnRef, col2: ColumnRef): QB;
+  }
+
+  interface WhereJsonObject<QB extends AnyQueryBuilder> {
+    // These must come first so that we get autocomplete.
+    <QBP extends QB>(col: ModelProps<ModelType<QBP>>, value: any): QB;
+
+    (col: ColumnRef, value: any): QB;
+  }
+
+  interface WhereJsonPath<QB extends AnyQueryBuilder> {
+    // These must come first so that we get autocomplete.
+    <QBP extends QB>(
+      col: ModelProps<ModelType<QBP>>,
+      jsonPath: string,
+      operator: string,
+      value: any
+    ): QB;
+
+    (col: ColumnRef, jsonPath: string, operator: string, value: any): QB;
   }
 
   interface WhereJsonMethod<QB extends AnyQueryBuilder> {
@@ -790,6 +862,12 @@ declare namespace Objection {
     from: FromMethod<this>;
     table: FromMethod<this>;
     into: FromMethod<this>;
+    fromRaw: FromRawMethod<this>;
+
+    jsonExtract: JsonExtract<this>;
+    jsonSet: JsonSet<this>;
+    jsonInsert: JsonInsert<this>;
+    jsonRemove: JsonRemove<this>;
 
     where: WhereMethod<this>;
     andWhere: WhereMethod<this>;
@@ -797,6 +875,12 @@ declare namespace Objection {
     whereNot: WhereMethod<this>;
     andWhereNot: WhereMethod<this>;
     orWhereNot: WhereMethod<this>;
+    whereLike: WhereMethod<this>;
+    andWhereLike: WhereMethod<this>;
+    orWhereLike: WhereMethod<this>;
+    whereILike: WhereMethod<this>;
+    andWhereILike: WhereMethod<this>;
+    orWhereILike: WhereMethod<this>;
 
     whereRaw: WhereRawMethod<this>;
     orWhereRaw: WhereRawMethod<this>;
@@ -834,13 +918,28 @@ declare namespace Objection {
     orWhereNotColumn: WhereColumnMethod<this>;
     andWhereNotColumn: WhereColumnMethod<this>;
 
+    whereJsonObject: WhereJsonObject<this>;
+    orWhereJsonObject: WhereJsonObject<this>;
+    andWhereJsonObject: WhereJsonObject<this>;
+    whereNotJsonObject: WhereJsonObject<this>;
+    orWhereNotJsonObject: WhereJsonObject<this>;
+    andWhereNotJsonObject: WhereJsonObject<this>;
+
+    whereJsonPath: WhereJsonPath<this>;
+    orWhereJsonPath: WhereJsonPath<this>;
+    andWhereJsonPath: WhereJsonPath<this>;
+
     whereJsonSupersetOf: WhereJsonMethod<this>;
+    andWhereJsonSupersetOf: WhereJsonMethod<this>;
     orWhereJsonSupersetOf: WhereJsonMethod<this>;
     whereJsonNotSupersetOf: WhereJsonMethod<this>;
+    andWhereJsonNotSupersetOf: WhereJsonMethod<this>;
     orWhereJsonNotSupersetOf: WhereJsonMethod<this>;
     whereJsonSubsetOf: WhereJsonMethod<this>;
+    andWhereJsonSubsetOf: WhereJsonMethod<this>;
     orWhereJsonSubsetOf: WhereJsonMethod<this>;
     whereJsonNotSubsetOf: WhereJsonMethod<this>;
+    andWhereJsonNotSubsetOf: WhereJsonMethod<this>;
     orWhereJsonNotSubsetOf: WhereJsonMethod<this>;
     whereJsonIsArray: WhereFieldExpressionMethod<this>;
     orWhereJsonIsArray: WhereFieldExpressionMethod<this>;
@@ -892,6 +991,8 @@ declare namespace Objection {
     with: WithMethod<this>;
     withRecursive: WithMethod<this>;
     withWrapped: WithMethod<this>;
+    withMaterialized: WithMethod<this>;
+    withNotMaterialized: WithMethod<this>;
 
     joinRelated: JoinRelatedMethod<this>;
     innerJoinRelated: JoinRelatedMethod<this>;
