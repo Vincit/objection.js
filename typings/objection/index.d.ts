@@ -225,15 +225,19 @@ declare namespace Objection {
    */
   type PartialModelGraph<M, T = M & GraphParameters> = T extends any
     ? {
-        [K in DataPropertyNames<T>]?: Defined<T[K]> extends Model
-          ? PartialModelGraph<Defined<T[K]>>
-          : Defined<T[K]> extends Array<infer I>
-          ? I extends Model
-            ? PartialModelGraph<I>[]
-            : Expression<T[K]>
-          : Expression<T[K]>;
+        [K in DataPropertyNames<T>]?: null extends T[K]
+          ? PartialModelGraphField<NonNullable<T[K]>> | null // handle nullable BelongsToOneRelations
+          : PartialModelGraphField<T[K]>;
       }
     : never;
+
+  type PartialModelGraphField<F> = Defined<F> extends Model
+    ? PartialModelGraph<Defined<F>>
+    : Defined<F> extends Array<infer I>
+      ? I extends Model
+        ? PartialModelGraph<I>[]
+        : Expression<F>
+      : Expression<F>;
 
   /**
    * Extracts the property names (excluding relations) of a model class.
