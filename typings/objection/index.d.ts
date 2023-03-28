@@ -1434,6 +1434,8 @@ declare namespace Objection {
     uidRefProp: string;
     dbRefProp: string;
     propRefRegex: RegExp;
+    graphUnrelateProp: string;
+    graphDeleteProp: string;
     pickJsonSchemaProperties: boolean;
     relatedFindQueryMutates: boolean;
     relatedInsertQueryMutates: boolean;
@@ -1540,6 +1542,8 @@ declare namespace Objection {
     static uidRefProp: string;
     static dbRefProp: string;
     static propRefRegex: RegExp;
+    static graphUnrelateProp: string;
+    static graphDeleteProp: string;
     static pickJsonSchemaProperties: boolean;
     static relatedFindQueryMutates: boolean;
     static relatedInsertQueryMutates: boolean;
