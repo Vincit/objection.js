@@ -222,14 +222,18 @@ declare namespace Objection {
    * Just like PartialModelObject but this is applied recursively to relations.
    */
   type PartialModelGraph<M, T = M & GraphParameters> = {
-    [K in DataPropertyNames<T>]?: Defined<T[K]> extends Model
-      ? PartialModelGraph<Defined<T[K]>>
-      : Defined<T[K]> extends Array<infer I>
+    [K in DataPropertyNames<T>]?: null extends T[K]
+      ? PartialModelGraphField<NonNullable<T[K]>> | null // handle nullable BelongsToOneRelations
+      : PartialModelGraphField<T[K]>;
+  };
+
+  type PartialModelGraphField<F> = Defined<F> extends Model
+    ? PartialModelGraph<Defined<F>>
+    : Defined<F> extends Array<infer I>
       ? I extends Model
         ? PartialModelGraph<I>[]
-        : Expression<T[K]>
-      : Expression<T[K]>;
-  };
+        : Expression<F>
+      : Expression<F>;
 
   /**
    * Extracts the property names (excluding relations) of a model class.
