@@ -185,7 +185,7 @@ await Person.query()
 
 ## select()
 
-See [knex documentation](http://knexjs.org/#Builder-select)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#select)
 
 ##### Return value
 
@@ -195,7 +195,7 @@ See [knex documentation](http://knexjs.org/#Builder-select)
 
 ## forUpdate()
 
-See [knex documentation](http://knexjs.org/#Builder-forUpdate)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#forupdate)
 
 ##### Return value
 
@@ -205,7 +205,7 @@ See [knex documentation](http://knexjs.org/#Builder-forUpdate)
 
 ## forShare()
 
-See [knex documentation](http://knexjs.org/#Builder-forShare)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#forshare)
 
 ##### Return value
 
@@ -215,7 +215,7 @@ See [knex documentation](http://knexjs.org/#Builder-forShare)
 
 ## skipLocked()
 
-See [knex documentation](http://knexjs.org/#Builder-skipLocked)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#skiplocked)
 
 ##### Return value
 
@@ -225,7 +225,7 @@ See [knex documentation](http://knexjs.org/#Builder-skipLocked)
 
 ## noWait()
 
-See [knex documentation](http://knexjs.org/#Builder-noWait)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#nowait)
 
 ##### Return value
 
@@ -235,7 +235,7 @@ See [knex documentation](http://knexjs.org/#Builder-noWait)
 
 ## as()
 
-See [knex documentation](http://knexjs.org/#Builder-as)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#as)
 
 ##### Return value
 
@@ -245,7 +245,7 @@ See [knex documentation](http://knexjs.org/#Builder-as)
 
 ## columns()
 
-See [knex documentation](http://knexjs.org/#Builder-columns)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#column)
 
 ##### Return value
 
@@ -255,7 +255,7 @@ See [knex documentation](http://knexjs.org/#Builder-columns)
 
 ## column()
 
-See [knex documentation](http://knexjs.org/#Builder-column)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#column)
 
 ##### Return value
 
@@ -265,7 +265,17 @@ See [knex documentation](http://knexjs.org/#Builder-column)
 
 ## from()
 
-See [knex documentation](http://knexjs.org/#Builder-from)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#from)
+
+##### Return value
+
+| Type                                | Description                        |
+| ----------------------------------- | ---------------------------------- |
+| [QueryBuilder](/api/query-builder/) | `this` query builder for chaining. |
+
+## fromRaw()
+
+See [knex documentation](https://knexjs.org/guide/query-builder.html#fromRaw)
 
 ##### Return value
 
@@ -275,7 +285,7 @@ See [knex documentation](http://knexjs.org/#Builder-from)
 
 ## into()
 
-See [knex documentation](http://knexjs.org/#Builder-into)
+See [knex documentation](https://knexjs.org/guide/query-builder.html)
 
 ##### Return value
 
@@ -285,7 +295,27 @@ See [knex documentation](http://knexjs.org/#Builder-into)
 
 ## with()
 
-See [knex documentation](http://knexjs.org/#Builder-with)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#with)
+
+##### Return value
+
+| Type                                | Description                        |
+| ----------------------------------- | ---------------------------------- |
+| [QueryBuilder](/api/query-builder/) | `this` query builder for chaining. |
+
+## withMaterialized()
+
+See [knex documentation](https://knexjs.org/guide/query-builder.html#withmaterialized)
+
+##### Return value
+
+| Type                                | Description                        |
+| ----------------------------------- | ---------------------------------- |
+| [QueryBuilder](/api/query-builder/) | `this` query builder for chaining. |
+
+## withNotMaterialized()
+
+See [knex documentation](https://knexjs.org/guide/query-builder.html#withnotmaterialized)
 
 ##### Return value
 
@@ -295,7 +325,7 @@ See [knex documentation](http://knexjs.org/#Builder-with)
 
 ## withSchema()
 
-See [knex documentation](http://knexjs.org/#Builder-withSchema)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#withschema)
 
 ##### Return value
 
@@ -305,7 +335,7 @@ See [knex documentation](http://knexjs.org/#Builder-withSchema)
 
 ## table()
 
-See [knex documentation](http://knexjs.org/#Builder-table)
+See [knex documentation](https://knexjs.org/guide/query-builder.html)
 
 ##### Return value
 
@@ -315,7 +345,7 @@ See [knex documentation](http://knexjs.org/#Builder-table)
 
 ## distinct()
 
-See [knex documentation](http://knexjs.org/#Builder-distinct)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#distinct)
 
 ##### Return value
 
@@ -325,7 +355,7 @@ See [knex documentation](http://knexjs.org/#Builder-distinct)
 
 ## distinctOn()
 
-See [knex documentation](http://knexjs.org/#Builder-distinctOn)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#distincton)
 
 ##### Return value
 
@@ -335,7 +365,7 @@ See [knex documentation](http://knexjs.org/#Builder-distinctOn)
 
 ## where()
 
-See [knex documentation](http://knexjs.org/#Builder-where)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#where)
 
 ##### Return value
 
@@ -345,7 +375,7 @@ See [knex documentation](http://knexjs.org/#Builder-where)
 
 ## andWhere()
 
-See [knex documentation](http://knexjs.org/#Builder-where)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#where)
 
 ##### Return value
 
@@ -355,7 +385,7 @@ See [knex documentation](http://knexjs.org/#Builder-where)
 
 ## orWhere()
 
-See [knex documentation](http://knexjs.org/#Builder-where)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#where)
 
 ##### Return value
 
@@ -365,7 +395,7 @@ See [knex documentation](http://knexjs.org/#Builder-where)
 
 ## whereNot()
 
-See [knex documentation](http://knexjs.org/#Builder-whereNot)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#wherenot)
 
 ##### Return value
 
@@ -375,7 +405,7 @@ See [knex documentation](http://knexjs.org/#Builder-whereNot)
 
 ## orWhereNot()
 
-See [knex documentation](http://knexjs.org/#Builder-whereNot)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#wherenot)
 
 ##### Return value
 
@@ -385,7 +415,7 @@ See [knex documentation](http://knexjs.org/#Builder-whereNot)
 
 ## whereRaw()
 
-See [knex documentation](http://knexjs.org/#Builder-whereRaw)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#whereraw)
 
 ##### Return value
 
@@ -395,7 +425,7 @@ See [knex documentation](http://knexjs.org/#Builder-whereRaw)
 
 ## whereWrapped()
 
-See [knex documentation](http://knexjs.org/#Builder-wheres)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#where)
 
 ##### Return value
 
@@ -405,7 +435,7 @@ See [knex documentation](http://knexjs.org/#Builder-wheres)
 
 ## havingWrapped()
 
-See [knex documentation](http://knexjs.org/#Builder-having)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#having)
 
 ##### Return value
 
@@ -415,7 +445,7 @@ See [knex documentation](http://knexjs.org/#Builder-having)
 
 ## orWhereRaw()
 
-See [knex documentation](http://knexjs.org/#Builder-whereRaw)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#whereraw)
 
 ##### Return value
 
@@ -425,7 +455,7 @@ See [knex documentation](http://knexjs.org/#Builder-whereRaw)
 
 ## whereExists()
 
-See [knex documentation](http://knexjs.org/#Builder-whereExists)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#whereexists)
 
 ##### Return value
 
@@ -435,7 +465,7 @@ See [knex documentation](http://knexjs.org/#Builder-whereExists)
 
 ## orWhereExists()
 
-See [knex documentation](http://knexjs.org/#Builder-whereExists)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#whereexists)
 
 ##### Return value
 
@@ -445,7 +475,7 @@ See [knex documentation](http://knexjs.org/#Builder-whereExists)
 
 ## whereNotExists()
 
-See [knex documentation](http://knexjs.org/#Builder-whereNotExists)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#wherenotexists)
 
 ##### Return value
 
@@ -455,7 +485,7 @@ See [knex documentation](http://knexjs.org/#Builder-whereNotExists)
 
 ## orWhereNotExists()
 
-See [knex documentation](http://knexjs.org/#Builder-whereNotExists)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#wherenotexists)
 
 ##### Return value
 
@@ -465,7 +495,7 @@ See [knex documentation](http://knexjs.org/#Builder-whereNotExists)
 
 ## whereIn()
 
-See [knex documentation](http://knexjs.org/#Builder-whereIn)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#wherein)
 
 ##### Return value
 
@@ -475,7 +505,7 @@ See [knex documentation](http://knexjs.org/#Builder-whereIn)
 
 ## orWhereIn()
 
-See [knex documentation](http://knexjs.org/#Builder-whereIn)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#wherein)
 
 ##### Return value
 
@@ -485,7 +515,7 @@ See [knex documentation](http://knexjs.org/#Builder-whereIn)
 
 ## whereNotIn()
 
-See [knex documentation](http://knexjs.org/#Builder-whereNotIn)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#wherenotin)
 
 ##### Return value
 
@@ -495,7 +525,7 @@ See [knex documentation](http://knexjs.org/#Builder-whereNotIn)
 
 ## orWhereNotIn()
 
-See [knex documentation](http://knexjs.org/#Builder-whereNotIn)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#wherenotin)
 
 ##### Return value
 
@@ -505,7 +535,7 @@ See [knex documentation](http://knexjs.org/#Builder-whereNotIn)
 
 ## whereNull()
 
-See [knex documentation](http://knexjs.org/#Builder-whereNull)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#wherenull)
 
 ##### Return value
 
@@ -515,7 +545,7 @@ See [knex documentation](http://knexjs.org/#Builder-whereNull)
 
 ## orWhereNull()
 
-See [knex documentation](http://knexjs.org/#Builder-whereNull)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#wherenull)
 
 ##### Return value
 
@@ -525,7 +555,7 @@ See [knex documentation](http://knexjs.org/#Builder-whereNull)
 
 ## whereNotNull()
 
-See [knex documentation](http://knexjs.org/#Builder-whereNotNull)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#wherenotnull)
 
 ##### Return value
 
@@ -535,7 +565,7 @@ See [knex documentation](http://knexjs.org/#Builder-whereNotNull)
 
 ## orWhereNotNull()
 
-See [knex documentation](http://knexjs.org/#Builder-whereNotNull)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#wherenotnull)
 
 ##### Return value
 
@@ -545,7 +575,7 @@ See [knex documentation](http://knexjs.org/#Builder-whereNotNull)
 
 ## whereBetween()
 
-See [knex documentation](http://knexjs.org/#Builder-whereBetween)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#wherebetween)
 
 ##### Return value
 
@@ -555,7 +585,7 @@ See [knex documentation](http://knexjs.org/#Builder-whereBetween)
 
 ## whereNotBetween()
 
-See [knex documentation](http://knexjs.org/#Builder-whereNotBetween)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#wherenotbetween)
 
 ##### Return value
 
@@ -565,7 +595,7 @@ See [knex documentation](http://knexjs.org/#Builder-whereNotBetween)
 
 ## orWhereBetween()
 
-See [knex documentation](http://knexjs.org/#Builder-whereBetween)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#wherebetween)
 
 ##### Return value
 
@@ -575,7 +605,7 @@ See [knex documentation](http://knexjs.org/#Builder-whereBetween)
 
 ## orWhereNotBetween()
 
-See [knex documentation](http://knexjs.org/#Builder-whereNotBetween)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#wherenotbetween)
 
 ##### Return value
 
@@ -585,7 +615,7 @@ See [knex documentation](http://knexjs.org/#Builder-whereNotBetween)
 
 ## whereColumn()
 
-See [knex documentation](http://knexjs.org/#Builder-whereColumn)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#where)
 
 ##### Return value
 
@@ -595,7 +625,7 @@ See [knex documentation](http://knexjs.org/#Builder-whereColumn)
 
 ## andWhereColumn()
 
-See [knex documentation](http://knexjs.org/#Builder-whereColumn)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#where)
 
 ##### Return value
 
@@ -605,7 +635,7 @@ See [knex documentation](http://knexjs.org/#Builder-whereColumn)
 
 ## orWhereColumn()
 
-See [knex documentation](http://knexjs.org/#Builder-whereColumn)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#where)
 
 ##### Return value
 
@@ -615,7 +645,7 @@ See [knex documentation](http://knexjs.org/#Builder-whereColumn)
 
 ## whereNotColumn()
 
-See [knex documentation](http://knexjs.org/#Builder-whereColumn)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#where)
 
 ##### Return value
 
@@ -625,7 +655,7 @@ See [knex documentation](http://knexjs.org/#Builder-whereColumn)
 
 ## andWhereNotColumn()
 
-See [knex documentation](http://knexjs.org/#Builder-whereColumn)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#where)
 
 ##### Return value
 
@@ -635,7 +665,27 @@ See [knex documentation](http://knexjs.org/#Builder-whereColumn)
 
 ## orWhereNotColumn()
 
-See [knex documentation](http://knexjs.org/#Builder-whereColumn)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#where)
+
+##### Return value
+
+| Type                                | Description                        |
+| ----------------------------------- | ---------------------------------- |
+| [QueryBuilder](/api/query-builder/) | `this` query builder for chaining. |
+
+## whereLike()
+
+See [knex documentation](https://knexjs.org/guide/query-builder.html#wherelike)
+
+##### Return value
+
+| Type                                | Description                        |
+| ----------------------------------- | ---------------------------------- |
+| [QueryBuilder](/api/query-builder/) | `this` query builder for chaining. |
+
+## whereILike()
+
+See [knex documentation](https://knexjs.org/guide/query-builder.html#whereilike)
 
 ##### Return value
 
@@ -645,7 +695,7 @@ See [knex documentation](http://knexjs.org/#Builder-whereColumn)
 
 ## groupBy()
 
-See [knex documentation](http://knexjs.org/#Builder-groupBy)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#groupby)
 
 ##### Return value
 
@@ -655,7 +705,7 @@ See [knex documentation](http://knexjs.org/#Builder-groupBy)
 
 ## groupByRaw()
 
-See [knex documentation](http://knexjs.org/#Builder-groupByRaw)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#groupbyraw)
 
 ##### Return value
 
@@ -665,7 +715,7 @@ See [knex documentation](http://knexjs.org/#Builder-groupByRaw)
 
 ## orderBy()
 
-See [knex documentation](http://knexjs.org/#Builder-orderBy)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#orderby)
 
 ##### Return value
 
@@ -675,7 +725,7 @@ See [knex documentation](http://knexjs.org/#Builder-orderBy)
 
 ## orderByRaw()
 
-See [knex documentation](http://knexjs.org/#Builder-orderByRaw)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#orderbyraw)
 
 ##### Return value
 
@@ -685,7 +735,7 @@ See [knex documentation](http://knexjs.org/#Builder-orderByRaw)
 
 ## union()
 
-See [knex documentation](http://knexjs.org/#Builder-union)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#union)
 
 ##### Return value
 
@@ -695,7 +745,7 @@ See [knex documentation](http://knexjs.org/#Builder-union)
 
 ## unionAll()
 
-See [knex documentation](http://knexjs.org/#Builder-unionAll)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#unionall)
 
 ##### Return value
 
@@ -705,7 +755,7 @@ See [knex documentation](http://knexjs.org/#Builder-unionAll)
 
 ## intersect()
 
-See [knex documentation](http://knexjs.org/#Builder-unionAll)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#intersect)
 
 ##### Return value
 
@@ -716,7 +766,7 @@ See [knex documentation](http://knexjs.org/#Builder-unionAll)
 
 ## having()
 
-See [knex documentation](http://knexjs.org/#Builder-having)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#having)
 
 ##### Return value
 
@@ -726,7 +776,7 @@ See [knex documentation](http://knexjs.org/#Builder-having)
 
 ## havingRaw()
 
-See [knex documentation](http://knexjs.org/#Builder-havingRaw)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#havingraw)
 
 ##### Return value
 
@@ -736,7 +786,7 @@ See [knex documentation](http://knexjs.org/#Builder-havingRaw)
 
 ## orHaving()
 
-See [knex documentation](http://knexjs.org/#Builder-having)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#having)
 
 ##### Return value
 
@@ -746,7 +796,7 @@ See [knex documentation](http://knexjs.org/#Builder-having)
 
 ## orHavingRaw()
 
-See [knex documentation](http://knexjs.org/#Builder-havingRaw)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#havingraw)
 
 ##### Return value
 
@@ -756,7 +806,7 @@ See [knex documentation](http://knexjs.org/#Builder-havingRaw)
 
 ## offset()
 
-See [knex documentation](http://knexjs.org/#Builder-offset)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#offset)
 
 ##### Return value
 
@@ -766,7 +816,7 @@ See [knex documentation](http://knexjs.org/#Builder-offset)
 
 ## limit()
 
-See [knex documentation](http://knexjs.org/#Builder-limit)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#limit)
 
 ##### Return value
 
@@ -776,7 +826,7 @@ See [knex documentation](http://knexjs.org/#Builder-limit)
 
 ## count()
 
-See [knex documentation](http://knexjs.org/#Builder-count)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#count)
 
 Also see the [resultSize](/api/query-builder/other-methods.md#resultsize) method for a cleaner way to just get the number of rows a query would create.
 
@@ -788,7 +838,7 @@ Also see the [resultSize](/api/query-builder/other-methods.md#resultsize) method
 
 ## countDistinct()
 
-See [knex documentation](http://knexjs.org/#Builder-count)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#count)
 
 ##### Return value
 
@@ -798,7 +848,7 @@ See [knex documentation](http://knexjs.org/#Builder-count)
 
 ## min()
 
-See [knex documentation](http://knexjs.org/#Builder-min)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#min)
 
 ##### Return value
 
@@ -808,7 +858,7 @@ See [knex documentation](http://knexjs.org/#Builder-min)
 
 ## max()
 
-See [knex documentation](http://knexjs.org/#Builder-max)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#max)
 
 ##### Return value
 
@@ -818,7 +868,7 @@ See [knex documentation](http://knexjs.org/#Builder-max)
 
 ## sum()
 
-See [knex documentation](http://knexjs.org/#Builder-sum)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#sum)
 
 ##### Return value
 
@@ -828,7 +878,7 @@ See [knex documentation](http://knexjs.org/#Builder-sum)
 
 ## avg()
 
-See [knex documentation](http://knexjs.org/#Builder-avg)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#avg)
 
 ##### Return value
 
@@ -838,7 +888,7 @@ See [knex documentation](http://knexjs.org/#Builder-avg)
 
 ## avgDistinct()
 
-See [knex documentation](http://knexjs.org/#Builder-avg)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#avg)
 
 ##### Return value
 
@@ -848,7 +898,7 @@ See [knex documentation](http://knexjs.org/#Builder-avg)
 
 ## returning()
 
-See [knex documentation](http://knexjs.org/#Builder-returning)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#returning)
 
 ##### Return value
 
@@ -858,7 +908,7 @@ See [knex documentation](http://knexjs.org/#Builder-returning)
 
 ## columnInfo()
 
-See [knex documentation](http://knexjs.org/#Builder-columnInfo)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#columninfo)
 
 ##### Return value
 
@@ -930,6 +980,76 @@ builder.whereInComposite('a', [1, 3, 1]);
 ```js
 builder.whereInComposite(['a', 'b'], SomeModel.query().select('a', 'b'));
 ```
+
+## jsonExtract()
+
+See [knex documentation](https://knexjs.org/guide/query-builder.html#jsonextract)
+
+##### Return value
+
+| Type                                | Description                        |
+| ----------------------------------- | ---------------------------------- |
+| [QueryBuilder](/api/query-builder/) | `this` query builder for chaining. |
+
+## jsonSet()
+
+See [knex documentation](https://knexjs.org/guide/query-builder.html#jsonset)
+
+##### Return value
+
+| Type                                | Description                        |
+| ----------------------------------- | ---------------------------------- |
+| [QueryBuilder](/api/query-builder/) | `this` query builder for chaining. |
+
+## jsonInsert()
+
+See [knex documentation](https://knexjs.org/guide/query-builder.html#jsoninsert)
+
+##### Return value
+
+| Type                                | Description                        |
+| ----------------------------------- | ---------------------------------- |
+| [QueryBuilder](/api/query-builder/) | `this` query builder for chaining. |
+
+## jsonRemove()
+
+See [knex documentation](https://knexjs.org/guide/query-builder.html#jsonremove)
+
+##### Return value
+
+| Type                                | Description                        |
+| ----------------------------------- | ---------------------------------- |
+| [QueryBuilder](/api/query-builder/) | `this` query builder for chaining. |
+
+## whereJsonObject()
+
+See [knex documentation](https://knexjs.org/guide/query-builder.html#wherejsonobject)
+
+##### Return value
+
+| Type                                | Description                        |
+| ----------------------------------- | ---------------------------------- |
+| [QueryBuilder](/api/query-builder/) | `this` query builder for chaining. |
+
+## whereNotJsonObject()
+
+See [knex documentation](https://knexjs.org/guide/query-builder.html#wherejsonobject)
+
+##### Return value
+
+| Type                                | Description                        |
+| ----------------------------------- | ---------------------------------- |
+| [QueryBuilder](/api/query-builder/) | `this` query builder for chaining. |
+
+## whereJsonPath()
+
+See [knex documentation](https://knexjs.org/guide/query-builder.html#wherejsonpath)
+
+##### Return value
+
+| Type                                | Description                        |
+| ----------------------------------- | ---------------------------------- |
+| [QueryBuilder](/api/query-builder/) | `this` query builder for chaining. |
 
 ## whereJsonSupersetOf()
 

@@ -997,7 +997,7 @@ const relQueryResult10: PromiseLike<Movie[]> =
   Person.relatedQuery<Movie>('nonExistentRelation').for(1);
 
 /**
- * http://knexjs.org/#Builder-count
+ * https://knexjs.org/guide/query-builder.html#count
  */
 Person.query().count('active', { as: 'a' });
 Person.query().count('active as a');

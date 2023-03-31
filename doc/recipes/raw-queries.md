@@ -1,8 +1,8 @@
 # Raw queries
 
-To mix raw SQL with queries, use the [raw](/api/objection/#raw) function from the main module. [raw](/api/objection/#raw) works just like the [knex's raw method](http://knexjs.org/#Raw) but in addition, supports objection queries, [raw](/api/objection/#raw), [ref](/api/objection/#ref), [val](/api/objection/#val) and all other objection types. You can also use [knex.raw()](http://knexjs.org/#Raw).
+To mix raw SQL with queries, use the [raw](/api/objection/#raw) function from the main module. [raw](/api/objection/#raw) works just like the [knex's raw method](https://knexjs.org/guide/raw.html) but in addition, supports objection queries, [raw](/api/objection/#raw), [ref](/api/objection/#ref), [val](/api/objection/#val) and all other objection types. You can also use [knex.raw()](https://knexjs.org/guide/raw.html).
 
-[raw](/api/objection/#raw) is handy when you want to mix SQL in objection queries, but if you want to fire off a completely custom query, you need to use [knex.raw](http://knexjs.org/#Raw).
+[raw](/api/objection/#raw) is handy when you want to mix SQL in objection queries, but if you want to fire off a completely custom query, you need to use [knex.raw](https://knexjs.org/guide/raw.html).
 
 There are also some helper methods such as [whereRaw](/api/query-builder/find-methods.html#whereraw) in the [QueryBuilder](/api/query-builder/).
 
