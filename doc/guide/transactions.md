@@ -21,7 +21,7 @@ try {
 }
 ```
 
-The first argument is a callback that gets called with the transaction object as an argument once the transaction has been successfully started. The transaction object is actually just a [knex transaction object](http://knexjs.org/#Transactions) and you can start the transaction just as well using [knex.transaction](http://knexjs.org/#Transactions) function.
+The first argument is a callback that gets called with the transaction object as an argument once the transaction has been successfully started. The transaction object is actually just a [knex transaction object](https://knexjs.org/guide/transactions.html) and you can start the transaction just as well using [knex.transaction](http://knexjs.org/#Transactions) function.
 
 The transaction is committed if the promise returned from the callback is resolved successfully. If the returned Promise is rejected or an error is thrown inside the callback the transaction is rolled back.
 

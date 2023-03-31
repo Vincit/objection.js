@@ -766,7 +766,7 @@ console.log(
 
 ## increment()
 
-See [knex documentation](http://knexjs.org/#Builder-increment)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#increment)
 
 ##### Return value
 
@@ -776,7 +776,7 @@ See [knex documentation](http://knexjs.org/#Builder-increment)
 
 ## decrement()
 
-See [knex documentation](http://knexjs.org/#Builder-decrement)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#decrement)
 
 ##### Return value
 
@@ -786,7 +786,7 @@ See [knex documentation](http://knexjs.org/#Builder-decrement)
 
 ## truncate()
 
-See [knex documentation](http://knexjs.org/#Builder-truncate)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#truncate)
 
 ##### Return value
 
@@ -796,7 +796,7 @@ See [knex documentation](http://knexjs.org/#Builder-truncate)
 
 ## onConflict()
 
-See [knex documentation](http://knexjs.org/#Builder-onConflict)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#onconflict)
 
 ##### Return value
 
@@ -806,7 +806,7 @@ See [knex documentation](http://knexjs.org/#Builder-onConflict)
 
 ## ignore()
 
-See [knex documentation](http://knexjs.org/#Builder-ignore)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#ignore)
 
 ##### Return value
 
@@ -816,7 +816,7 @@ See [knex documentation](http://knexjs.org/#Builder-ignore)
 
 ## merge()
 
-See [knex documentation](http://knexjs.org/#Builder-merge)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#merge)
 
 ##### Return value
 

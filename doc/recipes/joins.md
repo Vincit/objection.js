@@ -1,6 +1,6 @@
 # Joins
 
-Again, [do as you would with a knex query builder](http://knexjs.org/#Builder-join):
+Again, [do as you would with a knex query builder](https://knexjs.org/guide/query-builder.html#join):
 
 ```js
 const people = await Person.query()

@@ -4,7 +4,7 @@
 
 Chaining this method to any query will print all the executed SQL to console.
 
-See [knex documentation](http://knexjs.org/#Builder-debug)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#debug)
 
 ##### Return value
 
@@ -1010,7 +1010,7 @@ try {
 
 ## timeout()
 
-See [knex documentation](http://knexjs.org/#Builder-timeout)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#debug)
 
 ##### Return value
 
@@ -1020,7 +1020,7 @@ See [knex documentation](http://knexjs.org/#Builder-timeout)
 
 ## connection()
 
-See [knex documentation](http://knexjs.org/#Builder-connection)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#connection)
 
 ##### Return value
 
@@ -1030,7 +1030,7 @@ See [knex documentation](http://knexjs.org/#Builder-connection)
 
 ## modify()
 
-Works like `knex`'s [modify](http://knexjs.org/#Builder-modify) function but in addition you can specify a [modifier](/api/model/static-properties.html#static-modifiers) by providing modifier names.
+Works like `knex`'s [modify](https://knexjs.org/guide/query-builder.html#modify) function but in addition you can specify a [modifier](/api/model/static-properties.html#static-modifiers) by providing modifier names.
 
 See the [modifier](/recipes/modifiers.html) recipe for examples of the things you can do with modifiers.
 

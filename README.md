@@ -35,7 +35,7 @@ What objection.js **doesn't** give you:
 - **Automatic database schema creation and migration from model definitions.**
   For simple things it is useful that the database schema is automatically generated from the model definitions,
   but usually just gets in your way when doing anything non-trivial. Objection.js leaves the schema related things
-  to you. knex has a great [migration tool](http://knexjs.org/#Migrations) that we recommend for this job. Check
+  to you. knex has a great [migration tool](https://knexjs.org/guide/migrations.html) that we recommend for this job. Check
   out the [example project](https://github.com/Vincit/objection.js/tree/master/examples/koa-ts).
 
 The best way to get started is to clone our [example project](https://github.com/Vincit/objection.js/tree/master/examples/koa) and start playing with it. There's also a [typescript version](https://github.com/Vincit/objection.js/tree/master/examples/koa-ts) available.
