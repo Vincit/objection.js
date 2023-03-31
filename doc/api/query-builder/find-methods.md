@@ -303,6 +303,26 @@ See [knex documentation](https://knexjs.org/guide/query-builder.html#with)
 | ----------------------------------- | ---------------------------------- |
 | [QueryBuilder](/api/query-builder/) | `this` query builder for chaining. |
 
+## withMaterialized()
+
+See [knex documentation](https://knexjs.org/guide/query-builder.html#withmaterialized)
+
+##### Return value
+
+| Type                                | Description                        |
+| ----------------------------------- | ---------------------------------- |
+| [QueryBuilder](/api/query-builder/) | `this` query builder for chaining. |
+
+## withNotMaterialized()
+
+See [knex documentation](https://knexjs.org/guide/query-builder.html#withnotmaterialized)
+
+##### Return value
+
+| Type                                | Description                        |
+| ----------------------------------- | ---------------------------------- |
+| [QueryBuilder](/api/query-builder/) | `this` query builder for chaining. |
+
 ## withSchema()
 
 See [knex documentation](https://knexjs.org/guide/query-builder.html#withschema)
@@ -653,6 +673,26 @@ See [knex documentation](https://knexjs.org/guide/query-builder.html#where)
 | ----------------------------------- | ---------------------------------- |
 | [QueryBuilder](/api/query-builder/) | `this` query builder for chaining. |
 
+## whereLike()
+
+See [knex documentation](https://knexjs.org/guide/query-builder.html#wherelike)
+
+##### Return value
+
+| Type                                | Description                        |
+| ----------------------------------- | ---------------------------------- |
+| [QueryBuilder](/api/query-builder/) | `this` query builder for chaining. |
+
+## whereILike()
+
+See [knex documentation](https://knexjs.org/guide/query-builder.html#whereilike)
+
+##### Return value
+
+| Type                                | Description                        |
+| ----------------------------------- | ---------------------------------- |
+| [QueryBuilder](/api/query-builder/) | `this` query builder for chaining. |
+
 ## groupBy()
 
 See [knex documentation](https://knexjs.org/guide/query-builder.html#groupby)
@@ -940,6 +980,76 @@ builder.whereInComposite('a', [1, 3, 1]);
 ```js
 builder.whereInComposite(['a', 'b'], SomeModel.query().select('a', 'b'));
 ```
+
+## jsonExtract()
+
+See [knex documentation](https://knexjs.org/guide/query-builder.html#jsonextract)
+
+##### Return value
+
+| Type                                | Description                        |
+| ----------------------------------- | ---------------------------------- |
+| [QueryBuilder](/api/query-builder/) | `this` query builder for chaining. |
+
+## jsonSet()
+
+See [knex documentation](https://knexjs.org/guide/query-builder.html#jsonset)
+
+##### Return value
+
+| Type                                | Description                        |
+| ----------------------------------- | ---------------------------------- |
+| [QueryBuilder](/api/query-builder/) | `this` query builder for chaining. |
+
+## jsonInsert()
+
+See [knex documentation](https://knexjs.org/guide/query-builder.html#jsoninsert)
+
+##### Return value
+
+| Type                                | Description                        |
+| ----------------------------------- | ---------------------------------- |
+| [QueryBuilder](/api/query-builder/) | `this` query builder for chaining. |
+
+## jsonRemove()
+
+See [knex documentation](https://knexjs.org/guide/query-builder.html#jsonremove)
+
+##### Return value
+
+| Type                                | Description                        |
+| ----------------------------------- | ---------------------------------- |
+| [QueryBuilder](/api/query-builder/) | `this` query builder for chaining. |
+
+## whereJsonObject()
+
+See [knex documentation](https://knexjs.org/guide/query-builder.html#wherejsonobject)
+
+##### Return value
+
+| Type                                | Description                        |
+| ----------------------------------- | ---------------------------------- |
+| [QueryBuilder](/api/query-builder/) | `this` query builder for chaining. |
+
+## whereNotJsonObject()
+
+See [knex documentation](https://knexjs.org/guide/query-builder.html#wherejsonobject)
+
+##### Return value
+
+| Type                                | Description                        |
+| ----------------------------------- | ---------------------------------- |
+| [QueryBuilder](/api/query-builder/) | `this` query builder for chaining. |
+
+## whereJsonPath()
+
+See [knex documentation](https://knexjs.org/guide/query-builder.html#wherejsonpath)
+
+##### Return value
+
+| Type                                | Description                        |
+| ----------------------------------- | ---------------------------------- |
+| [QueryBuilder](/api/query-builder/) | `this` query builder for chaining. |
 
 ## whereJsonSupersetOf()
 
