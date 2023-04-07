@@ -1115,6 +1115,7 @@ declare namespace Objection {
     columnInfo: ColumnInfoMethod<this>;
 
     toKnexQuery<T extends {} = ModelObject<M>>(): Knex.QueryBuilder<T, T[]>;
+    knex(knex?: Knex): Knex;
     clone(): this;
 
     page(page: number, pageSize: number): PageQueryBuilder<this>;
