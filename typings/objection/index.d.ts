@@ -163,6 +163,7 @@ declare namespace Objection {
     | string[]
     | Record<string, Expression<PrimitiveValue>>;
   type OrderByDirection = 'asc' | 'desc' | 'ASC' | 'DESC';
+  type OrderByNulls = 'first' | 'last';
 
   interface Modifiers<QB extends AnyQueryBuilder = AnyQueryBuilder> {
     [key: string]: Modifier<QB>;
@@ -634,12 +635,13 @@ declare namespace Objection {
   interface OrderByDescriptor {
     column: ColumnRef;
     order?: OrderByDirection;
+    nulls?: OrderByNulls;
   }
 
   type ColumnRefOrOrderByDescriptor = ColumnRef | OrderByDescriptor;
 
   interface OrderByMethod<QB extends AnyQueryBuilder> {
-    (column: ColumnRef, order?: OrderByDirection): QB;
+    (column: ColumnRef, order?: OrderByDirection, nulls?: OrderByNulls): QB;
     (columns: ColumnRefOrOrderByDescriptor[]): QB;
   }
 

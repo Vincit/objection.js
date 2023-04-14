@@ -157,6 +157,7 @@ import { Person } from '../fixtures/person';
   await Person.query().orderBy('email');
   await Person.query().orderBy('email', 'ASC');
   await Person.query().orderBy('email', 'desc');
+  await Person.query().orderBy('email', 'desc', 'last');
   await Person.query().orderByRaw('? ASC', ['email']);
   await Person.query().orderByRaw('email desc');
 

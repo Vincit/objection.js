@@ -4,13 +4,13 @@ import * as objection from '../../';
 import {
   DBError,
   fn,
-  val,
+  QueryBuilder,
   raw,
   ref,
-  RelationMappings,
   RelationMapping,
-  QueryBuilder,
+  RelationMappings,
   StaticHookArguments,
+  val,
 } from '../../';
 
 // This file exercises the Objection.js typings.
@@ -1144,7 +1144,7 @@ const whereDelRetFirstWhere: PromiseLike<Person | undefined> = qb
 const orderByColumn: PromiseLike<Person[]> = qb.orderBy('firstName', 'asc');
 const orderByColumns: PromiseLike<Person[]> = qb.orderBy([
   'email',
-  { column: 'firstName', order: 'asc' },
+  { column: 'firstName', order: 'asc', nulls: 'first' },
   { column: 'lastName' },
 ]);
 
