@@ -127,13 +127,13 @@ declare namespace Objection {
     | number
     | boolean
     | Date
+    | Buffer
     | string[]
     | number[]
     | boolean[]
     | Date[]
-    | null
-    | Buffer
-    | Buffer[];
+    | Buffer[]
+    | null;
 
   type Expression<T> = T | Raw | ReferenceBuilder | ValueBuilder | AnyQueryBuilder;
 
