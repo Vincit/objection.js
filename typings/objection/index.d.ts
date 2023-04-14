@@ -986,6 +986,7 @@ declare namespace Objection {
 
     whereComposite: WhereCompositeMethod<this>;
     whereInComposite: WhereInCompositeMethod<this>;
+    whereNotInComposite: WhereInCompositeMethod<this>;
 
     union: UnionMethod<this>;
     unionAll: UnionMethod<this>;
