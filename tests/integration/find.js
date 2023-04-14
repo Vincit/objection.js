@@ -1753,6 +1753,19 @@ module.exports = (session) => {
           });
       });
 
+      it('should be able to alias the join table using aliasFor in many to many relation', () => {
+        return Model2.query()
+          .select('model2.*', 'model2Relation1.id')
+          .joinRelated('model2Relation1')
+          .aliasFor('Model1Model2', 'm1m2')
+          .where('m1m2.model1Id', '>', 5)
+          .then((models) => {
+            models = _.sortBy(models, ['idCol', 'id']);
+            expect(_.map(models, 'idCol')).to.eql([2, 2]);
+            expect(_.map(models, 'id')).to.eql([6, 7]);
+          });
+      });
+
       it('should be able to specify innerJoin', () => {
         return Model1.query()
           .innerJoinRelated('model1Relation1')
