@@ -40,11 +40,11 @@ function createRejectionReflection(err) {
   return {
     isRejected: () => true,
     isFulfilled: () => false,
-    reason: () => err
+    reason: () => err,
   };
 }
 
 module.exports = {
   expectPartialEqual,
-  createRejectionReflection
+  createRejectionReflection,
 };
