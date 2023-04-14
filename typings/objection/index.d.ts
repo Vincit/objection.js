@@ -526,7 +526,7 @@ declare namespace Objection {
 
   interface WhereCompositeMethod<QB extends AnyQueryBuilder> {
     (column: ColumnRef[], op: Operator, expr: readonly Expression<PrimitiveValue>[]): QB;
-    (column: ColumnRef, expr: readonly Expression<PrimitiveValue>): QB;
+    (column: ColumnRef, expr: Expression<PrimitiveValue>): QB;
     (column: ColumnRef, op: Operator, expr: Expression<PrimitiveValue>): QB;
     (column: ColumnRef[], expr: readonly Expression<PrimitiveValue>[]): QB;
     (column: ColumnRef[], qb: AnyQueryBuilder): QB;
