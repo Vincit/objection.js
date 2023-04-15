@@ -1044,6 +1044,40 @@ describe('Model', () => {
       });
     });
 
+    it('should format JSON attributes of all kinds', () => {
+      Model1.jsonAttributes = ['a', 'b', 'c', 'd', 'e', 'f'];
+      expect(
+        Model1.fromJson({
+          a: 1,
+          b: 'one',
+          c: { d: [1, 3] },
+          d: [1, 2, 3],
+          e: null,
+          f: undefined,
+
+          g: 1,
+          h: 'one',
+          i: { d: [1, 3] },
+          j: [1, 2, 3],
+          k: null,
+          l: undefined,
+        }).$toDatabaseJson()
+      ).to.eql({
+        a: '1',
+        b: '"one"',
+        c: '{"d":[1,3]}',
+        d: '[1,2,3]',
+        e: null,
+
+        g: 1,
+        h: 'one',
+        i: { d: [1, 3] },
+        j: [1, 2, 3],
+        k: null,
+      });
+      Model1.jsonAttributes = [];
+    });
+
     it('should call $formatDatabaseJson', () => {
       let calls = 0;
       let json = { a: 1 };
