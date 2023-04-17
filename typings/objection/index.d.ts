@@ -1417,9 +1417,9 @@ declare namespace Objection {
     table?: string;
   }
 
-  export interface Constructor<T> {
-    new (): T;
-  }
+  export type Constructor<TResult, TParams extends any[] = any[]> = new (
+    ...params: TParams
+  ) => TResult;
 
   export interface ModelConstructor<M extends Model> extends Constructor<M> {}
 
