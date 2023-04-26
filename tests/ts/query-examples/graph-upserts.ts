@@ -1,5 +1,6 @@
 import { UpsertGraphOptions } from '../../../typings/objection';
 import { Person } from '../fixtures/person';
+import { Animal } from '../fixtures/animal';
 
 (async () => {
   await Person.query().upsertGraph({
@@ -185,4 +186,13 @@ import { Person } from '../fixtures/person';
     },
     options
   );
+
+  // save an animal with only first name of the owner
+  // owner's type is defined as nullable with `Person | null` - and partial graph should still be accepted
+  // https://github.com/Vincit/objection.js/pull/2404
+  await Animal.query().upsertGraph({
+    species: 'Dog',
+    name: 'Wolfgang',
+    owner: { firstName: 'Jennifer' },
+  });
 })();
