@@ -376,7 +376,7 @@ class Animal extends objection.Model {
   // prettier-ignore
   species!: string;
   name?: string;
-  owner?: Person;
+  owner?: Person | null;
 
   // Tests the ColumnNameMappers interface.
   static columnNameMappers = {
