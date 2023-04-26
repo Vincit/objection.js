@@ -301,6 +301,27 @@ module.exports = (session) => {
             });
         });
 
+        it('.where() with a subquery and aliases (using tableRefFor in subquery)', () => {
+          return Model2.query()
+            .alias('m1')
+            .where((query) =>
+              query.where(
+                'id_col',
+                Model2.query()
+                  .select('m2.id_col')
+                  .alias('m2')
+                  .where(
+                    'm2.model2_prop2',
+                    ref(`${query.tableRefFor(query.modelClass())}.model2_prop2`)
+                  )
+              )
+            )
+            .orderBy('m1.model2_prop2')
+            .then((models) => {
+              expect(_.map(models, 'model2Prop2').sort()).to.eql([10, 20, 30]);
+            });
+        });
+
         it('.where() with an object and knex query builder', () => {
           return Model2.query()
             .where({
