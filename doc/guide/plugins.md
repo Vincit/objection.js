@@ -16,6 +16,7 @@ A curated list of plugins and modules for objection. Only plugins that follow [t
 
 - [objection-filter](https://github.com/tandg-digital/objection-filter) - API filtering on data and related models
 - [objection-graphql](https://github.com/vincit/objection-graphql) - Automatically generates rich graphql schema for objection models
+- [objectionjs-graphql](https://www.npmjs.com/package/objectionjs-graphql) - Automatically generates GraphQl schema for objection models compatible with Objection 3.x (Graph fetch support)
 
 ## Plugin development best practices
 
