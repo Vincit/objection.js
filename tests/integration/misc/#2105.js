@@ -44,12 +44,12 @@ module.exports = (session) => {
       Person.knex(knex);
     });
 
-    beforeEach(() => Person.query().delete());
     beforeEach(() => {
       return Person.query().insert({ firstName: 'John', lastName: 'Doe' });
     });
+    afterEach(() => Person.query().delete());
 
-    it('test', () => {
+    it('should not override lastName with undefined', () => {
       return Person.query()
         .where('lastName', 'Doe')
         .first()
@@ -57,11 +57,24 @@ module.exports = (session) => {
           return person
             .$query()
             .patch({ firstName: 'Jane' })
-            .then((count) => person);
+            .then(() => person);
         })
         .then((person) => {
           expect(person.firstName).to.eql('Jane');
           expect(person.lastName).to.eql('Doe');
+        });
+    });
+
+    it('should still set values to undefined if explicitly told to do so', () => {
+      Person.query()
+        .where('lastName', 'Doe')
+        .first()
+        .then((person) => {
+          person.$set({ lastName: undefined });
+        })
+        .then((person) => {
+          expect(person.firstName).to.eql('Jane');
+          expect(person.lastName).to.eql(undefined);
         });
     });
   });
