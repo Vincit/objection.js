@@ -1,6 +1,6 @@
 # Changelog
 
-## 3.0.3 (unreleased)
+## 3.0.3
 
 ### What's new
 

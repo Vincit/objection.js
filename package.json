@@ -1,6 +1,6 @@
 {
   "name": "objection",
-  "version": "3.0.2",
+  "version": "3.0.3",
   "description": "An SQL-friendly ORM for Node.js",
   "main": "lib/objection.js",
   "license": "MIT",
@@ -14,7 +14,7 @@
     "docs:build": "vuepress build doc"
   },
   "publishConfig": {
-    "tag": "next"
+    "tag": "latest"
   },
   "author": {
     "name": "Sami Koskimäki",
