@@ -42,5 +42,23 @@ describe('AjvValidator', () => {
       expect(definitions.length).to.be(2);
       definitions.forEach((d) => expect(d.required).to.be(undefined));
     });
+
+    it('should handle empty definitions', () => {
+      const emptyDefinitionsSchema = {
+        type: 'object',
+        required: ['a'],
+        definitions: {},
+        additionalProperties: false,
+        properties: {
+          a: { type: 'string' },
+        },
+      };
+      const validator = new AjvValidator({ onCreateAjv: () => {} });
+      validator.getValidator(
+        modelClass('test', emptyDefinitionsSchema),
+        emptyDefinitionsSchema,
+        true
+      );
+    });
   });
 });
