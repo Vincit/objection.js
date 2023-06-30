@@ -34,6 +34,33 @@ describe('AjvValidator', () => {
       anyOf: [{ $ref: '#/definitions/TestRef1' }, { $ref: '#/definitions/TestRef2' }],
     };
 
+    const schema2 = {
+      type: 'object',
+      discriminator: { propertyName: 'foo' },
+      required: ['bar', 'foo'],
+      properties: {
+        bar: {
+          type: 'string',
+        },
+      },
+      oneOf: [
+        {
+          properties: {
+            foo: { const: 'x' },
+            a: { type: 'string' },
+          },
+          required: ['a'],
+        },
+        {
+          properties: {
+            foo: { enum: ['y', 'z'] },
+            b: { type: 'string' },
+          },
+          required: ['b'],
+        },
+      ],
+    };
+
     it('should remove required fields from definitions', () => {
       const validator = new AjvValidator({ onCreateAjv: () => {} });
       const validators = validator.getValidator(modelClass('test', schema), schema, true);
@@ -41,6 +68,17 @@ describe('AjvValidator', () => {
 
       expect(definitions.length).to.be(2);
       definitions.forEach((d) => expect(d.required).to.be(undefined));
+    });
+
+    it('should not remove required fields if there is a discriminator', () => {
+      const validator = new AjvValidator({
+        onCreateAjv: () => {},
+        options: {
+          discriminator: true,
+        },
+      });
+      const validators = validator.getValidator(modelClass('test', schema2), schema2, true);
+      expect(validators.schema.required).to.eql(['foo']);
     });
 
     it('should handle empty definitions', () => {
