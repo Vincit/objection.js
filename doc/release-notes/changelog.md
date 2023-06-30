@@ -1,5 +1,62 @@
 # Changelog
 
+## 3.0.4
+
+### What's new
+
+- Fixes [#2447](https://github.com/Vincit/objection.js/issues/2447)
+
+## 3.0.3
+
+### What's new
+
+- Fixes [#1673](https://github.com/Vincit/objection.js/issues/1673)
+- Fixes [#1957](https://github.com/Vincit/objection.js/issues/1957)
+- Fixes [#2105](https://github.com/Vincit/objection.js/issues/2105)
+- Fixes [#2132](https://github.com/Vincit/objection.js/issues/2132)
+- Fixes [#2251](https://github.com/Vincit/objection.js/issues/2251)
+- Fixes [#2262](https://github.com/Vincit/objection.js/issues/2262)
+- Fixes [#2271](https://github.com/Vincit/objection.js/issues/2271)
+- Fixes [#2277](https://github.com/Vincit/objection.js/issues/2277)
+- Fixes [#2308](https://github.com/Vincit/objection.js/pull/2308)
+- Fixes [#2311](https://github.com/Vincit/objection.js/issues/2311)
+- Fixes [#2311](https://github.com/Vincit/objection.js/pull/2311)
+- Fixes [#2311](https://github.com/Vincit/objection.js/pull/2311)
+- Fixes [#2332](https://github.com/Vincit/objection.js/issues/2332)
+- Fixes [#2337](https://github.com/Vincit/objection.js/issues/2337)
+- Fixes [#2372](https://github.com/Vincit/objection.js/pull/2372)
+- Fixes [#2379](https://github.com/Vincit/objection.js/pull/2379)
+- Fixes [#2383](https://github.com/Vincit/objection.js/pull/2383)
+- Fixes [#2399](https://github.com/Vincit/objection.js/pull/2399)
+- Fixes [#2404](https://github.com/Vincit/objection.js/pull/2404)
+- Fixes [#2405](https://github.com/Vincit/objection.js/pull/2405)
+- Fixes [#2408](https://github.com/Vincit/objection.js/pull/2408)
+- Fixes [#2409](https://github.com/Vincit/objection.js/pull/2409)
+- Fixes [#2423](https://github.com/Vincit/objection.js/pull/2423)
+
+## 3.0.2
+
+### What's new
+
+- Fixes [#1356](https://github.com/Vincit/objection.js/issues/1356)
+- Fixes [#1957](https://github.com/Vincit/objection.js/issues/1957)
+- Fixes [#2192](https://github.com/Vincit/objection.js/issues/2192)
+- Fixes [#2247](https://github.com/Vincit/objection.js/pull/2247)
+- Fixes [#2307](https://github.com/Vincit/objection.js/pull/2307)
+- Fixes [#2308](https://github.com/Vincit/objection.js/pull/2308)
+- Fixes [#2311](https://github.com/Vincit/objection.js/pull/2311)
+- Fixes [#2323](https://github.com/Vincit/objection.js/pull/2323)
+- Fixes [#2337](https://github.com/Vincit/objection.js/issues/2337)
+- Fixes [#2362](https://github.com/Vincit/objection.js/pull/2362)
+
+## 3.0.1
+
+### What's new
+
+- Fixes [#2123](https://github.com/Vincit/objection.js/issues/2123)
+- Fixes [#2150](https://github.com/Vincit/objection.js/issues/2150)
+- Fixes [#2179](https://github.com/Vincit/objection.js/pull/2179)
+
 ## 3.0.0
 
 ### What's new

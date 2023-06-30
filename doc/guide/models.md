@@ -8,7 +8,7 @@ Each model must have an identifier column. The identifier column name can be set
 
 In objection, all configuration is done through [Model](/api/model/) classes and there is no global configuration or state. There is no "objection instance". This allows you to create isolated components and for example to use multiple different databases with different configurations in one app. Most of the time you want the same configuration for all models and a good pattern is to create a `BaseModel` class and inherit all your models from that. You can then add all shared configuration to `BaseModel`. See the static properties in [API Reference / Model](/api/model/static-properties.html#static-tablename) section for all available configuration options.
 
-Note that in addition to `idColumn`, you don't define properties, indexes or anything else related to database schema in the model. In objection, database schema is considered a separate concern and should be handled using [migrations](https://knexjs.org/#Migrations). The reasoning is that every non-trivial project will need migrations anyway. Managing the schema in two places (model and migrations) only makes things more complex in the long run.
+Note that in addition to `idColumn`, you don't define properties, indexes or anything else related to database schema in the model. In objection, database schema is considered a separate concern and should be handled using [migrations](https://knexjs.org/guide/migrations.html). The reasoning is that every non-trivial project will need migrations anyway. Managing the schema in two places (model and migrations) only makes things more complex in the long run.
 
 ## Examples
 

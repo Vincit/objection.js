@@ -1,6 +1,6 @@
 {
   "name": "objection",
-  "version": "3.0.1",
+  "version": "3.0.4",
   "description": "An SQL-friendly ORM for Node.js",
   "main": "lib/objection.js",
   "license": "MIT",
@@ -8,13 +8,13 @@
     "test": "npm run eslint && mocha --slow 10 --timeout 15000 --reporter spec --recursive tests --exclude \"tests/unit/relations/files/**\" && npm run test:typings",
     "test:fast": "mocha --slow 10 --timeout 15000 --reporter spec --recursive tests --bail --exclude \"tests/unit/relations/files/**\"",
     "test:typings": "tsc",
-    "prettier": "prettier --write \"{examples,lib,tests,typings,doc}/**/*.{js,ts}\"",
+    "prettier": "prettier --write \"{examples,lib,tests,testUtils,typings,doc}/**/*.{js,ts}\"",
     "eslint": "eslint --format codeframe \"examples/**/*.js\" \"lib/**/*.js\" \"tests/**/*.js\"",
     "docs:dev": "vuepress dev doc",
     "docs:build": "vuepress build doc"
   },
   "publishConfig": {
-    "tag": "next"
+    "tag": "latest"
   },
   "author": {
     "name": "Sami Koskimäki",
@@ -57,23 +57,23 @@
     "db-errors": "^0.2.3"
   },
   "peerDependencies": {
-    "knex": ">=0.95.0"
+    "knex": ">=1.0.1"
   },
   "devDependencies": {
-    "@types/node": "^16.11.6",
+    "@types/node": "^20.1.7",
     "chai": "^4.3.4",
     "chai-subset": "^1.6.0",
     "eslint": "^8.1.0",
     "eslint-formatter-codeframe": "^7.32.1",
     "eslint-plugin-prettier": "^4.0.0",
     "expect.js": "^0.3.1",
-    "knex": "0.95.13",
-    "mocha": "^9.1.3",
+    "knex": ">=1.0.1",
+    "mocha": "^10.2.0",
     "mysql": "^2.18.1",
     "pg": "^8.7.1",
-    "prettier": "2.4.1",
+    "prettier": "2.8.8",
     "sqlite3": "^5.0.2",
-    "typescript": "^4.5.4",
-    "vuepress": "1.8.2"
+    "typescript": ">=4.5.4",
+    "vuepress": "1.9.9"
   }
 }

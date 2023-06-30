@@ -127,16 +127,17 @@ declare namespace Objection {
     | number
     | boolean
     | Date
+    | Buffer
     | string[]
     | number[]
     | boolean[]
     | Date[]
-    | null
-    | Buffer;
+    | Buffer[]
+    | null;
 
   type Expression<T> = T | Raw | ReferenceBuilder | ValueBuilder | AnyQueryBuilder;
 
-  type Id = string | number | BigInt;
+  type Id = string | number | BigInt | Buffer;
   type CompositeId = Id[];
   type MaybeCompositeId = Id | CompositeId;
 
@@ -162,6 +163,7 @@ declare namespace Objection {
     | string[]
     | Record<string, Expression<PrimitiveValue>>;
   type OrderByDirection = 'asc' | 'desc' | 'ASC' | 'DESC';
+  type OrderByNulls = 'first' | 'last';
 
   interface Modifiers<QB extends AnyQueryBuilder = AnyQueryBuilder> {
     [key: string]: Modifier<QB>;
@@ -192,9 +194,7 @@ declare namespace Objection {
   /**
    * A Pojo version of model.
    */
-  type ModelObject<T extends Model> = {
-    [K in DataPropertyNames<T>]: T[K];
-  };
+  type ModelObject<T extends Model> = Pick<T, DataPropertyNames<T>>;
 
   /**
    * Any object that has some of the properties of model class T match this type.
@@ -221,15 +221,21 @@ declare namespace Objection {
   /**
    * Just like PartialModelObject but this is applied recursively to relations.
    */
-  type PartialModelGraph<M, T = M & GraphParameters> = {
-    [K in DataPropertyNames<T>]?: Defined<T[K]> extends Model
-      ? PartialModelGraph<Defined<T[K]>>
-      : Defined<T[K]> extends Array<infer I>
+  type PartialModelGraph<M, T = M & GraphParameters> = T extends any
+    ? {
+        [K in DataPropertyNames<T>]?: null extends T[K]
+          ? PartialModelGraphField<NonNullable<T[K]>> | null // handle nullable BelongsToOneRelations
+          : PartialModelGraphField<T[K]>;
+      }
+    : never;
+
+  type PartialModelGraphField<F> = Defined<F> extends Model
+    ? PartialModelGraph<Defined<F>>
+    : Defined<F> extends Array<infer I>
       ? I extends Model
         ? PartialModelGraph<I>[]
-        : Expression<T[K]>
-      : Expression<T[K]>;
-  };
+        : Expression<F>
+      : Expression<F>;
 
   /**
    * Extracts the property names (excluding relations) of a model class.
@@ -362,6 +368,59 @@ declare namespace Objection {
     (table: TableRef<QB>): QB;
   }
 
+  interface FromRawMethod<QB extends AnyQueryBuilder> extends RawInterface<QB> {}
+
+  interface JsonExtraction {
+    column: string | Raw | Knex.QueryBuilder;
+    path: string;
+    alias?: string;
+    singleValue?: boolean;
+  }
+
+  interface JsonExtract<QB extends AnyQueryBuilder> {
+    // These must come first so that we get autocomplete.
+    <QBP extends QB>(
+      column: ModelProps<ModelType<QBP>>,
+      path: string,
+      alias?: string,
+      singleValue?: boolean
+    ): QB;
+
+    (column: ColumnRef, path: string, alias?: string, singleValue?: boolean): QB;
+    (column: JsonExtraction[] | any[][], singleValue?: boolean): QB;
+  }
+
+  interface JsonSet<QB extends AnyQueryBuilder> {
+    // These must come first so that we get autocomplete.
+    <QBP extends QB>(
+      column: ModelProps<ModelType<QBP>>,
+      path: string,
+      value: any,
+      alias?: string
+    ): QB;
+
+    (column: ColumnRef, path: string, value: any, alias?: string): QB;
+  }
+
+  interface JsonInsert<QB extends AnyQueryBuilder> {
+    // These must come first so that we get autocomplete.
+    <QBP extends QB>(
+      column: ModelProps<ModelType<QBP>>,
+      path: string,
+      value: any,
+      alias?: string
+    ): QB;
+
+    (column: ColumnRef, path: string, value: any, alias?: string): QB;
+  }
+
+  interface JsonRemove<QB extends AnyQueryBuilder> {
+    // These must come first so that we get autocomplete.
+    <QBP extends QB>(column: ModelProps<ModelType<QBP>>, path: string, alias?: string): QB;
+
+    (column: ColumnRef, path: string, alias?: string): QB;
+  }
+
   interface WhereMethod<QB extends AnyQueryBuilder> {
     // These must come first so that we get autocomplete.
     <QBP extends QB>(
@@ -405,7 +464,7 @@ declare namespace Objection {
     <QBP extends QB>(col: ModelProps<ModelType<QBP>>, cb: CallbackVoid<QB>): QB;
     <QBP extends QB>(col: ModelProps<ModelType<QBP>>, qb: AnyQueryBuilder): QB;
 
-    (col: ColumnRef | ColumnRef[], expr: Expression<PrimitiveValue>[]): QB;
+    (col: ColumnRef | ColumnRef[], expr: readonly Expression<PrimitiveValue>[]): QB;
     (col: ColumnRef | ColumnRef[], cb: CallbackVoid<QB>): QB;
     (col: ColumnRef | ColumnRef[], qb: AnyQueryBuilder): QB;
   }
@@ -425,6 +484,25 @@ declare namespace Objection {
 
     (col1: ColumnRef, op: Operator, col2: ColumnRef): QB;
     (col1: ColumnRef, col2: ColumnRef): QB;
+  }
+
+  interface WhereJsonObject<QB extends AnyQueryBuilder> {
+    // These must come first so that we get autocomplete.
+    <QBP extends QB>(col: ModelProps<ModelType<QBP>>, value: any): QB;
+
+    (col: ColumnRef, value: any): QB;
+  }
+
+  interface WhereJsonPath<QB extends AnyQueryBuilder> {
+    // These must come first so that we get autocomplete.
+    <QBP extends QB>(
+      col: ModelProps<ModelType<QBP>>,
+      jsonPath: string,
+      operator: string,
+      value: any
+    ): QB;
+
+    (col: ColumnRef, jsonPath: string, operator: string, value: any): QB;
   }
 
   interface WhereJsonMethod<QB extends AnyQueryBuilder> {
@@ -451,17 +529,17 @@ declare namespace Objection {
   }
 
   interface WhereCompositeMethod<QB extends AnyQueryBuilder> {
-    (column: ColumnRef[], op: Operator, expr: Expression<PrimitiveValue>[]): QB;
+    (column: ColumnRef[], op: Operator, expr: readonly Expression<PrimitiveValue>[]): QB;
     (column: ColumnRef, expr: Expression<PrimitiveValue>): QB;
     (column: ColumnRef, op: Operator, expr: Expression<PrimitiveValue>): QB;
-    (column: ColumnRef[], expr: Expression<PrimitiveValue>[]): QB;
+    (column: ColumnRef[], expr: readonly Expression<PrimitiveValue>[]): QB;
     (column: ColumnRef[], qb: AnyQueryBuilder): QB;
   }
 
   interface WhereInCompositeMethod<QB extends AnyQueryBuilder> {
-    (column: ColumnRef, expr: Expression<PrimitiveValue>[]): QB;
+    (column: ColumnRef, expr: readonly Expression<PrimitiveValue>[]): QB;
     (column: ColumnRef, qb: AnyQueryBuilder): QB;
-    (column: ColumnRef[], expr: Expression<PrimitiveValue>[][]): QB;
+    (column: ColumnRef[], expr: readonly Expression<PrimitiveValue>[][]): QB;
     (column: ColumnRef[], qb: AnyQueryBuilder): QB;
   }
 
@@ -561,12 +639,13 @@ declare namespace Objection {
   interface OrderByDescriptor {
     column: ColumnRef;
     order?: OrderByDirection;
+    nulls?: OrderByNulls;
   }
 
   type ColumnRefOrOrderByDescriptor = ColumnRef | OrderByDescriptor;
 
   interface OrderByMethod<QB extends AnyQueryBuilder> {
-    (column: ColumnRef, order?: OrderByDirection): QB;
+    (column: ColumnRef, order?: OrderByDirection, nulls?: OrderByNulls): QB;
     (columns: ColumnRefOrOrderByDescriptor[]): QB;
   }
 
@@ -613,7 +692,7 @@ declare namespace Objection {
   }
 
   interface TableRefForMethod {
-    (modelClass: typeof Model): string;
+    (modelClass: ModelClass<Model> | typeof Model): string;
   }
 
   interface AliasForMethod<QB extends AnyQueryBuilder> {
@@ -627,12 +706,10 @@ declare namespace Objection {
   interface ReturningMethod {
     <QB extends AnyQueryBuilder>(
       this: QB,
-      column: string | string[]
-    ): QB extends ArrayQueryBuilder<QB>
+      column: string | Raw | (string | Raw)[]
+    ): QB extends NumberQueryBuilder<QB>
       ? ArrayQueryBuilder<QB>
-      : QB extends NumberQueryBuilder<QB>
-      ? ArrayQueryBuilder<QB>
-      : SingleQueryBuilder<QB>;
+      : QB;
   }
 
   interface TimeoutOptions {
@@ -790,6 +867,12 @@ declare namespace Objection {
     from: FromMethod<this>;
     table: FromMethod<this>;
     into: FromMethod<this>;
+    fromRaw: FromRawMethod<this>;
+
+    jsonExtract: JsonExtract<this>;
+    jsonSet: JsonSet<this>;
+    jsonInsert: JsonInsert<this>;
+    jsonRemove: JsonRemove<this>;
 
     where: WhereMethod<this>;
     andWhere: WhereMethod<this>;
@@ -797,6 +880,12 @@ declare namespace Objection {
     whereNot: WhereMethod<this>;
     andWhereNot: WhereMethod<this>;
     orWhereNot: WhereMethod<this>;
+    whereLike: WhereMethod<this>;
+    andWhereLike: WhereMethod<this>;
+    orWhereLike: WhereMethod<this>;
+    whereILike: WhereMethod<this>;
+    andWhereILike: WhereMethod<this>;
+    orWhereILike: WhereMethod<this>;
 
     whereRaw: WhereRawMethod<this>;
     orWhereRaw: WhereRawMethod<this>;
@@ -834,13 +923,28 @@ declare namespace Objection {
     orWhereNotColumn: WhereColumnMethod<this>;
     andWhereNotColumn: WhereColumnMethod<this>;
 
+    whereJsonObject: WhereJsonObject<this>;
+    orWhereJsonObject: WhereJsonObject<this>;
+    andWhereJsonObject: WhereJsonObject<this>;
+    whereNotJsonObject: WhereJsonObject<this>;
+    orWhereNotJsonObject: WhereJsonObject<this>;
+    andWhereNotJsonObject: WhereJsonObject<this>;
+
+    whereJsonPath: WhereJsonPath<this>;
+    orWhereJsonPath: WhereJsonPath<this>;
+    andWhereJsonPath: WhereJsonPath<this>;
+
     whereJsonSupersetOf: WhereJsonMethod<this>;
+    andWhereJsonSupersetOf: WhereJsonMethod<this>;
     orWhereJsonSupersetOf: WhereJsonMethod<this>;
     whereJsonNotSupersetOf: WhereJsonMethod<this>;
+    andWhereJsonNotSupersetOf: WhereJsonMethod<this>;
     orWhereJsonNotSupersetOf: WhereJsonMethod<this>;
     whereJsonSubsetOf: WhereJsonMethod<this>;
+    andWhereJsonSubsetOf: WhereJsonMethod<this>;
     orWhereJsonSubsetOf: WhereJsonMethod<this>;
     whereJsonNotSubsetOf: WhereJsonMethod<this>;
+    andWhereJsonNotSubsetOf: WhereJsonMethod<this>;
     orWhereJsonNotSubsetOf: WhereJsonMethod<this>;
     whereJsonIsArray: WhereFieldExpressionMethod<this>;
     orWhereJsonIsArray: WhereFieldExpressionMethod<this>;
@@ -884,6 +988,7 @@ declare namespace Objection {
 
     whereComposite: WhereCompositeMethod<this>;
     whereInComposite: WhereInCompositeMethod<this>;
+    whereNotInComposite: WhereInCompositeMethod<this>;
 
     union: UnionMethod<this>;
     unionAll: UnionMethod<this>;
@@ -892,6 +997,8 @@ declare namespace Objection {
     with: WithMethod<this>;
     withRecursive: WithMethod<this>;
     withWrapped: WithMethod<this>;
+    withMaterialized: WithMethod<this>;
+    withNotMaterialized: WithMethod<this>;
 
     joinRelated: JoinRelatedMethod<this>;
     innerJoinRelated: JoinRelatedMethod<this>;
@@ -991,6 +1098,8 @@ declare namespace Objection {
     returning: ReturningMethod;
     forUpdate: IdentityMethod<this>;
     forShare: IdentityMethod<this>;
+    forNoKeyUpdate: IdentityMethod<this>;
+    forKeyShare: IdentityMethod<this>;
     skipLocked: IdentityMethod<this>;
     noWait: IdentityMethod<this>;
     skipUndefined: IdentityMethod<this>;
@@ -1008,7 +1117,8 @@ declare namespace Objection {
     timeout: TimeoutMethod<this>;
     columnInfo: ColumnInfoMethod<this>;
 
-    toKnexQuery<T = ModelObject<M>>(): Knex.QueryBuilder<T, T[]>;
+    toKnexQuery<T extends {} = ModelObject<M>>(): Knex.QueryBuilder<T, T[]>;
+    knex(knex?: Knex): Knex;
     clone(): this;
 
     page(page: number, pageSize: number): PageQueryBuilder<this>;
@@ -1145,6 +1255,8 @@ declare namespace Objection {
     to: RelationMappingColumnRef;
     extra?: string | string[] | Record<string, string>;
     modelClass?: ModelClassSpecifier;
+    modify?: Modifier<QueryBuilderType<M>>;
+    filter?: Modifier<QueryBuilderType<M>>;
     beforeInsert?: RelationMappingHook<M>;
   }
 
@@ -1307,9 +1419,9 @@ declare namespace Objection {
     table?: string;
   }
 
-  export interface Constructor<T> {
-    new (): T;
-  }
+  export type Constructor<TResult, TParams extends any[] = any[]> = new (
+    ...params: TParams
+  ) => TResult;
 
   export interface ModelConstructor<M extends Model> extends Constructor<M> {}
 

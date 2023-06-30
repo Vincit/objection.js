@@ -14,7 +14,7 @@ const req = axios.create({
 })
 
 ;(async () => {
-  const matt = await inserPersonWithRelations()
+  const matt = await insertPersonWithRelations()
   await fetchPeople()
 
   await updatePerson(matt, { age: 41 })
@@ -47,7 +47,7 @@ const req = axios.create({
   }
 })
 
-async function inserPersonWithRelations() {
+async function insertPersonWithRelations() {
   console.log(`
     ////////////////////////////////////////////////
     //       Insert a person with relations       //

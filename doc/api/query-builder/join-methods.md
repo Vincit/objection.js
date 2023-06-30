@@ -122,7 +122,7 @@ Full outer join version of the [joinRelated](/api/query-builder/join-methods.htm
 
 ## join()
 
-See [knex documentation](http://knexjs.org/#Builder-join)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#join)
 
 ##### Return value
 
@@ -132,7 +132,7 @@ See [knex documentation](http://knexjs.org/#Builder-join)
 
 ## joinRaw()
 
-See [knex documentation](http://knexjs.org/#Builder-joinRaw)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#joinraw)
 
 ##### Return value
 
@@ -142,7 +142,7 @@ See [knex documentation](http://knexjs.org/#Builder-joinRaw)
 
 ## innerJoin()
 
-See [knex documentation](http://knexjs.org/#Builder-innerJoin)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#innerjoin)
 
 ##### Return value
 
@@ -152,7 +152,7 @@ See [knex documentation](http://knexjs.org/#Builder-innerJoin)
 
 ## leftJoin()
 
-See [knex documentation](http://knexjs.org/#Builder-leftJoin)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#leftjoin)
 
 ##### Return value
 
@@ -162,7 +162,7 @@ See [knex documentation](http://knexjs.org/#Builder-leftJoin)
 
 ## leftOuterJoin()
 
-See [knex documentation](http://knexjs.org/#Builder-leftOuterJoin)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#leftouterjoin)
 
 ##### Return value
 
@@ -172,7 +172,7 @@ See [knex documentation](http://knexjs.org/#Builder-leftOuterJoin)
 
 ## rightJoin()
 
-See [knex documentation](http://knexjs.org/#Builder-rightJoin)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#rightjoin)
 
 ##### Return value
 
@@ -182,7 +182,7 @@ See [knex documentation](http://knexjs.org/#Builder-rightJoin)
 
 ## rightOuterJoin()
 
-See [knex documentation](http://knexjs.org/#Builder-rightOuterJoin)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#rightouterjoin)
 
 ##### Return value
 
@@ -192,7 +192,7 @@ See [knex documentation](http://knexjs.org/#Builder-rightOuterJoin)
 
 ## outerJoin()
 
-See [knex documentation](http://knexjs.org/#Builder-outerJoin)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#fullouterjoin)
 
 ##### Return value
 
@@ -202,7 +202,7 @@ See [knex documentation](http://knexjs.org/#Builder-outerJoin)
 
 ## fullOuterJoin()
 
-See [knex documentation](http://knexjs.org/#Builder-fullOuterJoin)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#fullouterjoin)
 
 ##### Return value
 
@@ -212,7 +212,7 @@ See [knex documentation](http://knexjs.org/#Builder-fullOuterJoin)
 
 ## crossJoin()
 
-See [knex documentation](http://knexjs.org/#Builder-crossJoin)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#crossjoin)
 
 ##### Return value
 

@@ -301,6 +301,27 @@ module.exports = (session) => {
             });
         });
 
+        it('.where() with a subquery and aliases (using tableRefFor in subquery)', () => {
+          return Model2.query()
+            .alias('m1')
+            .where((query) =>
+              query.where(
+                'id_col',
+                Model2.query()
+                  .select('m2.id_col')
+                  .alias('m2')
+                  .where(
+                    'm2.model2_prop2',
+                    ref(`${query.tableRefFor(query.modelClass())}.model2_prop2`)
+                  )
+              )
+            )
+            .orderBy('m1.model2_prop2')
+            .then((models) => {
+              expect(_.map(models, 'model2Prop2').sort()).to.eql([10, 20, 30]);
+            });
+        });
+
         it('.where() with an object and knex query builder', () => {
           return Model2.query()
             .where({
@@ -1750,6 +1771,19 @@ module.exports = (session) => {
             models = _.sortBy(models, ['idCol', 'id']);
             expect(_.map(models, 'idCol')).to.eql([1, 2]);
             expect(_.map(models, 'id')).to.eql([5, 6]);
+          });
+      });
+
+      it('should be able to alias the join table using aliasFor in many to many relation', () => {
+        return Model2.query()
+          .select('model2.*', 'model2Relation1.id')
+          .joinRelated('model2Relation1')
+          .aliasFor('Model1Model2', 'm1m2')
+          .where('m1m2.model1Id', '>', 5)
+          .then((models) => {
+            models = _.sortBy(models, ['idCol', 'id']);
+            expect(_.map(models, 'idCol')).to.eql([2, 2]);
+            expect(_.map(models, 'id')).to.eql([6, 7]);
           });
       });
 

@@ -1,6 +1,6 @@
 # Getting started
 
-To use objection.js all you need to do is [initialize knex](http://knexjs.org/#Installation-node) and give the created knex instance to objection.js using [Model.knex(knex)](/api/model/static-methods.html#static-knex). Doing this installs the knex instance globally for all models (even the ones that have not been created yet). If you need to use multiple databases check out our [multi-tenancy recipe](/recipes/multitenancy-using-multiple-databases.html).
+To use objection.js all you need to do is [initialize knex](https://knexjs.org/guide/#node-js) and give the created knex instance to objection.js using [Model.knex(knex)](/api/model/static-methods.html#static-knex). Doing this installs the knex instance globally for all models (even the ones that have not been created yet). If you need to use multiple databases check out our [multi-tenancy recipe](/recipes/multitenancy-using-multiple-databases.html).
 
 The next step is to create some migrations and models and start using objection.js. The best way to get started is to check out one of our example projects:
 

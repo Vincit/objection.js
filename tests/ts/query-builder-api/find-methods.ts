@@ -36,6 +36,8 @@ import { Person } from '../fixtures/person';
   await Person.query().transacting(Person.knex()).select('*');
 
   await Person.query().forShare().select('*');
+  await Person.query().forNoKeyUpdate().select('*');
+  await Person.query().forKeyShare().select('*');
 
   await Person.query().select('name').as('person_name');
 
@@ -157,6 +159,7 @@ import { Person } from '../fixtures/person';
   await Person.query().orderBy('email');
   await Person.query().orderBy('email', 'ASC');
   await Person.query().orderBy('email', 'desc');
+  await Person.query().orderBy('email', 'desc', 'last');
   await Person.query().orderByRaw('? ASC', ['email']);
   await Person.query().orderByRaw('email desc');
 

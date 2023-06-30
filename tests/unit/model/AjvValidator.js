@@ -80,5 +80,23 @@ describe('AjvValidator', () => {
       const validators = validator.getValidator(modelClass('test', schema2), schema2, true);
       expect(validators.schema.required).to.eql(['foo']);
     });
+
+    it('should handle empty definitions', () => {
+      const emptyDefinitionsSchema = {
+        type: 'object',
+        required: ['a'],
+        definitions: {},
+        additionalProperties: false,
+        properties: {
+          a: { type: 'string' },
+        },
+      };
+      const validator = new AjvValidator({ onCreateAjv: () => {} });
+      validator.getValidator(
+        modelClass('test', emptyDefinitionsSchema),
+        emptyDefinitionsSchema,
+        true
+      );
+    });
   });
 });
