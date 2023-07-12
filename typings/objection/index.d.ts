@@ -127,17 +127,17 @@ declare namespace Objection {
     | number
     | boolean
     | Date
+    | Buffer
     | string[]
     | number[]
     | boolean[]
     | Date[]
-    | null
-    | Buffer
-    | Buffer[];
+    | Buffer[]
+    | null;
 
   type Expression<T> = T | Raw | ReferenceBuilder | ValueBuilder | AnyQueryBuilder;
 
-  type Id = string | number | BigInt;
+  type Id = string | number | BigInt | Buffer;
   type CompositeId = Id[];
   type MaybeCompositeId = Id | CompositeId;
 
@@ -163,6 +163,7 @@ declare namespace Objection {
     | string[]
     | Record<string, Expression<PrimitiveValue>>;
   type OrderByDirection = 'asc' | 'desc' | 'ASC' | 'DESC';
+  type OrderByNulls = 'first' | 'last';
 
   interface Modifiers<QB extends AnyQueryBuilder = AnyQueryBuilder> {
     [key: string]: Modifier<QB>;
@@ -222,11 +223,13 @@ declare namespace Objection {
   /**
    * Just like PartialModelObject but this is applied recursively to relations.
    */
-  type PartialModelGraph<M, T = M & GraphParameters> = {
-    [K in DataPropertyNames<T>]?: null extends T[K]
-      ? PartialModelGraphField<NonNullable<T[K]>> | null // handle nullable BelongsToOneRelations
-      : PartialModelGraphField<T[K]>;
-  };
+  type PartialModelGraph<M, T = M & GraphParameters> = T extends any
+    ? {
+        [K in DataPropertyNames<T>]?: null extends T[K]
+          ? PartialModelGraphField<NonNullable<T[K]>> | null // handle nullable BelongsToOneRelations
+          : PartialModelGraphField<T[K]>;
+      }
+    : never;
 
   type PartialModelGraphField<F> = Defined<F> extends Model
     ? PartialModelGraph<Defined<F>>
@@ -463,7 +466,7 @@ declare namespace Objection {
     <QBP extends QB>(col: ModelProps<ModelType<QBP>>, cb: CallbackVoid<QB>): QB;
     <QBP extends QB>(col: ModelProps<ModelType<QBP>>, qb: AnyQueryBuilder): QB;
 
-    (col: ColumnRef | ColumnRef[], expr: Expression<PrimitiveValue>[]): QB;
+    (col: ColumnRef | ColumnRef[], expr: readonly Expression<PrimitiveValue>[]): QB;
     (col: ColumnRef | ColumnRef[], cb: CallbackVoid<QB>): QB;
     (col: ColumnRef | ColumnRef[], qb: AnyQueryBuilder): QB;
   }
@@ -528,17 +531,17 @@ declare namespace Objection {
   }
 
   interface WhereCompositeMethod<QB extends AnyQueryBuilder> {
-    (column: ColumnRef[], op: Operator, expr: Expression<PrimitiveValue>[]): QB;
+    (column: ColumnRef[], op: Operator, expr: readonly Expression<PrimitiveValue>[]): QB;
     (column: ColumnRef, expr: Expression<PrimitiveValue>): QB;
     (column: ColumnRef, op: Operator, expr: Expression<PrimitiveValue>): QB;
-    (column: ColumnRef[], expr: Expression<PrimitiveValue>[]): QB;
+    (column: ColumnRef[], expr: readonly Expression<PrimitiveValue>[]): QB;
     (column: ColumnRef[], qb: AnyQueryBuilder): QB;
   }
 
   interface WhereInCompositeMethod<QB extends AnyQueryBuilder> {
-    (column: ColumnRef, expr: Expression<PrimitiveValue>[]): QB;
+    (column: ColumnRef, expr: readonly Expression<PrimitiveValue>[]): QB;
     (column: ColumnRef, qb: AnyQueryBuilder): QB;
-    (column: ColumnRef[], expr: Expression<PrimitiveValue>[][]): QB;
+    (column: ColumnRef[], expr: readonly Expression<PrimitiveValue>[][]): QB;
     (column: ColumnRef[], qb: AnyQueryBuilder): QB;
   }
 
@@ -638,12 +641,13 @@ declare namespace Objection {
   interface OrderByDescriptor {
     column: ColumnRef;
     order?: OrderByDirection;
+    nulls?: OrderByNulls;
   }
 
   type ColumnRefOrOrderByDescriptor = ColumnRef | OrderByDescriptor;
 
   interface OrderByMethod<QB extends AnyQueryBuilder> {
-    (column: ColumnRef, order?: OrderByDirection): QB;
+    (column: ColumnRef, order?: OrderByDirection, nulls?: OrderByNulls): QB;
     (columns: ColumnRefOrOrderByDescriptor[]): QB;
   }
 
@@ -704,12 +708,10 @@ declare namespace Objection {
   interface ReturningMethod {
     <QB extends AnyQueryBuilder>(
       this: QB,
-      column: string | string[]
-    ): QB extends ArrayQueryBuilder<QB>
+      column: string | Raw | (string | Raw)[]
+    ): QB extends NumberQueryBuilder<QB>
       ? ArrayQueryBuilder<QB>
-      : QB extends NumberQueryBuilder<QB>
-      ? ArrayQueryBuilder<QB>
-      : SingleQueryBuilder<QB>;
+      : QB;
   }
 
   interface TimeoutOptions {
@@ -988,6 +990,7 @@ declare namespace Objection {
 
     whereComposite: WhereCompositeMethod<this>;
     whereInComposite: WhereInCompositeMethod<this>;
+    whereNotInComposite: WhereInCompositeMethod<this>;
 
     union: UnionMethod<this>;
     unionAll: UnionMethod<this>;
@@ -1097,6 +1100,8 @@ declare namespace Objection {
     returning: ReturningMethod;
     forUpdate: IdentityMethod<this>;
     forShare: IdentityMethod<this>;
+    forNoKeyUpdate: IdentityMethod<this>;
+    forKeyShare: IdentityMethod<this>;
     skipLocked: IdentityMethod<this>;
     noWait: IdentityMethod<this>;
     skipUndefined: IdentityMethod<this>;
@@ -1115,6 +1120,7 @@ declare namespace Objection {
     columnInfo: ColumnInfoMethod<this>;
 
     toKnexQuery<T extends {} = ModelObject<M>>(): Knex.QueryBuilder<T, T[]>;
+    knex(knex?: Knex): Knex;
     clone(): this;
 
     page(page: number, pageSize: number): PageQueryBuilder<this>;
@@ -1415,9 +1421,9 @@ declare namespace Objection {
     table?: string;
   }
 
-  export interface Constructor<T> {
-    new (): T;
-  }
+  export type Constructor<TResult, TParams extends any[] = any[]> = new (
+    ...params: TParams
+  ) => TResult;
 
   export interface ModelConstructor<M extends Model> extends Constructor<M> {}
 

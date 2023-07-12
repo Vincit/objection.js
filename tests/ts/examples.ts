@@ -4,13 +4,13 @@ import * as objection from '../../';
 import {
   DBError,
   fn,
-  val,
+  QueryBuilder,
   raw,
   ref,
-  RelationMappings,
   RelationMapping,
-  QueryBuilder,
+  RelationMappings,
   StaticHookArguments,
+  val,
 } from '../../';
 
 // This file exercises the Objection.js typings.
@@ -376,7 +376,7 @@ class Animal extends objection.Model {
   // prettier-ignore
   species!: string;
   name?: string;
-  owner?: Person;
+  owner?: Person | null;
 
   // Tests the ColumnNameMappers interface.
   static columnNameMappers = {
@@ -833,6 +833,7 @@ const modelFromQuery = qb.modelClass();
 const knexQuery = qb.toKnexQuery().toSQL();
 const tableName: string = qb.tableNameFor(Person);
 const tableRef: string = qb.tableRefFor(Person);
+const tableRefModelClass: string = qb.tableRefFor(modelFromQuery);
 
 function noop() {
   // no-op
@@ -997,7 +998,7 @@ const relQueryResult10: PromiseLike<Movie[]> =
   Person.relatedQuery<Movie>('nonExistentRelation').for(1);
 
 /**
- * http://knexjs.org/#Builder-count
+ * https://knexjs.org/guide/query-builder.html#count
  */
 Person.query().count('active', { as: 'a' });
 Person.query().count('active as a');
@@ -1144,7 +1145,7 @@ const whereDelRetFirstWhere: PromiseLike<Person | undefined> = qb
 const orderByColumn: PromiseLike<Person[]> = qb.orderBy('firstName', 'asc');
 const orderByColumns: PromiseLike<Person[]> = qb.orderBy([
   'email',
-  { column: 'firstName', order: 'asc' },
+  { column: 'firstName', order: 'asc', nulls: 'first' },
   { column: 'lastName' },
 ]);
 

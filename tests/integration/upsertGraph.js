@@ -91,12 +91,27 @@ module.exports = (session) => {
         ]);
       });
 
-      for (const passthroughMethodCall of [null, 'forUpdate', 'forShare']) {
+      for (const passthroughMethodCall of [
+        null,
+        'forUpdate',
+        'forShare',
+        'forNoKeyUpdate',
+        'forKeyShare',
+      ]) {
         const passthroughMethodCallSql = {
           null: '',
           forUpdate: ' for update',
           forShare: ' for share',
+          forNoKeyUpdate: ' for no key update',
+          forKeyShare: ' for key share',
         };
+
+        if (
+          !session.isPostgres() &&
+          ['forNoKeyUpdate', 'forKeyShare'].includes(passthroughMethodCall)
+        ) {
+          continue;
+        }
 
         it(
           'by default, should insert new, update existing and delete missing' +

@@ -87,17 +87,17 @@ module.exports = (session) => {
         });
       });
 
-      it('should fail with an informational error when wighGraphJoined is used before warm up', () => {
+      it('should fail with an informational error when withGraphJoined is used before warm up', () => {
         expectJs(() => {
           Person.query(knex).withGraphJoined('children').toKnexQuery();
         }).to.throwException((err) => {
           expect(err.message).to.equal(
-            'table metadata has not been fetched. Are you trying to call toKnexQuery() for a withGraphJoined query? To make sure the table metadata is fetched see the objection.initialize function.'
+            `table metadata has not been fetched for table 'persons'. Are you trying to call toKnexQuery() for a withGraphJoined query? To make sure the table metadata is fetched see the objection.initialize function.`
           );
         });
       });
 
-      it('should fail with a informational error when wighGraphJoined is used before warm up', async () => {
+      it('should fail with a informational error when withGraphJoined is used before warm up', async () => {
         await initialize(knex, [Person]);
 
         testSql({
@@ -107,7 +107,7 @@ module.exports = (session) => {
         });
       });
 
-      it('should fail with a informational error when wighGraphJoined is used before warm up (2)', async () => {
+      it('should fail with a informational error when withGraphJoined is used before warm up (2)', async () => {
         Person.knex(knex);
         await initialize([Person]);
 
