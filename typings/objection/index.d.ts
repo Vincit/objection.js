@@ -232,10 +232,10 @@ declare namespace Objection {
   type PartialModelGraphField<F> = Defined<F> extends Model
     ? PartialModelGraph<Defined<F>>
     : Defined<F> extends Array<infer I>
-      ? I extends Model
-        ? PartialModelGraph<I>[]
-        : Expression<F>
-      : Expression<F>;
+    ? I extends Model
+      ? PartialModelGraph<I>[]
+      : Expression<F>
+    : Expression<F>;
 
   /**
    * Extracts the property names (excluding relations) of a model class.
@@ -707,9 +707,7 @@ declare namespace Objection {
     <QB extends AnyQueryBuilder>(
       this: QB,
       column: string | Raw | (string | Raw)[]
-    ): QB extends NumberQueryBuilder<QB>
-      ? ArrayQueryBuilder<QB>
-      : QB;
+    ): QB extends NumberQueryBuilder<QB> ? ArrayQueryBuilder<QB> : QB;
   }
 
   interface TimeoutOptions {

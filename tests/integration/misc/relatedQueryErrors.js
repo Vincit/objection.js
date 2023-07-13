@@ -1,7 +1,7 @@
 const { expect } = require('chai');
 const { Model } = require('../../../');
 
-module.exports = session => {
+module.exports = (session) => {
   describe('model relatedQueries fail when they lack a proper target', () => {
     let knex = session.knex;
 
@@ -22,9 +22,9 @@ module.exports = session => {
             relation: Model.HasManyRelation,
             join: {
               from: 'users.id',
-              to: 'posts.user_id'
-            }
-          }
+              to: 'posts.user_id',
+            },
+          },
         };
       }
     }
@@ -36,17 +36,13 @@ module.exports = session => {
       await knex.schema.dropTableIfExists('users');
 
       await knex.schema
-        .createTable('users', table => {
+        .createTable('users', (table) => {
           table.increments('id').primary();
           table.string('name');
         })
-        .createTable('posts', table => {
+        .createTable('posts', (table) => {
           table.increments('id').primary();
-          table
-            .integer('user_id')
-            .unsigned()
-            .references('id')
-            .inTable('users');
+          table.integer('user_id').unsigned().references('id').inTable('users');
           table.string('content');
         });
     });
