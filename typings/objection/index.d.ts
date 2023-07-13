@@ -991,6 +991,7 @@ declare namespace Objection {
     union: UnionMethod<this>;
     unionAll: UnionMethod<this>;
     intersect: SetOperationsMethod<this>;
+    except: SetOperationsMethod<this>;
 
     with: WithMethod<this>;
     withRecursive: WithMethod<this>;
