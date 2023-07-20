@@ -1,5 +1,15 @@
 # Changelog
 
+## 3.0.5
+
+### What's new
+
+- Fixes [#2183](https://github.com/Vincit/objection.js/pull/2183)
+- Fixes [#2257](https://github.com/Vincit/objection.js/pull/2257)
+- Fixes [#2276](https://github.com/Vincit/objection.js/pull/2276)
+- Fixes [#2453](https://github.com/Vincit/objection.js/pull/2453)
+- Fixes [#2476](https://github.com/Vincit/objection.js/pull/2476)
+
 ## 3.0.4
 
 ### What's new
