@@ -4,7 +4,7 @@ const expect = require('expect.js');
 const Promise = require('bluebird');
 const { inheritModel } = require('../../lib/model/inheritModel');
 const { expectPartialEqual: expectPartEql } = require('./../../testUtils/testUtils');
-const { Model, ValidationError, raw } = require('../../');
+const { Model, QueryBuilder, ValidationError, raw } = require('../../');
 const { isPostgres, isSqlite } = require('../../lib/utils/knexUtils');
 const mockKnexFactory = require('../../testUtils/mockKnex');
 
@@ -328,6 +328,32 @@ module.exports = (session) => {
               model1Prop1: 'updated',
               model1Prop2: 300,
             });
+          });
+      });
+
+      it('should not attempt to eager-load relations on patch `count` results when using overwritten `execute()` to load relations (#2397)', () => {
+        let runBeforeCalled = 0;
+
+        class MyModel1 extends Model1 {}
+
+        MyModel1.QueryBuilder = class MyQueryBuilder1 extends QueryBuilder {
+          execute() {
+            this.withGraphFetched('model1Relation2');
+            return super.execute();
+          }
+        };
+
+        return MyModel1.query()
+          .context({
+            runBefore() {
+              runBeforeCalled++;
+            },
+          })
+          .where({ id: 1 })
+          .patch({ model1Prop1: 'updated text' })
+          .then((count) => {
+            expect(count).to.eql(1);
+            expect(runBeforeCalled).to.eql(1);
           });
       });
     });
