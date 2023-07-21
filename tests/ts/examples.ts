@@ -1017,7 +1017,7 @@ Person.query()
 
 // ReferenceBuilder:
 // @see http://vincit.github.io/objection.js/#ref75
-// https://github.com/Vincit/objection.js/blob/master/doc/includes/API.md#global-query-building-helpers
+// https://github.com/Vincit/objection.js/blob/main/doc/includes/API.md#global-query-building-helpers
 Person.query()
   .select([
     'id',

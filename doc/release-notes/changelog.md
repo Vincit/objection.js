@@ -690,7 +690,7 @@ Person.prototype.fullName = function () {
   a class definition. You can still define all static and prototype methods and properties the old way. See the example on the right -->
 
   Note that this also affects Babel transpilation. You cannot (or need to) use `babel-plugin-transform-es2015-classes` anymore.
-  See the [ESNext example project](https://github.com/Vincit/objection.js/tree/master/examples/express-es7) as an example of
+  See the [ESNext example project](https://github.com/Vincit/objection.js/tree/main/examples/express-es7) as an example of
   how to setup babel.
 
 - The default value of [`pickJsonSchemaProperties`](#pickjsonschemaproperties) was changed to `false`. Before, all properties that

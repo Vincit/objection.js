@@ -10,7 +10,7 @@
 // * Joseph T Lapp <https://github.com/jtlapp>
 // * Drew R. <https://github.com/drew-r>
 // * Karl Blomster <https://github.com/kblomster>
-// * And many others: See <https://github.com/Vincit/objection.js/blob/master/typings/objection/index.d.ts>
+// * And many others: See <https://github.com/Vincit/objection.js/blob/main/typings/objection/index.d.ts>
 
 import Ajv, { Options as AjvOptions } from 'ajv';
 import * as dbErrors from 'db-errors';
