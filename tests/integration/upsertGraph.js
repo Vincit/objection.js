@@ -261,7 +261,7 @@ module.exports = (session) => {
                       }
                     }
 
-                    expect(result.$beforeUpdateCalled).to.equal(undefined);
+                    expect(result.$beforeUpdateCalled).to.equal(1);
                     expect(result.$afterUpdateCalled).to.equal(undefined);
 
                     expect(result.model1Relation1.$beforeUpdateCalled).to.equal(1);
@@ -501,7 +501,7 @@ module.exports = (session) => {
               expect(result.$beforeUpdateCalled).to.equal(1);
               expect(result.$afterUpdateCalled).to.equal(1);
 
-              expect(result.model1Relation1.$beforeUpdateCalled).to.equal(undefined);
+              expect(result.model1Relation1.$beforeUpdateCalled).to.equal(1);
               expect(result.model1Relation1.$afterUpdateCalled).to.equal(undefined);
             });
         })
@@ -577,7 +577,7 @@ module.exports = (session) => {
               expect(result.$beforeUpdateCalled).to.equal(1);
               expect(result.$afterUpdateCalled).to.equal(1);
 
-              expect(result.model1Relation1.$beforeUpdateCalled).to.equal(undefined);
+              expect(result.model1Relation1.$beforeUpdateCalled).to.equal(1);
               expect(result.model1Relation1.$afterUpdateCalled).to.equal(undefined);
             });
         })
@@ -733,7 +733,7 @@ module.exports = (session) => {
               })
               .then((result) => {
                 expect(result.model1Relation2[0].model2Relation1[2].$beforeUpdateCalled).to.equal(
-                  undefined
+                  1
                 );
 
                 if (session.isPostgres()) {
@@ -4092,6 +4092,41 @@ module.exports = (session) => {
             .then((model) => {
               expect(model.model2Relation1[0].aliasedExtra).to.equal('hello extra 1');
               expect(model.model2Relation1[1].aliasedExtra).to.equal('hello extra 2');
+            });
+        });
+      });
+
+      describe('modifying properties in $beforeUpdate (#2233)', () => {
+        let $beforeUpdate;
+
+        before(() => {
+          $beforeUpdate = Model1.prototype.$beforeUpdate;
+          Model1.prototype.$beforeUpdate = function () {
+            this.model1Prop1 = 'updated in before update';
+          };
+        });
+
+        after(() => {
+          Model1.prototype.$beforeUpdate = $beforeUpdate;
+        });
+
+        it('should include modified properties in update', () => {
+          const upsert = {
+            id: 1,
+            model1Prop2: 101,
+          };
+
+          return transaction(session.knex, (trx) =>
+            Model1.query(trx).upsertGraph(upsert, { fetchStrategy })
+          )
+            .then((res) => {
+              expect(res.model1Prop1).to.equal('updated in before update');
+              expect(res.model1Prop2).to.equal(101);
+              return Model1.query(session.knex).findById(1);
+            })
+            .then((model) => {
+              expect(model.model1Prop1).to.equal('updated in before update');
+              expect(model.model1Prop2).to.equal(101);
             });
         });
       });
