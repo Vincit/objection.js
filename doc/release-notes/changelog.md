@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.1.0
+
+### What's new
+
+- Support `$beforeUpdate()` mutations in `upsertGraph()` [#2233](https://github.com/Vincit/objection.js/issues/2233)
+- Remove deprecated `$afterGet()` hook [#2477](https://github.com/Vincit/objection.js/pull/2477)
+- Drop support for Node v12 [#2478](https://github.com/Vincit/objection.js/pull/2478)
+
 ## 3.0.5
 
 ### What's new
