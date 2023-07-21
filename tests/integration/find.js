@@ -120,7 +120,7 @@ module.exports = (session) => {
             .select('model2.id_col', 'model2_prop2')
             .then((models) => {
               expect(models[0]).to.be.a(Model2);
-              // Test that only the selected columns (and stuff set by the $afterGet hook)  were returned.
+              // Test that only the selected columns (and stuff set by the $afterFind hook)  were returned.
               expect(_.uniq(_.flattenDeep(_.map(models, _.keys))).sort()).to.eql([
                 '$afterFindCalled',
                 'idCol',
