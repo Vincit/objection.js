@@ -1253,8 +1253,8 @@ describe('QueryBuilder', () => {
       this.c = 'beforeUpdate';
     };
 
-    TestModel.prototype.$afterGet = function () {
-      throw new Error('$afterGet should not be called');
+    TestModel.prototype.$afterFind = function () {
+      throw new Error('$afterFind should not be called');
     };
 
     let model = TestModel.fromJson({ a: 10, b: 'test' });
@@ -1278,8 +1278,8 @@ describe('QueryBuilder', () => {
       });
     };
 
-    TestModel.prototype.$afterGet = function () {
-      throw new Error('$afterGet should not be called');
+    TestModel.prototype.$afterFind = function () {
+      throw new Error('$afterFind should not be called');
     };
 
     let model = TestModel.fromJson({ a: 10, b: 'test' });
@@ -1300,8 +1300,8 @@ describe('QueryBuilder', () => {
       this.c = 'beforeUpdate';
     };
 
-    TestModel.prototype.$afterGet = function () {
-      throw new Error('$afterGet should not be called');
+    TestModel.prototype.$afterFind = function () {
+      throw new Error('$afterFind should not be called');
     };
 
     let model = TestModel.fromJson({ a: 10, b: 'test' });
@@ -1325,8 +1325,8 @@ describe('QueryBuilder', () => {
       });
     };
 
-    TestModel.prototype.$afterGet = function () {
-      throw new Error('$afterGet should not be called');
+    TestModel.prototype.$afterFind = function () {
+      throw new Error('$afterFind should not be called');
     };
 
     let model = TestModel.fromJson({ a: 10, b: 'test' });
@@ -1347,8 +1347,8 @@ describe('QueryBuilder', () => {
       this.c = 'beforeInsert';
     };
 
-    TestModel.prototype.$afterGet = function () {
-      throw new Error('$afterGet should not be called');
+    TestModel.prototype.$afterFind = function () {
+      throw new Error('$afterFind should not be called');
     };
 
     QueryBuilder.forClass(TestModel)
@@ -1371,8 +1371,8 @@ describe('QueryBuilder', () => {
       });
     };
 
-    TestModel.prototype.$afterGet = function () {
-      throw new Error('$afterGet should not be called');
+    TestModel.prototype.$afterFind = function () {
+      throw new Error('$afterFind should not be called');
     };
 
     QueryBuilder.forClass(TestModel)
@@ -1387,7 +1387,7 @@ describe('QueryBuilder', () => {
       .catch(done);
   });
 
-  it('should call $afterGet on the model if no write operation is specified', (done) => {
+  it('should call $afterFind on the model if no write operation is specified', (done) => {
     mockKnexQueryResults = [
       [
         {
@@ -1399,7 +1399,7 @@ describe('QueryBuilder', () => {
       ],
     ];
 
-    TestModel.prototype.$afterGet = function (context) {
+    TestModel.prototype.$afterFind = function (context) {
       this.b = this.a * 2 + context.x;
     };
 
@@ -1423,7 +1423,7 @@ describe('QueryBuilder', () => {
       .catch(done);
   });
 
-  it('should call $afterGet on the model if no write operation is specified (async)', (done) => {
+  it('should call $afterFind on the model if no write operation is specified (async)', (done) => {
     mockKnexQueryResults = [
       [
         {
@@ -1435,7 +1435,7 @@ describe('QueryBuilder', () => {
       ],
     ];
 
-    TestModel.prototype.$afterGet = function (context) {
+    TestModel.prototype.$afterFind = function (context) {
       let self = this;
       return Bluebird.delay(10).then(() => {
         self.b = self.a * 2 + context.x;
@@ -1462,7 +1462,7 @@ describe('QueryBuilder', () => {
       .catch(done);
   });
 
-  it('should call $afterGet before any `runAfter` hooks', (done) => {
+  it('should call $afterFind before any `runAfter` hooks', (done) => {
     mockKnexQueryResults = [
       [
         {
@@ -1474,7 +1474,7 @@ describe('QueryBuilder', () => {
       ],
     ];
 
-    TestModel.prototype.$afterGet = function (context) {
+    TestModel.prototype.$afterFind = function (context) {
       let self = this;
       return Bluebird.delay(10).then(() => {
         self.b = self.a * 2 + context.x;
@@ -2249,13 +2249,13 @@ describe('QueryBuilder', () => {
         .catch(done);
     });
 
-    it('$afterGet should be called after relations have been fetched', (done) => {
+    it('$afterFind should be called after relations have been fetched', (done) => {
       class M1 extends Model {
         static get tableName() {
           return 'M1';
         }
 
-        $afterGet() {
+        $afterFind() {
           this.ids = _.map(this.someRel, 'id');
         }
 

@@ -1677,7 +1677,6 @@ declare namespace Objection {
     $afterInsert(queryContext: QueryContext): Promise<any> | void;
     $afterUpdate(opt: ModelOptions, queryContext: QueryContext): Promise<any> | void;
     $beforeUpdate(opt: ModelOptions, queryContext: QueryContext): Promise<any> | void;
-    $afterGet(queryContext: QueryContext): Promise<any> | void;
     $afterFind(queryContext: QueryContext): Promise<any> | void;
     $beforeDelete(queryContext: QueryContext): Promise<any> | void;
     $afterDelete(queryContext: QueryContext): Promise<any> | void;
