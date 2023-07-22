@@ -44,10 +44,10 @@ Check out [this issue](https://github.com/Vincit/objection.js/issues/1069) to se
 
 Shortcuts:
 
-- [Who uses objection.js](https://github.com/Vincit/objection.js/issues/1069)
+- [Who uses objection.js](https://github.com/Vincit/objection.js/discussions/2464)
 - [API reference](https://vincit.github.io/objection.js/api/query-builder/)
 - [Example projects](https://github.com/Vincit/objection.js/tree/main/examples)
 - [Changelog](https://vincit.github.io/objection.js/release-notes/changelog.html)
-- [v1 -> v2 migration guide](https://vincit.github.io/objection.js/release-notes/migration.html)
+- [v1 -> v2 -> v3 migration guide](https://vincit.github.io/objection.js/release-notes/migration.html)
 - [Contribution guide](https://vincit.github.io/objection.js/guide/contributing.html)
 - [Plugins](https://vincit.github.io/objection.js/guide/plugins.html)
