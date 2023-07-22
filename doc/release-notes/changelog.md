@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.1.1
+
+### What's new
+
+- Only add AJV formats if they weren't added in user-land already [#2482](https://github.com/Vincit/objection.js/pull/2482)
+
 ## 3.1.0
 
 ### What's new
