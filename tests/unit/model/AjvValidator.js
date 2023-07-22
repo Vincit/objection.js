@@ -1,3 +1,4 @@
+const addFormats = require('ajv-formats');
 const { AjvValidator, Model } = require('../../../');
 const expect = require('expect.js');
 
@@ -61,6 +62,16 @@ describe('AjvValidator', () => {
       ],
     };
 
+    const schema3 = {
+      type: 'object',
+      properties: {
+        date: {
+          type: 'string',
+          format: 'date-time',
+        },
+      },
+    };
+
     it('should remove required fields from definitions', () => {
       const validator = new AjvValidator({ onCreateAjv: () => {} });
       const validators = validator.getValidator(modelClass('test', schema), schema, true);
@@ -79,6 +90,23 @@ describe('AjvValidator', () => {
       });
       const validators = validator.getValidator(modelClass('test', schema2), schema2, true);
       expect(validators.schema.required).to.eql(['foo']);
+    });
+
+    it('should add ajv formats by default', () => {
+      expect(() => {
+        const validator = new AjvValidator({ onCreateAjv: () => {} });
+        validator.getValidator(modelClass('test', schema3), schema3, true);
+      }).to.not.throwException();
+    });
+
+    it('should not throw errors when adding formats in onCreateAjv hook', () => {
+      expect(() => {
+        new AjvValidator({
+          onCreateAjv: (ajv) => {
+            addFormats(ajv);
+          },
+        });
+      }).to.not.throwException();
     });
 
     it('should handle empty definitions', () => {
