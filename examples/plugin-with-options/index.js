@@ -17,7 +17,7 @@ module.exports = (options) => {
       setCreatedBy: true,
       setCreatedAt: true,
     },
-    options
+    options,
   );
 
   // Return the mixin. If your plugin doesn't take options, you can simply export

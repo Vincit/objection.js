@@ -113,20 +113,20 @@ module.exports = (session) => {
         Model1.query()
           .findById(1)
           .withGraphJoined(
-            '[model1Relation1, model1Relation2.model2Relation1.[model1Relation1, model1Relation2]]'
+            '[model1Relation1, model1Relation2.model2Relation1.[model1Relation1, model1Relation2]]',
           )
           .knex(session.knex),
 
         Model1.query(session.knex)
           .findById(1)
           .withGraphFetched(
-            '[model1Relation1, model1Relation2.model2Relation1.[model1Relation1, model1Relation2]]'
+            '[model1Relation1, model1Relation2.model2Relation1.[model1Relation1, model1Relation2]]',
           ),
 
         Model1.query(session.knex)
           .findById(1)
           .withGraphJoined(
-            '[model1Relation1, model1Relation2.model2Relation1.[model1Relation1, model1Relation2]]'
+            '[model1Relation1, model1Relation2.model2Relation1.[model1Relation1, model1Relation2]]',
           ),
       ]).then((results) => {
         results.forEach((models) => {
@@ -221,7 +221,7 @@ module.exports = (session) => {
           Model1.query()
             .select('Model1.id')
             .joinRelated('model1Relation1')
-            .where('model1Relation1.id', 4)
+            .where('model1Relation1.id', 4),
         );
 
         return query.knex(session.knex).then((models) => {
@@ -406,7 +406,7 @@ module.exports = (session) => {
           return Model1.query()
             .findById(1)
             .withGraphFetched(
-              '[model1Relation1, model1Relation2.model2Relation1.[model1Relation1, model1Relation2]]'
+              '[model1Relation1, model1Relation2.model2Relation1.[model1Relation1, model1Relation2]]',
             );
         }).catch((err) => createRejectionReflection(err)),
 
@@ -414,7 +414,7 @@ module.exports = (session) => {
           return Model1.query()
             .findById(1)
             .withGraphJoined(
-              '[model1Relation1, model1Relation2.model2Relation1.[model1Relation1, model1Relation2]]'
+              '[model1Relation1, model1Relation2.model2Relation1.[model1Relation1, model1Relation2]]',
             );
         }).catch((err) => createRejectionReflection(err)),
 
@@ -473,7 +473,7 @@ module.exports = (session) => {
         results.forEach((result) => {
           expect(result.isRejected()).to.equal(true);
           expect(result.reason().message).to.match(
-            /no database connection available for a query. You need to bind the model class or the query to a knex instance./
+            /no database connection available for a query. You need to bind the model class or the query to a knex instance./,
           );
         });
       });

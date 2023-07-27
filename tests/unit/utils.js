@@ -164,11 +164,11 @@ describe('utils', () => {
 
       testUnderscoreBetweenUppercaseLetters(
         'fooBar:spamBaz:troloLolo',
-        'foo_bar:spam_baz:trolo_lolo'
+        'foo_bar:spam_baz:trolo_lolo',
       );
       testUnderscoreBetweenUppercaseLetters(
         'fooBar.spamBaz.troloLolo',
-        'foo_bar.spam_baz.trolo_lolo'
+        'foo_bar.spam_baz.trolo_lolo',
       );
 
       function test(camel, snake, backToCamel) {
@@ -283,7 +283,7 @@ describe('utils', () => {
                 return result;
               });
           },
-          { concurrency }
+          { concurrency },
         ).then((result) => {
           expect(result).to.eql(range(numItems).map((it) => it * 2));
           expect(startOrder).to.eql(range(numItems));
@@ -301,7 +301,7 @@ describe('utils', () => {
             startOrder.push(item);
             return 2 * item;
           },
-          { concurrency }
+          { concurrency },
         ).then((result) => {
           expect(result).to.eql(range(numItems).map((it) => it * 2));
           expect(startOrder).to.eql(range(numItems));
@@ -368,8 +368,8 @@ describe('utils', () => {
           },
           {
             a: [1, { b: 'foo' }, false],
-          }
-        )
+          },
+        ),
       ).to.equal(true);
 
       expect(
@@ -379,8 +379,8 @@ describe('utils', () => {
           },
           {
             a: [1, { b: 'bar' }, false],
-          }
-        )
+          },
+        ),
       ).to.equal(false);
 
       expect(
@@ -390,8 +390,8 @@ describe('utils', () => {
           },
           {
             a: [1, { b: 'foo' }, true],
-          }
-        )
+          },
+        ),
       ).to.equal(false);
 
       expect(
@@ -407,8 +407,8 @@ describe('utils', () => {
               a: [1, { b: 'foo' }, false],
             },
             1,
-          ]
-        )
+          ],
+        ),
       ).to.equal(true);
 
       expect(
@@ -424,8 +424,8 @@ describe('utils', () => {
               a: ['1', { b: 'foo' }, false],
             },
             1,
-          ]
-        )
+          ],
+        ),
       ).to.equal(false);
     });
   });
@@ -445,8 +445,8 @@ describe('utils', () => {
     it('should work with Buffer[] items with custom keyGetter function', () => {
       expect(
         uniqBy(items, (item) =>
-          item.map((x) => (Buffer.isBuffer(x) ? x.toString('hex') : x)).join(',')
-        )
+          item.map((x) => (Buffer.isBuffer(x) ? x.toString('hex') : x)).join(','),
+        ),
       ).to.eql(items);
     });
   });

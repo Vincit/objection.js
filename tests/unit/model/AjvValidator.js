@@ -123,7 +123,7 @@ describe('AjvValidator', () => {
       validator.getValidator(
         modelClass('test', emptyDefinitionsSchema),
         emptyDefinitionsSchema,
-        true
+        true,
       );
     });
   });

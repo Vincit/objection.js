@@ -136,7 +136,7 @@ module.exports = (session) => {
                   latitudeCoordinate: 61,
                   longitudeCoordinate: 23,
                 },
-              }
+              },
             ),
           },
 
@@ -226,7 +226,7 @@ module.exports = (session) => {
             .select('person.first_name as rootFirstName')
             .modifyGraph('parentPerson', (qb) => qb.select('first_name as parentFirstName'))
             .modifyGraph('parentPerson.parentPerson', (qb) =>
-              qb.select('first_name as grandParentFirstName')
+              qb.select('first_name as grandParentFirstName'),
             )
             [method]('[parentPerson.parentPerson, pets, movies]')
             .orderBy('person.first_name')
@@ -454,7 +454,7 @@ module.exports = (session) => {
             .select('PERSON.FIRST_NAME as rootFirstName')
             .modifyGraph('parentPerson', (qb) => qb.select('FIRST_NAME as parentFirstName'))
             .modifyGraph('parentPerson.parentPerson', (qb) =>
-              qb.select('FIRST_NAME as GRAND_PARENT_FIRST_NAME')
+              qb.select('FIRST_NAME as GRAND_PARENT_FIRST_NAME'),
             )
             [method]('[parentPerson.parentPerson, pets, movies]')
             .orderBy('PERSON.FIRST_NAME')

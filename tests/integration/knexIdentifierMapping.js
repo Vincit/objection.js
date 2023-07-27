@@ -102,7 +102,7 @@ module.exports = (session) => {
           movie_id: 'movieId',
           snake_case_test_table: 'snakeCaseTestTable',
           animal_name: 'animalName',
-        })
+        }),
       );
 
       knex = Knex(config);

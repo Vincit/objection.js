@@ -190,7 +190,7 @@ module.exports = (session) => {
                 .as('alias'),
               (joinBuilder) => {
                 joinBuilder.on('Model1.id', 'alias.model1_id');
-              }
+              },
             )
             .then((models) => {
               // Three items because Model1 (id = 1) has three related Model2 instances.
@@ -293,7 +293,7 @@ module.exports = (session) => {
               Model2.query()
                 .select('m2.id_col')
                 .alias('m2')
-                .where('m2.model2_prop2', ref('m1.model2_prop2'))
+                .where('m2.model2_prop2', ref('m1.model2_prop2')),
             )
             .orderBy('m1.model2_prop2')
             .then((models) => {
@@ -312,9 +312,9 @@ module.exports = (session) => {
                   .alias('m2')
                   .where(
                     'm2.model2_prop2',
-                    ref(`${query.tableRefFor(query.modelClass())}.model2_prop2`)
-                  )
-              )
+                    ref(`${query.tableRefFor(query.modelClass())}.model2_prop2`),
+                  ),
+              ),
             )
             .orderBy('m1.model2_prop2')
             .then((models) => {
@@ -374,7 +374,7 @@ module.exports = (session) => {
               'id_col',
               raw(':subQuery', {
                 subQuery: Model2.query().select('id_col').where('model2_prop2', 20),
-              })
+              }),
             )
             .then((models) => {
               expect(_.map(models, 'model2Prop2').sort()).to.eql([20]);
@@ -387,7 +387,7 @@ module.exports = (session) => {
               'id_col',
               raw(':nestedMess', {
                 nestedMess: raw('?', Model2.query().select('id_col').where('model2_prop2', 20)),
-              })
+              }),
             )
             .then((models) => {
               expect(_.map(models, 'model2Prop2').sort()).to.eql([20]);
@@ -398,7 +398,7 @@ module.exports = (session) => {
           return Model2.query()
             .where(
               'id_col',
-              raw('?', Model2.query().select('id_col').where('model2_prop2', 20).toKnexQuery())
+              raw('?', Model2.query().select('id_col').where('model2_prop2', 20).toKnexQuery()),
             )
             .then((models) => {
               expect(_.map(models, 'model2Prop2').sort()).to.eql([20]);
@@ -417,7 +417,7 @@ module.exports = (session) => {
           return Model2.query()
             .where(
               'id_col',
-              raw('?', [Model2.query().select('id_col').where('model2_prop2', 20).toKnexQuery()])
+              raw('?', [Model2.query().select('id_col').where('model2_prop2', 20).toKnexQuery()]),
             )
             .then((models) => {
               expect(_.map(models, 'model2Prop2').sort()).to.eql([20]);
@@ -488,7 +488,7 @@ module.exports = (session) => {
                   },
                 },
               ],
-              { allowRefs: true }
+              { allowRefs: true },
             );
 
             return Model1.query()
@@ -776,10 +776,10 @@ module.exports = (session) => {
               builder
                 .from('model2')
                 .where('model2.id_col', ref('foo.id_col'))
-                .select('model2_prop2')
+                .select('model2_prop2'),
             )
             .whereExists((builder) =>
-              builder.from('Model1').where('foo.model1_id', ref('Model1.id'))
+              builder.from('Model1').where('foo.model1_id', ref('Model1.id')),
             )
             .castTo(Model2)
             .then((models) => {
@@ -824,7 +824,7 @@ module.exports = (session) => {
             return Model2.query()
               .select(
                 'model2.*',
-                fn('concat', ref('model2_prop2'), val('10').castText()).as('model2_prop2')
+                fn('concat', ref('model2_prop2'), val('10').castText()).as('model2_prop2'),
               )
               .orderBy('id_col')
               .then((models) => {
@@ -837,7 +837,7 @@ module.exports = (session) => {
             return Model2.query()
               .select(
                 'model2.*',
-                fn.concat(ref('model2_prop2'), val('10').castText()).as('model2_prop2')
+                fn.concat(ref('model2_prop2'), val('10').castText()).as('model2_prop2'),
               )
               .orderBy('id_col')
               .then((models) => {
@@ -907,7 +907,7 @@ module.exports = (session) => {
               Model2.query()
                 .sum('model2_prop2')
                 .where('Model1.id', ref('model2.model1_id'))
-                .as('sum')
+                .as('sum'),
             )
             .orderBy('id')
             .then((models) => {
@@ -939,8 +939,8 @@ module.exports = (session) => {
                 'Model1.*',
                 raw(
                   'ARRAY(?) as "model1Ids"',
-                  Model1.relatedQuery('model1Relation2').select('id_col').orderBy('id_col')
-                )
+                  Model1.relatedQuery('model1Relation2').select('id_col').orderBy('id_col'),
+                ),
               )
               .orderBy('id')
               .then((res) => {
@@ -959,9 +959,9 @@ module.exports = (session) => {
                   // Test doubly nested `raw` for shits and giggles.
                   raw(
                     '?',
-                    Model1.relatedQuery('model1Relation2').select('id_col').orderBy('id_col')
-                  )
-                )
+                    Model1.relatedQuery('model1Relation2').select('id_col').orderBy('id_col'),
+                  ),
+                ),
               )
               .orderBy('id')
               .then((res) => {
@@ -979,8 +979,8 @@ module.exports = (session) => {
                 'Model1.*',
                 raw(
                   'ARRAY(?) as "model1Ids"',
-                  TestModel.relatedQuery('model1Relation2').select('id_col').orderBy('id_col')
-                )
+                  TestModel.relatedQuery('model1Relation2').select('id_col').orderBy('id_col'),
+                ),
               )
               .orderBy('id')
               .then((res) => {
@@ -999,7 +999,7 @@ module.exports = (session) => {
                   id: 2,
                 },
               },
-              { relate: true }
+              { relate: true },
             )
             .then(() => {
               return Model1.query()
@@ -1021,7 +1021,7 @@ module.exports = (session) => {
                   id: 2,
                 },
               },
-              { relate: true }
+              { relate: true },
             )
             .then(() => {
               return Model1.query()
@@ -1062,8 +1062,8 @@ module.exports = (session) => {
                     .whereExists(
                       Model1.relatedQuery('model1Relation1')
                         .alias('m3')
-                        .whereExists(Model1.relatedQuery('model1Relation1').alias('m4'))
-                    )
+                        .whereExists(Model1.relatedQuery('model1Relation1').alias('m4')),
+                    ),
                 );
             })
             .then((res) => {
@@ -1086,7 +1086,7 @@ module.exports = (session) => {
               },
               'foo',
               undefined,
-              10
+              10,
             )
             .then((models) => {
               expect(_.map(models, 'model2Prop1').sort()).to.eql(['hejsan 2', 'hejsan 3']);
@@ -1205,7 +1205,7 @@ module.exports = (session) => {
                   .table('model2')
                   .clear(QueryBuilderOperation)
                   .select('*')
-                  .from('model2')
+                  .from('model2'),
               )
               .clearSelect()
               .clearWhere()
@@ -1272,7 +1272,7 @@ module.exports = (session) => {
                   .andOnNotNull('m2.model2_prop2')
                   .onVal('m2.model2_prop2', 1)
                   .andOnVal('m2.model2_prop2', 2)
-                  .orOnVal('m2.model2_prop2', 3)
+                  .orOnVal('m2.model2_prop2', 3),
               )
               .rightJoin('model2 as m3', 'm3.model2_prop2', 'm1.model2_prop2')
               .rightOuterJoin('model2 as m4', 'm4.model2_prop2', 'm1.model2_prop2')
@@ -1691,7 +1691,7 @@ module.exports = (session) => {
             Model1.query()
               .joinRelated('model1Relation2')
               .select('Model1.id', 'model1Relation2.id_col as m2r2Id')
-              .as('inner')
+              .as('inner'),
           )
           .select('*')
           .orderBy(['id', 'm2r2Id'])
@@ -1713,8 +1713,8 @@ module.exports = (session) => {
               Model1.query()
                 .joinRelated('model1Relation2')
                 .select('Model1.id', 'model1Relation2.id_col as m2r2Id')
-                .as('inner')
-            )
+                .as('inner'),
+            ),
           )
           .select('*')
           .orderBy(['id', 'm2r2Id'])
@@ -1879,7 +1879,7 @@ module.exports = (session) => {
           .select(
             'Model1.id',
             'model1Relation2:model2Relation1.model1Prop1 as foo',
-            'model1Relation2.model2_prop1 as model2Prop1'
+            'model1Relation2.model2_prop1 as model2Prop1',
           )
           .leftJoinRelated('[model1Relation1, model1Relation2.model2Relation1]')
           .where('model1Relation2:model2Relation1.model1Prop1', 'hello 6')
@@ -1900,7 +1900,7 @@ module.exports = (session) => {
               'Model1.id',
               'model1Relation1.id as m1r1Id',
               'model1Relation2.id_col as m1r2Id',
-              'model1Relation2:model2Relation1.id as m1r2M2r1Id'
+              'model1Relation2:model2Relation1.id as m1r2M2r1Id',
             )
             .joinRelated('model1Relation1')
             // Join the same relation again for shits and giggles.
@@ -2021,7 +2021,7 @@ module.exports = (session) => {
             .select(
               'Model1.id',
               'model1Relation2:model2Relation1.model1Prop1 as foo',
-              'model1Relation2.model2_prop1 as model2Prop1'
+              'model1Relation2.model2_prop1 as model2Prop1',
             )
             .leftJoinRelated('model1Relation1')
             // Join the same relation again for shits and giggles.
@@ -2083,7 +2083,7 @@ module.exports = (session) => {
             model1Relation2 as m1r2.[
               model2Relation1 as m2r1
             ]
-          ]`
+          ]`,
           )
           .where('m1r2:m2r1.model1Prop1', 'hello 6')
           .first()
@@ -2360,7 +2360,7 @@ module.exports = (session) => {
           })
           .catch((err) => {
             expect(err.message).to.equal(
-              `one of the identifier columns [id] is null or undefined. Have you specified the correct identifier column for the model 'Model1' using the 'idColumn' property?`
+              `one of the identifier columns [id] is null or undefined. Have you specified the correct identifier column for the model 'Model1' using the 'idColumn' property?`,
             );
             done();
           })
@@ -2379,7 +2379,7 @@ module.exports = (session) => {
           })
           .catch((err) => {
             expect(err.message).to.equal(
-              `one of the identifier columns [id] is null or undefined. Have you specified the correct identifier column for the model 'Model1' using the 'idColumn' property?`
+              `one of the identifier columns [id] is null or undefined. Have you specified the correct identifier column for the model 'Model1' using the 'idColumn' property?`,
             );
             done();
           })
@@ -2441,12 +2441,12 @@ module.exports = (session) => {
           expect(result1).to.be.equal(undefined);
 
           const result2 = await Model1.query().from(
-            Model1.relatedQuery('model1Relation1').for(parent).as('model1')
+            Model1.relatedQuery('model1Relation1').for(parent).as('model1'),
           );
           expect(result2).to.eql([]);
 
           const result3 = await Model1.query().from(
-            Model1.relatedQuery('model1Relation1').for(parent.id).as('model1')
+            Model1.relatedQuery('model1Relation1').for(parent.id).as('model1'),
           );
           expect(result3).to.eql([]);
         });

@@ -172,7 +172,7 @@ module.exports = (session) => {
 
         expect(models[0]).to.be.a(Model1);
         expect(models[0].model1Relation1).to.be.a(Model1);
-      }
+      },
     );
 
     test('model1Relation1.model1Relation1', (models) => {
@@ -288,7 +288,7 @@ module.exports = (session) => {
           },
         ]);
       },
-      { disableJoin: true }
+      { disableJoin: true },
     );
 
     test('model1Relation1.^2', (models) => {
@@ -349,7 +349,7 @@ module.exports = (session) => {
             },
           },
         ]);
-      }
+      },
     );
 
     test(
@@ -388,7 +388,7 @@ module.exports = (session) => {
           },
         },
         disableJoin: true,
-      }
+      },
     );
 
     test(
@@ -425,7 +425,7 @@ module.exports = (session) => {
         },
         disableWhereIn: true,
         eagerOptions: { minimize: true },
-      }
+      },
     );
 
     test('model1Relation2.model2Relation2', (models) => {
@@ -605,7 +605,7 @@ module.exports = (session) => {
         },
         disableJoin: true,
         disableSort: true,
-      }
+      },
     );
 
     test('[model1Relation1, model1Relation2.model2Relation1]', (models) => {
@@ -880,7 +880,7 @@ module.exports = (session) => {
         filters: {
           localModifier: (builder) => builder.select('model1Prop2'),
         },
-      }
+      },
     );
 
     it('should fail fast on incorrect table name', function (done) {
@@ -890,7 +890,7 @@ module.exports = (session) => {
         .then(_.noop)
         .catch((err) => {
           expect(err.message).to.equal(
-            'unknown relation "model1Relation111" in a relation expression'
+            'unknown relation "model1Relation111" in a relation expression',
           );
           done();
         });
@@ -1035,7 +1035,7 @@ module.exports = (session) => {
               ]);
             });
         },
-        { concurrency: 1 }
+        { concurrency: 1 },
       );
     });
 
@@ -1048,7 +1048,7 @@ module.exports = (session) => {
         .modifyGraph('model1Relation1', (qb) => qb.select('Model1.id'))
         .modifyGraph('model1Relation2', (qb) => qb.select('model2.id_col').orderBy('model2.id_col'))
         .modifyGraph('model1Relation2.model2Relation1', (qb) =>
-          qb.select('Model1.id').orderBy('Model1.id')
+          qb.select('Model1.id').orderBy('Model1.id'),
         )
         .then((res) => {
           expect(res).to.eql({
@@ -1293,7 +1293,7 @@ module.exports = (session) => {
         Model1.query().withGraphFetched('[model1Relation1, model1Relation1.model1Relation2]');
       }).to.throwException((err) => {
         expect(err.message).to.equal(
-          `Duplicate relation name "model1Relation1" in relation expression "[model1Relation1, model1Relation1.model1Relation2]". Use "a.[b, c]" instead of "[a.b, a.c]".`
+          `Duplicate relation name "model1Relation1" in relation expression "[model1Relation1, model1Relation1.model1Relation2]". Use "a.[b, c]" instead of "[a.b, a.c]".`,
         );
       });
     });
@@ -1310,7 +1310,7 @@ module.exports = (session) => {
           mockKnexFactory(session.knex, function (mock, oldImpl, args) {
             queries.push(this.toSQL());
             return oldImpl.apply(this, args);
-          })
+          }),
         );
       });
 
@@ -1393,7 +1393,7 @@ module.exports = (session) => {
         const result = await TestModel.fetchGraph(
           models,
           '[model1Relation1.model1Relation1, model1Relation2(orderById)]',
-          { skipFetched: true }
+          { skipFetched: true },
         );
 
         expect(queries).to.have.length(2);
@@ -1447,7 +1447,7 @@ module.exports = (session) => {
         const result = await TestModel.fetchGraph(
           models,
           '[model1Relation1.model1Relation1, model1Relation2(orderById)]',
-          { skipFetched: true }
+          { skipFetched: true },
         );
 
         expect(queries).to.have.length(1);
@@ -1501,7 +1501,7 @@ module.exports = (session) => {
         const result = await TestModel.fetchGraph(
           models,
           '[model1Relation1.model1Relation1, model1Relation2]',
-          { skipFetched: true }
+          { skipFetched: true },
         );
 
         expect(queries).to.have.length(0);
@@ -1601,7 +1601,7 @@ module.exports = (session) => {
           return Model1.query()
             .select(
               'Model1.*',
-              raw(`concat(??, ' - ', ??) as "rawThingy"`, 'Model1.model1Prop1', 'Model1.id')
+              raw(`concat(??, ' - ', ??) as "rawThingy"`, 'Model1.model1Prop1', 'Model1.id'),
             )
             .where('Model1.id', 1)
             .where('model1Relation2.id_col', 2)
@@ -1660,7 +1660,7 @@ module.exports = (session) => {
             .modifiers({
               rawStuff(builder) {
                 builder.select(
-                  raw(`concat(??, ' - ', ?? * 2)`, 'model1Prop1', 'id').as('rawThingy')
+                  raw(`concat(??, ' - ', ?? * 2)`, 'model1Prop1', 'id').as('rawThingy'),
                 );
               },
             })
@@ -1987,7 +1987,7 @@ module.exports = (session) => {
             expect(err.type).to.equal('RelationExpression');
             expect(err.modelClass).to.equal(Model1);
             expect(err.message).to.equal(
-              'identifier model1Relation1:model1Relation1:model1Relation1:model1Relation1:id is over 63 characters long and would be truncated by the database engine.'
+              'identifier model1Relation1:model1Relation1:model1Relation1:model1Relation1:id is over 63 characters long and would be truncated by the database engine.',
             );
             done();
           })
@@ -2048,7 +2048,7 @@ module.exports = (session) => {
           .catch((err) => {
             expect(err.type).to.equal('RelationExpression');
             expect(err.message).to.equal(
-              'recursion depth of eager expression model1Relation1.^ too big for JoinEagerAlgorithm'
+              'recursion depth of eager expression model1Relation1.^ too big for JoinEagerAlgorithm',
             );
             done();
           })
@@ -2066,7 +2066,7 @@ module.exports = (session) => {
             expect(err).to.be.a(ValidationError);
             expect(err.type).to.equal('RelationExpression');
             expect(err.message).to.equal(
-              'could not find modifier "missingFilter" for relation "model1Relation2"'
+              'could not find modifier "missingFilter" for relation "model1Relation2"',
             );
             done();
           })
@@ -2084,7 +2084,7 @@ module.exports = (session) => {
             expect(err).to.be.a(ValidationError);
             expect(err.type).to.equal('RelationExpression');
             expect(err.message).to.equal(
-              'unknown relation "invalidRelation" in an eager expression'
+              'unknown relation "invalidRelation" in an eager expression',
             );
             done();
           })
@@ -2102,7 +2102,7 @@ module.exports = (session) => {
             expect(err).to.be.a(ValidationError);
             expect(err.type).to.equal('RelationExpression');
             expect(err.message).to.equal(
-              'unknown relation "invalidRelation" in an eager expression'
+              'unknown relation "invalidRelation" in an eager expression',
             );
             done();
           })
@@ -2130,7 +2130,7 @@ module.exports = (session) => {
                 expect(models[0].model1Relation2[0].model2Relation1).to.have.length(1);
                 expect(models[0].model1Relation2[0].model2Relation1[0].id).to.equal(6);
               });
-          })
+          }),
         );
       });
 
@@ -2148,7 +2148,7 @@ module.exports = (session) => {
                   '$afterFindCalled',
                 ]);
               });
-          })
+          }),
         );
       });
 
@@ -2166,7 +2166,7 @@ module.exports = (session) => {
                   '$afterFindCalled',
                 ]);
               });
-          })
+          }),
         );
       });
 
@@ -2193,7 +2193,7 @@ module.exports = (session) => {
                 models[0].model1Relation2 = _.sortBy(models[0].model1Relation2, 'model2Prop1');
                 models[0].model1Relation2[1].model2Relation1 = _.sortBy(
                   models[0].model1Relation2[1].model2Relation1,
-                  'model1Prop1'
+                  'model1Prop1',
                 );
 
                 expect(models).to.eql([
@@ -2242,7 +2242,7 @@ module.exports = (session) => {
                   },
                 ]);
               });
-          })
+          }),
         );
       });
 
@@ -2267,7 +2267,7 @@ module.exports = (session) => {
             models[0].model1Relation2 = _.sortBy(models[0].model1Relation2, 'model2Prop1');
             models[0].model1Relation2[1].model2Relation1 = _.sortBy(
               models[0].model1Relation2[1].model2Relation1,
-              'model1Prop1'
+              'model1Prop1',
             );
 
             expect(models).to.eql([
@@ -2708,7 +2708,7 @@ module.exports = (session) => {
               ],
             },
           ],
-          { allowRefs: true }
+          { allowRefs: true },
         );
       });
 
@@ -2767,7 +2767,7 @@ module.exports = (session) => {
                 model2Relation1(f1) as c,
                 model2Relation1(f1) as d
               ]
-            ]`
+            ]`,
               )
               .modifiers({
                 f1: (builder) => builder.select('Model1.id'),
@@ -2826,7 +2826,7 @@ module.exports = (session) => {
                 });
               });
           },
-          { concurrency: 1 }
+          { concurrency: 1 },
         );
       });
 
@@ -2841,7 +2841,7 @@ module.exports = (session) => {
               model2Relation1(f1) as c,
               model2Relation1(f1) as d
             ]
-          ]`
+          ]`,
           )
           .modifiers({
             f1: (builder) => builder.select('Model1.id'),
@@ -2914,7 +2914,7 @@ module.exports = (session) => {
                 });
               });
           },
-          { concurrency: 1 }
+          { concurrency: 1 },
         );
       });
     });
@@ -2939,7 +2939,7 @@ module.exports = (session) => {
           return Model1.bindKnex(mockKnex)
             .query()
             .withGraphFetched(
-              '[model1Relation1, model1Relation1Inverse, model1Relation2.[model2Relation1, model2Relation2], model1Relation3]'
+              '[model1Relation1, model1Relation1Inverse, model1Relation2.[model2Relation1, model2Relation2], model1Relation3]',
             )
             .context({
               onBuild(builder) {
@@ -2978,7 +2978,7 @@ module.exports = (session) => {
           return Model1.bindKnex(mockKnex)
             .query()
             .withGraphJoined(
-              '[model1Relation1, model1Relation1Inverse, model1Relation2.[model2Relation1, model2Relation2], model1Relation3]'
+              '[model1Relation1, model1Relation1Inverse, model1Relation2.[model2Relation1, model2Relation2], model1Relation3]',
             )
             .then(() => {
               expect(_.last(sql).replace(/\s/g, '')).to.equal(
@@ -3035,7 +3035,7 @@ module.exports = (session) => {
                   "Model1Model2" as "model1Relation3_join" on "model1Relation3_join"."model1Id" = "Model1"."id"
                 left join
                   "model2" as "model1Relation3" on "model1Relation3_join"."model2Id" = "model1Relation3"."id_col"
-              `.replace(/\s/g, '')
+              `.replace(/\s/g, ''),
               );
             });
         });
@@ -3110,7 +3110,7 @@ module.exports = (session) => {
               return Model1.query()
                 .where('Model1.model1Prop1', 'like', 'hello%')
                 [method](
-                  '[model1Relation1.model1Relation1, model1Relation1Inverse, model1Relation2.[model2Relation1, model2Relation2], model1Relation3]'
+                  '[model1Relation1.model1Relation1, model1Relation1Inverse, model1Relation2.[model2Relation1, model2Relation2], model1Relation3]',
                 )
                 .then((res) => {
                   console.log('query time', Date.now() - t1);
@@ -3127,7 +3127,7 @@ module.exports = (session) => {
                   expect(got).to.eql(expected);
                 });
             },
-            { concurrency: 1 }
+            { concurrency: 1 },
           );
         });
 
@@ -3135,7 +3135,7 @@ module.exports = (session) => {
           ['extra1', 'extra2', 'aliasedExtra', 'model1Id', 'model1Prop2', 'model2Prop2'].forEach(
             (key) => {
               delete model[key];
-            }
+            },
           );
 
           ['model1Relation2', 'model1Relation3'].map((rel) => {

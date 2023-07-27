@@ -57,7 +57,7 @@ module.exports = (session) => {
         await User.relatedQuery('posts', knex).insert({ content: 'my post content' });
       } catch (e) {
         expect(e.message).to.equal(
-          'query method `for` ommitted outside a subquery, can not figure out relation target'
+          'query method `for` ommitted outside a subquery, can not figure out relation target',
         );
       }
     });
@@ -66,7 +66,7 @@ module.exports = (session) => {
         await User.relatedQuery('posts', knex).where({ content: 'my post content' });
       } catch (e) {
         expect(e.message).to.equal(
-          'query method `for` ommitted outside a subquery, can not figure out relation target'
+          'query method `for` ommitted outside a subquery, can not figure out relation target',
         );
       }
     });

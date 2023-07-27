@@ -339,7 +339,7 @@ module.exports = (session) => {
               ],
             },
           ],
-          { allowRefs: true }
+          { allowRefs: true },
         );
       });
 
@@ -687,7 +687,7 @@ module.exports = (session) => {
               ],
             },
           ],
-          { allowRefs: true }
+          { allowRefs: true },
         );
       });
 
@@ -1034,7 +1034,7 @@ module.exports = (session) => {
               ],
             },
           ],
-          { allowRefs: true }
+          { allowRefs: true },
         );
       });
 
@@ -1567,7 +1567,7 @@ module.exports = (session) => {
               ],
             },
           ],
-          { allowRefs: true }
+          { allowRefs: true },
         );
       });
 
@@ -1846,7 +1846,7 @@ module.exports = (session) => {
               ],
             },
           ],
-          { allowRefs: true }
+          { allowRefs: true },
         );
       });
 
@@ -2284,7 +2284,7 @@ module.exports = (session) => {
               ],
             },
           ],
-          { allowRefs: true }
+          { allowRefs: true },
         );
       });
 
@@ -2521,7 +2521,7 @@ module.exports = (session) => {
               ],
             },
           ],
-          { allowRefs: true }
+          { allowRefs: true },
         );
       });
 
@@ -2863,7 +2863,7 @@ module.exports = (session) => {
               ],
             },
           ],
-          { allowRefs: true }
+          { allowRefs: true },
         );
       });
 

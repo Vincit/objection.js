@@ -122,7 +122,7 @@ describe('QueryBuilder', () => {
         expect(arg2).to.equal(1);
       },
       'foo',
-      1
+      1,
     );
 
     expect(called1).to.equal(true);
@@ -147,7 +147,7 @@ describe('QueryBuilder', () => {
         },
       ],
       'foo',
-      1
+      1,
     );
 
     expect(called1).to.equal(true);
@@ -199,7 +199,7 @@ describe('QueryBuilder', () => {
       builder.modify('unknown');
     }).to.throwException((err) => {
       expect(err.message).to.equal(
-        'Unable to determine modify function from provided value: "unknown".'
+        'Unable to determine modify function from provided value: "unknown".',
       );
     });
   });
@@ -309,7 +309,7 @@ describe('QueryBuilder', () => {
       builder.modify('unknown');
     }).to.throwException((err) => {
       expect(err.message).to.equal(
-        'Unable to determine modify function from provided value: "unknown".'
+        'Unable to determine modify function from provided value: "unknown".',
       );
     });
   });
@@ -514,7 +514,7 @@ describe('QueryBuilder', () => {
           [
             [1, 2],
             [3, 4],
-          ]
+          ],
         )
         .then(() => {
           expect(executedQueries).to.eql([
@@ -882,7 +882,7 @@ describe('QueryBuilder', () => {
         expect(executedQueries).to.have.length(1);
         expect(query.toKnexQuery().toString()).to.equal(executedQueries[0]);
         expect(executedQueries[0]).to.equal(
-          'update "Model" set "a" = 1, "b" = 2 where "test" < 100'
+          'update "Model" set "a" = 1, "b" = 2 where "test" < 100',
         );
         executedQueries = [];
         return query;
@@ -891,7 +891,7 @@ describe('QueryBuilder', () => {
         expect(executedQueries).to.have.length(1);
         expect(query.toKnexQuery().toString()).to.equal(executedQueries[0]);
         expect(executedQueries[0]).to.equal(
-          'update "Model" set "a" = 1, "b" = 2 where "test" < 100'
+          'update "Model" set "a" = 1, "b" = 2 where "test" < 100',
         );
         executedQueries = [];
         return query;
@@ -900,7 +900,7 @@ describe('QueryBuilder', () => {
         expect(executedQueries).to.have.length(1);
         expect(query.toKnexQuery().toString()).to.equal(executedQueries[0]);
         expect(executedQueries[0]).to.equal(
-          'update "Model" set "a" = 1, "b" = 2 where "test" < 100'
+          'update "Model" set "a" = 1, "b" = 2 where "test" < 100',
         );
       });
   });
@@ -917,7 +917,7 @@ describe('QueryBuilder', () => {
         expect(executedQueries).to.have.length(1);
         expect(res).to.equal(123);
         expect(executedQueries[0]).to.equal(
-          'select count(*) as "count" from (select "Model".* from "Model" where "test" = 100) as "temp"'
+          'select count(*) as "count" from (select "Model".* from "Model" where "test" = 100) as "temp"',
         );
         done();
       })
@@ -1237,7 +1237,7 @@ describe('QueryBuilder', () => {
       chai
         .expect(
           query.clear(operation).has(operation),
-          `query().clear('${operation}').has('${operation}')`
+          `query().clear('${operation}').has('${operation}')`,
         )
         .to.equal(false);
       operations.forEach((testOperation) => {
@@ -1263,7 +1263,7 @@ describe('QueryBuilder', () => {
       .then(() => {
         expect(model.c).to.equal('beforeUpdate');
         expect(executedQueries[0]).to.equal(
-          'update "Model" set "a" = 10, "b" = \'test\', "c" = \'beforeUpdate\''
+          'update "Model" set "a" = 10, "b" = \'test\', "c" = \'beforeUpdate\'',
         );
         done();
       })
@@ -1288,7 +1288,7 @@ describe('QueryBuilder', () => {
       .then(() => {
         expect(model.c).to.equal('beforeUpdate');
         expect(executedQueries[0]).to.equal(
-          'update "Model" set "a" = 10, "b" = \'test\', "c" = \'beforeUpdate\''
+          'update "Model" set "a" = 10, "b" = \'test\', "c" = \'beforeUpdate\'',
         );
         done();
       })
@@ -1310,7 +1310,7 @@ describe('QueryBuilder', () => {
       .then(() => {
         expect(model.c).to.equal('beforeUpdate');
         expect(executedQueries[0]).to.equal(
-          'update "Model" set "a" = 10, "b" = \'test\', "c" = \'beforeUpdate\''
+          'update "Model" set "a" = 10, "b" = \'test\', "c" = \'beforeUpdate\'',
         );
         done();
       })
@@ -1335,7 +1335,7 @@ describe('QueryBuilder', () => {
       .then(() => {
         expect(model.c).to.equal('beforeUpdate');
         expect(executedQueries[0]).to.equal(
-          'update "Model" set "a" = 10, "b" = \'test\', "c" = \'beforeUpdate\''
+          'update "Model" set "a" = 10, "b" = \'test\', "c" = \'beforeUpdate\'',
         );
         done();
       })
@@ -1356,7 +1356,7 @@ describe('QueryBuilder', () => {
       .then((model) => {
         expect(model.c).to.equal('beforeInsert');
         expect(executedQueries[0]).to.equal(
-          'insert into "Model" ("a", "b", "c") values (10, \'test\', \'beforeInsert\') returning "id"'
+          'insert into "Model" ("a", "b", "c") values (10, \'test\', \'beforeInsert\') returning "id"',
         );
         done();
       })
@@ -1380,7 +1380,7 @@ describe('QueryBuilder', () => {
       .then((model) => {
         expect(model.c).to.equal('beforeInsert');
         expect(executedQueries[0]).to.equal(
-          'insert into "Model" ("a", "b", "c") values (10, \'test\', \'beforeInsert\') returning "id"'
+          'insert into "Model" ("a", "b", "c") values (10, \'test\', \'beforeInsert\') returning "id"',
         );
         done();
       })
@@ -1570,7 +1570,7 @@ describe('QueryBuilder', () => {
       .join('M1', 'M1.id', 'M2.m1Id')
       .then(() => {
         expect(executedQueries[0]).to.equal(
-          'select "M2".* from "M2" inner join "M1" as "m" on "m"."m2Id" = "M2"."id" inner join "M1" on "M1"."id" = "M2"."m1Id"'
+          'select "M2".* from "M2" inner join "M1" as "m" on "m"."m2Id" = "M2"."id" inner join "M1" on "M1"."id" = "M2"."m1Id"',
         );
         done();
       })
@@ -1582,7 +1582,7 @@ describe('QueryBuilder', () => {
       QueryBuilder.forClass(TestModel).where('id', undefined).toKnexQuery();
     }).to.throwException((err) => {
       expect(err.message).to.equal(
-        "undefined passed as argument #1 for 'where' operation. Call skipUndefined() method to ignore the undefined values."
+        "undefined passed as argument #1 for 'where' operation. Call skipUndefined() method to ignore the undefined values.",
       );
     });
 
@@ -1590,7 +1590,7 @@ describe('QueryBuilder', () => {
       QueryBuilder.forClass(TestModel).orWhere('id', '<', undefined).toKnexQuery();
     }).to.throwException((err) => {
       expect(err.message).to.equal(
-        "undefined passed as argument #2 for 'orWhere' operation. Call skipUndefined() method to ignore the undefined values."
+        "undefined passed as argument #2 for 'orWhere' operation. Call skipUndefined() method to ignore the undefined values.",
       );
     });
 
@@ -1606,7 +1606,7 @@ describe('QueryBuilder', () => {
       QueryBuilder.forClass(TestModel).delete().whereIn('id', [1, undefined, 3]).toKnexQuery();
     }).to.throwException((err) => {
       expect(err.message).to.equal(
-        "undefined passed as an item in argument #1 for 'whereIn' operation. Call skipUndefined() method to ignore the undefined values."
+        "undefined passed as an item in argument #1 for 'whereIn' operation. Call skipUndefined() method to ignore the undefined values.",
       );
     });
   });
@@ -1653,10 +1653,10 @@ describe('QueryBuilder', () => {
     }
 
     expect(UnboundModel.query(mockKnex).increment('foo', 10).toKnexQuery().toString()).to.equal(
-      'update "Bar" set "foo" = "foo" + 10'
+      'update "Bar" set "foo" = "foo" + 10',
     );
     expect(UnboundModel.query(mockKnex).decrement('foo', 5).toKnexQuery().toString()).to.equal(
-      'update "Bar" set "foo" = "foo" - 5'
+      'update "Bar" set "foo" = "foo" - 5',
     );
   });
 
@@ -1737,15 +1737,15 @@ describe('QueryBuilder', () => {
     expect(TestModel.query().select('*').hasSelectionAs('foo', 'bar')).to.equal(false);
 
     expect(TestModel.query().select('foo.*').hasSelectionAs('foo.anything', 'anything')).to.equal(
-      true
+      true,
     );
 
     expect(
-      TestModel.query().select('foo.*').hasSelectionAs('foo.anything', 'somethingElse')
+      TestModel.query().select('foo.*').hasSelectionAs('foo.anything', 'somethingElse'),
     ).to.equal(false);
 
     expect(TestModel.query().select('foo.*').hasSelectionAs('bar.anything', 'anything')).to.equal(
-      false
+      false,
     );
   });
 
@@ -1764,7 +1764,7 @@ describe('QueryBuilder', () => {
     expect(TestModel.query().select('foo.*').hasSelection('foo.anything')).to.equal(true);
 
     expect(
-      TestModel.query().select(ref('*')).hasSelection(ref('DifferentTable.anything'))
+      TestModel.query().select(ref('*')).hasSelection(ref('DifferentTable.anything')),
     ).to.equal(true);
 
     expect(TestModel.query().select('foo').hasSelection('foo')).to.equal(true);
@@ -1778,7 +1778,7 @@ describe('QueryBuilder', () => {
     expect(TestModel.query().select('foo').hasSelection('DifferentTable.foo')).to.equal(false);
 
     expect(TestModel.query().select(ref('foo')).hasSelection(ref('DifferentTable.foo'))).to.equal(
-      false
+      false,
     );
 
     expect(TestModel.query().select('foo').hasSelection('bar')).to.equal(false);
@@ -1792,13 +1792,13 @@ describe('QueryBuilder', () => {
     expect(TestModel.query().select('Model.foo').hasSelection('Model.foo')).to.equal(true);
 
     expect(TestModel.query().select(ref('Model.foo')).hasSelection(ref('Model.foo'))).to.equal(
-      true
+      true,
     );
 
     expect(TestModel.query().select('Model.foo').hasSelection('NotTestModel.foo')).to.equal(false);
 
     expect(
-      TestModel.query().select(ref('Model.foo')).hasSelection(ref('NotTestModel.foo'))
+      TestModel.query().select(ref('Model.foo')).hasSelection(ref('NotTestModel.foo')),
     ).to.equal(false);
 
     expect(TestModel.query().select('Model.foo').hasSelection('bar')).to.equal(false);
@@ -2594,7 +2594,7 @@ describe('QueryBuilder', () => {
     it('query().update()', () => {
       testToFindQuery(
         Person.query(mockKnex).update({ foo: 'bar' }).where('name', 'like', '%foo'),
-        'select "person".* from "person" where "name" like ?'
+        'select "person".* from "person" where "name" like ?',
       );
     });
 
@@ -2604,7 +2604,7 @@ describe('QueryBuilder', () => {
           .$relatedQuery('pets', mockKnex)
           .update({ foo: 'bar' })
           .where('name', 'like', '%foo'),
-        'select "pet".* from "pet" where "pet"."owner_id" in (?) and "name" like ?'
+        'select "pet".* from "pet" where "pet"."owner_id" in (?) and "name" like ?',
       );
     });
 
@@ -2614,7 +2614,7 @@ describe('QueryBuilder', () => {
           .$relatedQuery('owner', mockKnex)
           .patch({ foo: 'bar' })
           .where('name', 'like', '%foo'),
-        'select "person".* from "person" where "person"."id" in (?) and "name" like ?'
+        'select "person".* from "person" where "person"."id" in (?) and "name" like ?',
       );
     });
 
