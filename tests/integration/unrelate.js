@@ -83,7 +83,7 @@ module.exports = (session) => {
             })
             .catch((err) => {
               expect(err.message).to.equal(
-                `Don't pass arguments to unrelate(). You should use it like this: unrelate().where('foo', 'bar').andWhere(...)`
+                `Don't pass arguments to unrelate(). You should use it like this: unrelate().where('foo', 'bar').andWhere(...)`,
               );
               done();
             })
@@ -180,7 +180,7 @@ module.exports = (session) => {
             })
             .catch((err) => {
               expect(err.message).to.equal(
-                `Don't pass arguments to unrelate(). You should use it like this: unrelate().where('foo', 'bar').andWhere(...)`
+                `Don't pass arguments to unrelate(). You should use it like this: unrelate().where('foo', 'bar').andWhere(...)`,
               );
               done();
             })
@@ -291,7 +291,7 @@ module.exports = (session) => {
             })
             .catch((err) => {
               expect(err.message).to.equal(
-                `Don't pass arguments to unrelate(). You should use it like this: unrelate().where('foo', 'bar').andWhere(...)`
+                `Don't pass arguments to unrelate(). You should use it like this: unrelate().where('foo', 'bar').andWhere(...)`,
               );
               done();
             })
@@ -486,7 +486,7 @@ module.exports = (session) => {
             })
             .catch((err) => {
               expect(err.message).to.equal(
-                `Don't pass arguments to unrelate(). You should use it like this: unrelate().where('foo', 'bar').andWhere(...)`
+                `Don't pass arguments to unrelate(). You should use it like this: unrelate().where('foo', 'bar').andWhere(...)`,
               );
               done();
             })
@@ -621,7 +621,7 @@ module.exports = (session) => {
             })
             .catch((err) => {
               expect(err.message).to.equal(
-                `Don't pass arguments to unrelate(). You should use it like this: unrelate().where('foo', 'bar').andWhere(...)`
+                `Don't pass arguments to unrelate(). You should use it like this: unrelate().where('foo', 'bar').andWhere(...)`,
               );
               done();
             })
@@ -763,7 +763,7 @@ module.exports = (session) => {
             })
             .catch((err) => {
               expect(err.message).to.equal(
-                `Don't pass arguments to unrelate(). You should use it like this: unrelate().where('foo', 'bar').andWhere(...)`
+                `Don't pass arguments to unrelate(). You should use it like this: unrelate().where('foo', 'bar').andWhere(...)`,
               );
               done();
             })

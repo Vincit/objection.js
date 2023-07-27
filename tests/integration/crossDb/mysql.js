@@ -31,7 +31,7 @@ module.exports = (session) => {
           table.integer('t1_id').references('t1.id');
           table.integer('bar');
         });
-      })
+      }),
     );
 
     after(
@@ -40,7 +40,7 @@ module.exports = (session) => {
         yield db2Knex.schema.dropTableIfExists('t1');
         yield db2Knex.destroy();
         yield session.knex.raw('DROP DATABASE IF EXISTS objection_test_2');
-      })
+      }),
     );
 
     beforeEach(() => {
@@ -88,7 +88,7 @@ module.exports = (session) => {
       Promise.coroutine(function* () {
         yield db2Knex('t2').delete();
         yield db2Knex('t1').delete();
-      })
+      }),
     );
 
     it('should be able to insert to another database', () => {

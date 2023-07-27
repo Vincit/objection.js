@@ -217,7 +217,7 @@ module.exports = (session) => {
                   latitudeCoordinate: 61,
                   longitudeCoordinate: 23,
                 },
-              }
+              },
             ),
           },
 
@@ -317,7 +317,7 @@ module.exports = (session) => {
             .select('person.firstName as rootFirstName')
             .modifyGraph('parentPerson', (qb) => qb.select('firstName as parentFirstName'))
             .modifyGraph('parentPerson.parentPerson', (qb) =>
-              qb.select('firstName as grandParentFirstName')
+              qb.select('firstName as grandParentFirstName'),
             )
             [method]('[parentPerson.parentPerson, pets, movies]')
             .orderBy('person.firstName')
@@ -470,7 +470,7 @@ module.exports = (session) => {
       const config = Object.assign(
         {},
         session.opt.knexConfig,
-        knexSnakeCaseMappers({ upperCase: true })
+        knexSnakeCaseMappers({ upperCase: true }),
       );
       knex = Knex(config);
     });
@@ -617,7 +617,7 @@ module.exports = (session) => {
             .select('person.firstName as rootFirstName')
             .modifyGraph('parentPerson', (qb) => qb.select('firstName as parentFirstName'))
             .modifyGraph('parentPerson.parentPerson', (qb) =>
-              qb.select('firstName as grandParentFirstName')
+              qb.select('firstName as grandParentFirstName'),
             )
             [method]('[parentPerson.parentPerson, pets, movies]')
             .orderBy('person.firstName')

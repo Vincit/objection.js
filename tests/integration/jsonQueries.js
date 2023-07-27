@@ -483,7 +483,7 @@ module.exports = (session) => {
       it('should have test data', () => {
         return BoundModel.query().then((all) => {
           expect(_.find(all, { name: 'complex line' }).jsonObject.stringField).to.be(
-            complexJsonObj.jsonObject.stringField
+            complexJsonObj.jsonObject.stringField,
           );
         });
       });
@@ -491,13 +491,16 @@ module.exports = (session) => {
       describe('private function parseFieldExpression(expression, extractAsText)', () => {
         it('should quote ModelJson.jsonArray column reference properly', () => {
           expect(
-            BoundModel.query().whereJsonIsArray('ModelJson.jsonArray').toKnexQuery().toString()
+            BoundModel.query().whereJsonIsArray('ModelJson.jsonArray').toKnexQuery().toString(),
           ).to.contain('"ModelJson"."jsonArray"');
         });
 
         it('should quote ModelJson.jsonArray:[10] column reference properly', () => {
           expect(
-            BoundModel.query().whereJsonIsArray('ModelJson.jsonArray:[50]').toKnexQuery().toString()
+            BoundModel.query()
+              .whereJsonIsArray('ModelJson.jsonArray:[50]')
+              .toKnexQuery()
+              .toString(),
           ).to.contain('"ModelJson"."jsonArray"');
         });
       });
@@ -827,7 +830,7 @@ module.exports = (session) => {
               '@>',
               val({
                 object: 'something else',
-              })
+              }),
             )
             .then((results) => {
               expect(results).to.have.length(0);
@@ -865,7 +868,7 @@ module.exports = (session) => {
             .whereNot(
               ref('jsonObject:objectField'),
               '@>',
-              val(complexJsonObj.jsonObject.objectField)
+              val(complexJsonObj.jsonObject.objectField),
             )
             .then((results) => {
               expectIdsEqual(results, []);
@@ -1077,7 +1080,7 @@ module.exports = (session) => {
               '<@',
               val({
                 object: 'something else',
-              })
+              }),
             )
             .then((results) => {
               expect(results).to.have.length(0);
@@ -1410,7 +1413,7 @@ module.exports = (session) => {
             .where(
               ref('jsonObject:stringField').castText(),
               '=',
-              'string in jsonObject.stringField'
+              'string in jsonObject.stringField',
             )
             .then((results) => {
               expectIdsEqual(results, [1]);
@@ -1422,7 +1425,7 @@ module.exports = (session) => {
             .where(
               ref('jsonObject:stringField').castText(),
               '=',
-              val('string in jsonObject.stringField').castText()
+              val('string in jsonObject.stringField').castText(),
             )
             .then((results) => {
               expectIdsEqual(results, [1]);

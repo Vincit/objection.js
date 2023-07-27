@@ -196,12 +196,12 @@ module.exports = (session) => {
           res.map((it) => ({
             value: it.value,
             rel: { value: it.rel.value, rel: { value: it.rel.rel.value } },
-          }))
+          })),
         )
         .then((res) => {
           if (session.isPostgres()) {
             expect(queries[queries.length - 1]).to.eql(
-              `select "table1"."id" as "id", "table1"."relId" as "relId", "table1"."value" as "value", "rel"."id" as "rel:id", "rel"."relId" as "rel:relId", "rel"."value" as "rel:value", "rel:rel"."id" as "rel:rel:id", "rel:rel"."relId" as "rel:rel:relId", "rel:rel"."value" as "rel:rel:value" from "table1" left join "table1" as "rel" on "rel"."id" = "table1"."relId" left join "table1" as "rel:rel" on "rel:rel"."id" = "rel"."relId" where "table1"."value" = '1'`
+              `select "table1"."id" as "id", "table1"."relId" as "relId", "table1"."value" as "value", "rel"."id" as "rel:id", "rel"."relId" as "rel:relId", "rel"."value" as "rel:value", "rel:rel"."id" as "rel:rel:id", "rel:rel"."relId" as "rel:rel:relId", "rel:rel"."value" as "rel:rel:value" from "table1" left join "table1" as "rel" on "rel"."id" = "table1"."relId" left join "table1" as "rel:rel" on "rel:rel"."id" = "rel"."relId" where "table1"."value" = '1'`,
             );
           }
 

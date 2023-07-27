@@ -641,7 +641,7 @@ module.exports = (session) => {
           })
           .catch((err) => {
             expect(err.message).to.equal(
-              `one of the identifier columns [id] is null or undefined. Have you specified the correct identifier column for the model 'Model1' using the 'idColumn' property?`
+              `one of the identifier columns [id] is null or undefined. Have you specified the correct identifier column for the model 'Model1' using the 'idColumn' property?`,
             );
             done();
           })
@@ -659,7 +659,7 @@ module.exports = (session) => {
           })
           .catch((err) => {
             expect(err.message).to.equal(
-              `one of the identifier columns [id] is null or undefined. Have you specified the correct identifier column for the model 'Model1' using the 'idColumn' property?`
+              `one of the identifier columns [id] is null or undefined. Have you specified the correct identifier column for the model 'Model1' using the 'idColumn' property?`,
             );
             done();
           })

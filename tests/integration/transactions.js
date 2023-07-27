@@ -50,7 +50,7 @@ module.exports = (session) => {
         function () {},
         () => {
           return { a: 1 };
-        }
+        },
       )
         .then(() => {
           done(new Error('should not get here'));
@@ -584,7 +584,7 @@ module.exports = (session) => {
                   throw new Error();
                 }
                 return Model1.query().insert({ model1Prop1: i.toString() }).then();
-              })
+              }),
             );
           });
       })
@@ -733,7 +733,7 @@ module.exports = (session) => {
 
           expect(model2Rows).to.have.length(1);
           expect(model2Rows[0].model2_prop1).to.equal('test 3');
-        })
+        }),
       );
 
       it(
@@ -754,7 +754,7 @@ module.exports = (session) => {
 
           expect(model2Rows).to.have.length(1);
           expect(model2Rows[0].model2_prop1).to.equal('test 3');
-        })
+        }),
       );
 
       it(
@@ -772,7 +772,7 @@ module.exports = (session) => {
 
           expect(model1Rows).to.have.length(0);
           expect(model2Rows).to.have.length(0);
-        })
+        }),
       );
 
       it('should work when a knex connection is passed instead of a model', (done) => {

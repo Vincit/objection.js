@@ -206,7 +206,7 @@ module.exports = (session) => {
                 inner join "Model1Model2" as "model1Relation3_join" on "model1Relation3_join"."model1Id" = "someAlias"."id"
                 inner join "model2" as "model1Relation3" on "model1Relation3_join"."model2Id" = "model1Relation3"."id_col"
                 where "someAlias"."id" = 1
-              `.replace(/\s/g, '')
+              `.replace(/\s/g, ''),
               );
             }
           });
@@ -337,7 +337,7 @@ module.exports = (session) => {
                   "model2" as "model1Relation2:model2Relation1:model1Relation2" on "model1Relation2:model2Relation1:model1Relation2"."model1_id" = "model1Relation2:model2Relation1"."id"
                 where
                   "someAlias"."id" = 1
-              `.replace(/\s/g, '')
+              `.replace(/\s/g, ''),
               );
             }
 
@@ -384,7 +384,7 @@ module.exports = (session) => {
                   inner join "Model1Model2" as "model1Relation3_join" on "model1Relation3_join"."model1Id" = "someView"."id"
                   inner join "model2" as "model1Relation3" on "model1Relation3_join"."model2Id" = "model1Relation3"."id_col"
                   where "someView"."id" = 1
-                `.replace(/\s/g, '')
+                `.replace(/\s/g, ''),
                 );
               }
             });
@@ -550,7 +550,7 @@ module.exports = (session) => {
                   "model2" as "model1Relation2:model2Relation1:model1Relation2" on "model1Relation2:model2Relation1:model1Relation2"."model1_id" = "model1Relation2:model2Relation1"."id"
                 where
                   "someView"."id" = 1
-                `.replace(/\s/g, '')
+                `.replace(/\s/g, ''),
               );
 
               // This makes sure, `Model1` and `someView` have different metadata.
@@ -647,7 +647,7 @@ module.exports = (session) => {
             .withGraphJoined(fullEager)
             .modifyGraph('model1Relation1', (builder) => builder.select('someView.id'))
             .modifyGraph('model1Relation2.model2Relation1', (builder) =>
-              builder.select('someView.id')
+              builder.select('someView.id'),
             )
             .then(sortEager)
             .then(() => {
@@ -691,7 +691,7 @@ module.exports = (session) => {
                   "model2" as "model1Relation2:model2Relation1:model1Relation2" on "model1Relation2:model2Relation1:model1Relation2"."model1_id" = "model1Relation2:model2Relation1"."id"
                 where
                   "someView"."id" = 1
-                `.replace(/\s/g, '')
+                `.replace(/\s/g, ''),
               );
             });
         });
@@ -715,7 +715,7 @@ function sortEager(models) {
     if (model.model1Relation2[1].model2Relation1) {
       model.model1Relation2[1].model2Relation1 = _.sortBy(
         model.model1Relation2[1].model2Relation1,
-        'id'
+        'id',
       );
     }
   });

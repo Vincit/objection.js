@@ -293,7 +293,7 @@ describe('ManyToManyRelation', () => {
       });
     }).to.throwException((err) => {
       expect(err.message).to.equal(
-        'OwnerModel.relationMappings.testRelation: join.through.modelClass: is not a subclass of Model or a file path to a module that exports one. You may be dealing with a require loop. See the documentation section about require loops.'
+        'OwnerModel.relationMappings.testRelation: join.through.modelClass: is not a subclass of Model or a file path to a module that exports one. You may be dealing with a require loop. See the documentation section about require loops.',
       );
     });
   });
@@ -317,7 +317,7 @@ describe('ManyToManyRelation', () => {
       });
     }).to.throwException((err) => {
       expect(err.message).to.contain(
-        "OwnerModel.relationMappings.testRelation: Cannot find module '/not/a/path/to/a/model'"
+        "OwnerModel.relationMappings.testRelation: Cannot find module '/not/a/path/to/a/model'",
       );
     });
   });
@@ -339,7 +339,7 @@ describe('ManyToManyRelation', () => {
       });
     }).to.throwException((err) => {
       expect(err.message).to.contain(
-        'OwnerModel.relationMappings.testRelation: join.through must be an object that describes the join table. For example: {from: "JoinTable.someId", to: "JoinTable.someOtherId"}'
+        'OwnerModel.relationMappings.testRelation: join.through must be an object that describes the join table. For example: {from: "JoinTable.someId", to: "JoinTable.someOtherId"}',
       );
     });
   });
@@ -361,7 +361,7 @@ describe('ManyToManyRelation', () => {
       });
     }).to.throwException((err) => {
       expect(err.message).to.contain(
-        'OwnerModel.relationMappings.testRelation: join.through must be an object that describes the join table. For example: {from: "JoinTable.someId", to: "JoinTable.someOtherId"}'
+        'OwnerModel.relationMappings.testRelation: join.through must be an object that describes the join table. For example: {from: "JoinTable.someId", to: "JoinTable.someOtherId"}',
       );
     });
   });
@@ -384,7 +384,7 @@ describe('ManyToManyRelation', () => {
       });
     }).to.throwException((err) => {
       expect(err.message).to.contain(
-        'OwnerModel.relationMappings.testRelation: join.through.from must have format JoinTable.columnName. For example "JoinTable.someId" or in case of composite key ["JoinTable.a", "JoinTable.b"].'
+        'OwnerModel.relationMappings.testRelation: join.through.from must have format JoinTable.columnName. For example "JoinTable.someId" or in case of composite key ["JoinTable.a", "JoinTable.b"].',
       );
     });
   });
@@ -407,7 +407,7 @@ describe('ManyToManyRelation', () => {
       });
     }).to.throwException((err) => {
       expect(err.message).to.contain(
-        'OwnerModel.relationMappings.testRelation: join.through.to must have format JoinTable.columnName. For example "JoinTable.someId" or in case of composite key ["JoinTable.a", "JoinTable.b"].'
+        'OwnerModel.relationMappings.testRelation: join.through.to must have format JoinTable.columnName. For example "JoinTable.someId" or in case of composite key ["JoinTable.a", "JoinTable.b"].',
       );
     });
   });
@@ -430,7 +430,7 @@ describe('ManyToManyRelation', () => {
       });
     }).to.throwException((err) => {
       expect(err.message).to.contain(
-        'OwnerModel.relationMappings.testRelation: join.through `from` and `to` must point to the same join table.'
+        'OwnerModel.relationMappings.testRelation: join.through `from` and `to` must point to the same join table.',
       );
     });
   });
@@ -496,7 +496,7 @@ describe('ManyToManyRelation', () => {
             'where "JoinModel"."ownerId" in (666)',
             'and "name" = \'Teppo\'',
             'or "age" > 60',
-          ].join(' ')
+          ].join(' '),
         );
       });
     });
@@ -535,7 +535,7 @@ describe('ManyToManyRelation', () => {
             'where ("JoinModel"."ownerAId", "JoinModel"."ownerBId") in ((11, 22))',
             'and "name" = \'Teppo\'',
             'or "age" > 60',
-          ].join(' ')
+          ].join(' '),
         );
       });
     });
@@ -580,7 +580,7 @@ describe('ManyToManyRelation', () => {
             'where "JoinModel"."ownerId" in (666, 667)',
             'and "name" = \'Teppo\'',
             'or "age" > 60',
-          ].join(' ')
+          ].join(' '),
         );
       });
     });
@@ -628,7 +628,7 @@ describe('ManyToManyRelation', () => {
             'where ("JoinModel"."ownerAId", "JoinModel"."ownerBId") in ((11, 22), (11, 33))',
             'and "name" = \'Teppo\'',
             'or "age" > 60',
-          ].join(' ')
+          ].join(' '),
         );
       });
     });
@@ -668,7 +668,7 @@ describe('ManyToManyRelation', () => {
             'where "JoinModel"."ownerId" in (666)',
             'and "name" = \'Teppo\'',
             'or "age" > 60',
-          ].join(' ')
+          ].join(' '),
         );
       });
     });
@@ -711,7 +711,7 @@ describe('ManyToManyRelation', () => {
             'and "someColumn" = 100',
             'and "name" = \'Teppo\'',
             'or "age" > 60',
-          ].join(' ')
+          ].join(' '),
         );
       });
     });
@@ -754,7 +754,7 @@ describe('ManyToManyRelation', () => {
             'and "filteredProperty" = true',
             'and "name" = \'Teppo\'',
             'or "age" > 60',
-          ].join(' ')
+          ].join(' '),
         );
       });
     });
@@ -778,7 +778,7 @@ describe('ManyToManyRelation', () => {
             'inner join (select "JoinModel".* from "JoinModel" where "someColumn" = \'foo\') as "JoinModel"',
             'on "RelatedModel"."rid" = "JoinModel"."relatedId"',
             'where "JoinModel"."ownerId" in (666)',
-          ].join(' ')
+          ].join(' '),
         );
       });
     });
@@ -810,10 +810,10 @@ describe('ManyToManyRelation', () => {
         expect(executedQueries[0]).to.equal(toString);
         expect(executedQueries[0]).to.equal(toSql);
         expect(executedQueries[0]).to.equal(
-          'insert into "RelatedModel" ("a", "rid") values (\'str1\', 3), (\'str2\', 4) returning "id"'
+          'insert into "RelatedModel" ("a", "rid") values (\'str1\', 3), (\'str2\', 4) returning "id"',
         );
         expect(executedQueries[1]).to.equal(
-          'insert into "JoinModel" ("ownerId", "relatedId") values (666, 3), (666, 4) returning "relatedId"'
+          'insert into "JoinModel" ("ownerId", "relatedId") values (666, 3), (666, 4) returning "relatedId"',
         );
 
         expect(_.sortBy(owner.nameOfOurRelation, 'id')).to.eql([
@@ -862,10 +862,10 @@ describe('ManyToManyRelation', () => {
         expect(executedQueries[0]).to.equal(toString);
         expect(executedQueries[0]).to.equal(toSql);
         expect(executedQueries[0]).to.equal(
-          'insert into "RelatedModel" ("a", "cid", "did") values (\'str1\', 33, 44), (\'str2\', 33, 55) returning "id"'
+          'insert into "RelatedModel" ("a", "cid", "did") values (\'str1\', 33, 44), (\'str2\', 33, 55) returning "id"',
         );
         expect(executedQueries[1]).to.equal(
-          'insert into "JoinModel" ("ownerAId", "ownerBId", "relatedCId", "relatedDId") values (11, 22, 33, 44), (11, 22, 33, 55) returning "relatedCId", "relatedDId"'
+          'insert into "JoinModel" ("ownerAId", "ownerBId", "relatedCId", "relatedDId") values (11, 22, 33, 44), (11, 22, 33, 55) returning "relatedCId", "relatedDId"',
         );
 
         expect(_.sortBy(owner.nameOfOurRelation, 'id')).to.eql([
@@ -907,10 +907,10 @@ describe('ManyToManyRelation', () => {
         expect(executedQueries[0]).to.equal(toString);
         expect(executedQueries[0]).to.equal(toSql);
         expect(executedQueries[0]).to.equal(
-          'insert into "RelatedModel" ("a", "rid") values (\'str1\', 3), (\'str2\', 4) returning "id"'
+          'insert into "RelatedModel" ("a", "rid") values (\'str1\', 3), (\'str2\', 4) returning "id"',
         );
         expect(executedQueries[1]).to.equal(
-          'insert into "JoinModel" ("ownerId", "relatedId") values (666, 3), (666, 4) returning "relatedId"'
+          'insert into "JoinModel" ("ownerId", "relatedId") values (666, 3), (666, 4) returning "relatedId"',
         );
 
         expect(owner.nameOfOurRelation).to.eql([
@@ -948,10 +948,10 @@ describe('ManyToManyRelation', () => {
         expect(executedQueries[0]).to.equal(toString);
         expect(executedQueries[0]).to.equal(toSql);
         expect(executedQueries[0]).to.equal(
-          'insert into "RelatedModel" ("a", "rid") values (\'str1\', 2) returning "id"'
+          'insert into "RelatedModel" ("a", "rid") values (\'str1\', 2) returning "id"',
         );
         expect(executedQueries[1]).to.equal(
-          'insert into "JoinModel" ("ownerId", "relatedId") values (666, 2) returning "relatedId"'
+          'insert into "JoinModel" ("ownerId", "relatedId") values (666, 2) returning "relatedId"',
         );
 
         expect(result).to.eql({ a: 'str1', id: 1, rid: 2 });
@@ -979,10 +979,10 @@ describe('ManyToManyRelation', () => {
         expect(executedQueries[0]).to.equal(toString);
         expect(executedQueries[0]).to.equal(toSql);
         expect(executedQueries[0]).to.equal(
-          'insert into "RelatedModel" ("a", "rid") values (\'str1\', 2) returning "id"'
+          'insert into "RelatedModel" ("a", "rid") values (\'str1\', 2) returning "id"',
         );
         expect(executedQueries[1]).to.equal(
-          'insert into "JoinModel" ("ownerId", "relatedId") values (666, 2) returning "relatedId"'
+          'insert into "JoinModel" ("ownerId", "relatedId") values (666, 2) returning "relatedId"',
         );
 
         expect(result).to.eql({ a: 'str1', id: 1, rid: 2 });
@@ -1017,10 +1017,10 @@ describe('ManyToManyRelation', () => {
         expect(executedQueries[0]).to.equal(toString);
         expect(executedQueries[0]).to.equal(toSql);
         expect(executedQueries[0]).to.equal(
-          'insert into "RelatedModel" ("a", "rid") values (\'str2\', 4) returning "id"'
+          'insert into "RelatedModel" ("a", "rid") values (\'str2\', 4) returning "id"',
         );
         expect(executedQueries[1]).to.equal(
-          'insert into "JoinModel" ("extra1", "extra2", "ownerId", "relatedId") values (\'extraVal1\', \'extraVal2\', 666, 4) returning "relatedId"'
+          'insert into "JoinModel" ("extra1", "extra2", "ownerId", "relatedId") values (\'extraVal1\', \'extraVal2\', 666, 4) returning "relatedId"',
         );
 
         expect(_.sortBy(_.invokeMap(owner.nameOfOurRelation, 'toJSON'), 'id')).to.eql([
@@ -1061,10 +1061,10 @@ describe('ManyToManyRelation', () => {
         expect(executedQueries[0]).to.equal(toString);
         expect(executedQueries[0]).to.equal(toSql);
         expect(executedQueries[0]).to.equal(
-          'insert into "RelatedModel" ("a", "rid") values (\'str2\', 4) returning "id"'
+          'insert into "RelatedModel" ("a", "rid") values (\'str2\', 4) returning "id"',
         );
         expect(executedQueries[1]).to.equal(
-          'insert into "JoinModel" ("extra2", "ownerId", "relatedId") values (\'extraVal2\', 666, 4) returning "relatedId"'
+          'insert into "JoinModel" ("extra2", "ownerId", "relatedId") values (\'extraVal2\', 666, 4) returning "relatedId"',
         );
 
         expect(_.sortBy(_.invokeMap(owner.nameOfOurRelation, 'toJSON'), 'id')).to.eql([
@@ -1100,7 +1100,7 @@ describe('ManyToManyRelation', () => {
         expect(executedQueries[0]).to.equal(builder.toKnexQuery().toString());
         expect(executedQueries[0]).to.equal(builder.toKnexQuery().toString());
         expect(executedQueries[0]).to.eql(
-          `update "RelatedModel" set "a" = 'str1' where "RelatedModel"."id" in (select "RelatedModel"."id" from "RelatedModel" inner join "JoinModel" on "RelatedModel"."rid" = "JoinModel"."relatedId" where "JoinModel"."ownerId" in (666) and "gender" = 'male' and "thingy" is not null)`
+          `update "RelatedModel" set "a" = 'str1' where "RelatedModel"."id" in (select "RelatedModel"."id" from "RelatedModel" inner join "JoinModel" on "RelatedModel"."rid" = "JoinModel"."relatedId" where "JoinModel"."ownerId" in (666) and "gender" = 'male' and "thingy" is not null)`,
         );
       });
     });
@@ -1126,7 +1126,7 @@ describe('ManyToManyRelation', () => {
         expect(executedQueries[0]).to.equal(builder.toKnexQuery().toString());
         expect(executedQueries[0]).to.equal(builder.toKnexQuery().toString());
         expect(executedQueries[0]).to.eql(
-          `update "RelatedModel" set "a" = 'str1' where "RelatedModel"."id" in (select "RelatedModel"."id" from "RelatedModel" inner join "JoinModel" on "RelatedModel"."cid" = "JoinModel"."relatedCId" and "RelatedModel"."did" = "JoinModel"."relatedDId" where ("JoinModel"."ownerAId", "JoinModel"."ownerBId") in ((11, 22)) and "gender" = 'male' and "thingy" is not null)`
+          `update "RelatedModel" set "a" = 'str1' where "RelatedModel"."id" in (select "RelatedModel"."id" from "RelatedModel" inner join "JoinModel" on "RelatedModel"."cid" = "JoinModel"."relatedCId" and "RelatedModel"."did" = "JoinModel"."relatedDId" where ("JoinModel"."ownerAId", "JoinModel"."ownerBId") in ((11, 22)) and "gender" = 'male' and "thingy" is not null)`,
         );
       });
     });
@@ -1149,7 +1149,7 @@ describe('ManyToManyRelation', () => {
           expect(numUpdated).to.equal(42);
           expect(executedQueries).to.have.length(1);
           expect(executedQueries[0]).to.eql(
-            `update "RelatedModel" set "a" = 'str1' where "RelatedModel"."id" in (select "RelatedModel"."id" from "RelatedModel" inner join "JoinModel" on "RelatedModel"."rid" = "JoinModel"."relatedId" where "JoinModel"."ownerId" in (666) and "gender" = 'male' and "thingy" is not null)`
+            `update "RelatedModel" set "a" = 'str1' where "RelatedModel"."id" in (select "RelatedModel"."id" from "RelatedModel" inner join "JoinModel" on "RelatedModel"."rid" = "JoinModel"."relatedId" where "JoinModel"."ownerId" in (666) and "gender" = 'male' and "thingy" is not null)`,
           );
         });
     });
@@ -1170,7 +1170,7 @@ describe('ManyToManyRelation', () => {
         .then(() => {
           expect(executedQueries).to.have.length(1);
           expect(executedQueries[0]).to.eql(
-            `update "RelatedModel" set "a" = 'str1' where "RelatedModel"."id" in (select "RelatedModel"."id" from "RelatedModel" inner join "JoinModel" on "RelatedModel"."rid" = "JoinModel"."relatedId" where "JoinModel"."ownerId" in (666) and "someColumn" = 100 and "gender" = 'male' and "thingy" is not null)`
+            `update "RelatedModel" set "a" = 'str1' where "RelatedModel"."id" in (select "RelatedModel"."id" from "RelatedModel" inner join "JoinModel" on "RelatedModel"."rid" = "JoinModel"."relatedId" where "JoinModel"."ownerId" in (666) and "someColumn" = 100 and "gender" = 'male' and "thingy" is not null)`,
           );
         });
     });
@@ -1198,7 +1198,7 @@ describe('ManyToManyRelation', () => {
         expect(executedQueries[0]).to.equal(builder.toKnexQuery().toString());
         expect(executedQueries[0]).to.equal(builder.toKnexQuery().toString());
         expect(executedQueries[0]).to.eql(
-          `update "RelatedModel" set "a" = 'str1' where "RelatedModel"."id" in (select "RelatedModel"."id" from "RelatedModel" inner join "JoinModel" on "RelatedModel"."rid" = "JoinModel"."relatedId" where "JoinModel"."ownerId" in (666) and "gender" = 'male' and "thingy" is not null)`
+          `update "RelatedModel" set "a" = 'str1' where "RelatedModel"."id" in (select "RelatedModel"."id" from "RelatedModel" inner join "JoinModel" on "RelatedModel"."rid" = "JoinModel"."relatedId" where "JoinModel"."ownerId" in (666) and "gender" = 'male' and "thingy" is not null)`,
         );
       });
     });
@@ -1231,7 +1231,7 @@ describe('ManyToManyRelation', () => {
           expect(numUpdated).to.equal(42);
           expect(executedQueries).to.have.length(1);
           expect(executedQueries[0]).to.eql(
-            `update "RelatedModel" set "a" = 'str1' where "RelatedModel"."id" in (select "RelatedModel"."id" from "RelatedModel" inner join "JoinModel" on "RelatedModel"."rid" = "JoinModel"."relatedId" where "JoinModel"."ownerId" in (666) and "gender" = 'male' and "thingy" is not null)`
+            `update "RelatedModel" set "a" = 'str1' where "RelatedModel"."id" in (select "RelatedModel"."id" from "RelatedModel" inner join "JoinModel" on "RelatedModel"."rid" = "JoinModel"."relatedId" where "JoinModel"."ownerId" in (666) and "gender" = 'male' and "thingy" is not null)`,
           );
         });
     });
@@ -1247,7 +1247,7 @@ describe('ManyToManyRelation', () => {
         .then(() => {
           expect(executedQueries).to.have.length(1);
           expect(executedQueries[0]).to.eql(
-            `update "RelatedModel" set "test" = "test" + 1 where "RelatedModel"."id" in (select "RelatedModel"."id" from "RelatedModel" inner join "JoinModel" on "RelatedModel"."rid" = "JoinModel"."relatedId" where "JoinModel"."ownerId" in (666))`
+            `update "RelatedModel" set "test" = "test" + 1 where "RelatedModel"."id" in (select "RelatedModel"."id" from "RelatedModel" inner join "JoinModel" on "RelatedModel"."rid" = "JoinModel"."relatedId" where "JoinModel"."ownerId" in (666))`,
           );
         });
     });
@@ -1263,7 +1263,7 @@ describe('ManyToManyRelation', () => {
         .then(() => {
           expect(executedQueries).to.have.length(1);
           expect(executedQueries[0]).to.eql(
-            `update "RelatedModel" set "test" = "test" - 10 where "RelatedModel"."id" in (select "RelatedModel"."id" from "RelatedModel" inner join "JoinModel" on "RelatedModel"."rid" = "JoinModel"."relatedId" where "JoinModel"."ownerId" in (666))`
+            `update "RelatedModel" set "test" = "test" - 10 where "RelatedModel"."id" in (select "RelatedModel"."id" from "RelatedModel" inner join "JoinModel" on "RelatedModel"."rid" = "JoinModel"."relatedId" where "JoinModel"."ownerId" in (666))`,
           );
         });
     });
@@ -1285,7 +1285,7 @@ describe('ManyToManyRelation', () => {
         .then(() => {
           expect(executedQueries).to.have.length(1);
           expect(executedQueries[0]).to.eql(
-            `update "RelatedModel" set "a" = 'str1' where "RelatedModel"."id" in (select "RelatedModel"."id" from "RelatedModel" inner join "JoinModel" on "RelatedModel"."rid" = "JoinModel"."relatedId" where "JoinModel"."ownerId" in (666) and "someColumn" = 100 and "gender" = 'male' and "thingy" is not null)`
+            `update "RelatedModel" set "a" = 'str1' where "RelatedModel"."id" in (select "RelatedModel"."id" from "RelatedModel" inner join "JoinModel" on "RelatedModel"."rid" = "JoinModel"."relatedId" where "JoinModel"."ownerId" in (666) and "someColumn" = 100 and "gender" = 'male' and "thingy" is not null)`,
           );
         });
     });
@@ -1311,7 +1311,7 @@ describe('ManyToManyRelation', () => {
         expect(executedQueries[0]).to.equal(builder.toKnexQuery().toString());
         expect(executedQueries[0]).to.equal(builder.toKnexQuery().toString());
         expect(executedQueries[0]).to.eql(
-          `delete from "RelatedModel" where "RelatedModel"."id" in (select "RelatedModel"."id" from "RelatedModel" inner join "JoinModel" on "RelatedModel"."rid" = "JoinModel"."relatedId" where "JoinModel"."ownerId" in (666) and "gender" = 'male' and "thingy" is not null)`
+          `delete from "RelatedModel" where "RelatedModel"."id" in (select "RelatedModel"."id" from "RelatedModel" inner join "JoinModel" on "RelatedModel"."rid" = "JoinModel"."relatedId" where "JoinModel"."ownerId" in (666) and "gender" = 'male' and "thingy" is not null)`,
         );
       });
     });
@@ -1335,7 +1335,7 @@ describe('ManyToManyRelation', () => {
         expect(executedQueries[0]).to.equal(builder.toKnexQuery().toString());
         expect(executedQueries[0]).to.equal(builder.toKnexQuery().toString());
         expect(executedQueries[0]).to.eql(
-          `delete from "RelatedModel" where "RelatedModel"."id" in (select "RelatedModel"."id" from "RelatedModel" inner join "JoinModel" on "RelatedModel"."cid" = "JoinModel"."relatedCId" and "RelatedModel"."did" = "JoinModel"."relatedDId" where ("JoinModel"."ownerAId", "JoinModel"."ownerBId") in ((11, 22)) and "gender" = 'male' and "thingy" is not null)`
+          `delete from "RelatedModel" where "RelatedModel"."id" in (select "RelatedModel"."id" from "RelatedModel" inner join "JoinModel" on "RelatedModel"."cid" = "JoinModel"."relatedCId" and "RelatedModel"."did" = "JoinModel"."relatedDId" where ("JoinModel"."ownerAId", "JoinModel"."ownerBId") in ((11, 22)) and "gender" = 'male' and "thingy" is not null)`,
         );
       });
     });
@@ -1356,7 +1356,7 @@ describe('ManyToManyRelation', () => {
           expect(executedQueries).to.have.length(1);
           expect(result).to.eql({});
           expect(executedQueries[0]).to.eql(
-            `delete from "RelatedModel" where "RelatedModel"."id" in (select "RelatedModel"."id" from "RelatedModel" inner join "JoinModel" on "RelatedModel"."rid" = "JoinModel"."relatedId" where "JoinModel"."ownerId" in (666) and "someColumn" = 100 and "gender" = 'male' and "thingy" is not null)`
+            `delete from "RelatedModel" where "RelatedModel"."id" in (select "RelatedModel"."id" from "RelatedModel" inner join "JoinModel" on "RelatedModel"."rid" = "JoinModel"."relatedId" where "JoinModel"."ownerId" in (666) and "someColumn" = 100 and "gender" = 'male' and "thingy" is not null)`,
           );
         });
     });
@@ -1382,7 +1382,7 @@ describe('ManyToManyRelation', () => {
         expect(executedQueries[0]).to.eql(
           [
             'insert into "JoinModel" ("ownerId", "relatedId") values (666, 10) returning "relatedId"',
-          ].join(' ')
+          ].join(' '),
         );
       });
     });
@@ -1406,7 +1406,7 @@ describe('ManyToManyRelation', () => {
         expect(executedQueries[0]).to.eql(
           [
             'insert into "JoinModel" ("ownerId", "relatedId") values (666, 10), (666, 20), (666, 30) returning "relatedId"',
-          ].join(' ')
+          ].join(' '),
         );
       });
     });
@@ -1430,7 +1430,7 @@ describe('ManyToManyRelation', () => {
         expect(executedQueries[0]).to.eql(
           [
             'insert into "JoinModel" ("ownerId", "relatedId") values (666, 10), (666, 20), (666, 30) returning "relatedId"',
-          ].join(' ')
+          ].join(' '),
         );
       });
     });
@@ -1464,7 +1464,7 @@ describe('ManyToManyRelation', () => {
         expect(executedQueries[0]).to.eql(
           [
             'insert into "JoinModel" ("ownerAId", "ownerBId", "relatedCId", "relatedDId") values (11, 22, 33, 44), (11, 22, 33, 55), (11, 22, 66, 77) returning "relatedCId", "relatedDId"',
-          ].join(' ')
+          ].join(' '),
         );
       });
     });
@@ -1498,7 +1498,7 @@ describe('ManyToManyRelation', () => {
         expect(executedQueries[0]).to.eql(
           [
             'insert into "JoinModel" ("ownerAId", "ownerBId", "relatedCId", "relatedDId") values (11, 22, 33, 44), (11, 22, 33, 55), (11, 22, 66, 77) returning "relatedCId", "relatedDId"',
-          ].join(' ')
+          ].join(' '),
         );
       });
     });
@@ -1516,7 +1516,7 @@ describe('ManyToManyRelation', () => {
           expect(executedQueries).to.have.length(1);
           expect(result).to.eql(1);
           expect(executedQueries[0]).to.eql(
-            'insert into "JoinModel" ("ownerId", "relatedId") values (666, 11) returning "relatedId"'
+            'insert into "JoinModel" ("ownerId", "relatedId") values (666, 11) returning "relatedId"',
           );
         });
     });
@@ -1540,7 +1540,7 @@ describe('ManyToManyRelation', () => {
         expect(executedQueries[0]).to.eql(
           [
             'insert into "JoinModel" ("extra2", "ownerId", "relatedId") values (\'foo\', 666, 10) returning "relatedId"',
-          ].join(' ')
+          ].join(' '),
         );
       });
     });
@@ -1566,7 +1566,7 @@ describe('ManyToManyRelation', () => {
         expect(executedQueries[0]).to.equal(builder.toKnexQuery().toString());
         expect(executedQueries[0]).to.equal(builder.toKnexQuery().toString());
         expect(executedQueries[0]).to.eql(
-          `delete from "JoinModel" where "JoinModel"."relatedId" in (select "RelatedModel"."rid" from "RelatedModel" inner join "JoinModel" on "RelatedModel"."rid" = "JoinModel"."relatedId" where "JoinModel"."ownerId" in (666) and "someColumn" = 100 and "code" in (55, 66, 77)) and "JoinModel"."ownerId" in (666)`
+          `delete from "JoinModel" where "JoinModel"."relatedId" in (select "RelatedModel"."rid" from "RelatedModel" inner join "JoinModel" on "RelatedModel"."rid" = "JoinModel"."relatedId" where "JoinModel"."ownerId" in (666) and "someColumn" = 100 and "code" in (55, 66, 77)) and "JoinModel"."ownerId" in (666)`,
         );
       });
     });
@@ -1589,7 +1589,7 @@ describe('ManyToManyRelation', () => {
         expect(executedQueries[0]).to.equal(builder.toKnexQuery().toString());
         expect(executedQueries[0]).to.equal(builder.toKnexQuery().toString());
         expect(executedQueries[0]).to.eql(
-          `delete from "JoinModel" where ("JoinModel"."relatedCId","JoinModel"."relatedDId") in (select "RelatedModel"."cid", "RelatedModel"."did" from "RelatedModel" inner join "JoinModel" on "RelatedModel"."cid" = "JoinModel"."relatedCId" and "RelatedModel"."did" = "JoinModel"."relatedDId" where ("JoinModel"."ownerAId", "JoinModel"."ownerBId") in ((11, 22)) and "code" in (55, 66, 77) and "someColumn" = 100) and ("JoinModel"."ownerAId", "JoinModel"."ownerBId") in ((11, 22))`
+          `delete from "JoinModel" where ("JoinModel"."relatedCId","JoinModel"."relatedDId") in (select "RelatedModel"."cid", "RelatedModel"."did" from "RelatedModel" inner join "JoinModel" on "RelatedModel"."cid" = "JoinModel"."relatedCId" and "RelatedModel"."did" = "JoinModel"."relatedDId" where ("JoinModel"."ownerAId", "JoinModel"."ownerBId") in ((11, 22)) and "code" in (55, 66, 77) and "someColumn" = 100) and ("JoinModel"."ownerAId", "JoinModel"."ownerBId") in ((11, 22))`,
         );
       });
     });

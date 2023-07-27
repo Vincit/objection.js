@@ -761,7 +761,7 @@ describe('Model', () => {
           ],
           relation2: { id: 13, model1Id: null },
         },
-        { skipParseRelations: true }
+        { skipParseRelations: true },
       );
 
       expect(model.relation1[0]).to.not.be.a(Model2);
@@ -798,7 +798,7 @@ describe('Model', () => {
           relation1: [1, 2, '3', null, undefined, 6],
           relation2: '5',
         },
-        { skipParseRelations: true }
+        { skipParseRelations: true },
       );
 
       expect(model.relation1).to.eql([1, 2, '3', null, undefined, 6]);
@@ -1061,7 +1061,7 @@ describe('Model', () => {
           j: [1, 2, 3],
           k: null,
           l: undefined,
-        }).$toDatabaseJson()
+        }).$toDatabaseJson(),
       ).to.eql({
         a: '1',
         b: '"one"',
@@ -1241,7 +1241,7 @@ describe('Model', () => {
           b: 10,
           rel1: Model1.fromJson({ a: 101, b: 11 }),
           rel2: [Model1.fromJson({ a: 102, b: 12 }), Model1.fromJson({ a: 103, b: 13 })],
-        }).toJSON()
+        }).toJSON(),
       ).to.eql({
         a: 100,
         b: 10,
@@ -1281,7 +1281,7 @@ describe('Model', () => {
           b: 10,
           rel1: Model1.fromJson({ a: 101, b: 11 }),
           rel2: [Model1.fromJson({ a: 102, b: 12 }), Model1.fromJson({ a: 103, b: 13 })],
-        }).toJSON({ virtuals: false })
+        }).toJSON({ virtuals: false }),
       ).to.eql({
         a: 100,
         b: 10,
@@ -1319,7 +1319,7 @@ describe('Model', () => {
           b: 10,
           rel1: Model1.fromJson({ a: 101, b: 11 }),
           rel2: [Model1.fromJson({ a: 102, b: 12 }), Model1.fromJson({ a: 103, b: 13 })],
-        }).$toJson({ virtuals: false })
+        }).$toJson({ virtuals: false }),
       ).to.eql({
         a: 100,
         b: 10,
@@ -1357,7 +1357,7 @@ describe('Model', () => {
           b: 10,
           rel1: Model1.fromJson({ a: 101, b: 11 }),
           rel2: [Model1.fromJson({ a: 102, b: 12 }), Model1.fromJson({ a: 103, b: 13 })],
-        }).$toJson({ virtuals: ['foo', 'bar'] })
+        }).$toJson({ virtuals: ['foo', 'bar'] }),
       ).to.eql({
         a: 100,
         b: 10,

@@ -177,7 +177,7 @@ module.exports = (session) => {
               peopleWhoseFavoriteIAm(name),
               favoritePerson(name),
             ]
-          ]`
+          ]`,
           )
           .then(sortRelations)
           .then((person) => {
@@ -221,7 +221,7 @@ module.exports = (session) => {
               peopleWhoseFavoriteIAm(name),
               favoritePerson(name),
             ]
-          ]`
+          ]`,
           )
           .then(sortRelations)
           .then((person) => {
@@ -337,7 +337,7 @@ module.exports = (session) => {
               Animal.query()
                 .findOne({ name: 'Fluffy' })
                 .withGraphFetched('peopleWhoseFavoriteIAm(name)')
-                .select('name')
+                .select('name'),
             )
             .then(sortRelations)
             .then((pet) => {
@@ -373,7 +373,7 @@ module.exports = (session) => {
           return Animal.query()
             .findOne({ name: 'Fluffy' })
             .then((it) =>
-              it.$relatedQuery('peopleWhoseFavoriteIAm').patch({ name: 'Arnold the second' })
+              it.$relatedQuery('peopleWhoseFavoriteIAm').patch({ name: 'Arnold the second' }),
             )
             .then(() => Person.query().select('name').orderBy('name'))
             .then((pet) => {
@@ -396,7 +396,7 @@ module.exports = (session) => {
             .then(() =>
               Animal.query()
                 .findOne({ name: 'Fluffy' })
-                .withGraphFetched('peopleWhoseFavoriteIAm(name)')
+                .withGraphFetched('peopleWhoseFavoriteIAm(name)'),
             )
             .then(sortRelations)
             .then((pet) => {
@@ -419,15 +419,15 @@ module.exports = (session) => {
               fluffy
                 .$relatedQuery('peopleWhoseFavoriteIAm')
                 .relate(brad)
-                .then(() => fluffy)
+                .then(() => fluffy),
             )
             .then((it) =>
-              it.$relatedQuery('peopleWhoseFavoriteIAm').unrelate().where('name', 'Arnold')
+              it.$relatedQuery('peopleWhoseFavoriteIAm').unrelate().where('name', 'Arnold'),
             )
             .then(() =>
               Animal.query()
                 .findOne({ name: 'Fluffy' })
-                .withGraphFetched('peopleWhoseFavoriteIAm(name)')
+                .withGraphFetched('peopleWhoseFavoriteIAm(name)'),
             )
             .then(sortRelations)
             .then((pet) => {
@@ -454,7 +454,7 @@ module.exports = (session) => {
               Person.query()
                 .findOne({ name: 'Brad' })
                 .withGraphFetched('movies(name)')
-                .select('name')
+                .select('name'),
             )
             .then(sortRelations)
             .then((pet) => {
@@ -518,7 +518,7 @@ module.exports = (session) => {
               Person.query()
                 .select('name')
                 .findOne({ name: 'Arnold' })
-                .withGraphFetched('movies(name)')
+                .withGraphFetched('movies(name)'),
             )
             .then(sortRelations)
             .then((person) => {
@@ -544,14 +544,14 @@ module.exports = (session) => {
               arnold
                 .$relatedQuery('movies')
                 .relate(bastards.id)
-                .then(() => arnold)
+                .then(() => arnold),
             )
             .then((arnold) => arnold.$relatedQuery('movies').unrelate().where('name', 'Terminator'))
             .then(() =>
               Person.query()
                 .select('name')
                 .findOne({ name: 'Arnold' })
-                .withGraphFetched('movies(name)')
+                .withGraphFetched('movies(name)'),
             )
             .then(sortRelations)
             .then((person) => {

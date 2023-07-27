@@ -124,7 +124,7 @@ module.exports = (session) => {
         queryOut: (query) =>
           query
             .withGraphFetched(
-              '[pets.favoritePerson.relatives(orderByName), relatives(orderByName).relatives(orderByName)]'
+              '[pets.favoritePerson.relatives(orderByName), relatives(orderByName).relatives(orderByName)]',
             )
             .whereIn('name', ['Matti', 'Anja'])
             .orderBy('name'),

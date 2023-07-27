@@ -464,12 +464,12 @@ module.exports = (session) => {
                 if (builder.modelClass() === Model1) {
                   builder.select(
                     'Model1.*',
-                    Model1.raw('"model1Prop1" || \' computed1\' as computed')
+                    Model1.raw('"model1Prop1" || \' computed1\' as computed'),
                   );
                 } else {
                   builder.select(
                     'model2.*',
-                    Model1.raw('"model2_prop1" || \' computed2\' as computed')
+                    Model1.raw('"model2_prop1" || \' computed2\' as computed'),
                   );
                 }
               },
@@ -487,7 +487,7 @@ module.exports = (session) => {
             })
             .where('id', 1)
             .withGraphFetched(
-              '[model1Relation1.[model1Relation1, model1Relation2.model2Relation1]]'
+              '[model1Relation1.[model1Relation1, model1Relation2.model2Relation1]]',
             )
             .modifyGraph('model1Relation1.model1Relation2', (builder) => {
               builder.orderBy('id_col');
