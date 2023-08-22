@@ -24,7 +24,7 @@ import { Knex } from 'knex';
   async function insertPersonAndPet(
     personAttrs: Partial<Person>,
     petAttrs: Partial<Animal>,
-    trxOrKnex?: Transaction | Knex
+    trxOrKnex?: Transaction | Knex,
   ) {
     const person = await Person.query(trxOrKnex).insert(personAttrs);
 

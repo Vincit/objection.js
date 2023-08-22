@@ -242,21 +242,21 @@ async () => {
     .union(
       // supports callbacks, or querybuilders along-side each other.
       Person.query().where({ lastName: 'doe' }),
-      (qb) => qb.table(Person.tableName).where({ lastName: 'black' })
+      (qb) => qb.table(Person.tableName).where({ lastName: 'black' }),
     );
   await Person.query()
     .where({ lastName: 'finnigan' })
     .union(
       // multiple query builders
       Person.query().where({ lastName: 'doe' }),
-      Person.query().where({ lastName: 'black' })
+      Person.query().where({ lastName: 'black' }),
     );
   await Person.query()
     .where({ lastName: 'finnigan' })
     .union(
       // supports callbacks, or querybuilders along-side each other.
       (qb) => qb.table(Person.tableName).where({ lastName: 'doe' }),
-      (qb) => qb.table(Person.tableName).where({ lastName: 'black' })
+      (qb) => qb.table(Person.tableName).where({ lastName: 'black' }),
     );
   // checks for unions that include wrap options
   await Person.query()
@@ -266,7 +266,7 @@ async () => {
         (qb) => qb.table(Person.tableName).where({ lastName: 'doe' }),
         (qb) => qb.table(Person.tableName).where({ lastName: 'black' }),
       ],
-      true
+      true,
     );
   await Person.query()
     .where({ lastName: 'finnigan' })
@@ -279,11 +279,11 @@ async () => {
       Person.query().where({ lastName: 'doe' }),
       (qb) => qb.table(Person.tableName).where({ lastName: 'doe' }),
       (qb) => qb.table(Person.tableName).where({ lastName: 'black' }),
-      true
+      true,
     );
 
   await Person.query().intersect(Person.query().where({ lastName: 'doe' }), (qb) =>
-    qb.table(Person.tableName).where({ lastName: 'black' })
+    qb.table(Person.tableName).where({ lastName: 'black' }),
   );
 };
 
@@ -307,7 +307,7 @@ async () => {
     await person.$query().patchAndFetch({
       firstName: 'Test',
       lastName: 'Name',
-    })
+    }),
   );
 };
 
@@ -428,7 +428,7 @@ const pickPersonFromObj: Person = examplePerson.$pick({ firstName: true });
 const clonePerson: Person = examplePerson.$clone();
 const setRelatedPerson: Person = examplePerson.$setRelated(
   'parent',
-  Person.fromJson({ firstName: 'parent' })
+  Person.fromJson({ firstName: 'parent' }),
 );
 const appendRelatedPerson: Person = examplePerson.$appendRelated('pets', [
   Animal.fromJson({ firstName: 'pet 1' }),
@@ -534,7 +534,7 @@ qb = qb.whereInComposite(
   [
     [1, '2'],
     [1, '2'],
-  ]
+  ],
 );
 qb = qb.whereInComposite(['id1', 'id2'], Person.query().select('firstName', 'lastName'));
 
@@ -546,7 +546,7 @@ const runBeforePerson: PromiseLike<Person> = qb
   .runBefore(async (result: any, builder: objection.QueryBuilder<Person, Person>) => 88);
 
 const runBeforePersons: PromiseLike<Person[]> = qb.runBefore(
-  async (result: any, builder: objection.QueryBuilder<Person>) => 88
+  async (result: any, builder: objection.QueryBuilder<Person>) => 88,
 );
 
 const runAfterPerson: PromiseLike<Person> = qb
@@ -555,7 +555,7 @@ const runAfterPerson: PromiseLike<Person> = qb
   .runAfter(async (result: any, builder: objection.QueryBuilder<Person, Person>) => 88);
 
 const runAfterPersons: PromiseLike<Person[]> = qb.runAfter(
-  async (result: any, builder: objection.QueryBuilder<Person>) => 88
+  async (result: any, builder: objection.QueryBuilder<Person>) => 88,
 );
 
 // signature-changing QueryBuilder methods:
@@ -651,7 +651,7 @@ const insertedModels2: PromiseLike<Person[]> = Person.query().insertGraphAndFetc
   [new Person(), new Person()],
   {
     relate: true,
-  }
+  },
 );
 
 const upsertModel1: PromiseLike<Person> = Person.query().upsertGraph({});
@@ -662,7 +662,7 @@ const upsertModels2: PromiseLike<Person[]> = Person.query().upsertGraph([], {
 });
 
 const insertedGraphAndFetchOne: PromiseLike<Person> = Person.query().insertGraphAndFetch(
-  new Person()
+  new Person(),
 );
 const insertedGraphAndFetchSome: PromiseLike<Person[]> = Person.query().insertGraphAndFetch([
   new Person(),
@@ -758,8 +758,8 @@ const rowsPageRunAfter: PromiseLike<objection.Page<Person>> = Person.query()
   .runAfter(
     async (
       result: objection.Page<Person>,
-      builder: objection.QueryBuilder<Person, objection.Page<Person>>
-    ) => {}
+      builder: objection.QueryBuilder<Person, objection.Page<Person>>,
+    ) => {},
   );
 
 // `retuning` should change the return value from number to T[]
@@ -902,7 +902,7 @@ objection.transaction(
     const n: number = new TxPerson().examplePersonMethod('hello');
     const s: string = new TxAnimal().species;
     const c: string = new TxComment().comment;
-  }
+  },
 );
 
 objection.transaction(
@@ -916,7 +916,7 @@ objection.transaction(
     const s: string = new TxAnimal().species;
     const c: string = new TxComment().comment;
     Movie.query(trx);
-  }
+  },
 );
 
 objection.transaction.start(Person).then((trx) => {
@@ -989,7 +989,7 @@ const relQueryResult5: PromiseLike<Animal[]> = Person.relatedQuery('pets').for([
   [3, 4],
 ]);
 const relQueryResult6: PromiseLike<Animal[]> = Person.relatedQuery('pets').for(
-  Movie.query().select('id')
+  Movie.query().select('id'),
 );
 const relQueryResult7: PromiseLike<Movie[]> = Person.relatedQuery('movies').for(1);
 const relQueryResult8: PromiseLike<Person[]> = Person.relatedQuery('mom').for(1);

@@ -222,7 +222,7 @@ import { Person } from '../fixtures/person';
       [1, 2],
       [3, 4],
       [1, 4],
-    ]
+    ],
   );
   await Person.query().whereInComposite('a', [[1], [3], [1]]);
   await Person.query().whereInComposite('a', [1, 3, 1]);
@@ -239,7 +239,7 @@ import { Person } from '../fixtures/person';
 
   await Person.query().orWhereJsonNotSupersetOf(
     'additionalData:myDogs',
-    'additionalData:dogsAtHome'
+    'additionalData:dogsAtHome',
   );
   await Person.query().orWhereJsonNotSupersetOf('additionalData:myDogs[0]', { name: 'peter' });
 

@@ -52,7 +52,7 @@ declare namespace Objection {
   export interface ValueBuilder extends Castable {}
   export interface ValueFunction {
     (
-      value: PrimitiveValue | PrimitiveValue[] | PrimitiveValueObject | PrimitiveValueObject[]
+      value: PrimitiveValue | PrimitiveValue[] | PrimitiveValueObject | PrimitiveValueObject[],
     ): ValueBuilder;
   }
 
@@ -383,7 +383,7 @@ declare namespace Objection {
       column: ModelProps<ModelType<QBP>>,
       path: string,
       alias?: string,
-      singleValue?: boolean
+      singleValue?: boolean,
     ): QB;
 
     (column: ColumnRef, path: string, alias?: string, singleValue?: boolean): QB;
@@ -396,7 +396,7 @@ declare namespace Objection {
       column: ModelProps<ModelType<QBP>>,
       path: string,
       value: any,
-      alias?: string
+      alias?: string,
     ): QB;
 
     (column: ColumnRef, path: string, value: any, alias?: string): QB;
@@ -408,7 +408,7 @@ declare namespace Objection {
       column: ModelProps<ModelType<QBP>>,
       path: string,
       value: any,
-      alias?: string
+      alias?: string,
     ): QB;
 
     (column: ColumnRef, path: string, value: any, alias?: string): QB;
@@ -426,7 +426,7 @@ declare namespace Objection {
     <QBP extends QB>(
       col: ModelProps<ModelType<QBP>>,
       op: Operator,
-      expr: Expression<PrimitiveValue>
+      expr: Expression<PrimitiveValue>,
     ): QB;
 
     <QBP extends QB>(col: ModelProps<ModelType<QBP>>, expr: Expression<PrimitiveValue>): QB;
@@ -499,7 +499,7 @@ declare namespace Objection {
       col: ModelProps<ModelType<QBP>>,
       jsonPath: string,
       operator: string,
-      value: any
+      value: any,
     ): QB;
 
     (col: ColumnRef, jsonPath: string, operator: string, value: any): QB;
@@ -508,7 +508,7 @@ declare namespace Objection {
   interface WhereJsonMethod<QB extends AnyQueryBuilder> {
     (
       fieldExpression: FieldExpression,
-      jsonObjectOrFieldExpression: JsonObjectOrFieldExpression
+      jsonObjectOrFieldExpression: JsonObjectOrFieldExpression,
     ): QB;
   }
 
@@ -524,7 +524,7 @@ declare namespace Objection {
     (
       fieldExpression: FieldExpression,
       operator: string,
-      value: boolean | number | string | null
+      value: boolean | number | string | null,
     ): QB;
   }
 
@@ -563,7 +563,7 @@ declare namespace Objection {
       arg2: QBOrCallback<QB>,
       arg3: QBOrCallback<QB>,
       arg4: QBOrCallback<QB>,
-      wrap?: boolean
+      wrap?: boolean,
     ): QB;
     (
       arg1: QBOrCallback<QB>,
@@ -571,7 +571,7 @@ declare namespace Objection {
       arg3: QBOrCallback<QB>,
       arg4: QBOrCallback<QB>,
       arg5: QBOrCallback<QB>,
-      wrap?: boolean
+      wrap?: boolean,
     ): QB;
     (
       arg1: QBOrCallback<QB>,
@@ -580,7 +580,7 @@ declare namespace Objection {
       arg4: QBOrCallback<QB>,
       arg5: QBOrCallback<QB>,
       arg6: QBOrCallback<QB>,
-      wrap?: boolean
+      wrap?: boolean,
     ): QB;
     (
       arg1: QBOrCallback<QB>,
@@ -590,7 +590,7 @@ declare namespace Objection {
       arg5: QBOrCallback<QB>,
       arg6: QBOrCallback<QB>,
       arg7: QBOrCallback<QB>,
-      wrap?: boolean
+      wrap?: boolean,
     ): QB;
   }
 
@@ -652,9 +652,9 @@ declare namespace Objection {
   interface OrderByRawMethod<QB extends AnyQueryBuilder> extends RawInterface<QB> {}
 
   interface FirstMethod {
-    <QB extends AnyQueryBuilder>(this: QB): QB extends ArrayQueryBuilder<QB>
-      ? MaybeSingleQueryBuilder<QB>
-      : QB;
+    <QB extends AnyQueryBuilder>(
+      this: QB,
+    ): QB extends ArrayQueryBuilder<QB> ? MaybeSingleQueryBuilder<QB> : QB;
   }
 
   type ForIdValue = MaybeCompositeId | AnyQueryBuilder;
@@ -706,7 +706,7 @@ declare namespace Objection {
   interface ReturningMethod {
     <QB extends AnyQueryBuilder>(
       this: QB,
-      column: string | Raw | (string | Raw)[]
+      column: string | Raw | (string | Raw)[],
     ): QB extends NumberQueryBuilder<QB> ? ArrayQueryBuilder<QB> : QB;
   }
 
@@ -768,13 +768,13 @@ declare namespace Objection {
     <QB extends AnyQueryBuilder>(
       this: QB,
       graph: PartialModelGraph<M>,
-      options?: InsertGraphOptions
+      options?: InsertGraphOptions,
     ): SingleQueryBuilder<QB>;
 
     <QB extends AnyQueryBuilder>(
       this: QB,
       graph: PartialModelGraph<M>[],
-      options?: InsertGraphOptions
+      options?: InsertGraphOptions,
     ): ArrayQueryBuilder<QB>;
   }
 
@@ -795,13 +795,13 @@ declare namespace Objection {
     <QB extends AnyQueryBuilder>(
       this: QB,
       graph: PartialModelGraph<M>[],
-      options?: UpsertGraphOptions
+      options?: UpsertGraphOptions,
     ): ArrayQueryBuilder<QB>;
 
     <QB extends AnyQueryBuilder>(
       this: QB,
       graph: PartialModelGraph<M>,
-      options?: UpsertGraphOptions
+      options?: UpsertGraphOptions,
     ): SingleQueryBuilder<QB>;
   }
 
@@ -820,7 +820,7 @@ declare namespace Objection {
   interface ModifyGraphMethod<QB extends AnyQueryBuilder> {
     <M extends Model>(
       expr: RelationExpression<ModelType<QB>>,
-      modifier: Modifier<QueryBuilderType<M>>
+      modifier: Modifier<QueryBuilderType<M>>,
     ): QB;
   }
 
@@ -848,7 +848,7 @@ declare namespace Objection {
 
   export interface CatchablePromiseLike<R> extends PromiseLike<R> {
     catch<FR = never>(
-      onrejected?: ((reason: any) => FR | PromiseLike<FR>) | undefined | null
+      onrejected?: ((reason: any) => FR | PromiseLike<FR>) | undefined | null,
     ): Promise<R | FR>;
   }
 
@@ -1050,7 +1050,7 @@ declare namespace Objection {
     updateAndFetch(update: PartialModelObject<M>): SingleQueryBuilder<this>;
     updateAndFetchById(
       id: MaybeCompositeId,
-      update: PartialModelObject<M>
+      update: PartialModelObject<M>,
     ): SingleQueryBuilder<this>;
 
     patch(update: PartialModelObject<M>): NumberQueryBuilder<this>;
@@ -1058,7 +1058,7 @@ declare namespace Objection {
     patchAndFetch(update: PartialModelObject<M>): SingleQueryBuilder<this>;
     patchAndFetchById(
       id: MaybeCompositeId,
-      update: PartialModelObject<M>
+      update: PartialModelObject<M>,
     ): SingleQueryBuilder<this>;
 
     del(): NumberQueryBuilder<this>;
@@ -1078,7 +1078,7 @@ declare namespace Objection {
     insertAndFetch(): SingleQueryBuilder<this>;
 
     relate(
-      ids: MaybeCompositeId | MaybeCompositeId[] | PartialModelObject<M> | PartialModelObject<M>[]
+      ids: MaybeCompositeId | MaybeCompositeId[] | PartialModelObject<M> | PartialModelObject<M>[],
     ): NumberQueryBuilder<this>;
 
     unrelate(): NumberQueryBuilder<this>;
@@ -1091,7 +1091,7 @@ declare namespace Objection {
     allowGraph: AllowGraphMethod<this>;
 
     throwIfNotFound: (
-      arg?: any
+      arg?: any,
     ) => R extends Model | undefined ? SingleQueryBuilder<QueryBuilder<M, M>> : this;
 
     returning: ReturningMethod;
@@ -1182,11 +1182,11 @@ declare namespace Objection {
 
     then<R1 = R, R2 = never>(
       onfulfilled?: ((value: R) => R1 | PromiseLike<R1>) | undefined | null,
-      onrejected?: ((reason: any) => R2 | PromiseLike<R2>) | undefined | null
+      onrejected?: ((reason: any) => R2 | PromiseLike<R2>) | undefined | null,
     ): Promise<R1 | R2>;
 
     catch<FR = never>(
-      onrejected?: ((reason: any) => FR | PromiseLike<FR>) | undefined | null
+      onrejected?: ((reason: any) => FR | PromiseLike<FR>) | undefined | null,
     ): Promise<R | FR>;
   }
 
@@ -1229,7 +1229,7 @@ declare namespace Objection {
   type ModelClassSpecifier = ModelClassFactory | AnyModelConstructor | string;
   type RelationMappingHook<M extends Model> = (
     model: M,
-    context: QueryContext
+    context: QueryContext,
   ) => Promise<void> | void;
   type StringOrReferenceBuilder = string | ReferenceBuilder;
   type RelationMappingColumnRef = StringOrReferenceBuilder | StringOrReferenceBuilder[];
@@ -1461,12 +1461,12 @@ declare namespace Objection {
 
     relatedQuery<K extends keyof M>(
       relationName: K,
-      trxOrKnex?: TransactionOrKnex
+      trxOrKnex?: TransactionOrKnex,
     ): ArrayRelatedQueryBuilder<M[K]>;
 
     relatedQuery<RM extends Model>(
       relationName: string,
-      trxOrKnex?: TransactionOrKnex
+      trxOrKnex?: TransactionOrKnex,
     ): QueryBuilderType<RM>;
 
     fromJson(json: object, opt?: ModelOptions): M;
@@ -1486,7 +1486,7 @@ declare namespace Objection {
     transaction<T>(callback: (trx: Transaction) => Promise<T>): Promise<T>;
     transaction<T>(
       trxOrKnex: TransactionOrKnex,
-      callback: (trx: Transaction) => Promise<T>
+      callback: (trx: Transaction) => Promise<T>,
     ): Promise<T>;
 
     bindKnex(trxOrKnex: TransactionOrKnex): this;
@@ -1495,13 +1495,13 @@ declare namespace Objection {
     fetchGraph(
       modelOrObject: PartialModelObject<M>,
       expression: RelationExpression<M>,
-      options?: FetchGraphOptions
+      options?: FetchGraphOptions,
     ): SingleQueryBuilder<QueryBuilderType<M>>;
 
     fetchGraph(
       modelOrObject: PartialModelObject<M>[],
       expression: RelationExpression<M>,
-      options?: FetchGraphOptions
+      options?: FetchGraphOptions,
     ): QueryBuilderType<M>;
 
     getRelations(): Relations;
@@ -1511,13 +1511,13 @@ declare namespace Objection {
     traverse(
       filterConstructor: ModelConstructor<Model>,
       models: Model | Model[],
-      traverser: TraverserFunction
+      traverser: TraverserFunction,
     ): void;
     traverseAsync(models: Model | Model[], traverser: TraverserFunction): Promise<void>;
     traverseAsync(
       filterConstructor: ModelConstructor<Model>,
       models: Model | Model[],
-      traverser: TraverserFunction
+      traverser: TraverserFunction,
     ): Promise<void>;
 
     beforeFind(args: StaticHookArguments<any>): any;
@@ -1565,18 +1565,18 @@ declare namespace Objection {
 
     static query<M extends Model>(
       this: Constructor<M>,
-      trxOrKnex?: TransactionOrKnex
+      trxOrKnex?: TransactionOrKnex,
     ): QueryBuilderType<M>;
 
     static relatedQuery<M extends Model, K extends keyof M>(
       this: Constructor<M>,
       relationName: K,
-      trxOrKnex?: TransactionOrKnex
+      trxOrKnex?: TransactionOrKnex,
     ): ArrayRelatedQueryBuilder<M[K]>;
 
     static relatedQuery<RM extends Model>(
       relationName: string,
-      trxOrKnex?: TransactionOrKnex
+      trxOrKnex?: TransactionOrKnex,
     ): QueryBuilderType<RM>;
 
     static fromJson<M extends Model>(this: Constructor<M>, json: object, opt?: ModelOptions): M;
@@ -1596,7 +1596,7 @@ declare namespace Objection {
     static transaction<T>(callback: (trx: Transaction) => Promise<T>): Promise<T>;
     static transaction<T>(
       trxOrKnex: TransactionOrKnex,
-      callback: (trx: Transaction) => Promise<T>
+      callback: (trx: Transaction) => Promise<T>,
     ): Promise<T>;
 
     static bindKnex<M>(this: M, trxOrKnex: TransactionOrKnex): M;
@@ -1606,14 +1606,14 @@ declare namespace Objection {
       this: Constructor<M>,
       modelOrObject: PartialModelObject<M>,
       expression: RelationExpression<M>,
-      options?: FetchGraphOptions
+      options?: FetchGraphOptions,
     ): SingleQueryBuilder<QueryBuilderType<M>>;
 
     static fetchGraph<M extends Model>(
       this: Constructor<M>,
       modelOrObject: PartialModelObject<M>[],
       expression: RelationExpression<M>,
-      options?: FetchGraphOptions
+      options?: FetchGraphOptions,
     ): QueryBuilderType<M>;
 
     static getRelations(): Relations;
@@ -1623,13 +1623,13 @@ declare namespace Objection {
     static traverse(
       filterConstructor: typeof Model,
       models: Model | Model[],
-      traverser: TraverserFunction
+      traverser: TraverserFunction,
     ): void;
     static traverseAsync(models: Model | Model[], traverser: TraverserFunction): Promise<void>;
     static traverseAsync(
       filterConstructor: typeof Model,
       models: Model | Model[],
-      traverser: TraverserFunction
+      traverser: TraverserFunction,
     ): Promise<void>;
 
     static beforeFind(args: StaticHookArguments<any>): any;
@@ -1645,12 +1645,12 @@ declare namespace Objection {
 
     $relatedQuery<K extends keyof this>(
       relationName: K,
-      trxOrKnex?: TransactionOrKnex
+      trxOrKnex?: TransactionOrKnex,
     ): RelatedQueryBuilder<this[K]>;
 
     $relatedQuery<RM extends Model>(
       relationName: string,
-      trxOrKnex?: TransactionOrKnex
+      trxOrKnex?: TransactionOrKnex,
     ): QueryBuilderType<RM>;
 
     $query(trxOrKnex?: TransactionOrKnex): SingleQueryBuilder<QueryBuilderType<this>>;
@@ -1660,7 +1660,7 @@ declare namespace Objection {
 
     $fetchGraph(
       expression: RelationExpression<this>,
-      options?: FetchGraphOptions
+      options?: FetchGraphOptions,
     ): SingleQueryBuilder<QueryBuilderType<this>>;
 
     $formatDatabaseJson(json: Pojo): Pojo;
@@ -1690,12 +1690,12 @@ declare namespace Objection {
 
     $setRelated<RM extends Model>(
       relation: String | Relation,
-      related: RM | RM[] | null | undefined
+      related: RM | RM[] | null | undefined,
     ): this;
 
     $appendRelated<RM extends Model>(
       relation: String | Relation,
-      related: RM | RM[] | null | undefined
+      related: RM | RM[] | null | undefined,
     ): this;
 
     $set(obj: Pojo): this;
@@ -1726,7 +1726,7 @@ declare namespace Objection {
 
     <MC1 extends AnyModelConstructor, ReturnValue>(
       modelClass1: MC1,
-      callback: (boundModelClass: MC1, trx?: Transaction) => Promise<ReturnValue>
+      callback: (boundModelClass: MC1, trx?: Transaction) => Promise<ReturnValue>,
     ): Promise<ReturnValue>;
 
     <MC1 extends AnyModelConstructor, MC2 extends AnyModelConstructor, ReturnValue>(
@@ -1735,15 +1735,15 @@ declare namespace Objection {
       callback: (
         boundModelClass1: MC1,
         boundModelClass2: MC2,
-        trx?: Transaction
-      ) => Promise<ReturnValue>
+        trx?: Transaction,
+      ) => Promise<ReturnValue>,
     ): Promise<ReturnValue>;
 
     <
       MC1 extends AnyModelConstructor,
       MC2 extends AnyModelConstructor,
       MC3 extends AnyModelConstructor,
-      ReturnValue
+      ReturnValue,
     >(
       modelClass1: MC1,
       modelClass2: MC2,
@@ -1752,8 +1752,8 @@ declare namespace Objection {
         boundModelClass1: MC1,
         boundModelClass2: MC2,
         boundModelClass3: MC3,
-        trx?: Transaction
-      ) => Promise<ReturnValue>
+        trx?: Transaction,
+      ) => Promise<ReturnValue>,
     ): Promise<ReturnValue>;
 
     <
@@ -1761,7 +1761,7 @@ declare namespace Objection {
       MC2 extends AnyModelConstructor,
       MC3 extends AnyModelConstructor,
       MC4 extends AnyModelConstructor,
-      ReturnValue
+      ReturnValue,
     >(
       modelClass1: MC1,
       modelClass2: MC2,
@@ -1772,8 +1772,8 @@ declare namespace Objection {
         boundModelClass2: MC2,
         boundModelClass3: MC3,
         boundModelClass4: MC4,
-        trx?: Transaction
-      ) => Promise<ReturnValue>
+        trx?: Transaction,
+      ) => Promise<ReturnValue>,
     ): Promise<ReturnValue>;
 
     <
@@ -1782,7 +1782,7 @@ declare namespace Objection {
       MC3 extends AnyModelConstructor,
       MC4 extends AnyModelConstructor,
       MC5 extends AnyModelConstructor,
-      ReturnValue
+      ReturnValue,
     >(
       modelClass1: MC1,
       modelClass2: MC2,
@@ -1795,13 +1795,13 @@ declare namespace Objection {
         boundModelClass3: MC3,
         boundModelClass4: MC4,
         boundModelClass5: MC5,
-        trx?: Transaction
-      ) => Promise<ReturnValue>
+        trx?: Transaction,
+      ) => Promise<ReturnValue>,
     ): Promise<ReturnValue>;
 
     <ReturnValue>(
       knex: Knex,
-      callback: (trx: Transaction) => Promise<ReturnValue>
+      callback: (trx: Transaction) => Promise<ReturnValue>,
     ): Promise<ReturnValue>;
   }
 

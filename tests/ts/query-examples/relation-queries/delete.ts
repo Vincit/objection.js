@@ -7,7 +7,7 @@ import { Person } from '../../fixtures/person';
     .delete()
     .whereIn(
       'id',
-      Person.query().select('persons.id').joinRelated('pets').where('pets.name', 'Fluffy')
+      Person.query().select('persons.id').joinRelated('pets').where('pets.name', 'Fluffy'),
     );
 
   // This is another way to implement the same query.

@@ -313,7 +313,7 @@ class TestSession {
             '. Make sure the server is running and the database ' +
             opt.knexConfig.connection.database +
             ' is created. You can see the test database configurations from file ' +
-            path.join(__dirname, 'index.js')
+            path.join(__dirname, 'index.js'),
         );
 
         const oldStack = err.stack;
@@ -355,11 +355,11 @@ class TestSession {
                 // Reset sequence.
                 if (knexUtils.isSqlite(trx)) {
                   return trx.raw(
-                    'UPDATE sqlite_sequence SET seq = ' + maxId + ' WHERE name = "' + table + '"'
+                    'UPDATE sqlite_sequence SET seq = ' + maxId + ' WHERE name = "' + table + '"',
                   );
                 } else if (knexUtils.isPostgres(trx)) {
                   return trx.raw(
-                    'ALTER SEQUENCE "' + table + '_' + idCol + '_seq" RESTART WITH ' + (maxId + 1)
+                    'ALTER SEQUENCE "' + table + '_' + idCol + '_seq" RESTART WITH ' + (maxId + 1),
                   );
                 } else if (knexUtils.isMySql(trx)) {
                   return trx.raw('ALTER TABLE ' + table + ' AUTO_INCREMENT = ' + (maxId + 1));

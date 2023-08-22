@@ -127,7 +127,7 @@ import { Model, transaction } from '../../../typings/objection';
     },
     () => {
       console.log('error');
-    }
+    },
   );
 
   // builder.map((obj) => obj);
