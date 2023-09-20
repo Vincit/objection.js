@@ -72,6 +72,27 @@ describe('AjvValidator', () => {
       },
     };
 
+    const schema4 = {
+      type: 'object',
+      properties: {
+        address: {
+          type: 'object',
+          required: ['city'],
+          properties: {
+            city: {
+              type: 'string',
+            },
+            zip: {
+              type: 'string',
+            },
+            street: {
+              type: 'string',
+            },
+          },
+        },
+      },
+    };
+
     it('should remove required fields from definitions', () => {
       const validator = new AjvValidator({ onCreateAjv: () => {} });
       const validators = validator.getValidator(modelClass('test', schema), schema, true);
@@ -97,6 +118,15 @@ describe('AjvValidator', () => {
         const validator = new AjvValidator({ onCreateAjv: () => {} });
         validator.getValidator(modelClass('test', schema3), schema3, true);
       }).to.not.throwException();
+    });
+
+    it('should remove required fields in inner properties', () => {
+      const validator = new AjvValidator({
+        onCreateAjv: () => {},
+      });
+      const validators = validator.getValidator(modelClass('test', schema4), schema4, true);
+      expect(validators.schema.properties.address.properties).to.not.be(undefined);
+      expect(validators.schema.properties.address.required).to.be(undefined);
     });
 
     it('should not throw errors when adding formats in onCreateAjv hook', () => {
