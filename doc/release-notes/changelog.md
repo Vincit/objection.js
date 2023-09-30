@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.1.2
+  
+### What's new
+
+- Patch Validator: Prevent recursion on inner properties [#2520](https://github.com/Vincit/objection.js/pull/2520)
+
 ## 3.1.1
 
 ### What's new
