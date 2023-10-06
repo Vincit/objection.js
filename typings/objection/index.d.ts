@@ -1422,6 +1422,19 @@ declare namespace Objection {
     ...params: TParams
   ) => TResult;
 
+  interface PrototypeType<T> extends Function {
+    prototype: T;
+  }
+  
+  interface ConstructorFunctionType<T = any> extends PrototypeType<T> {
+    new (...args: any[]): T;
+  }
+  
+  // for internal use on generic static this deduction, copied from https://github.com/microsoft/TypeScript/issues/5863#issuecomment-1483978415
+  type ConstructorType<T = unknown, Static extends Record<string, any> = PrototypeType<T>> = (ConstructorFunctionType<T> | PrototypeType<T>) & {
+    [Key in keyof Static]: Static[Key];
+  };  
+
   export interface ModelConstructor<M extends Model> extends Constructor<M> {}
 
   export interface ModelClass<M extends Model> extends ModelConstructor<M> {
@@ -1569,7 +1582,7 @@ declare namespace Objection {
     ): QueryBuilderType<M>;
 
     static relatedQuery<M extends Model, K extends keyof M>(
-      this: Constructor<M>,
+      this: ConstructorType<M>,
       relationName: K,
       trxOrKnex?: TransactionOrKnex,
     ): ArrayRelatedQueryBuilder<M[K]>;
