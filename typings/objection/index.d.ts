@@ -15,6 +15,7 @@
 import Ajv, { Options as AjvOptions } from 'ajv';
 import * as dbErrors from 'db-errors';
 import { Knex } from 'knex';
+import { SnakeCase, SnakeCasedProperties } from 'type-fest';
 
 // Export the entire Objection namespace.
 export = Objection;
@@ -1563,8 +1564,8 @@ declare namespace Objection {
 
     static defaultGraphOptions?: GraphOptions;
 
-    static columnNameToPropertyName(propertyName: string): string;
-    static propertyNameToColumnName(propertyName: string): string;
+    static columnNameToPropertyName<M extends Model>(this: Constructor<M>, col: SnakeCase<ModelProps<M>>): string;
+    static propertyNameToColumnName<M extends Model>(this: Constructor<M>, col:  ModelProps<M>): string;
 
     static query<M extends Model>(
       this: Constructor<M>,
