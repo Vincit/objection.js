@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.1.2-fork1
+  
+### What's new
+
+- Better typings for `propertyNameToColumnName` and `columnNameToPropertyName`
+
 ## 3.1.2
   
 ### What's new

@@ -17,3 +17,17 @@ import { ModelClass } from '../../';
   const persons = await modelClass.query().where('firstName', 'Jennifer');
   const persons2: Person[] = await modelClass.fetchGraph(persons, 'pets');
 })();
+
+(async () => {
+  const property: string = Person.propertyNameToColumnName('firstName');
+  
+  // @ts-expect-error
+  const propertyFail: string = Person.propertyNameToColumnName('first_name');
+})();
+
+(async () => {
+  // @ts-expect-error
+  const propertyFail: string = Person.columnNameToPropertyName('firstName');
+
+  const property: string = Person.columnNameToPropertyName('first_name');
+})();
