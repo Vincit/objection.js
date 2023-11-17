@@ -201,10 +201,10 @@ declare namespace Objection {
    */
   type PartialModelObject<T extends Model> = {
     [K in DataPropertyNames<T>]?: Defined<T[K]> extends Model
-      ? T[K]
+      ? unknown
       : Defined<T[K]> extends Array<infer I>
       ? I extends Model
-        ? I[]
+        ? unknown[]
         : Expression<T[K]>
       : Expression<T[K]>;
   };
