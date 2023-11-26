@@ -203,10 +203,10 @@ declare namespace Objection {
     [K in DataPropertyNames<T>]?: Defined<T[K]> extends Model
       ? T[K]
       : Defined<T[K]> extends Array<infer I>
-      ? I extends Model
-        ? I[]
-        : Expression<T[K]>
-      : Expression<T[K]>;
+        ? I extends Model
+          ? I[]
+          : Expression<T[K]>
+        : Expression<T[K]>;
   };
 
   /**
@@ -232,10 +232,10 @@ declare namespace Objection {
   type PartialModelGraphField<F> = Defined<F> extends Model
     ? PartialModelGraph<Defined<F>>
     : Defined<F> extends Array<infer I>
-    ? I extends Model
-      ? PartialModelGraph<I>[]
-      : Expression<F>
-    : Expression<F>;
+      ? I extends Model
+        ? PartialModelGraph<I>[]
+        : Expression<F>
+      : Expression<F>;
 
   /**
    * Extracts the property names (excluding relations) of a model class.
@@ -245,12 +245,12 @@ declare namespace Objection {
       [K in keyof T]?: Defined<T[K]> extends Model
         ? never
         : Defined<T[K]> extends Array<infer I>
-        ? I extends Model
-          ? never
-          : K
-        : T[K] extends Function
-        ? never
-        : K;
+          ? I extends Model
+            ? never
+            : K
+          : T[K] extends Function
+            ? never
+            : K;
     }[keyof T],
     undefined | 'QueryBuilderType'
   >;
@@ -263,10 +263,10 @@ declare namespace Objection {
       [K in keyof T]?: Defined<T[K]> extends Model
         ? K
         : Defined<T[K]> extends Array<infer I>
-        ? I extends Model
-          ? K
-          : never
-        : never;
+          ? I extends Model
+            ? K
+            : never
+          : never;
     }[keyof T]
   >;
 
@@ -277,10 +277,10 @@ declare namespace Objection {
   type RelatedQueryBuilder<T> = T extends Model
     ? SingleQueryBuilder<QueryBuilderType<T>>
     : T extends Array<infer I>
-    ? I extends Model
-      ? QueryBuilderType<I>
-      : never
-    : never;
+      ? I extends Model
+        ? QueryBuilderType<I>
+        : never
+      : never;
 
   /**
    * Just like RelatedQueryBuilder but always returns an array
@@ -290,10 +290,10 @@ declare namespace Objection {
   type ArrayRelatedQueryBuilder<T> = T extends Model
     ? QueryBuilderType<T>
     : T extends Array<infer I>
-    ? I extends Model
-      ? QueryBuilderType<I>
-      : never
-    : never;
+      ? I extends Model
+        ? QueryBuilderType<I>
+        : never
+      : never;
 
   /**
    * Gets the query builder type for a model type.
