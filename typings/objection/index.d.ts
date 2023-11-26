@@ -1700,7 +1700,6 @@ declare namespace Objection {
 
     $set(obj: Pojo): this;
     $omit(keys: string | string[] | { [key: string]: boolean }): this;
-    $pick(keys: string | string[] | { [key: string]: boolean }): this;
     $clone(opt?: CloneOptions): this;
     $traverse(filterConstructor: typeof Model, traverser: TraverserFunction): this;
     $traverse(traverser: TraverserFunction): this;

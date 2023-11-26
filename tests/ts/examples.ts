@@ -423,8 +423,6 @@ const exampleDatabaseJsonPerson: Person = examplePerson.$setDatabaseJson({
 });
 const omitPersonFromKey: Person = examplePerson.$omit('lastName');
 const omitPersonFromObj: Person = examplePerson.$omit({ firstName: true });
-const pickPersonFromKey: Person = examplePerson.$pick('lastName');
-const pickPersonFromObj: Person = examplePerson.$pick({ firstName: true });
 const clonePerson: Person = examplePerson.$clone();
 const setRelatedPerson: Person = examplePerson.$setRelated(
   'parent',
