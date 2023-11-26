@@ -1,5 +1,15 @@
 # Changelog
 
+## 3.1.3
+
+### What's new
+
+- Revert generic constructor type change [#2531](https://github.com/Vincit/objection.js/issues/2531), [#2399](https://github.com/Vincit/objection.js/pull/2399)
+
+### What's new
+
+- Patch Validator: Prevent recursion on inner properties [#2520](https://github.com/Vincit/objection.js/pull/2520)
+
 ## 3.1.2
   
 ### What's new
