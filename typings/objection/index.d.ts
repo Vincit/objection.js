@@ -1699,12 +1699,13 @@ declare namespace Objection {
     ): this;
 
     $set(obj: Pojo): this;
-    $omit(keys: string | string[] | { [key: string]: boolean }): this;
     $clone(opt?: CloneOptions): this;
     $traverse(filterConstructor: typeof Model, traverser: TraverserFunction): this;
     $traverse(traverser: TraverserFunction): this;
     $traverseAsync(filterConstructor: typeof Model, traverser: TraverserFunction): Promise<this>;
     $traverseAsync(traverser: TraverserFunction): Promise<this>;
+    $omitFromJson(keys: string | string[] | { [key: string]: boolean }): this;
+    $omitFromDatabaseJson(keys: string | string[] | { [key: string]: boolean }): this;
 
     $knex(): Knex;
     $transaction(): Knex;
