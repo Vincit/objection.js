@@ -229,13 +229,14 @@ declare namespace Objection {
       }
     : never;
 
-  type PartialModelGraphField<F> = Defined<F> extends Model
-    ? PartialModelGraph<Defined<F>>
-    : Defined<F> extends Array<infer I>
-      ? I extends Model
-        ? PartialModelGraph<I>[]
-        : Expression<F>
-      : Expression<F>;
+  type PartialModelGraphField<F> =
+    Defined<F> extends Model
+      ? PartialModelGraph<Defined<F>>
+      : Defined<F> extends Array<infer I>
+        ? I extends Model
+          ? PartialModelGraph<I>[]
+          : Expression<F>
+        : Expression<F>;
 
   /**
    * Extracts the property names (excluding relations) of a model class.

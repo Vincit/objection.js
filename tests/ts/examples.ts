@@ -172,11 +172,8 @@ function takesModel(m: objection.Model) {}
 function takesModelClass(m: objection.ModelClass<any>) {}
 
 // Borrowed from https://github.com/TypeStrong/ts-expect/blob/39f04b5/src/index.ts
-type TypeEqual<T, U> = Exclude<T, U> extends never
-  ? Exclude<U, T> extends never
-    ? true
-    : false
-  : false;
+type TypeEqual<T, U> =
+  Exclude<T, U> extends never ? (Exclude<U, T> extends never ? true : false) : false;
 const expectsTrue = <T extends true>() => 1;
 
 const takesPerson = (person: Person) => {

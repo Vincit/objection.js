@@ -50,7 +50,7 @@ module.exports = (options) => {
       }
 
       $beforeUpdate(opt, context) {
-        // If you exetend existing methods like this one, always remember to call the
+        // If you extend existing methods like this one, always remember to call the
         // super implementation. Check the documentation to see if the function can be
         // async and prepare for that also.
         const maybePromise = super.$beforeUpdate(opt, context);
