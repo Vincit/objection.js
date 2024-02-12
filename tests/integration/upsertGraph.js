@@ -4131,6 +4131,34 @@ module.exports = (session) => {
         });
       });
 
+      describe('should not call onError() with internal exception (#2603)', () => {
+        let query;
+
+        before(() => {
+          query = Model1.query;
+        });
+
+        after(() => {
+          Model1.query = query;
+        });
+
+        it('should not call onError() with internal exception', async () => {
+          const upsert = { id: 2 };
+
+          let error = null;
+          Model1.query = function (trx) {
+            return query.call(this, trx).onError((err) => {
+              error = err;
+            });
+          };
+
+          await transaction(session.knex, (trx) =>
+            Model1.query(trx).upsertGraph(upsert, { fetchStrategy }),
+          );
+          expect(error).to.equal(null);
+        });
+      });
+
       if (session.isPostgres()) {
         describe('returning', () => {
           it('should propagate returning(*) to all update an insert operations', () => {
