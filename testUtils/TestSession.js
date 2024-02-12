@@ -405,7 +405,7 @@ TestSession.unhandledRejectionHandlers = [];
 TestSession.hookCounter = 0;
 
 // Creates a hook that waits for `delay` milliseconds and then
-// increments a `${name}Called` property. The hook is asynchonous
+// increments a `${name}Called` property. The hook is asynchronous
 // every other time it is called so that the synchronous path is
 // also tested.
 function createHook(name, delay, extraAction) {

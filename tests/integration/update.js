@@ -320,9 +320,9 @@ module.exports = (session) => {
               model1Prop1: 'updated text',
               model1Prop2: null,
               model1Id: null,
-              $beforeUpdateCalled: true,
+              $beforeUpdateCalled: 1,
               $beforeUpdateOptions: {},
-              $afterUpdateCalled: true,
+              $afterUpdateCalled: 1,
               $afterUpdateOptions: {},
             });
             return session.knex('Model1').orderBy('id');

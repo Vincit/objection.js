@@ -439,8 +439,8 @@ module.exports = (session) => {
               model1Prop1: 'hello 3',
               model1Prop2: null,
               model1Id: null,
-              $beforeInsertCalled: true,
-              $afterInsertCalled: true,
+              $beforeInsertCalled: 1,
+              $afterInsertCalled: 1,
             });
             return session.knex(Model1.getTableName());
           })
@@ -466,8 +466,8 @@ module.exports = (session) => {
                 model1Prop1: 'hello 3',
                 model1Prop2: null,
                 model1Id: null,
-                $beforeInsertCalled: true,
-                $afterInsertCalled: true,
+                $beforeInsertCalled: 1,
+                $afterInsertCalled: 1,
               });
 
               expect(inserted[1]).to.be.a(Model1);
@@ -477,8 +477,8 @@ module.exports = (session) => {
                 model1Prop1: 'hello 4',
                 model1Prop2: 10,
                 model1Id: null,
-                $beforeInsertCalled: true,
-                $afterInsertCalled: true,
+                $beforeInsertCalled: 1,
+                $afterInsertCalled: 1,
               });
 
               return session.knex(Model1.getTableName());

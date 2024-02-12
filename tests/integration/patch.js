@@ -408,9 +408,9 @@ module.exports = (session) => {
               model1Prop1: 'updated text',
               model1Prop2: null,
               model1Id: null,
-              $beforeUpdateCalled: true,
+              $beforeUpdateCalled: 1,
               $beforeUpdateOptions: { patch: true },
-              $afterUpdateCalled: true,
+              $afterUpdateCalled: 1,
               $afterUpdateOptions: { patch: true },
             });
             return session.knex('Model1').orderBy('id');
@@ -436,9 +436,9 @@ module.exports = (session) => {
               model1Prop1: 'updated text',
               model1Prop2: null,
               model1Id: null,
-              $beforeUpdateCalled: true,
+              $beforeUpdateCalled: 1,
               $beforeUpdateOptions: { patch: true },
-              $afterUpdateCalled: true,
+              $afterUpdateCalled: 1,
               $afterUpdateOptions: { patch: true },
 
               model1Relation2: [
