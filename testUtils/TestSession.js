@@ -429,11 +429,7 @@ function createHook(name, delay, extraAction) {
 }
 
 function inc(obj, key) {
-  if (!_.has(obj, key)) {
-    obj[key] = 1;
-  } else {
-    obj[key]++;
-  }
+  obj[key] = (obj[key] || 0) + 1;
 }
 
 function registerUnhandledRejectionHandler() {
