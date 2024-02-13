@@ -261,7 +261,7 @@ module.exports = (session) => {
                       }
                     }
 
-                    expect(result.$beforeUpdateCalled).to.equal(1);
+                    expect(result.$beforeUpdateCalled).to.equal(undefined);
                     expect(result.$afterUpdateCalled).to.equal(undefined);
 
                     expect(result.model1Relation1.$beforeUpdateCalled).to.equal(1);
@@ -501,7 +501,7 @@ module.exports = (session) => {
               expect(result.$beforeUpdateCalled).to.equal(1);
               expect(result.$afterUpdateCalled).to.equal(1);
 
-              expect(result.model1Relation1.$beforeUpdateCalled).to.equal(1);
+              expect(result.model1Relation1.$beforeUpdateCalled).to.equal(undefined);
               expect(result.model1Relation1.$afterUpdateCalled).to.equal(undefined);
             });
         })
@@ -577,7 +577,7 @@ module.exports = (session) => {
               expect(result.$beforeUpdateCalled).to.equal(1);
               expect(result.$afterUpdateCalled).to.equal(1);
 
-              expect(result.model1Relation1.$beforeUpdateCalled).to.equal(1);
+              expect(result.model1Relation1.$beforeUpdateCalled).to.equal(undefined);
               expect(result.model1Relation1.$afterUpdateCalled).to.equal(undefined);
             });
         })
@@ -733,7 +733,7 @@ module.exports = (session) => {
               })
               .then((result) => {
                 expect(result.model1Relation2[0].model2Relation1[2].$beforeUpdateCalled).to.equal(
-                  1,
+                  undefined,
                 );
 
                 if (session.isPostgres()) {
@@ -4116,9 +4116,9 @@ module.exports = (session) => {
             model1Prop2: 101,
           };
 
-          return transaction(session.knex, (trx) =>
-            Model1.query(trx).upsertGraph(upsert, { fetchStrategy }),
-          )
+          return transaction(session.knex, (trx) => {
+            return Model1.query(trx).upsertGraph(upsert, { fetchStrategy });
+          })
             .then((res) => {
               expect(res.model1Prop1).to.equal('updated in before update');
               expect(res.model1Prop2).to.equal(101);
@@ -4152,10 +4152,28 @@ module.exports = (session) => {
             });
           };
 
-          await transaction(session.knex, (trx) =>
-            Model1.query(trx).upsertGraph(upsert, { fetchStrategy }),
-          );
+          await transaction(session.knex, (trx) => {
+            return Model1.query(trx).upsertGraph(upsert, { fetchStrategy });
+          });
           expect(error).to.equal(null);
+        });
+      });
+
+      describe('should not call $beforeUpdate() on empty relates (#2605)', () => {
+        it('should not call $beforeUpdate() on empty relates', async () => {
+          const upsert = {
+            id: 2,
+            model1Relation1: { id: 3 },
+          };
+
+          await transaction(session.knex, (trx) => {
+            return Model1.query(trx)
+              .upsertGraph(upsert, { relate: true, fetchStrategy })
+              .then((result) => {
+                expect(result.$beforeUpdateCalled).to.equal(undefined);
+                expect(result.model1Relation1.$beforeUpdateCalled).to.equal(undefined);
+              });
+          });
         });
       });
 
