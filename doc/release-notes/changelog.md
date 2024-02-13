@@ -1,5 +1,14 @@
 # Changelog
 
+## 3.1.4
+
+### What's new
+
+- Fix `upsertGraph()` `$beforeUpdate()` calls on empty relates [#2605](https://github.com/Vincit/objection.js/issues/2605)
+- Don't call `onError()` with internal exceptions [#2603](https://github.com/Vincit/objection.js/issues/2603)
+- Remove docs and typings for nonexistent `$pick()`
+- Make `$omitFromJson()` + `$omitFromDatabaseJson()` compatible with old `$omit()` syntax
+ 
 ## 3.1.3
 
 ### What's new
