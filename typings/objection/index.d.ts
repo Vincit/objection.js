@@ -1473,6 +1473,9 @@ declare namespace Objection {
     fromJson(json: object, opt?: ModelOptions): M;
     fromDatabaseJson(json: object): M;
 
+    columnNameToPropertyName(columnName: string): string;
+    propertyNameToColumnName(propertyName: string): string;
+
     createValidator(): Validator;
     createValidationError(args: CreateValidationErrorArgs): Error;
     createNotFoundError(queryContext: QueryContext, args: CreateNotFoundErrorArgs): Error;
@@ -1582,6 +1585,9 @@ declare namespace Objection {
 
     static fromJson<M extends Model>(this: Constructor<M>, json: object, opt?: ModelOptions): M;
     static fromDatabaseJson<M extends Model>(this: Constructor<M>, json: object): M;
+
+    static columnNameToPropertyName(columnName: string): string;
+    static propertyNameToColumnName(propertyName: string): string;
 
     static createValidator(): Validator;
     static createValidationError(args: CreateValidationErrorArgs): Error;
