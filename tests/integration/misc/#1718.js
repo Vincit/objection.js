@@ -5,17 +5,14 @@ const { AjvValidator } = require('../../../lib/model/AjvValidator');
 const { ValidationError } = require('../../../lib/model/ValidationError');
 
 module.exports = (session) => {
-  describe('When Ajv verbose is enabled, pass through the data field in exception #1718', () => {
-    class A extends Model {
+  describe('Pass through data in exceptions when Ajv verbose option is enabled #1718', () => {
+    class MyModel extends Model {
       static get tableName() {
-        return 'a';
+        return 'MyModel';
       }
 
       static createValidator() {
         return new AjvValidator({
-          onCreateAjv: (ajv) => {
-            // Here you can modify the `Ajv` instance.
-          },
           options: {
             allErrors: true,
             validateSchema: false,
@@ -39,22 +36,22 @@ module.exports = (session) => {
 
     beforeEach(() => {
       return session.knex.schema
-        .dropTableIfExists('a')
-        .createTable('a', (table) => {
+        .dropTableIfExists('MyModel')
+        .createTable('MyModel', (table) => {
           table.integer('id').primary();
         })
         .then(() => {
-          return Promise.all([session.knex('a').insert({ id: 1 })]);
+          return Promise.all([session.knex('MyModel').insert({ id: 1 })]);
         });
     });
 
     afterEach(() => {
-      return session.knex.schema.dropTableIfExists('a');
+      return session.knex.schema.dropTableIfExists('MyModel');
     });
 
-    it('the test', () => {
-      return A.query(session.knex)
-        .insert({ id: '2' })
+    it('test', () => {
+      return MyModel.query(session.knex)
+        .insert({ id: 2 })
         .catch((err) => {
           expect(err).to.be.an(ValidationError);
           expect(err.data).to.be.an('object');
