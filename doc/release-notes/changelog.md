@@ -29,7 +29,7 @@
 
 ### What's new
 
-- Only add AJV formats if they weren't added in user-land already [#2482](https://github.com/Vincit/objection.js/pull/2482)
+- Only add Ajv formats if they weren't added in user-land already [#2482](https://github.com/Vincit/objection.js/pull/2482)
 
 ## 3.1.0
 
