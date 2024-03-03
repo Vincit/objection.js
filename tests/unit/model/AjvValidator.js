@@ -94,7 +94,7 @@ describe('AjvValidator', () => {
     };
 
     it('should remove required fields from definitions', () => {
-      const validator = new AjvValidator({ onCreateAjv: () => {} });
+      const validator = new AjvValidator({});
       const validators = validator.getValidator(modelClass('test', schema), schema, true);
       const definitions = Object.entries(validators.schema.definitions);
 
@@ -104,7 +104,6 @@ describe('AjvValidator', () => {
 
     it('should not remove required fields if there is a discriminator', () => {
       const validator = new AjvValidator({
-        onCreateAjv: () => {},
         options: {
           discriminator: true,
         },
@@ -115,15 +114,13 @@ describe('AjvValidator', () => {
 
     it('should add ajv formats by default', () => {
       expect(() => {
-        const validator = new AjvValidator({ onCreateAjv: () => {} });
+        const validator = new AjvValidator({});
         validator.getValidator(modelClass('test', schema3), schema3, true);
       }).to.not.throwException();
     });
 
     it('should remove required fields in inner properties', () => {
-      const validator = new AjvValidator({
-        onCreateAjv: () => {},
-      });
+      const validator = new AjvValidator({});
       const validators = validator.getValidator(modelClass('test', schema4), schema4, true);
       expect(validators.schema.properties.address.properties).to.not.be(undefined);
       expect(validators.schema.properties.address.required).to.be(undefined);
@@ -149,7 +146,7 @@ describe('AjvValidator', () => {
           a: { type: 'string' },
         },
       };
-      const validator = new AjvValidator({ onCreateAjv: () => {} });
+      const validator = new AjvValidator({});
       validator.getValidator(
         modelClass('test', emptyDefinitionsSchema),
         emptyDefinitionsSchema,

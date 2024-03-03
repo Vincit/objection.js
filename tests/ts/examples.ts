@@ -124,8 +124,8 @@ class Person extends objection.Model {
 
   static createValidator() {
     return new objection.AjvValidator({
-      onCreateAjv(ajvalidator: Ajv) {
-        // modify ajvalidator
+      onCreateAjv(ajv: Ajv) {
+        // modify ajv
       },
       options: {
         allErrors: false,
