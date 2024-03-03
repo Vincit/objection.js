@@ -9,7 +9,7 @@ services:
     environment:
       - POSTGRES_HOST_AUTH_METHOD=trust
   mysql:
-    image: 'mysql:5'
+    image: 'mariadb:lts'
     container_name: 'objection_mysql'
     ports:
       - '3306:3306'
