@@ -13,3 +13,4 @@ npm-debug.log*
 .vscode
 /**/yarn.lock
 /**/.vuepress/dist
+docker-compose.override.yml
