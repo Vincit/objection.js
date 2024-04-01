@@ -1070,7 +1070,7 @@ declare namespace Objection {
     insert(insert: PartialModelObject<M>[]): ArrayQueryBuilder<this>;
     insert(): SingleQueryBuilder<this>;
 
-    onConflict(column?: string | string[] | true): this;
+    onConflict(column?: ColumnRef | ColumnRef[] | true): this;
     ignore(): this;
     merge(merge?: PartialModelObject<M> | string[]): this;
 
