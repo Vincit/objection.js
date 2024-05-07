@@ -17,12 +17,24 @@ describe('QueryBuilder', () => {
   let executedQueries = [];
   let mockKnex = null;
   let TestModel = null;
+  let keepColumnInfo = false;
+  let skippedColumnInfo = 0;
 
   before(() => {
     let knex = Knex({ client: 'pg' });
 
     mockKnex = knexMocker(knex, function (mock, oldImpl, args) {
-      executedQueries.push(this.toString());
+      const queryString = this.toString();
+      const matchColInfo = queryString.match(/select \* from information_schema\.columns/) != null;
+
+      if (matchColInfo && keepColumnInfo && skippedColumnInfo++ > 0) {
+        executedQueries.push(queryString);
+      } else if (!matchColInfo) {
+        executedQueries.push(queryString);
+      } else {
+        const promise = Promise.resolve([]);
+        return promise.then.apply(promise, args);
+      }
 
       let result = mockKnexQueryResults[mockKnexQueryResultIndex++] || [];
       let promise = Promise.resolve(result);
@@ -35,6 +47,8 @@ describe('QueryBuilder', () => {
     mockKnexQueryResults = [];
     mockKnexQueryResultIndex = 0;
     executedQueries = [];
+    keepColumnInfo = false;
+    skippedColumnInfo = 0;
 
     TestModel = class TestModel extends Model {
       static get tableName() {
@@ -925,6 +939,8 @@ describe('QueryBuilder', () => {
   });
 
   it('should consider withSchema when looking for column info', (done) => {
+    keepColumnInfo = true;
+
     class TestModelRelated extends Model {
       static get tableName() {
         return 'Related';
