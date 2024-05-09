@@ -62,7 +62,7 @@
   },
   "devDependencies": {
     "@types/node": "^20.12.7",
-    "chai": "^4.3.10",
+    "chai": "^5.1.1",
     "chai-subset": "^1.6.0",
     "eslint": "^8.54.0",
     "eslint-formatter-codeframe": "^7.32.1",
