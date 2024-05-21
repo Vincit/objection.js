@@ -854,6 +854,8 @@ declare namespace Objection {
   }
 
   export class QueryBuilder<M extends Model, R = M[]> implements CatchablePromiseLike<R> {
+    constructor(modelClass: ModelClass<M>);
+    
     static forClass: ForClassMethod;
 
     select: SelectMethod<this>;
