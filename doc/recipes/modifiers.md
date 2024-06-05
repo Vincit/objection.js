@@ -50,7 +50,7 @@ Note that you can only use modifiers registered for the relation's model class. 
 
 ```js
 const people = await Person.query().withGraphFetched(
-  '[children(defaultSelects), pets(onlyDogs)]'
+  '[children(defaultSelects), pets(filterDogs)]'
 );
 ```
 
