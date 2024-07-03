@@ -1,4 +1,9 @@
 # Changelog
+## 3.1.2-fork2
+  
+### What's new
+
+- Fix `ref` when referencing JSON fields with MySQL
 
 ## 3.1.2-fork1
   
