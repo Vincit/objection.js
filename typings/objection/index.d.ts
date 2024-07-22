@@ -859,6 +859,7 @@ declare namespace Objection {
     new(modelClass: ModelClass<M>): QueryBuilder<M>;
     static forClass: ForClassMethod;
 
+
     select: SelectMethod<this>;
     columns: SelectMethod<this>;
     column: SelectMethod<this>;
