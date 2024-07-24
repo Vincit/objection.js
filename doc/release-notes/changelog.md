@@ -1,4 +1,10 @@
 # Changelog
+## 3.1.2-fork3
+  
+### What's new
+
+- Fix `ref` when referencing JSON sub fields like ```Model.ref(`column:property.field`)```
+
 ## 3.1.2-fork2
   
 ### What's new

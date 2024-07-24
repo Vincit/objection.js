@@ -1,6 +1,6 @@
 {
   "name": "objection",
-  "version": "3.1.2-fork2",
+  "version": "3.1.2-fork3",
   "description": "An SQL-friendly ORM for Node.js",
   "main": "lib/objection.js",
   "license": "MIT",
