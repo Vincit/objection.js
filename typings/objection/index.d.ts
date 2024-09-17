@@ -1602,7 +1602,7 @@ declare namespace Objection {
 
     static transaction<T>(callback: (trx: Transaction) => Promise<T>): Promise<T>;
     static transaction<T>(
-      trxOrKnex: TransactionOrKnex,
+      trxOrKnex: TransactionOrKnex | undefined,
       callback: (trx: Transaction) => Promise<T>,
     ): Promise<T>;
 
