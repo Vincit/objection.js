@@ -41,7 +41,7 @@ git clone git@github.com:<your-account>/objection.js.git objection
 
 3. **Run `npm install` at the root of the repo**
 
-4. **Run `docker-compose up` at the root of the repo**
+4. **Run `docker compose up` at the root of the repo**
    - If you have local databases running, shut them down or port binding will conflict.
 
 5. **Create test users and databases by running `node setup-test-db` at the root of the repo**
@@ -53,7 +53,7 @@ git clone git@github.com:<your-account>/objection.js.git objection
 You can run the tests on a subset of databases by setting the `DATABASES` env variable
 
 ```bash
-# Only run tests on sqlite. No need for docker-compose.
+# Only run tests on sqlite. No need for docker compose.
 DATABASES=sqlite3 npm test
 ```
 
