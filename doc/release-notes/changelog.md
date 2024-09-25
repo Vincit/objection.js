@@ -1,5 +1,14 @@
 # Changelog
 
+## 3.1.5
+
+### What's new
+
+- Types: Fix generic static `this` [#2533](https://github.com/Vincit/objection.js/pull/2533)
+- Types: Add `fromRaw` to `FromSelector regex [#2628](https://github.com/Vincit/objection.js/issues/2628)
+- Types: Fix argument types of `onConflict()` [#2635](https://github.com/Vincit/objection.js/pull/2635)
+- Types: Make `trx` optional for `Model.transaction(trx, cb)` [#2694](https://github.com/Vincit/objection.js/pull/2694)
+
 ## 3.1.4
 
 ### What's new
@@ -8,7 +17,7 @@
 - Don't call `onError()` with internal exceptions [#2603](https://github.com/Vincit/objection.js/issues/2603)
 - Remove docs and typings for nonexistent `$pick()`
 - Make `$omitFromJson()` + `$omitFromDatabaseJson()` compatible with old `$omit()` syntax
- 
+
 ## 3.1.3
 
 ### What's new
