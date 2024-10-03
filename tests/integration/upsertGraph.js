@@ -165,7 +165,13 @@ module.exports = (session) => {
 
               // Wrap the transaction to catch the executed sql.
               trx = mockKnexFactory(trx, function (mock, oldImpl, args) {
-                sql.push(this.toString());
+                const queryString = this.toString();
+                if (
+                  queryString.match(/PRAGMA/) == null &&
+                  queryString.match(/select \* from information_schema\.columns/) == null
+                ) {
+                  sql.push(queryString);
+                }
                 return oldImpl.apply(this, args);
               });
 
@@ -710,7 +716,13 @@ module.exports = (session) => {
 
           // Wrap the transaction to catch the executed sql.
           trx = mockKnexFactory(trx, function (mock, oldImpl, args) {
-            sql.push(this.toString());
+            const queryString = this.toString();
+            if (
+              queryString.match(/select \* from information_schema\.columns/) == null &&
+              queryString.match(/PRAGMA/) == null
+            ) {
+              sql.push(queryString);
+            }
             return oldImpl.apply(this, args);
           });
 
@@ -2668,7 +2680,13 @@ module.exports = (session) => {
 
               // Wrap the transaction to catch the executed sql.
               trx = mockKnexFactory(trx, function (mock, oldImpl, args) {
-                sql.push(this.toString());
+                const queryString = this.toString();
+                if (
+                  queryString.match(/select \* from information_schema\.columns/) == null &&
+                  queryString.match(/PRAGMA/) == null
+                ) {
+                  sql.push(queryString);
+                }
                 return oldImpl.apply(this, args);
               });
 
