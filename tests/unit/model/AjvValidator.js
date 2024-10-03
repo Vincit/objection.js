@@ -35,6 +35,26 @@ describe('AjvValidator', () => {
       anyOf: [{ $ref: '#/definitions/TestRef1' }, { $ref: '#/definitions/TestRef2' }],
     };
 
+    const schemaBis = {
+      $defs: {
+        TestRef1: {
+          type: 'object',
+          properties: {
+            aRequiredProp1: { type: 'string' },
+          },
+          required: ['aRequiredProp1'],
+        },
+        TestRef2: {
+          type: 'object',
+          properties: {
+            aRequiredProp2: { type: 'string' },
+          },
+          required: ['aRequiredProp2'],
+        },
+      },
+      anyOf: [{ $ref: '#/$defs/TestRef1' }, { $ref: '#/$defs/TestRef2' }],
+    };
+
     const schema2 = {
       type: 'object',
       discriminator: { propertyName: 'foo' },
@@ -102,6 +122,15 @@ describe('AjvValidator', () => {
       definitions.forEach((d) => expect(d.required).to.be(undefined));
     });
 
+    it('should remove required fields from $defs', () => {
+      const validator = new AjvValidator({ onCreateAjv: () => {} });
+      const validators = validator.getValidator(modelClass('test', schemaBis), schemaBis, true);
+      const $defs = Object.entries(validators.schema.$defs);
+
+      expect($defs.length).to.be(2);
+      $defs.forEach((d) => expect(d.required).to.be(undefined));
+    });
+
     it('should not remove required fields if there is a discriminator', () => {
       const validator = new AjvValidator({
         options: {
@@ -147,6 +176,24 @@ describe('AjvValidator', () => {
         },
       };
       const validator = new AjvValidator({});
+      validator.getValidator(
+        modelClass('test', emptyDefinitionsSchema),
+        emptyDefinitionsSchema,
+        true,
+      );
+    });
+
+    it('should handle empty $defs', () => {
+      const emptyDefinitionsSchema = {
+        type: 'object',
+        required: ['a'],
+        $defs: {},
+        additionalProperties: false,
+        properties: {
+          a: { type: 'string' },
+        },
+      };
+      const validator = new AjvValidator({ onCreateAjv: () => {} });
       validator.getValidator(
         modelClass('test', emptyDefinitionsSchema),
         emptyDefinitionsSchema,
