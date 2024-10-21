@@ -64,7 +64,7 @@
     "@types/node": "^22.7.0",
     "chai": "^4.3.10",
     "chai-subset": "^1.6.0",
-    "eslint": "^8.54.0",
+    "eslint": "^9.13.0",
     "eslint-formatter-codeframe": "^7.32.1",
     "eslint-plugin-prettier": "^5.2.1",
     "expect.js": "^0.3.1",
