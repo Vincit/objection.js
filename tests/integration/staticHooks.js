@@ -1163,6 +1163,32 @@ module.exports = (session) => {
           expect(queries.length).to.equal(4);
         });
 
+        it('should be able to access modelOptions in beforeUpdate when using patchAndFetchById', async () => {
+          Movie.beforeUpdate = createHookSpy(({ modelOptions }) => {
+            chaiExpect(modelOptions).to.deep.equal({ patch: true });
+          });
+
+          const hungerGames = await Movie.query().findOne('name', 'like', '%gam%');
+          expect(queries.length).to.equal(1);
+
+          await Movie.query().patchAndFetchById(hungerGames.id, { name: 'Updated' });
+          expect(Movie.beforeUpdate.calls.length).to.equal(1);
+        });
+
+        it('should populate modelOptions with old data when using upsertGraph', async () => {
+          Movie.beforeUpdate = createHookSpy(({ modelOptions }) => {
+            expect(modelOptions).to.have.property('old');
+
+            chaiExpect(modelOptions.old).containSubset({ name: 'Hungergames' });
+          });
+
+          const hungerGames = await Movie.query().findOne('name', 'like', '%gam%');
+          expect(queries.length).to.equal(1);
+
+          await Movie.query().upsertGraph({ id: hungerGames.id, name: 'Updated' });
+          expect(Movie.beforeUpdate.calls.length).to.equal(1);
+        });
+
         it('should be able to cancel the query', () => {
           Movie.beforeUpdate = createHookSpy(({ cancelQuery }) => {
             cancelQuery();
