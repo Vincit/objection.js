@@ -1442,7 +1442,7 @@ declare namespace Objection {
     QueryBuilder: typeof QueryBuilder;
 
     tableName: string;
-    idColumn: string | string[];
+    idColumn: string | readonly string[];
     jsonSchema: JSONSchema;
     relationMappings: RelationMappings | RelationMappingsThunk;
     modelPaths: string[];
@@ -1551,7 +1551,7 @@ declare namespace Objection {
     static QueryBuilder: typeof QueryBuilder;
 
     static tableName: string;
-    static idColumn: string | string[];
+    static idColumn: string | readonly string[];
     static jsonSchema: JSONSchema;
     static relationMappings: RelationMappings | RelationMappingsThunk;
     static modelPaths: string[];
