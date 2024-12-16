@@ -75,7 +75,7 @@ import { Person } from '../fixtures/person';
     ],
     {
       relate: true,
-    }
+    },
   );
 
   await Person.query().insertGraph(
@@ -93,7 +93,7 @@ import { Person } from '../fixtures/person';
     ],
     {
       relate: ['movies'],
-    }
+    },
   );
 
   await Person.query().insertGraph(
@@ -118,7 +118,7 @@ import { Person } from '../fixtures/person';
     ],
     {
       relate: ['movies.actors'],
-    }
+    },
   );
 
   await Person.query().insertGraph([

@@ -225,7 +225,7 @@ module.exports = (session) => {
               [1, '2'],
               [2, '3'],
               [3, '3'],
-            ]
+            ],
           )
           .orderBy(['id1', 'id2'])
           .then((models) => {
@@ -245,7 +245,7 @@ module.exports = (session) => {
               [1, '2'],
               [2, '3'],
               [3, '3'],
-            ]
+            ],
           )
           .orderBy(['id1', 'id2'])
           .then((models) => {
@@ -351,7 +351,7 @@ module.exports = (session) => {
             id1: 1000,
             id2: "doesn't exist in the db",
           },
-          { insertMissing: true }
+          { insertMissing: true },
         );
 
         expect(queries.length).to.equal(2);
@@ -371,7 +371,7 @@ module.exports = (session) => {
 
         if (session.isPostgres()) {
           expect(queries[0].sql).to.equal(
-            'select "A"."id1", "A"."id2", "A"."aval" from "A" where ("A"."id1", "A"."id2") in ((?, ?))'
+            'select "A"."id1", "A"."id2", "A"."aval" from "A" where ("A"."id1", "A"."id2") in ((?, ?))',
           );
         }
 
@@ -434,7 +434,7 @@ module.exports = (session) => {
                 },
               ],
             },
-            { insertMissing: true }
+            { insertMissing: true },
           )
           .then(() => {
             return A.query()
@@ -645,7 +645,7 @@ module.exports = (session) => {
               ],
             },
           ],
-          { allowRefs: true }
+          { allowRefs: true },
         );
       });
 
@@ -1192,7 +1192,7 @@ module.exports = (session) => {
             })
             .then(([a, ab]) => {
               expect(a).to.eql(
-                aOld.concat([{ id1: 1000, id2: '2000', aval: 'new', bid3: null, bid4: null }])
+                aOld.concat([{ id1: 1000, id2: '2000', aval: 'new', bid3: null, bid4: null }]),
               );
 
               expect(ab).to.eql(abOld.concat([{ aid1: 1000, aid2: '2000', bid3: 1, bid4: '2' }]));
@@ -1281,7 +1281,7 @@ module.exports = (session) => {
                   'bid4',
                   'aid1',
                   'aid2',
-                ])
+                ]),
               );
             });
         });

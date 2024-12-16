@@ -171,7 +171,7 @@ module.exports = (session) => {
           .joinRelated('parents.parents')
           .select(
             'parents:parents.page_id as id',
-            ref('object_data:name').from('parents:parents').as('name')
+            ref('object_data:name').from('parents:parents').as('name'),
           )
           .orderBy('parents:parents.page_id')
           .then((models) => {

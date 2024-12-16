@@ -100,7 +100,7 @@ module.exports = (session) => {
           })
           .catch((err) => {
             expect(err.message).to.equal(
-              '#ref references are not allowed in a graph by default. see the allowRefs insert/upsert graph option'
+              '#ref references are not allowed in a graph by default. see the allowRefs insert/upsert graph option',
             );
             done();
           });
@@ -122,7 +122,7 @@ module.exports = (session) => {
           })
           .catch((err) => {
             expect(err.message).to.equal(
-              '#ref references are not allowed in a graph by default. see the allowRefs insert/upsert graph option'
+              '#ref references are not allowed in a graph by default. see the allowRefs insert/upsert graph option',
             );
             done();
           });
@@ -316,21 +316,21 @@ module.exports = (session) => {
         'should validate models upon insertion and return correct validation paths',
         testValidation((graph) => {
           graph.model1Relation1.model1Prop1 = 666;
-        }, 'model1Relation1.model1Prop1')
+        }, 'model1Relation1.model1Prop1'),
       );
 
       it(
         'should return correct validation paths with has-many relations',
         testValidation((graph) => {
           graph.model1Relation2[0].model2Prop1 = 666;
-        }, 'model1Relation2[0].model2Prop1')
+        }, 'model1Relation2[0].model2Prop1'),
       );
 
       it(
         'should return correct validation paths with many-to-many relations',
         testValidation((graph) => {
           graph.model1Relation1.model1Relation3[1].model2Prop1 = 666;
-        }, 'model1Relation1.model1Relation3[1].model2Prop1')
+        }, 'model1Relation1.model1Relation3[1].model2Prop1'),
       );
 
       it('should validate models upon insertion: references in integer columns should be accepted', () => {
@@ -393,7 +393,7 @@ module.exports = (session) => {
             },
             {
               relate: true,
-            }
+            },
           )
           .then((model) => {
             return Model2.query().findById(model.idCol).withGraphFetched('model2Relation1');
@@ -435,12 +435,12 @@ module.exports = (session) => {
             },
             {
               relate: true,
-            }
+            },
           )
           .then(() => done(new Error('should not get here')))
           .catch((err) => {
             expect(err.message).to.equal(
-              'You cannot relate HasManyRelation or HasOneRelation using insertGraph, because those require update operations. Consider using upsertGraph instead.'
+              'You cannot relate HasManyRelation or HasOneRelation using insertGraph, because those require update operations. Consider using upsertGraph instead.',
             );
             done();
           })
@@ -482,14 +482,14 @@ module.exports = (session) => {
               },
               {
                 relate: ['model1Relation1', 'model1Relation2.model2Relation1'],
-              }
+              },
             );
           })
           .then((model) => {
             return Model1.query()
               .findById(model.id)
               .withGraphFetched(
-                '[model1Relation1, model1Relation2.model2Relation1, model1Relation3]'
+                '[model1Relation1, model1Relation2.model2Relation1, model1Relation3]',
               );
           })
           .then((model) => {
@@ -604,7 +604,7 @@ module.exports = (session) => {
             },
             {
               relate: true,
-            }
+            },
           )
           .then((model) => {
             return Model2.query().findById(model.idCol).withGraphFetched('model2Relation1');
@@ -784,7 +784,7 @@ module.exports = (session) => {
 
       model.model1Relation1.model1Relation3 = _.sortBy(
         model.model1Relation1.model1Relation3,
-        'model2Prop1'
+        'model2Prop1',
       );
       model.model1Relation2 = _.sortBy(model.model1Relation2, 'model2Prop1');
 

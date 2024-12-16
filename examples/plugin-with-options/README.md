@@ -6,7 +6,7 @@ The plugin adds a `session` method for `QueryBuilder` and extends a model
 so that it sets `modifiedAt`, `modifiedBy`, `createdAt` and `createdBy` properties
 automatically based on the given session.
 
-This example is exactly the same as the [plugin](https://github.com/Vincit/objection.js/tree/master/examples/plugin)
+This example is exactly the same as the [plugin](https://github.com/Vincit/objection.js/tree/main/examples/plugin)
 example but this one accepts options. The only difference is that the main module is a factory method that accepts options
 and returns a mixin.
 

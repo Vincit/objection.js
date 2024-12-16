@@ -124,7 +124,7 @@ import { Animal } from '../fixtures/animal';
         },
       ],
     },
-    options
+    options,
   );
 
   options = {
@@ -184,7 +184,7 @@ import { Animal } from '../fixtures/animal';
         },
       ],
     },
-    options
+    options,
   );
 
   // save an animal with only first name of the owner

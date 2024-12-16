@@ -4,7 +4,7 @@ const expect = require('expect.js');
 const Promise = require('bluebird');
 const { inheritModel } = require('../../lib/model/inheritModel');
 const { expectPartialEqual: expectPartEql } = require('./../../testUtils/testUtils');
-const { Model, ValidationError, raw } = require('../../');
+const { Model, QueryBuilder, ValidationError, raw } = require('../../');
 const { isPostgres, isSqlite } = require('../../lib/utils/knexUtils');
 const mockKnexFactory = require('../../testUtils/mockKnex');
 
@@ -330,6 +330,32 @@ module.exports = (session) => {
             });
           });
       });
+
+      it('should not attempt to eager-load relations on patch `count` results when using overwritten `execute()` to load relations (#2397)', () => {
+        let runBeforeCalled = 0;
+
+        class MyModel1 extends Model1 {}
+
+        MyModel1.QueryBuilder = class MyQueryBuilder1 extends QueryBuilder {
+          execute() {
+            this.withGraphFetched('model1Relation2');
+            return super.execute();
+          }
+        };
+
+        return MyModel1.query()
+          .context({
+            runBefore() {
+              runBeforeCalled++;
+            },
+          })
+          .where({ id: 1 })
+          .patch({ model1Prop1: 'updated text' })
+          .then((count) => {
+            expect(count).to.eql(1);
+            expect(runBeforeCalled).to.eql(1);
+          });
+      });
     });
 
     describe('.query().patchAndFetchById()', () => {
@@ -382,9 +408,9 @@ module.exports = (session) => {
               model1Prop1: 'updated text',
               model1Prop2: null,
               model1Id: null,
-              $beforeUpdateCalled: true,
+              $beforeUpdateCalled: 1,
               $beforeUpdateOptions: { patch: true },
-              $afterUpdateCalled: true,
+              $afterUpdateCalled: 1,
               $afterUpdateOptions: { patch: true },
             });
             return session.knex('Model1').orderBy('id');
@@ -410,9 +436,9 @@ module.exports = (session) => {
               model1Prop1: 'updated text',
               model1Prop2: null,
               model1Id: null,
-              $beforeUpdateCalled: true,
+              $beforeUpdateCalled: 1,
               $beforeUpdateOptions: { patch: true },
-              $afterUpdateCalled: true,
+              $afterUpdateCalled: 1,
               $afterUpdateOptions: { patch: true },
 
               model1Relation2: [
@@ -615,7 +641,7 @@ module.exports = (session) => {
           })
           .catch((err) => {
             expect(err.message).to.equal(
-              `one of the identifier columns [id] is null or undefined. Have you specified the correct identifier column for the model 'Model1' using the 'idColumn' property?`
+              `one of the identifier columns [id] is null or undefined. Have you specified the correct identifier column for the model 'Model1' using the 'idColumn' property?`,
             );
             done();
           })
@@ -633,7 +659,7 @@ module.exports = (session) => {
           })
           .catch((err) => {
             expect(err.message).to.equal(
-              `one of the identifier columns [id] is null or undefined. Have you specified the correct identifier column for the model 'Model1' using the 'idColumn' property?`
+              `one of the identifier columns [id] is null or undefined. Have you specified the correct identifier column for the model 'Model1' using the 'idColumn' property?`,
             );
             done();
           })

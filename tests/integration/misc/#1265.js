@@ -109,7 +109,7 @@ module.exports = (session) => {
               },
             ],
           },
-          { noDelete: true }
+          { noDelete: true },
         )
         .then(() => {
           return Person.query().findOne({ firstName: 'Jennifer' }).withGraphFetched('pets');

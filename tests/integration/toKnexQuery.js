@@ -80,7 +80,7 @@ module.exports = (session) => {
         testSql({
           query: Person.query(knex).where(
             raw('?', raw('?', val(1))),
-            Person.relatedQuery('children').select('id').limit(1)
+            Person.relatedQuery('children').select('id').limit(1),
           ),
           sql: 'select "persons".* from "persons" where ? = (select "id" from "persons" as "children" where "children"."parentId" = "persons"."id" limit ?)',
           bindings: [1, 1],
@@ -92,7 +92,7 @@ module.exports = (session) => {
           Person.query(knex).withGraphJoined('children').toKnexQuery();
         }).to.throwException((err) => {
           expect(err.message).to.equal(
-            `table metadata has not been fetched for table 'persons'. Are you trying to call toKnexQuery() for a withGraphJoined query? To make sure the table metadata is fetched see the objection.initialize function.`
+            `table metadata has not been fetched for table 'persons'. Are you trying to call toKnexQuery() for a withGraphJoined query? To make sure the table metadata is fetched see the objection.initialize function.`,
           );
         });
       });

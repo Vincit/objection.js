@@ -1,6 +1,6 @@
 {
   "name": "objection",
-  "version": "3.0.4",
+  "version": "3.1.5",
   "description": "An SQL-friendly ORM for Node.js",
   "main": "lib/objection.js",
   "license": "MIT",
@@ -33,7 +33,7 @@
     "url": "git://github.com/vincit/objection.js.git"
   },
   "engines": {
-    "node": ">=12.0.0"
+    "node": ">=14.0.0"
   },
   "keywords": [
     "orm",
@@ -53,27 +53,28 @@
   ],
   "types": "./typings/objection/index.d.ts",
   "dependencies": {
-    "ajv": "^8.6.2",
+    "ajv": "^8.17.1",
+    "ajv-formats": "^2.1.1",
     "db-errors": "^0.2.3"
   },
   "peerDependencies": {
     "knex": ">=1.0.1"
   },
   "devDependencies": {
-    "@types/node": "^20.1.7",
-    "chai": "^4.3.4",
+    "@types/node": "^22.7.0",
+    "chai": "^4.3.10",
     "chai-subset": "^1.6.0",
-    "eslint": "^8.1.0",
+    "eslint": "^8.54.0",
     "eslint-formatter-codeframe": "^7.32.1",
-    "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-prettier": "^5.2.1",
     "expect.js": "^0.3.1",
-    "knex": ">=1.0.1",
-    "mocha": "^10.2.0",
+    "knex": "^3.1.0",
+    "mocha": "^10.7.3",
     "mysql": "^2.18.1",
-    "pg": "^8.7.1",
-    "prettier": "2.8.8",
-    "sqlite3": "^5.0.2",
-    "typescript": ">=4.5.4",
-    "vuepress": "1.9.9"
+    "pg": "^8.13.0",
+    "prettier": "3.3.3",
+    "sqlite3": "^5.1.7",
+    "typescript": ">=5.6.2",
+    "vuepress": "1.9.10"
   }
 }

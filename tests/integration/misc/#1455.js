@@ -106,7 +106,7 @@ module.exports = (session) => {
               setAttributes: [{ name: 'First SetAttribute' }, { name: 'Second SetAttribute' }],
             },
           ],
-        })
+        }),
       )
         .then((role) => {
           return transaction(Role.knex(), (trx) =>
@@ -119,7 +119,7 @@ module.exports = (session) => {
                   setAttributes: [{ name: 'First SetAttribute' }, { name: 'Second SetAttribute' }],
                 },
               ],
-            })
+            }),
           );
         })
         .then(() => {

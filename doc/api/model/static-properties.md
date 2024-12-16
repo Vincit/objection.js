@@ -118,6 +118,8 @@ Composite id can be specified by giving an array of column names.
 
 Defaults to 'id'.
 
+You can return `null` in order to tell objection there is no primary key. This may be useful in models of join tables.
+
 ## `static` jsonSchema
 
 ```js

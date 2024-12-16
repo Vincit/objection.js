@@ -17,7 +17,7 @@ module.exports = (options) => {
       setCreatedBy: true,
       setCreatedAt: true,
     },
-    options
+    options,
   );
 
   // Return the mixin. If your plugin doesn't take options, you can simply export
@@ -50,7 +50,7 @@ module.exports = (options) => {
       }
 
       $beforeUpdate(opt, context) {
-        // If you exetend existing methods like this one, always remember to call the
+        // If you extend existing methods like this one, always remember to call the
         // super implementation. Check the documentation to see if the function can be
         // async and prepare for that also.
         const maybePromise = super.$beforeUpdate(opt, context);

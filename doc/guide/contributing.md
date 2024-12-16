@@ -13,7 +13,7 @@ When creating an issue there are couple of things you need to remember:
    Answer the following questions: Which objection version are you using? What are you doing? What code are you running? What is happening? What are you expecting to happen instead? If you provide code examples (please do!), **use the actual code you are running**. People often leave out details or use made up examples because they think they are only leaving out irrelevant stuff. If you do that, you have already made an assumption about what the problem is and it's usually something else. Also provide all possible stack traces and error messages.
 
 3. **If possible, provide an actual reproduction**
-   The fastest way to get your bug fixed or problem solved is to create a simple standalone app or a test case that demonstrates your problem. There's a file called [reproduction-template.js](https://github.com/Vincit/objection.js/blob/master/reproduction-template.js) you can use as a starting point for your reproduction.
+   The fastest way to get your bug fixed or problem solved is to create a simple standalone app or a test case that demonstrates your problem. There's a file called [reproduction-template.js](https://github.com/Vincit/objection.js/blob/main/reproduction-template.js) you can use as a starting point for your reproduction.
 
 Please bear in mind that objection has thousands of tests and if you run into a problem, say with `insert` method, it doesn't mean that `insert` is completely broken, but some small part of it you are using is. That's why enough context is necessary. It's not enough to say, "insert fails". You need to provide the code that fails and usually the models that are used too. And let's say this again: **don't provide made up code examples!** When you do, you only write the parts you think are relevant and usually leave out the useful information. Use the actual code that you have tested to fail.
 
@@ -41,7 +41,7 @@ git clone git@github.com:<your-account>/objection.js.git objection
 
 3. **Run `npm install` at the root of the repo**
 
-4. **Run `docker-compose up` at the root of the repo**
+4. **Run `docker compose up` at the root of the repo**
    - If you have local databases running, shut them down or port binding will conflict.
 
 5. **Create test users and databases by running `node setup-test-db` at the root of the repo**
@@ -53,7 +53,7 @@ git clone git@github.com:<your-account>/objection.js.git objection
 You can run the tests on a subset of databases by setting the `DATABASES` env variable
 
 ```bash
-# Only run tests on sqlite. No need for docker-compose.
+# Only run tests on sqlite. No need for docker compose.
 DATABASES=sqlite3 npm test
 ```
 

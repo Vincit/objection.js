@@ -175,7 +175,7 @@ describe('Relation', () => {
       });
     }).to.throwException((err) => {
       expect(err.message).to.equal(
-        "OwnerModel.relationMappings.foo: join: relation name and join property 'foo' cannot have the same name. If you cannot change one or the other, you can use $parseDatabaseJson and $formatDatabaseJson methods to convert the column name."
+        "OwnerModel.relationMappings.foo: join: relation name and join property 'foo' cannot have the same name. If you cannot change one or the other, you can use $parseDatabaseJson and $formatDatabaseJson methods to convert the column name.",
       );
     });
   });
@@ -220,7 +220,7 @@ describe('Relation', () => {
       });
     }).to.throwException((err) => {
       expect(err.message).to.equal(
-        'OwnerModel.relationMappings.testRelation: modelClass: is not a subclass of Model or a file path to a module that exports one. You may be dealing with a require loop. See the documentation section about require loops.'
+        'OwnerModel.relationMappings.testRelation: modelClass: is not a subclass of Model or a file path to a module that exports one. You may be dealing with a require loop. See the documentation section about require loops.',
       );
     });
   });
@@ -239,7 +239,7 @@ describe('Relation', () => {
       });
     }).to.throwException((err) => {
       expect(err.message).to.match(
-        /OwnerModel\.relationMappings\.testRelation: modelClass: path .*\/tests\/unit\/relations\/files\/InvalidModelManyNamedModels exports multiple models\. Don't know which one to choose\./
+        /OwnerModel\.relationMappings\.testRelation: modelClass: path .*\/tests\/unit\/relations\/files\/InvalidModelManyNamedModels exports multiple models\. Don't know which one to choose\./,
       );
     });
   });
@@ -258,7 +258,7 @@ describe('Relation', () => {
       });
     }).to.throwException((err) => {
       expect(err.message).to.equal(
-        'OwnerModel.relationMappings.testRelation: modelClass is not defined'
+        'OwnerModel.relationMappings.testRelation: modelClass is not defined',
       );
     });
   });
@@ -277,7 +277,7 @@ describe('Relation', () => {
       });
     }).to.throwException((err) => {
       expect(err.message).to.equal(
-        'OwnerModel.relationMappings.testRelation: modelClass: could not resolve blaa using modelPaths'
+        'OwnerModel.relationMappings.testRelation: modelClass: could not resolve blaa using modelPaths',
       );
     });
   });
@@ -297,8 +297,8 @@ describe('Relation', () => {
     }).to.throwException((err) => {
       expect(
         /^OwnerModel\.relationMappings\.testRelation: modelClass: (.+)\/InvalidModel is an invalid file path to a model class$/.test(
-          err.message
-        )
+          err.message,
+        ),
       ).to.equal(true);
     });
   });
@@ -316,7 +316,7 @@ describe('Relation', () => {
       });
     }).to.throwException((err) => {
       expect(err.message).to.equal(
-        'OwnerModel.relationMappings.testRelation: relation is not defined'
+        'OwnerModel.relationMappings.testRelation: relation is not defined',
       );
     });
   });
@@ -335,7 +335,7 @@ describe('Relation', () => {
       });
     }).to.throwException((err) => {
       expect(err.message).to.equal(
-        'OwnerModel.relationMappings.testRelation: relation is not a subclass of Relation'
+        'OwnerModel.relationMappings.testRelation: relation is not a subclass of Relation',
       );
     });
   });
@@ -371,7 +371,7 @@ describe('Relation', () => {
       });
     }).to.throwException((err) => {
       expect(err.message).to.equal(
-        'OwnerModel.relationMappings.testRelation: join.to must have format TableName.columnName. For example "SomeTable.id" or in case of composite key ["SomeTable.a", "SomeTable.b"].'
+        'OwnerModel.relationMappings.testRelation: join.to must have format TableName.columnName. For example "SomeTable.id" or in case of composite key ["SomeTable.a", "SomeTable.b"].',
       );
     });
   });
@@ -390,7 +390,7 @@ describe('Relation', () => {
       });
     }).to.throwException((err) => {
       expect(err.message).to.equal(
-        "OwnerModel.relationMappings.testRelation: join: either `from` or `to` must point to the owner model table and the other one to the related table. It might be that specified table 'SomeOtherModel' is not correct"
+        "OwnerModel.relationMappings.testRelation: join: either `from` or `to` must point to the owner model table and the other one to the related table. It might be that specified table 'SomeOtherModel' is not correct",
       );
     });
   });
@@ -409,7 +409,7 @@ describe('Relation', () => {
       });
     }).to.throwException((err) => {
       expect(err.message).to.equal(
-        'OwnerModel.relationMappings.testRelation: join.from must have format TableName.columnName. For example "SomeTable.id" or in case of composite key ["SomeTable.a", "SomeTable.b"].'
+        'OwnerModel.relationMappings.testRelation: join.from must have format TableName.columnName. For example "SomeTable.id" or in case of composite key ["SomeTable.a", "SomeTable.b"].',
       );
     });
   });
@@ -428,7 +428,7 @@ describe('Relation', () => {
       });
     }).to.throwException((err) => {
       expect(err.message).to.equal(
-        "OwnerModel.relationMappings.testRelation: join: either `from` or `to` must point to the owner model table and the other one to the related table. It might be that specified table 'SomeOtherModel' is not correct"
+        "OwnerModel.relationMappings.testRelation: join: either `from` or `to` must point to the owner model table and the other one to the related table. It might be that specified table 'SomeOtherModel' is not correct",
       );
     });
   });
@@ -443,7 +443,7 @@ describe('Relation', () => {
       });
     }).to.throwException((err) => {
       expect(err.message).to.equal(
-        'OwnerModel.relationMappings.testRelation: join must be an object that maps the columns of the related models together. For example: {from: "SomeTable.id", to: "SomeOtherTable.someModelId"}'
+        'OwnerModel.relationMappings.testRelation: join must be an object that maps the columns of the related models together. For example: {from: "SomeTable.id", to: "SomeOtherTable.someModelId"}',
       );
     });
   });
@@ -461,7 +461,7 @@ describe('Relation', () => {
       });
     }).to.throwException((err) => {
       expect(err.message).to.equal(
-        'OwnerModel.relationMappings.testRelation: join must be an object that maps the columns of the related models together. For example: {from: "SomeTable.id", to: "SomeOtherTable.someModelId"}'
+        'OwnerModel.relationMappings.testRelation: join must be an object that maps the columns of the related models together. For example: {from: "SomeTable.id", to: "SomeOtherTable.someModelId"}',
       );
     });
   });
@@ -479,7 +479,7 @@ describe('Relation', () => {
       });
     }).to.throwException((err) => {
       expect(err.message).to.equal(
-        'OwnerModel.relationMappings.testRelation: join must be an object that maps the columns of the related models together. For example: {from: "SomeTable.id", to: "SomeOtherTable.someModelId"}'
+        'OwnerModel.relationMappings.testRelation: join must be an object that maps the columns of the related models together. For example: {from: "SomeTable.id", to: "SomeOtherTable.someModelId"}',
       );
     });
   });

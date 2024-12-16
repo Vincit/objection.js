@@ -21,7 +21,7 @@ describe('RelationExpression', () => {
           $modify: [],
           $recursive: false,
           $allRecursive: false,
-        }
+        },
       );
     });
 
@@ -78,7 +78,7 @@ describe('RelationExpression', () => {
               $recursive: false,
               $allRecursive: false,
             },
-          }
+          },
         );
       });
 
@@ -217,7 +217,7 @@ describe('RelationExpression', () => {
                 },
               },
             },
-          }
+          },
         );
       });
     });
@@ -291,7 +291,7 @@ describe('RelationExpression', () => {
             $recursive: false,
             $allRecursive: false,
           },
-        }
+        },
       );
     });
 
@@ -420,7 +420,7 @@ describe('RelationExpression', () => {
             $recursive: false,
             $allRecursive: false,
           },
-        }
+        },
       );
     });
 
@@ -602,7 +602,7 @@ describe('RelationExpression', () => {
               $allRecursive: false,
             },
           },
-        }
+        },
       );
 
       testParse('a(f1).b(^f2, ^f3)', {
@@ -667,7 +667,7 @@ describe('RelationExpression', () => {
             $recursive: false,
             $allRecursive: false,
           },
-        }
+        },
       );
 
       testParse('aasb', {
@@ -745,7 +745,7 @@ describe('RelationExpression', () => {
               $allRecursive: false,
             },
           },
-        }
+        },
       );
 
       testParse(
@@ -802,7 +802,7 @@ describe('RelationExpression', () => {
               },
             },
           },
-        }
+        },
       );
     });
 
@@ -855,7 +855,7 @@ describe('RelationExpression', () => {
               $allRecursive: false,
             },
           },
-        }
+        },
       );
     });
 
@@ -906,7 +906,7 @@ describe('RelationExpression', () => {
             $recursive: false,
             $allRecursive: false,
           },
-        }
+        },
       );
 
       testParse(
@@ -929,7 +929,7 @@ describe('RelationExpression', () => {
             $recursive: false,
             $allRecursive: false,
           },
-        }
+        },
       );
     });
   });
@@ -1418,7 +1418,7 @@ describe('RelationExpression', () => {
     it(str1 + ' + ' + str2 + ' --> ' + parsed, () => {
       expect(RelationExpression.create(str1).merge(str2).toString()).to.equal(parsed);
       expect(
-        RelationExpression.create(str1).merge(RelationExpression.create(str2)).toString()
+        RelationExpression.create(str1).merge(RelationExpression.create(str2)).toString(),
       ).to.equal(parsed);
     });
   }
@@ -1428,7 +1428,7 @@ describe('RelationExpression', () => {
       .expect(
         RelationExpression.create(str)
           .expressionsAtPath(path)
-          .map((it) => it.node)
+          .map((it) => it.node),
       )
       .to.containSubset(expected);
   }

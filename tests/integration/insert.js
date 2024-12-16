@@ -439,8 +439,8 @@ module.exports = (session) => {
               model1Prop1: 'hello 3',
               model1Prop2: null,
               model1Id: null,
-              $beforeInsertCalled: true,
-              $afterInsertCalled: true,
+              $beforeInsertCalled: 1,
+              $afterInsertCalled: 1,
             });
             return session.knex(Model1.getTableName());
           })
@@ -466,8 +466,8 @@ module.exports = (session) => {
                 model1Prop1: 'hello 3',
                 model1Prop2: null,
                 model1Id: null,
-                $beforeInsertCalled: true,
-                $afterInsertCalled: true,
+                $beforeInsertCalled: 1,
+                $afterInsertCalled: 1,
               });
 
               expect(inserted[1]).to.be.a(Model1);
@@ -477,8 +477,8 @@ module.exports = (session) => {
                 model1Prop1: 'hello 4',
                 model1Prop2: 10,
                 model1Id: null,
-                $beforeInsertCalled: true,
-                $afterInsertCalled: true,
+                $beforeInsertCalled: 1,
+                $afterInsertCalled: 1,
               });
 
               return session.knex(Model1.getTableName());
@@ -990,7 +990,7 @@ module.exports = (session) => {
             .then((rows) => {
               expect(rows).to.have.length(3);
               expect(
-                _.filter(rows, { model1Id: inserted.id, model2Id: parent1.idCol })
+                _.filter(rows, { model1Id: inserted.id, model2Id: parent1.idCol }),
               ).to.have.length(1);
             });
         });
@@ -1040,7 +1040,7 @@ module.exports = (session) => {
             .then((rows) => {
               expect(rows).to.have.length(3);
               expect(
-                _.filter(rows, { model1Id: inserted.id, model2Id: parent1.idCol })
+                _.filter(rows, { model1Id: inserted.id, model2Id: parent1.idCol }),
               ).to.have.length(1);
             });
         });
@@ -1081,10 +1081,10 @@ module.exports = (session) => {
               .then((rows) => {
                 expect(rows).to.have.length(4);
                 expect(
-                  _.filter(rows, { model1Id: inserted[0].id, model2Id: parent1.idCol })
+                  _.filter(rows, { model1Id: inserted[0].id, model2Id: parent1.idCol }),
                 ).to.have.length(1);
                 expect(
-                  _.filter(rows, { model1Id: inserted[1].id, model2Id: parent1.idCol })
+                  _.filter(rows, { model1Id: inserted[1].id, model2Id: parent1.idCol }),
                 ).to.have.length(1);
               });
           });
@@ -1125,10 +1125,10 @@ module.exports = (session) => {
               .then((rows) => {
                 expect(rows).to.have.length(4);
                 expect(
-                  _.filter(rows, { model1Id: inserted[0].id, model2Id: parent1.idCol })
+                  _.filter(rows, { model1Id: inserted[0].id, model2Id: parent1.idCol }),
                 ).to.have.length(1);
                 expect(
-                  _.filter(rows, { model1Id: inserted[1].id, model2Id: parent1.idCol })
+                  _.filter(rows, { model1Id: inserted[1].id, model2Id: parent1.idCol }),
                 ).to.have.length(1);
               });
           });
@@ -1165,7 +1165,7 @@ module.exports = (session) => {
                   model1Id: inserted.id,
                   model2Id: parent1.idCol,
                   extra3: inserted.aliasedExtra,
-                })
+                }),
               ).to.have.length(1);
             });
         });
@@ -1248,7 +1248,7 @@ module.exports = (session) => {
             .then((rows) => {
               expect(rows).to.have.length(1);
               expect(
-                _.filter(rows, { model1Id: inserted.id, model2Id: parent.idCol })
+                _.filter(rows, { model1Id: inserted.id, model2Id: parent.idCol }),
               ).to.have.length(1);
             });
         });
@@ -1454,7 +1454,7 @@ module.exports = (session) => {
             })
             .catch((err) => {
               expect(err.message).to.equal(
-                "Can only insert items for one parent at a time in case of HasManyRelation. Otherwise multiple insert queries would need to be created. If you need to insert items for multiple parents, simply loop through them. That's the most performant way."
+                "Can only insert items for one parent at a time in case of HasManyRelation. Otherwise multiple insert queries would need to be created. If you need to insert items for multiple parents, simply loop through them. That's the most performant way.",
               );
               done();
             })
@@ -1652,7 +1652,7 @@ module.exports = (session) => {
                   model1Id: 5,
                   model2Id: 1,
                   extra3: 'foo',
-                })
+                }),
               ).to.have.length(1);
             });
         });

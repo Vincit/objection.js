@@ -277,24 +277,24 @@ module.exports = (session) => {
                     expect(result.model1Relation2[1].$afterInsertCalled).to.equal(1);
 
                     expect(
-                      result.model1Relation2[0].model2Relation1[0].$beforeUpdateCalled
+                      result.model1Relation2[0].model2Relation1[0].$beforeUpdateCalled,
                     ).to.equal(1);
                     expect(
-                      result.model1Relation2[0].model2Relation1[0].$afterUpdateCalled
+                      result.model1Relation2[0].model2Relation1[0].$afterUpdateCalled,
                     ).to.equal(1);
 
                     expect(
-                      result.model1Relation2[0].model2Relation1[1].$beforeInsertCalled
+                      result.model1Relation2[0].model2Relation1[1].$beforeInsertCalled,
                     ).to.equal(1);
                     expect(
-                      result.model1Relation2[0].model2Relation1[1].$afterInsertCalled
+                      result.model1Relation2[0].model2Relation1[1].$afterInsertCalled,
                     ).to.equal(1);
 
                     // Fetch the graph from the database.
                     return Model1.query(trx)
                       .findById(2)
                       .withGraphFetched(
-                        '[model1Relation1, model1Relation2(orderById).model2Relation1(orderById)]'
+                        '[model1Relation1, model1Relation2(orderById).model2Relation1(orderById)]',
                       );
                   })
                   .then(omitIrrelevantProps)
@@ -348,12 +348,12 @@ module.exports = (session) => {
                         expect(model1Rows.find((it) => it.id == 7)).to.be.an(Object);
                         // Row 2 should be deleted.
                         expect(model2Rows.find((it) => it.id_col == 2)).to.equal(undefined);
-                      }
+                      },
                     );
                   })
               );
             });
-          }
+          },
         );
       }
 
@@ -411,7 +411,7 @@ module.exports = (session) => {
               return Model1.query(trx)
                 .findById(2)
                 .withGraphFetched(
-                  '[model1Relation1, model1Relation2(orderById).model2Relation1(orderById)]'
+                  '[model1Relation1, model1Relation2(orderById).model2Relation1(orderById)]',
                 );
             })
             .then(omitIrrelevantProps)
@@ -480,7 +480,7 @@ module.exports = (session) => {
                   expect(model1Rows.find((it) => it.id == 7)).to.be.an(Object);
                   // Row 2 should NOT be deleted because of `noDelete`.
                   expect(model2Rows.find((it) => it.id_col == 2)).to.be.an(Object);
-                }
+                },
               );
             });
         });
@@ -519,10 +519,10 @@ module.exports = (session) => {
         };
 
         return transaction(session.knex, (trx) =>
-          Model1.query(trx).upsertGraph(upsert, { fetchStrategy })
+          Model1.query(trx).upsertGraph(upsert, { fetchStrategy }),
         )
           .then((inserted) =>
-            Model1.query(session.knex).findById(inserted.id).withGraphFetched('model1Relation1')
+            Model1.query(session.knex).findById(inserted.id).withGraphFetched('model1Relation1'),
           )
           .then((model) => {
             chai.expect(model).to.containSubset({
@@ -542,12 +542,12 @@ module.exports = (session) => {
         };
 
         return transaction(session.knex, (trx) =>
-          Model1.query(trx).upsertGraph(upsert, { fetchStrategy })
+          Model1.query(trx).upsertGraph(upsert, { fetchStrategy }),
         )
           .then((inserted) =>
             Model1.query(session.knex)
               .findById(inserted.id)
-              .withGraphFetched('model1Relation1Inverse')
+              .withGraphFetched('model1Relation1Inverse'),
           )
           .then((model) => {
             chai.expect(model).to.containSubset({
@@ -733,7 +733,7 @@ module.exports = (session) => {
               })
               .then((result) => {
                 expect(result.model1Relation2[0].model2Relation1[2].$beforeUpdateCalled).to.equal(
-                  undefined
+                  undefined,
                 );
 
                 if (session.isPostgres()) {
@@ -766,7 +766,7 @@ module.exports = (session) => {
                 return Model1.query(trx)
                   .findById(2)
                   .withGraphFetched(
-                    '[model1Relation1, model1Relation2(orderById).model2Relation1(orderById)]'
+                    '[model1Relation1, model1Relation2(orderById).model2Relation1(orderById)]',
                   );
               })
               .then(omitIrrelevantProps)
@@ -836,7 +836,7 @@ module.exports = (session) => {
                       model2_prop1: 'hasMany 2',
                       model2_prop2: null,
                     });
-                  }
+                  },
                 );
               })
           );
@@ -1207,7 +1207,7 @@ module.exports = (session) => {
               return Model1.query(trx)
                 .findById(2)
                 .withGraphFetched(
-                  '[model1Relation1, model1Relation2(orderById).model2Relation1(orderById)]'
+                  '[model1Relation1, model1Relation2(orderById).model2Relation1(orderById)]',
                 );
             })
             .then(omitIrrelevantProps)
@@ -1290,7 +1290,7 @@ module.exports = (session) => {
                     model2_prop1: 'hasMany 2',
                     model2_prop2: null,
                   });
-                }
+                },
               );
             });
         });
@@ -1575,7 +1575,7 @@ module.exports = (session) => {
               return Model1.query(trx)
                 .findById(2)
                 .withGraphFetched(
-                  '[model1Relation1, model1Relation2(orderById).model2Relation1(orderById)]'
+                  '[model1Relation1, model1Relation2(orderById).model2Relation1(orderById)]',
                 );
             })
             .then(omitIrrelevantProps)
@@ -1640,7 +1640,7 @@ module.exports = (session) => {
 
                   // Row 2 should be deleted.
                   expect(model2Rows.find((it) => it.id_col == 2)).to.equal(undefined);
-                }
+                },
               );
             });
         });
@@ -1781,7 +1781,7 @@ module.exports = (session) => {
                 ([model1Rows, model2Rows]) => {
                   // Row 3 should be deleted.
                   expect(model1Rows.find((it) => it.id == 3)).to.equal(undefined);
-                }
+                },
               );
             });
         });
@@ -1891,7 +1891,7 @@ module.exports = (session) => {
                 ([model1Rows, model2Rows]) => {
                   // Row 3 should not be deleted.
                   expect(model1Rows.find((it) => it.id == 3)).to.not.equal(undefined);
-                }
+                },
               );
             });
         });
@@ -2283,7 +2283,7 @@ module.exports = (session) => {
           .catch((err) => {
             expect(err instanceof Model1.NotFoundError).to.equal(true);
             expect(err.message).to.equal(
-              'root model (id=1000) does not exist. If you want to insert it with an id, use the insertMissing option'
+              'root model (id=1000) does not exist. If you want to insert it with an id, use the insertMissing option',
             );
             expect(err.data.dataPath).to.eql([]);
             return session
@@ -2319,7 +2319,7 @@ module.exports = (session) => {
             expect(err instanceof Model1.NotFoundError).to.equal(true);
             expect(err.type).to.equal('NotFound');
             expect(err.message).to.equal(
-              'model (id=1000) is not a child of model (id=2). If you want to relate it, use the relate option. If you want to insert it with an id, use the insertMissing option'
+              'model (id=1000) is not a child of model (id=2). If you want to relate it, use the relate option. If you want to insert it with an id, use the insertMissing option',
             );
             expect(err.data.dataPath).to.eql(['model1Relation1']);
             return session
@@ -2404,7 +2404,7 @@ module.exports = (session) => {
             return Model1.query(session.knex)
               .findById(2)
               .withGraphFetched(
-                '[model1Relation1, model1Relation2(orderById).model2Relation1(orderById)]'
+                '[model1Relation1, model1Relation2(orderById).model2Relation1(orderById)]',
               );
           })
           .then(omitIrrelevantProps)
@@ -2482,7 +2482,7 @@ module.exports = (session) => {
                   model2_prop1: 'hasMany 2',
                   model2_prop2: null,
                 });
-              }
+              },
             );
           });
       });
@@ -2536,7 +2536,7 @@ module.exports = (session) => {
               return Model1.query(trx)
                 .findById(2)
                 .withGraphFetched(
-                  '[model1Relation1, model1Relation2(orderById).model2Relation1(orderById)]'
+                  '[model1Relation1, model1Relation2(orderById).model2Relation1(orderById)]',
                 );
             })
             .then(omitIrrelevantProps)
@@ -2590,7 +2590,7 @@ module.exports = (session) => {
                   expect(model1Rows.find((it) => it.id == 7)).to.be.an(Object);
                   // Row 2 should be deleted.
                   expect(model2Rows.find((it) => it.id_col == 2)).to.equal(undefined);
-                }
+                },
               );
             });
         });
@@ -2659,7 +2659,7 @@ module.exports = (session) => {
           .catch((err) => {
             expect(err.type).to.equal('InvalidGraph');
             expect(err.message).to.equal(
-              'expected value "not a model" to be an instance of Model1'
+              'expected value "not a model" to be an instance of Model1',
             );
             done();
           })
@@ -2676,7 +2676,7 @@ module.exports = (session) => {
             },
             {
               fetchStrategy,
-            }
+            },
           )
           .then(() => {
             throw new Error('should not get here');
@@ -2684,7 +2684,7 @@ module.exports = (session) => {
           .catch((err) => {
             expect(err.type).to.equal('InvalidGraph');
             expect(err.message).to.equal(
-              'expected value "not an object" to be an instance of Model1'
+              'expected value "not an object" to be an instance of Model1',
             );
             done();
           })
@@ -2701,7 +2701,7 @@ module.exports = (session) => {
             },
             {
               fetchStrategy,
-            }
+            },
           )
           .then(() => {
             throw new Error('should not get here');
@@ -2709,7 +2709,7 @@ module.exports = (session) => {
           .catch((err) => {
             expect(err.type).to.equal('InvalidGraph');
             expect(err.message).to.equal(
-              'expected value "not an object" to be an instance of Model2'
+              'expected value "not an object" to be an instance of Model2',
             );
             done();
           })
@@ -2726,14 +2726,14 @@ module.exports = (session) => {
             },
             {
               fetchStrategy,
-            }
+            },
           )
           .then(() => {
             throw new Error('should not get here');
           })
           .catch((err) => {
             expect(err.message).to.equal(
-              'upsertGraph query should contain no other query builder calls like `findById`, `where` or `$relatedQuery` that would affect the SQL. They have no effect.'
+              'upsertGraph query should contain no other query builder calls like `findById`, `where` or `$relatedQuery` that would affect the SQL. They have no effect.',
             );
             done();
           })
@@ -2750,14 +2750,14 @@ module.exports = (session) => {
             },
             {
               fetchStrategy,
-            }
+            },
           )
           .then(() => {
             throw new Error('should not get here');
           })
           .catch((err) => {
             expect(err.message).to.equal(
-              'upsertGraph query should contain no other query builder calls like `findById`, `where` or `$relatedQuery` that would affect the SQL. They have no effect.'
+              'upsertGraph query should contain no other query builder calls like `findById`, `where` or `$relatedQuery` that would affect the SQL. They have no effect.',
             );
             done();
           })
@@ -2774,14 +2774,14 @@ module.exports = (session) => {
             },
             {
               fetchStrategy,
-            }
+            },
           )
           .then(() => {
             throw new Error('should not get here');
           })
           .catch((err) => {
             expect(err.message).to.equal(
-              'upsertGraph query should contain no other query builder calls like `findById`, `where` or `$relatedQuery` that would affect the SQL. They have no effect.'
+              'upsertGraph query should contain no other query builder calls like `findById`, `where` or `$relatedQuery` that would affect the SQL. They have no effect.',
             );
             done();
           })
@@ -2797,14 +2797,14 @@ module.exports = (session) => {
             },
             {
               fetchStrategy,
-            }
+            },
           )
           .then(() => {
             throw new Error('should not get here');
           })
           .catch((err) => {
             expect(err.message).to.equal(
-              'upsertGraph query should contain no other query builder calls like `findById`, `where` or `$relatedQuery` that would affect the SQL. They have no effect.'
+              'upsertGraph query should contain no other query builder calls like `findById`, `where` or `$relatedQuery` that would affect the SQL. They have no effect.',
             );
             done();
           })
@@ -2935,7 +2935,7 @@ module.exports = (session) => {
                     .then((fetchedGraph) => {
                       sql = [];
                       const model2 = fetchedGraph.model1Relation2.find(
-                        (it) => it.model2Relation3.length > 0
+                        (it) => it.model2Relation3.length > 0,
                       );
                       const model3 = model2.model2Relation3[0];
                       model3.model3JsonProp.bar[1].spam = true;
@@ -2959,14 +2959,14 @@ module.exports = (session) => {
               },
               {
                 noRelate: 'model1Relation2',
-              }
+              },
             )
             .then(() => {
               throw new Error('should not get here');
             })
             .catch((err) => {
               expect(err.message).to.equal(
-                'expected noRelate option value "model1Relation2" to be an instance of boolean or array of strings'
+                'expected noRelate option value "model1Relation2" to be an instance of boolean or array of strings',
               );
               done();
             })
@@ -3078,7 +3078,7 @@ module.exports = (session) => {
                 return Model1.query(trx)
                   .findById(2)
                   .withGraphFetched(
-                    '[model1Relation1.[model1Relation3(orderById).model2Relation3(orderById)]]'
+                    '[model1Relation1.[model1Relation3(orderById).model2Relation3(orderById)]]',
                   );
               })
               .then(omitIrrelevantProps)
@@ -3144,7 +3144,7 @@ module.exports = (session) => {
                 return Model1.query(trx)
                   .findById(2)
                   .withGraphFetched(
-                    '[model1Relation3(orderById).[model2Relation2(orderById).model1Relation1]]'
+                    '[model1Relation3(orderById).[model2Relation2(orderById).model1Relation1]]',
                   );
               })
               .then(omitIrrelevantProps)
@@ -3212,7 +3212,7 @@ module.exports = (session) => {
                 return Model1.query(trx)
                   .findById(2)
                   .withGraphFetched(
-                    '[model1Relation2(orderById).[model2Relation2(orderById).model1Relation1]]'
+                    '[model1Relation2(orderById).[model2Relation2(orderById).model1Relation1]]',
                   );
               })
               .then(omitIrrelevantProps)
@@ -3355,7 +3355,7 @@ module.exports = (session) => {
             })
             .catch((err) => {
               expect(err.message).to.equal(
-                '#ref references are not allowed in a graph by default. see the allowRefs insert/upsert graph option'
+                '#ref references are not allowed in a graph by default. see the allowRefs insert/upsert graph option',
               );
               done();
             });
@@ -3416,7 +3416,7 @@ module.exports = (session) => {
               });
 
               expect(result.model1Relation1.id).to.equal(
-                result.model1Relation3[0].model2Relation2.id
+                result.model1Relation3[0].model2Relation2.id,
               );
 
               return Model1.query(session.knex)
@@ -3450,7 +3450,7 @@ module.exports = (session) => {
               });
 
               expect(result.model1Relation1.id).to.equal(
-                result.model1Relation3[0].model2Relation2.id
+                result.model1Relation3[0].model2Relation2.id,
               );
             });
         });
@@ -3513,7 +3513,7 @@ module.exports = (session) => {
               });
 
               expect(result.model1Relation1.id).to.not.equal(
-                result.model1Relation3[0].model2Relation2.id
+                result.model1Relation3[0].model2Relation2.id,
               );
 
               return Model1.query(session.knex)
@@ -3548,7 +3548,7 @@ module.exports = (session) => {
               });
 
               expect(result.model1Relation1.id).to.not.equal(
-                result.model1Relation3[0].model2Relation2.id
+                result.model1Relation3[0].model2Relation2.id,
               );
             });
         });
@@ -3730,7 +3730,7 @@ module.exports = (session) => {
 
           return Promise.map(fails, (fail) => {
             return transaction(session.knex, (trx) =>
-              Model1.query(trx).upsertGraph(fail, { fetchStrategy })
+              Model1.query(trx).upsertGraph(fail, { fetchStrategy }),
             ).catch((err) => createRejectionReflection(err));
           })
             .then((results) => {
@@ -3738,7 +3738,7 @@ module.exports = (session) => {
               results.forEach((res, index) => {
                 expect(res.isRejected()).to.equal(true);
                 expect(res.reason().data[errorKeys[index]][0].message).to.equal(
-                  'must be string,null'
+                  'must be string,null',
                 );
               });
 
@@ -3746,7 +3746,7 @@ module.exports = (session) => {
                 .orderBy('id')
                 .whereIn('id', [1, 2])
                 .withGraphFetched(
-                  '[model1Relation1, model1Relation2(orderById).model2Relation1(orderById)]'
+                  '[model1Relation1, model1Relation2(orderById).model2Relation1(orderById)]',
                 );
             })
             .then((db) => {
@@ -3761,7 +3761,7 @@ module.exports = (session) => {
                     return Model1.query(trx)
                       .findById(2)
                       .withGraphFetched(
-                        '[model1Relation1, model1Relation2(orderById).model2Relation1(orderById)]'
+                        '[model1Relation1, model1Relation2(orderById).model2Relation1(orderById)]',
                       );
                   })
                   .then(omitIrrelevantProps)
@@ -3810,7 +3810,7 @@ module.exports = (session) => {
                         expect(model1Rows.find((it) => it.id == 7)).to.be.an(Object);
                         // Row 2 should be deleted.
                         expect(model2Rows.find((it) => it.id_col == 2)).to.equal(undefined);
-                      }
+                      },
                     );
                   });
               });
@@ -3860,7 +3860,7 @@ module.exports = (session) => {
               return Model1.query(session.knex)
                 .findByIds([1000, 1001])
                 .withGraphFetched(
-                  '[model1Relation1, model1Relation2(orderById), model1Relation3(orderById)]'
+                  '[model1Relation1, model1Relation2(orderById), model1Relation3(orderById)]',
                 );
             })
             .then((result) => {
@@ -3939,7 +3939,7 @@ module.exports = (session) => {
               return Model1.query(session.knex)
                 .findByIds([1000, 1001])
                 .withGraphFetched(
-                  '[model1Relation1, model1Relation2(orderById), model1Relation3(orderById)]'
+                  '[model1Relation1, model1Relation2(orderById), model1Relation3(orderById)]',
                 );
             })
             .then((result) => {
@@ -4019,7 +4019,7 @@ module.exports = (session) => {
             })
             .catch((err) => {
               expect(err.data['model1Relation2[0].model2Prop1'][0].message).to.equal(
-                'must be string,null'
+                'must be string,null',
               );
               done();
             })
@@ -4091,7 +4091,7 @@ module.exports = (session) => {
 
           return Promise.map(fails, (fail) => {
             return transaction(session.knex, (trx) =>
-              Model1.query(trx).upsertGraph(fail, { update: true, fetchStrategy })
+              Model1.query(trx).upsertGraph(fail, { update: true, fetchStrategy }),
             ).catch((err) => createRejectionReflection(err));
           })
             .then((results) => {
@@ -4099,7 +4099,7 @@ module.exports = (session) => {
               results.forEach((res, index) => {
                 expect(res.isRejected()).to.equal(true);
                 expect(res.reason().data[errorKeys[index]][0].message).to.equal(
-                  "must have required property 'model1Prop2'"
+                  "must have required property 'model1Prop2'",
                 );
               });
             })
@@ -4316,6 +4316,87 @@ module.exports = (session) => {
               expect(model.model2Relation1[0].aliasedExtra).to.equal('hello extra 1');
               expect(model.model2Relation1[1].aliasedExtra).to.equal('hello extra 2');
             });
+        });
+      });
+
+      describe('modifying properties in $beforeUpdate (#2233)', () => {
+        let $beforeUpdate;
+
+        before(() => {
+          $beforeUpdate = Model1.prototype.$beforeUpdate;
+          Model1.prototype.$beforeUpdate = function () {
+            this.model1Prop1 = 'updated in before update';
+          };
+        });
+
+        after(() => {
+          Model1.prototype.$beforeUpdate = $beforeUpdate;
+        });
+
+        it('should include modified properties in update', () => {
+          const upsert = {
+            id: 1,
+            model1Prop2: 101,
+          };
+
+          return transaction(session.knex, (trx) => {
+            return Model1.query(trx).upsertGraph(upsert, { fetchStrategy });
+          })
+            .then((res) => {
+              expect(res.model1Prop1).to.equal('updated in before update');
+              expect(res.model1Prop2).to.equal(101);
+              return Model1.query(session.knex).findById(1);
+            })
+            .then((model) => {
+              expect(model.model1Prop1).to.equal('updated in before update');
+              expect(model.model1Prop2).to.equal(101);
+            });
+        });
+      });
+
+      describe('should not call onError() with internal exception (#2603)', () => {
+        let query;
+
+        before(() => {
+          query = Model1.query;
+        });
+
+        after(() => {
+          Model1.query = query;
+        });
+
+        it('should not call onError() with internal exception', async () => {
+          const upsert = { id: 2 };
+
+          let error = null;
+          Model1.query = function (trx) {
+            return query.call(this, trx).onError((err) => {
+              error = err;
+            });
+          };
+
+          await transaction(session.knex, (trx) => {
+            return Model1.query(trx).upsertGraph(upsert, { fetchStrategy });
+          });
+          expect(error).to.equal(null);
+        });
+      });
+
+      describe('should not call $beforeUpdate() on empty relates (#2605)', () => {
+        it('should not call $beforeUpdate() on empty relates', async () => {
+          const upsert = {
+            id: 2,
+            model1Relation1: { id: 3 },
+          };
+
+          await transaction(session.knex, (trx) => {
+            return Model1.query(trx)
+              .upsertGraph(upsert, { relate: true, fetchStrategy })
+              .then((result) => {
+                expect(result.$beforeUpdateCalled).to.equal(undefined);
+                expect(result.model1Relation1.$beforeUpdateCalled).to.equal(undefined);
+              });
+          });
         });
       });
 

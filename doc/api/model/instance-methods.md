@@ -1036,70 +1036,19 @@ called explicitly when needed.
 | ---------------------------------------------------- | -------------------- |
 | [ValidationError](/api/types/#class-validationerror) | If validation fails. |
 
-## $omit()
+## $omitFromJson()
 
 ```js
-modelInstance.$omit(keys);
+modelInstance.$omitFromJson(props);
 ```
 
-Omits a set of properties.
+Omits a set of properties when converting the model to JSON.
 
 ##### Arguments
 
-| Argument | Type                                                     | Description  |
-| -------- | -------------------------------------------------------- | ------------ |
-| keys     | string<br>string[]<br>Object&lt;string,&nbsp;boolean&gt; | keys to omit |
-
-##### Return value
-
-| Type                 | Description         |
-| -------------------- | ------------------- |
-| [Model](/api/model/) | `this` for chaining |
-
-##### Examples
-
-Omits a set of properties.
-
-```js
-const json = person
-  .fromJson({ firstName: 'Jennifer', lastName: 'Lawrence', age: 24 })
-  .$omit('lastName')
-  .toJSON();
-
-console.log(_.has(json, 'lastName')); // --> false
-```
-
-```js
-const json = person
-  .fromJson({ firstName: 'Jennifer', lastName: 'Lawrence', age: 24 })
-  .$omit(['lastName'])
-  .toJSON();
-
-console.log(_.has(json, 'lastName')); // --> false
-```
-
-```js
-const json = person
-  .fromJson({ firstName: 'Jennifer', lastName: 'Lawrence', age: 24 })
-  .$omit({ lastName: true })
-  .toJSON();
-
-console.log(_.has(json, 'lastName')); // --> false
-```
-
-## $pick()
-
-```js
-modelInstance.$pick(keys);
-```
-
-Picks a set of properties.
-
-##### Arguments
-
-| Argument | Type                                                     | Description  |
-| -------- | -------------------------------------------------------- | ------------ |
-| keys     | string<br>string[]<br>Object&lt;string,&nbsp;boolean&gt; | keys to pick |
+| Argument | Type                                                     | Description   |
+| -------- | -------------------------------------------------------- | ------------- |
+| props    | string<br>string[]<br>Object&lt;string,&nbsp;boolean&gt; | props to omit |
 
 ##### Return value
 
@@ -1112,8 +1061,8 @@ Picks a set of properties.
 ```js
 const json = person
   .fromJson({ firstName: 'Jennifer', lastName: 'Lawrence', age: 24 })
-  .$pick('firstName', 'age')
-  .toJSON();
+  .$omitFromJson('lastName')
+  .$toJson();
 
 console.log(_.has(json, 'lastName')); // --> false
 ```
@@ -1121,8 +1070,8 @@ console.log(_.has(json, 'lastName')); // --> false
 ```js
 const json = person
   .fromJson({ firstName: 'Jennifer', lastName: 'Lawrence', age: 24 })
-  .$pick(['firstName', 'age'])
-  .toJSON();
+  .$omitFromJson(['lastName'])
+  .$toJson();
 
 console.log(_.has(json, 'lastName')); // --> false
 ```
@@ -1130,8 +1079,57 @@ console.log(_.has(json, 'lastName')); // --> false
 ```js
 const json = person
   .fromJson({ firstName: 'Jennifer', lastName: 'Lawrence', age: 24 })
-  .$pick({ firstName: true, age: true })
-  .toJSON();
+  .$omitFromJson({ lastName: true })
+  .$toJson();
+
+console.log(_.has(json, 'lastName')); // --> false
+```
+
+## $omitFromDatabaseJson()
+
+```js
+modelInstance.$omitFromDatabaseJson(props);
+```
+
+Omits a set of properties when converting the model to database JSON.
+
+##### Arguments
+
+| Argument | Type                                                     | Description   |
+| -------- | -------------------------------------------------------- | ------------- |
+| props    | string<br>string[]<br>Object&lt;string,&nbsp;boolean&gt; | props to omit |
+
+##### Return value
+
+| Type                 | Description         |
+| -------------------- | ------------------- |
+| [Model](/api/model/) | `this` for chaining |
+
+##### Examples
+
+```js
+const json = person
+  .fromJson({ firstName: 'Jennifer', lastName: 'Lawrence', age: 24 })
+  .$omitFromDatabaseJson('lastName')
+  .$toDatabaseJson();
+
+console.log(_.has(json, 'lastName')); // --> false
+```
+
+```js
+const json = person
+  .fromJson({ firstName: 'Jennifer', lastName: 'Lawrence', age: 24 })
+  .$omitFromJson(['lastName'])
+  .$toDatabaseJson();
+
+console.log(_.has(json, 'lastName')); // --> false
+```
+
+```js
+const json = person
+  .fromJson({ firstName: 'Jennifer', lastName: 'Lawrence', age: 24 })
+  .$omitFromJson({ lastName: true })
+  .$toDatabaseJson();
 
 console.log(_.has(json, 'lastName')); // --> false
 ```

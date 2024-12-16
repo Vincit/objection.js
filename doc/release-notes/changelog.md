@@ -1,5 +1,63 @@
 # Changelog
 
+## 3.1.5
+
+### What's new
+
+- Types: Fix generic static `this` [#2533](https://github.com/Vincit/objection.js/pull/2533)
+- Types: Add `fromRaw` to `FromSelector regex [#2628](https://github.com/Vincit/objection.js/issues/2628)
+- Types: Fix argument types of `onConflict()` [#2635](https://github.com/Vincit/objection.js/pull/2635)
+- Types: Make `trx` optional for `Model.transaction(trx, cb)` [#2694](https://github.com/Vincit/objection.js/pull/2694)
+
+## 3.1.4
+
+### What's new
+
+- Fix `upsertGraph()` `$beforeUpdate()` calls on empty relates [#2605](https://github.com/Vincit/objection.js/issues/2605)
+- Don't call `onError()` with internal exceptions [#2603](https://github.com/Vincit/objection.js/issues/2603)
+- Remove docs and typings for nonexistent `$pick()`
+- Make `$omitFromJson()` + `$omitFromDatabaseJson()` compatible with old `$omit()` syntax
+
+## 3.1.3
+
+### What's new
+
+- Revert generic constructor type change [#2531](https://github.com/Vincit/objection.js/issues/2531), [#2399](https://github.com/Vincit/objection.js/pull/2399)
+
+### What's new
+
+- Patch Validator: Prevent recursion on inner properties [#2520](https://github.com/Vincit/objection.js/pull/2520)
+
+## 3.1.2
+  
+### What's new
+
+- Patch Validator: Prevent recursion on inner properties [#2520](https://github.com/Vincit/objection.js/pull/2520)
+
+## 3.1.1
+
+### What's new
+
+- Only add Ajv formats if they weren't added in user-land already [#2482](https://github.com/Vincit/objection.js/pull/2482)
+
+## 3.1.0
+
+### What's new
+
+- Support `$beforeUpdate()` mutations in `upsertGraph()` [#2233](https://github.com/Vincit/objection.js/issues/2233)
+- Remove deprecated `$afterGet()` hook [#2477](https://github.com/Vincit/objection.js/pull/2477)
+- Drop support for Node v12 [#2478](https://github.com/Vincit/objection.js/pull/2478)
+
+## 3.0.5
+
+### What's new
+
+- Fixes [#2183](https://github.com/Vincit/objection.js/pull/2183)
+- Fixes [#2257](https://github.com/Vincit/objection.js/pull/2257)
+- Fixes [#2276](https://github.com/Vincit/objection.js/pull/2276)
+- Fixes [#2453](https://github.com/Vincit/objection.js/pull/2453)
+- Fixes [#2476](https://github.com/Vincit/objection.js/pull/2476)
+
 ## 3.0.4
 
 ### What's new
@@ -680,7 +738,7 @@ Person.prototype.fullName = function () {
   a class definition. You can still define all static and prototype methods and properties the old way. See the example on the right -->
 
   Note that this also affects Babel transpilation. You cannot (or need to) use `babel-plugin-transform-es2015-classes` anymore.
-  See the [ESNext example project](https://github.com/Vincit/objection.js/tree/master/examples/express-es7) as an example of
+  See the [ESNext example project](https://github.com/Vincit/objection.js/tree/main/examples/express-es7) as an example of
   how to setup babel.
 
 - The default value of [`pickJsonSchemaProperties`](#pickjsonschemaproperties) was changed to `false`. Before, all properties that

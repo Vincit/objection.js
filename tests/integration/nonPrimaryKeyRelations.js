@@ -275,7 +275,7 @@ module.exports = (session) => {
                 'Terminator',
                 'Terminator 2',
                 'Terminator 3',
-              ])
+              ]),
             );
         });
 
@@ -295,7 +295,7 @@ module.exports = (session) => {
           return findArnold()
             .then((arnold) => arnold.$relatedQuery('movies').orderBy('name'))
             .then((movies) =>
-              expect(movies.map((it) => it.name)).to.eql(['Terminator', 'Terminator 2'])
+              expect(movies.map((it) => it.name)).to.eql(['Terminator', 'Terminator 2']),
             );
         });
 

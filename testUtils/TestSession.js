@@ -313,7 +313,7 @@ class TestSession {
             '. Make sure the server is running and the database ' +
             opt.knexConfig.connection.database +
             ' is created. You can see the test database configurations from file ' +
-            path.join(__dirname, 'index.js')
+            path.join(__dirname, 'index.js'),
         );
 
         const oldStack = err.stack;
@@ -355,11 +355,11 @@ class TestSession {
                 // Reset sequence.
                 if (knexUtils.isSqlite(trx)) {
                   return trx.raw(
-                    'UPDATE sqlite_sequence SET seq = ' + maxId + ' WHERE name = "' + table + '"'
+                    'UPDATE sqlite_sequence SET seq = ' + maxId + ' WHERE name = "' + table + '"',
                   );
                 } else if (knexUtils.isPostgres(trx)) {
                   return trx.raw(
-                    'ALTER SEQUENCE "' + table + '_' + idCol + '_seq" RESTART WITH ' + (maxId + 1)
+                    'ALTER SEQUENCE "' + table + '_' + idCol + '_seq" RESTART WITH ' + (maxId + 1),
                   );
                 } else if (knexUtils.isMySql(trx)) {
                   return trx.raw('ALTER TABLE ' + table + ' AUTO_INCREMENT = ' + (maxId + 1));
@@ -405,7 +405,7 @@ TestSession.unhandledRejectionHandlers = [];
 TestSession.hookCounter = 0;
 
 // Creates a hook that waits for `delay` milliseconds and then
-// increments a `${name}Called` property. The hook is asynchonous
+// increments a `${name}Called` property. The hook is asynchronous
 // every other time it is called so that the synchronous path is
 // also tested.
 function createHook(name, delay, extraAction) {
@@ -429,11 +429,7 @@ function createHook(name, delay, extraAction) {
 }
 
 function inc(obj, key) {
-  if (!_.has(obj, key)) {
-    obj[key] = 1;
-  } else {
-    obj[key]++;
-  }
+  obj[key] = (obj[key] || 0) + 1;
 }
 
 function registerUnhandledRejectionHandler() {

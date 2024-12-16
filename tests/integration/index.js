@@ -103,7 +103,7 @@ describe('integration tests', () => {
     return Promise.all(
       sessions.map((session) => {
         return session.destroy();
-      })
+      }),
     );
   });
 });

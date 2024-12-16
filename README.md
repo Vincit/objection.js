@@ -17,7 +17,7 @@ What objection.js gives you:
 - **Simple and fun way to [fetch, insert, update and delete](https://vincit.github.io/objection.js/guide/query-examples.html) objects using the full power of SQL**
 - **Powerful mechanisms for [eager loading](https://vincit.github.io/objection.js/guide/query-examples.html#eager-loading), [inserting](https://vincit.github.io/objection.js/guide/query-examples.html#graph-inserts) and [upserting](https://vincit.github.io/objection.js/guide/query-examples.html#graph-upserts) object graphs**
 - **Easy to use [transactions](https://vincit.github.io/objection.js/guide/transactions.html)**
-- **Official [TypeScript](https://github.com/Vincit/objection.js/blob/master/typings/objection/index.d.ts) support**
+- **Official [TypeScript](https://github.com/Vincit/objection.js/blob/main/typings/objection/index.d.ts) support**
 - **Optional [JSON schema](https://vincit.github.io/objection.js/guide/validation.html) validation**
 - **A way to [store complex documents](https://vincit.github.io/objection.js/guide/documents.html) as single rows**
 
@@ -36,18 +36,18 @@ What objection.js **doesn't** give you:
   For simple things it is useful that the database schema is automatically generated from the model definitions,
   but usually just gets in your way when doing anything non-trivial. Objection.js leaves the schema related things
   to you. knex has a great [migration tool](https://knexjs.org/guide/migrations.html) that we recommend for this job. Check
-  out the [example project](https://github.com/Vincit/objection.js/tree/master/examples/koa-ts).
+  out the [example project](https://github.com/Vincit/objection.js/tree/main/examples/koa-ts).
 
-The best way to get started is to clone our [example project](https://github.com/Vincit/objection.js/tree/master/examples/koa) and start playing with it. There's also a [typescript version](https://github.com/Vincit/objection.js/tree/master/examples/koa-ts) available.
+The best way to get started is to clone our [example project](https://github.com/Vincit/objection.js/tree/main/examples/koa) and start playing with it. There's also a [typescript version](https://github.com/Vincit/objection.js/tree/main/examples/koa-ts) available.
 
 Check out [this issue](https://github.com/Vincit/objection.js/issues/1069) to see who is using objection and what they think about it.
 
 Shortcuts:
 
-- [Who uses objection.js](https://github.com/Vincit/objection.js/issues/1069)
+- [Who uses objection.js](https://github.com/Vincit/objection.js/discussions/2464)
 - [API reference](https://vincit.github.io/objection.js/api/query-builder/)
-- [Example projects](https://github.com/Vincit/objection.js/tree/master/examples)
+- [Example projects](https://github.com/Vincit/objection.js/tree/main/examples)
 - [Changelog](https://vincit.github.io/objection.js/release-notes/changelog.html)
-- [v1 -> v2 migration guide](https://vincit.github.io/objection.js/release-notes/migration.html)
+- [v1 -> v2 -> v3 migration guide](https://vincit.github.io/objection.js/release-notes/migration.html)
 - [Contribution guide](https://vincit.github.io/objection.js/guide/contributing.html)
 - [Plugins](https://vincit.github.io/objection.js/guide/plugins.html)

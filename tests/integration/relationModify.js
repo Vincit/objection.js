@@ -321,7 +321,7 @@ module.exports = (session) => {
             .then(findArnold)
             .then((arnold) => arnold.$relatedQuery('pets').orderBy('name').select('name'))
             .then((pets) =>
-              expect(pets.map((it) => it.name)).to.eql(['Freud', 'Ruffus', 'Stalin'])
+              expect(pets.map((it) => it.name)).to.eql(['Freud', 'Ruffus', 'Stalin']),
             );
         });
 
@@ -358,7 +358,7 @@ module.exports = (session) => {
                 .context(modifyManyToMany((qb) => qb.select('name').orderBy('name')));
             })
             .then((movies) =>
-              expect(movies.map((it) => it.name)).to.eql(['Terminator', 'Terminator 2'])
+              expect(movies.map((it) => it.name)).to.eql(['Terminator', 'Terminator 2']),
             );
         });
 

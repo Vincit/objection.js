@@ -354,7 +354,7 @@ module.exports = (session) => {
               .toSQL().sql;
 
             expect(sql).to.equal(
-              'insert into "Model1Model2" ("model1Id", "model2Id") values (?, ?) on conflict ("model1Id") do nothing returning "model1Id"'
+              'insert into "Model1Model2" ("model1Id", "model2Id") values (?, ?) on conflict ("model1Id") do nothing returning "model1Id"',
             );
           });
         }
@@ -397,7 +397,7 @@ module.exports = (session) => {
               expect(rows).to.have.length(5);
               expect(_.filter(rows, { model2Id: 1, model1Id: 3 })).to.have.length(1);
               expect(_.filter(rows, { model2Id: 1, model1Id: 5, extra3: 'foobar' })).to.have.length(
-                1
+                1,
               );
               expect(_.filter(rows, { model2Id: 2, model1Id: 4 })).to.have.length(1);
               expect(_.filter(rows, { model2Id: 2, model1Id: 5 })).to.have.length(1);
@@ -656,7 +656,7 @@ module.exports = (session) => {
             })
             .catch((err) => {
               expect(err.message).to.equal(
-                "Can only relate items for one parent at a time in case of HasManyRelation. Otherwise multiple update queries would need to be created. If you need to relate items for multiple parents, simply loop through them. That's the most performant way."
+                "Can only relate items for one parent at a time in case of HasManyRelation. Otherwise multiple update queries would need to be created. If you need to relate items for multiple parents, simply loop through them. That's the most performant way.",
               );
               done();
             })

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-npm run docs:build
+NODE_OPTIONS=--openssl-legacy-provider npm run docs:build
 rm -rf ../objection-doc/*
 mv doc/.vuepress/dist/* ../objection-doc/
 cd ../objection-doc

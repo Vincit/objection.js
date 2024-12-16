@@ -146,7 +146,7 @@ module.exports = (session) => {
             .then(() => {
               return Campaign.query().upsertGraph(
                 { id: campaign.id, cogs: [{ deliverableId: deliverable.id }] },
-                { relate: ['cogs'], unrelate: ['cogs'] }
+                { relate: ['cogs'], unrelate: ['cogs'] },
               );
             })
             .then(() => {
@@ -158,7 +158,7 @@ module.exports = (session) => {
             .then(() => {
               return Campaign.query().upsertGraph(
                 { id: campaign.id, cogs: [] },
-                { relate: ['cogs'], unrelate: ['cogs'] }
+                { relate: ['cogs'], unrelate: ['cogs'] },
               );
             })
             .then(() => {
@@ -170,7 +170,7 @@ module.exports = (session) => {
             .then(() => {
               return Deliverable.query().upsertGraph(
                 { id: deliverable.id, cogs: [{ campaignId: campaign.id }] },
-                { relate: ['cogs'], unrelate: ['cogs'] }
+                { relate: ['cogs'], unrelate: ['cogs'] },
               );
             })
             .then(() => {
@@ -182,7 +182,7 @@ module.exports = (session) => {
             .then(() => {
               return Deliverable.query().upsertGraph(
                 { id: deliverable.id, cogs: [] },
-                { relate: ['cogs'], unrelate: ['cogs'] }
+                { relate: ['cogs'], unrelate: ['cogs'] },
               );
             })
             .then(() => {
