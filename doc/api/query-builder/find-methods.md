@@ -303,6 +303,15 @@ See [knex documentation](https://knexjs.org/guide/query-builder.html#fromRaw)
 | ----------------------------------- | ---------------------------------- |
 | [QueryBuilder](/api/query-builder/) | `this` query builder for chaining. |
 
+## updateFrom()
+
+See [knex documentation](https://knexjs.org/guide/query-builder.html#updatefrom)
+##### Return value
+
+| Type                                | Description                        |
+| ----------------------------------- | ---------------------------------- |
+| [QueryBuilder](/api/query-builder/) | `this` query builder for chaining. |
+
 ## into()
 
 See [knex documentation](https://knexjs.org/guide/query-builder.html)
