@@ -124,7 +124,6 @@ module.exports = (session) => {
         trx.runAfterTransactionMethods.push(async () => {
           return new Promise((resolve) =>
             setTimeout(() => {
-              console.log('aha');
               runAfterTransactionMethodsExecuted = true;
               resolve();
             }, 2000),
@@ -271,6 +270,39 @@ module.exports = (session) => {
           done();
         })
         .catch(done);
+    });
+
+    it('should not resolve runAfterTransaction methods when rollback happens', async () => {
+      let runAfterTransactionMethodsExecuted = false;
+      try {
+        await Model1.transaction(async (trx) => {
+          trx.runAfterTransactionMethods.push(async () => {
+            return new Promise((resolve) =>
+              setTimeout(() => {
+                runAfterTransactionMethodsExecuted = true;
+                resolve();
+              }, 2000),
+            );
+          });
+          await Model1.query(trx).insert({ model1Prop1: 'test 1' });
+          await Model1.query(trx).insert({ model1Prop1: 'test 2' });
+          await Model2.query(trx).insert({ model2Prop1: 'test 3' });
+
+          throw new Error('whoops');
+        });
+
+        throw new Error('should not get here');
+      } catch (err) {
+        expect(runAfterTransactionMethodsExecuted).to.equal(false);
+
+        expect(err.message).to.equal('whoops');
+
+        let rows = await session.knex('Model1');
+        expect(rows).to.have.length(0);
+
+        rows = await session.knex('model2');
+        expect(rows).to.have.length(0);
+      }
     });
 
     it('should rollback if an error occurs (Model.transaction)', async () => {
