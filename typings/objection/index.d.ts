@@ -12,7 +12,7 @@
 // * Karl Blomster <https://github.com/kblomster>
 // * And many others: See <https://github.com/Vincit/objection.js/blob/main/typings/objection/index.d.ts>
 
-import Ajv, { Options as AjvOptions } from 'ajv';
+import Ajv, { Options as AjvOptions } from 'ajv';id
 import * as dbErrors from 'db-errors';
 import { Knex } from 'knex';
 
@@ -1442,7 +1442,7 @@ declare namespace Objection {
     QueryBuilder: typeof QueryBuilder;
 
     tableName: string;
-    idColumn: string | string[] | readonly string[];
+    idColumn: string | string[] | readonly string[] | never;
     jsonSchema: JSONSchema;
     relationMappings: RelationMappings | RelationMappingsThunk;
     modelPaths: string[];
@@ -1551,7 +1551,7 @@ declare namespace Objection {
     static QueryBuilder: typeof QueryBuilder;
 
     static tableName: string;
-    static idColumn: string | string[] | readonly string[];
+    static idColumn: string | string[] | readonly string[] | never;
     static jsonSchema: JSONSchema;
     static relationMappings: RelationMappings | RelationMappingsThunk;
     static modelPaths: string[];
