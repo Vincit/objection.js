@@ -12,7 +12,7 @@
 // * Karl Blomster <https://github.com/kblomster>
 // * And many others: See <https://github.com/Vincit/objection.js/blob/main/typings/objection/index.d.ts>
 
-import Ajv, { Options as AjvOptions } from 'ajv';id
+import Ajv, { Options as AjvOptions } from 'ajv';
 import * as dbErrors from 'db-errors';
 import { Knex } from 'knex';
 
