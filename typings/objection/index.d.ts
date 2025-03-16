@@ -597,6 +597,7 @@ declare namespace Objection {
 
   interface WithMethod<QB extends AnyQueryBuilder> {
     (alias: string, expr: CallbackVoid<QB> | AnyQueryBuilder | Raw): QB;
+    (alias: string, columns: string[], expr: CallbackVoid<QB> | AnyQueryBuilder | Raw): QB;
   }
 
   interface JoinRelatedOptions {
