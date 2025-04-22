@@ -183,7 +183,7 @@ class Person extends Model {
 }
 ```
 
-The example above turns all delete queries into updates that set the `deleted` property to true. These two lines implement a simple version of a "soft delete" feature.
+The example above turns all delete queries into updates that set the `deleted` property to `true`. These two lines implement a simple version of a "soft delete" feature.
 
 You can also access the model instances for which the query is started, the input model instances and the relation. The next example should explain what each of them mean:
 
@@ -286,7 +286,7 @@ So for example when the results of a query are read from the database the data g
 
 Similarly when you give data for a query (for example [`query().insert(req.body)`](/api/query-builder/mutate-methods.html#insert)) or create a model explicitly using [`Model.fromJson(obj)`](/api/model/static-methods.html#static-fromjson) the [\$parseJson](/api/model/instance-methods.html#parsejson) method is invoked. When you call [`model.toJSON()`](/api/model/instance-methods.html#tojson) or [`model.$toJson()`](/api/model/instance-methods.html#tojson) the [\$formatJson](/api/model/instance-methods.html#formatjson) is called.
 
-Note: Most libraries like [express](http://expressjs.com/en/index.html) and [koa](https://koajs.com/) automatically call the [toJSON](/api/model/instance-methods.html#tojson) method when you pass the model instance to methods like `response.json(model)`. You rarely need to call [toJSON()](/api/model/instance-methods.html#tojson) or [\$toJson()](/api/model/instance-methods.html#tojson) explicitly. This is because `JSON.stringify` calls the `toJSON` method and basically all libraries that create JSON strings use `JSON.stringify` under the hood.
+Note: Most libraries like [express](https://expressjs.com/en/index.html) and [koa](https://koajs.com/) automatically call the [toJSON](/api/model/instance-methods.html#tojson) method when you pass the model instance to methods like `response.json(model)`. You rarely need to call [toJSON()](/api/model/instance-methods.html#tojson) or [\$toJson()](/api/model/instance-methods.html#tojson) explicitly. This is because `JSON.stringify` calls the `toJSON` method and basically all libraries that create JSON strings use `JSON.stringify` under the hood.
 
 Data lifecycle hooks are always synchronous. They cannot be `async` or return promises.
 

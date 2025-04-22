@@ -64,7 +64,7 @@ class MyCustomValidator extends Validator {
 
     // `ModelOptions` object. If your custom validator sets default
     // values or has the concept of required properties, you need to
-    // check the `opt.patch` boolean. If it is true we are validating
+    // check the `opt.patch` boolean. If it is `true` we are validating
     // a patch object (an object with a subset of model's properties).
     const opt = args.options;
 

@@ -219,7 +219,7 @@ Skips the database query and "fakes" a result.
 const isExecutable = queryBuilder.isExecutable();
 ```
 
-Returns false if this query will never be executed.
+Returns `false` if this query will never be executed.
 
 This may be true in multiple cases:
 
@@ -230,7 +230,7 @@ This may be true in multiple cases:
 
 | Type    | Description                                |
 | ------- | ------------------------------------------ |
-| boolean | false if the query will never be executed. |
+| boolean | `false` if the query will never be executed. |
 
 ## isFind()
 
@@ -238,13 +238,13 @@ This may be true in multiple cases:
 const isFind = queryBuilder.isFind();
 ```
 
-Returns true if the query is read-only.
+Returns `true` if the query is read-only.
 
 ##### Return value
 
 | Type    | Description                     |
 | ------- | ------------------------------- |
-| boolean | true if the query is read-only. |
+| boolean | `true` if the query is read-only. |
 
 ## isInsert()
 
@@ -252,13 +252,13 @@ Returns true if the query is read-only.
 const isInsert = queryBuilder.isInsert();
 ```
 
-Returns true if the query performs an insert operation.
+Returns `true` if the query performs an insert operation.
 
 ##### Return value
 
 | Type    | Description                                     |
 | ------- | ----------------------------------------------- |
-| boolean | true if the query performs an insert operation. |
+| boolean | `true` if the query performs an insert operation. |
 
 ## isUpdate()
 
@@ -266,13 +266,13 @@ Returns true if the query performs an insert operation.
 const isUpdate = queryBuilder.isUpdate();
 ```
 
-Returns true if the query performs an update or patch operation.
+Returns `true` if the query performs an update or patch operation.
 
 ##### Return value
 
 | Type    | Description                                              |
 | ------- | -------------------------------------------------------- |
-| boolean | true if the query performs an update or patch operation. |
+| boolean | `true` if the query performs an update or patch operation. |
 
 ## isDelete()
 
@@ -280,13 +280,13 @@ Returns true if the query performs an update or patch operation.
 const isDelete = queryBuilder.isDelete();
 ```
 
-Returns true if the query performs a delete operation.
+Returns `true` if the query performs a delete operation.
 
 ##### Return value
 
 | Type    | Description                                    |
 | ------- | ---------------------------------------------- |
-| boolean | true if the query performs a delete operation. |
+| boolean | `true` if the query performs a delete operation. |
 
 ## isRelate()
 
@@ -294,13 +294,13 @@ Returns true if the query performs a delete operation.
 const isRelate = queryBuilder.isRelate();
 ```
 
-Returns true if the query performs a relate operation.
+Returns `true` if the query performs a relate operation.
 
 ##### Return value
 
 | Type    | Description                                    |
 | ------- | ---------------------------------------------- |
-| boolean | true if the query performs a relate operation. |
+| boolean | `true` if the query performs a relate operation. |
 
 ## isUnrelate()
 
@@ -308,13 +308,13 @@ Returns true if the query performs a relate operation.
 const isUnrelate = queryBuilder.isUnrelate();
 ```
 
-Returns true if the query performs an unrelate operation.
+Returns `true` if the query performs an unrelate operation.
 
 ##### Return value
 
 | Type    | Description                                       |
 | ------- | ------------------------------------------------- |
-| boolean | true if the query performs an unrelate operation. |
+| boolean | `true` if the query performs an unrelate operation. |
 
 ## isInternal()
 
@@ -322,7 +322,7 @@ Returns true if the query performs an unrelate operation.
 const isInternal = queryBuilder.isInternal();
 ```
 
-Returns true for internal "helper" queries that are not directly
+Returns `true` for internal "helper" queries that are not directly
 part of the operation being executed. For example the `select` queries
 performed by `upsertGraph` to get the current state of the graph are
 internal queries.
@@ -331,7 +331,7 @@ internal queries.
 
 | Type    | Description                                              |
 | ------- | -------------------------------------------------------- |
-| boolean | true if the query performs an internal helper operation. |
+| boolean | `true` if the query performs an internal helper operation. |
 
 ## hasWheres()
 
@@ -339,13 +339,13 @@ internal queries.
 const hasWheres = queryBuilder.hasWheres();
 ```
 
-Returns true if the query contains where statements.
+Returns `true` if the query contains where statements.
 
 ##### Return value
 
 | Type    | Description                                  |
 | ------- | -------------------------------------------- |
-| boolean | true if the query contains where statements. |
+| boolean | `true` if the query contains where statements. |
 
 ## hasSelects()
 
@@ -353,14 +353,14 @@ Returns true if the query contains where statements.
 const hasSelects = queryBuilder.hasSelects();
 ```
 
-Returns true if the query contains any specific select staments, such as:
+Returns `true` if the query contains any specific select staments, such as:
 `'select'`, `'columns'`, `'column'`, `'distinct'`, `'count'`, `'countDistinct'`, `'min'`, `'max'`, `'sum'`, `'sumDistinct'`, `'avg'`, `'avgDistinct'`
 
 ##### Return value
 
 | Type    | Description                                              |
 | ------- | -------------------------------------------------------- |
-| boolean | true if the query contains any specific select staments. |
+| boolean | `true` if the query contains any specific select staments. |
 
 ## hasWithGraph()
 
@@ -368,13 +368,13 @@ Returns true if the query contains any specific select staments, such as:
 const hasWithGraph = queryBuilder.hasWithGraph();
 ```
 
-Returns true if `withGraphFetched` or `withGraphJoined` has been called for the query.
+Returns `true` if `withGraphFetched` or `withGraphJoined` has been called for the query.
 
 ##### Return value
 
 | Type    | Description                                                                    |
 | ------- | ------------------------------------------------------------------------------ |
-| boolean | true if `withGraphFetched` or `withGraphJoined` has been called for the query. |
+| boolean | `true` if `withGraphFetched` or `withGraphJoined` has been called for the query. |
 
 ## has()
 
@@ -390,7 +390,7 @@ console.log(
 );
 ```
 
-Returns true if the query defines an operation that matches the given selector.
+Returns `true` if the query defines an operation that matches the given selector.
 
 ##### Arguments
 
@@ -402,7 +402,7 @@ Returns true if the query defines an operation that matches the given selector.
 
 | Type    | Description                                                             |
 | ------- | ----------------------------------------------------------------------- |
-| boolean | true if the query defines an operation that matches the given selector. |
+| boolean | `true` if the query defines an operation that matches the given selector. |
 
 ## clear()
 
@@ -876,7 +876,7 @@ console.log(result.total); // --> 3341
 
 Two queries are performed by this method: the actual query and a query to get the `total` count.
 
-Mysql has the `SQL_CALC_FOUND_ROWS` option and `FOUND_ROWS()` function that can be used to calculate the result size, but according to my tests and [the interwebs](http://www.google.com/search?q=SQL_CALC_FOUND_ROWS+performance) the performance is significantly worse than just executing a separate count query.
+Mysql has the `SQL_CALC_FOUND_ROWS` option and `FOUND_ROWS()` function that can be used to calculate the result size, but according to my tests and [the interwebs](https://www.google.com/search?q=SQL_CALC_FOUND_ROWS+performance) the performance is significantly worse than just executing a separate count query.
 
 Postgresql has window functions that can be used to get the total count like this `select count(*) over () as total`. The problem with this is that if the result set is empty, we don't get the total count either. (If someone can figure out a way around this, a PR is very welcome).
 
@@ -903,7 +903,7 @@ Only returns the given range of results.
 
 Two queries are performed by this method: the actual query and a query to get the `total` count.
 
-Mysql has the `SQL_CALC_FOUND_ROWS` option and `FOUND_ROWS()` function that can be used to calculate the result size, but according to my tests and [the interwebs](http://www.google.com/search?q=SQL_CALC_FOUND_ROWS+performance) the performance is significantly worse than just executing a separate count query.
+Mysql has the `SQL_CALC_FOUND_ROWS` option and `FOUND_ROWS()` function that can be used to calculate the result size, but according to my tests and [the interwebs](https://www.google.com/search?q=SQL_CALC_FOUND_ROWS+performance) the performance is significantly worse than just executing a separate count query.
 
 Postgresql has window functions that can be used to get the total count like this `select count(*) over () as total`. The problem with this is that if the result set is empty, we don't get the total count either. (If someone can figure out a way around this, a PR is very welcome).
 
