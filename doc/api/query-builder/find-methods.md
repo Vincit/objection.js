@@ -83,6 +83,8 @@ queryBuilder = queryBuilder.findOne(...whereArgs);
 
 Shorthand for `where(...whereArgs).first()`.
 
+NOTE: [`.first()`](https://vincit.github.io/objection.js/api/query-builder/other-methods.html#first) doesn't add `limit 1` to the query by default. You can override the [Model.useLimitInFirst](/api/model/static-properties.html#static-uselimitinfirst) property to change this behaviour.
+
 ##### Arguments
 
 | Argument  | Type   | Description                                                                      |
@@ -215,7 +217,7 @@ See [knex documentation](https://knexjs.org/guide/query-builder.html#forshare)
 
 ## forNoKeyUpdate()
 
-See [knex documentation](http://knexjs.org/#Builder-forNoKeyUpdate)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#fornokeyupdate)
 
 ##### Return value
 
@@ -225,7 +227,7 @@ See [knex documentation](http://knexjs.org/#Builder-forNoKeyUpdate)
 
 ## forKeyShare()
 
-See [knex documentation](http://knexjs.org/#Builder-forKeyShare)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#forkeyshare)
 
 ##### Return value
 

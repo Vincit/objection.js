@@ -140,7 +140,7 @@ class Person extends Model {
 
 The optional schema against which the model is validated.
 
-Must follow [JSON Schema](http://json-schema.org) specification. If unset, no validation is done.
+Must follow [JSON Schema](https://json-schema.org) specification. If unset, no validation is done.
 
 ##### Read more
 
@@ -385,7 +385,7 @@ class Person extends Model {
 }
 ```
 
-If true (the default) object attributes (for example jsonb columns) are cloned when `$toDatabaseJson`, `$toJson` or `toJSON` is called. If this is set to false, they are not cloned. Note that nested `Model` instances inside relations etc. are still effectively cloned, because `$toJson` is called for them recursively, but their jsonb columns, again,
+If `true` (the default) object attributes (for example jsonb columns) are cloned when `$toDatabaseJson`, `$toJson` or `toJSON` is called. If this is set to `false`, they are not cloned. Note that nested `Model` instances inside relations etc. are still effectively cloned, because `$toJson` is called for them recursively, but their jsonb columns, again,
 are not :)
 
 Usually you don't need to care about this setting, but if you have large object fields (for example large objects in jsonb columns) cloning the data can become slow and play a significant part in your server's performance. There's rarely a need to to clone this data, but since it has historically been copied, we cannot change the default behaviour
@@ -514,9 +514,9 @@ class Person extends Model {
 }
 ```
 
-If this is true only properties in `jsonSchema` are picked when inserting or updating a row in the database.
+If this is `true` only properties in `jsonSchema` are picked when inserting or updating a row in the database.
 
-Defaults to false.
+Defaults to `false`.
 
 ## `static` defaultGraphOptions
 
@@ -548,7 +548,7 @@ class Animal extends Model {
 }
 ```
 
-If true, `limit(1)` is added to the query when [first()](/api/query-builder/instance-methods#first) is called. Defaults to `false` for legacy reasons.
+If `true`, `limit(1)` is added to the query when [first()](/api/query-builder/other-methods.html#first) is called. Defaults to `false` for legacy reasons.
 
 ## `static` QueryBuilder
 

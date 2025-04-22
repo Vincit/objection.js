@@ -1,6 +1,6 @@
 # Validation
 
-[JSON schema](http://json-schema.org/) validation can be enabled by setting the [jsonSchema](/api/model/static-properties.html#static-jsonschema) property of a model class. The validation is ran each time a [Model](/api/model/) instance is created.
+[JSON schema](https://json-schema.org/) validation can be enabled by setting the [jsonSchema](/api/model/static-properties.html#static-jsonschema) property of a model class. The validation is ran each time a [Model](/api/model/) instance is created.
 
 You rarely need to call [\$validate](/api/model/instance-methods.html#validate) method explicitly, but you can do it when needed. If validation fails a [ValidationError](/api/types/#class-validationerror) will be thrown. Since we use Promises, this usually means that a promise will be rejected with an instance of [ValidationError](/api/types/#class-validationerror).
 

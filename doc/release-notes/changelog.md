@@ -574,7 +574,7 @@ See the [migration guide](/release-notes/migration.md).
 
 ### Changes
 
-- `isFindQuery` is renamed to [`isFind`](http://vincit.github.io/objection.js/#isfind) and deprecated.
+- `isFindQuery` is renamed to [`isFind`](https://vincit.github.io/objection.js/#isfind) and deprecated.
 
 ## 0.9.4
 
@@ -603,17 +603,17 @@ See the [migration guide](/release-notes/migration.md).
 
 ### What's new
 
-- [`castTo`](http://vincit.github.io/objection.js/#castto) method for setting the model class of query result rows.
-- [`onError`](http://vincit.github.io/objection.js/#onerror) `QueryBuilder` method.
-- [`knexSnakeCaseMappers`](http://vincit.github.io/objection.js/#objection-knexsnakecasemappers) and [`snakeCaseMappers`](http://vincit.github.io/objection.js/#objection-snakecasemappers) for snake_case to camelCase conversions.
+- [`castTo`](https://vincit.github.io/objection.js/#castto) method for setting the model class of query result rows.
+- [`onError`](https://vincit.github.io/objection.js/#onerror) `QueryBuilder` method.
+- [`knexSnakeCaseMappers`](https://vincit.github.io/objection.js/#objection-knexsnakecasemappers) and [`snakeCaseMappers`](https://vincit.github.io/objection.js/#objection-snakecasemappers) for snake_case to camelCase conversions.
 
 ## 0.9.0
 
 ### What's new
 
-- Relations can now be defined using keys inside JSON columns. See the examples [here](http://vincit.github.io/objection.js/#relationmappings).
-- [`lit`](http://vincit.github.io/objection.js/#lit) helper function [#275](https://github.com/Vincit/objection.js/issues/275)
-- Fixes for [`upsertGraph`](http://vincit.github.io/objection.js/#upsertgraph) when using composite keys. [#517](https://github.com/Vincit/objection.js/issues/517)
+- Relations can now be defined using keys inside JSON columns. See the examples [here](https://vincit.github.io/objection.js/#relationmappings).
+- [`lit`](https://vincit.github.io/objection.js/#lit) helper function [#275](https://github.com/Vincit/objection.js/issues/275)
+- Fixes for [`upsertGraph`](https://vincit.github.io/objection.js/#upsertgraph) when using composite keys. [#517](https://github.com/Vincit/objection.js/issues/517)
 - Added `noDelete`, `noUpdate`, `noInsert`, `noRelate` and `noUnrelate` options for `upsertGraph`. See [UpsertGraphOptions docs](#upsertgraphoptions) for more info.
 - `insertGraph` now accepts an options object just like `upsertGraph`. `relate` option can be used instead of `#dbRef`. [#586](https://github.com/Vincit/objection.js/issues/586)
 
@@ -621,7 +621,7 @@ See the [migration guide](/release-notes/migration.md).
 
 - Instance update/patch with `returning` now return a single object instead of an array. [#423](https://github.com/Vincit/objection.js/issues/423)
 
-- Because of the support for JSON relations [the `Relation` class](http://vincit.github.io/objection.js/#relation)
+- Because of the support for JSON relations [the `Relation` class](https://vincit.github.io/objection.js/#relation)
   has changed a bit.
 
 ## 0.8.8
@@ -653,31 +653,31 @@ See the [migration guide](/release-notes/migration.md).
 
 ### What's new
 
-- Add [`Model.useLimitInFirst`](http://vincit.github.io/objection.js/#uselimitinfirst) configuration flag.
+- Add [`Model.useLimitInFirst`](https://vincit.github.io/objection.js/#uselimitinfirst) configuration flag.
 
 ## 0.8.4
 
 ### What's new
 
-- New shorthand methods [`joinEager`](http://vincit.github.io/objection.js/#joineager), [`naiveEager`](http://vincit.github.io/objection.js/#naiveeager),
-  [`mergeJoinEager`](http://vincit.github.io/objection.js/#mergejoineager) and [`mergeNaiveEager`](http://vincit.github.io/objection.js/#mergenaiveeager).
-- New shorthand method [`findOne`](http://vincit.github.io/objection.js/#findone)
-- New reflection method [`isFindQuery`](http://vincit.github.io/objection.js/#isfind)
+- New shorthand methods [`joinEager`](https://vincit.github.io/objection.js/#joineager), [`naiveEager`](https://vincit.github.io/objection.js/#naiveeager),
+  [`mergeJoinEager`](https://vincit.github.io/objection.js/#mergejoineager) and [`mergeNaiveEager`](https://vincit.github.io/objection.js/#mergenaiveeager).
+- New shorthand method [`findOne`](https://vincit.github.io/objection.js/#findone)
+- New reflection method [`isFindQuery`](https://vincit.github.io/objection.js/#isfind)
 - ManyToMany extra properties can now be updated [#413](https://github.com/Vincit/objection.js/issues/413)
 
 ## 0.8.3
 
 ### What's new
 
-- [`NaiveEagerAlogrithm`](http://vincit.github.io/objection.js/#eager)
-- [Aliases in relation expressions](http://vincit.github.io/objection.js/#relationexpression) [#402](https://github.com/Vincit/objection.js/issues/402)
+- [`NaiveEagerAlogrithm`](https://vincit.github.io/objection.js/#eager)
+- [Aliases in relation expressions](https://vincit.github.io/objection.js/#relationexpression) [#402](https://github.com/Vincit/objection.js/issues/402)
 - New lazily evaluated `raw` function. [#275](https://github.com/Vincit/objection.js/issues/275)
 
 ## 0.8.2
 
 ### What's new
 
-- [`Model.namedFilters`](http://vincit.github.io/objection.js/#namedfilters) object for defining shared filters that can be used by name in eager expressions.
+- [`Model.namedFilters`](https://vincit.github.io/objection.js/#namedfilters) object for defining shared filters that can be used by name in eager expressions.
 - Full support for views and table aliases in eager, join, joinRelation etc. [#181](https://github.com/Vincit/objection.js/issues/181)
 - Fix `bindTransaction` bug with `ManyToManyRelation` junction tables [#395](https://github.com/Vincit/objection.js/issues/395)
 
@@ -685,7 +685,7 @@ See the [migration guide](/release-notes/migration.md).
 
 ### What's new
 
-- [`throwIfNotFound`](http://vincit.github.io/objection.js/#throwifnotfound) method for making empty query results throw an exception.
+- [`throwIfNotFound`](https://vincit.github.io/objection.js/#throwifnotfound) method for making empty query results throw an exception.
 - fix error when passing model instance to a `where` method. [#387](https://github.com/Vincit/objection.js/issues/387)
 
 ## 0.8.0
@@ -738,7 +738,7 @@ Person.prototype.fullName = function () {
   a class definition. You can still define all static and prototype methods and properties the old way. See the example on the right -->
 
   Note that this also affects Babel transpilation. You cannot (or need to) use `babel-plugin-transform-es2015-classes` anymore.
-  See the [ESNext example project](https://github.com/Vincit/objection.js/tree/main/examples/express-es7) as an example of
+  See the [ESNext example project](https://github.com/Vincit/objection.js/tree/0.8.0/examples/express-es7) as an example of
   how to setup babel.
 
 - The default value of [`pickJsonSchemaProperties`](#pickjsonschemaproperties) was changed to `false`. Before, all properties that
@@ -778,7 +778,7 @@ Person.prototype.fullName = function () {
 
 ### What's new
 
-- [`joinRelation`](http://vincit.github.io/objection.js/#joinrelation) now accepts [`RelationExpressions`](http://vincit.github.io/objection.js/#relationexpression) and can join multiple and nested relations.
+- [`joinRelation`](https://vincit.github.io/objection.js/#joinrelation) now accepts [`RelationExpressions`](https://vincit.github.io/objection.js/#relationexpression) and can join multiple and nested relations.
 
 ## 0.7.6
 
@@ -832,7 +832,7 @@ Person.prototype.fullName = function () {
 - Validation can now be easily modified through a new [`Validator`](#validator) interface. [#241](https://github.com/Vincit/objection.js/issues/241) [#199](https://github.com/Vincit/objection.js/issues/199)
 - fix a `JoinEager` problem where an empty result for a relation caused the following relations to be empty. [#292](https://github.com/Vincit/objection.js/issues/292)
 - `ref(fieldExpression)` syntax to reduce need for knex.raw and updating single attribute inside JSON column. [#270](https://github.com/Vincit/objection.js/issues/270)
-- [mergeEager](http://vincit.github.io/objection.js/#mergeeager) method.
+- [mergeEager](https://vincit.github.io/objection.js/#mergeeager) method.
 
 ### Breaking changes
 
@@ -874,7 +874,7 @@ Person.prototype.fullName = function () {
 ### Breaking changes
 
 - Undefined values as query method arguments now throw an exception. Before they were just silently ignored
-  and for example `delete().where('id', undefined)` caused the entire table to be deleted. [skipUndefined](http://vincit.github.io/objection.js/#skipundefined)
+  and for example `delete().where('id', undefined)` caused the entire table to be deleted. [skipUndefined](https://vincit.github.io/objection.js/#skipundefined)
   method can be called for a query builder to handle the undefined values the old way.
 
 - Deprecated method `dumpSql` is now removed.
@@ -972,11 +972,11 @@ There are a few known corner cases that may break:
 
 ### What's new
 
-- [insertWithRelated](http://vincit.github.io/objection.js/QueryBuilder.html#insertWithRelated) method for
+- [insertWithRelated](https://vincit.github.io/objection.js/QueryBuilder.html#insertWithRelated) method for
   inserting model trees
-- [insertAndFetch](http://vincit.github.io/objection.js/QueryBuilder.html#insertAndFetch),
-  [updateAndFetchById](http://vincit.github.io/objection.js/QueryBuilder.html#updateAndFetchById) and
-  [patchAndFetchById](http://vincit.github.io/objection.js/QueryBuilder.html#patchAndFetchById) helper methods
+- [insertAndFetch](https://vincit.github.io/objection.js/QueryBuilder.html#insertAndFetch),
+  [updateAndFetchById](https://vincit.github.io/objection.js/QueryBuilder.html#updateAndFetchById) and
+  [patchAndFetchById](https://vincit.github.io/objection.js/QueryBuilder.html#patchAndFetchById) helper methods
 - Filters for [eager expressions](#eager-queries)
 - [New alternative way to use transactions](#transaction-object)
 - Many performance updates related to cloning, serializing and deserializing model trees.

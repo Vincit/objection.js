@@ -53,7 +53,7 @@ console.log('there are', people.length, 'People in total');
 select "persons".* from "persons"
 ```
 
-The return value of the [query](/api/model/static-methods.html#static-query) method is an instance of [QueryBuilder](/api/query-builder/) that has all the methods a [knex QueryBuilder](http://knexjs.org/#Builder) has and a lot more. Here is a simple example that uses some of them:
+The return value of the [query](/api/model/static-methods.html#static-query) method is an instance of [QueryBuilder](/api/query-builder/) that has all the methods a [knex QueryBuilder](https://knexjs.org/#Builder) has and a lot more. Here is a simple example that uses some of them:
 
 ```js
 const middleAgedJennifers = await Person.query()
@@ -965,7 +965,7 @@ await Person.query().insertGraph(
 );
 ```
 
-Note that you need to also set the `allowRefs` option to true for this to work.
+Note that you need to also set the `allowRefs` option to `true` for this to work.
 
 The query above will insert only one movie (the 'Silver Linings Playbook') but both 'Jennifer' and 'Bradley' will have the movie related to them through the many-to-many relation `movies`. The `#id` can be any string. There are no format or length requirements for them. It is quite easy to create circular dependencies using `#id` and `#ref`. Luckily [insertGraph](/api/query-builder/mutate-methods.html#insertgraph) detects them and rejects the query with a clear error message.
 
@@ -989,7 +989,7 @@ await Person
   }]);
 ```
 
-Again, make sure you set the `allowRefs` option to true.
+Again, make sure you set the `allowRefs` option to `true`.
 
 The query above will insert a pet named `I am the dog of Jennifer whose id is 523` for Jennifer. If `#ref{}` is used within a string, the references are replaced with the referred values inside the string. If the reference string contains nothing but the reference, the referred value is copied to its place preserving its type.
 

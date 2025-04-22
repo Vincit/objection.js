@@ -2,7 +2,7 @@
 
 Good reading on the subject:
 
-- [JSONB type performance in PostgreSQL 9.4](https://blog.2ndquadrant.com/jsonb-type-performance-postgresql-9-4/) and
+- [JSONB type performance in PostgreSQL 9.4](https://www.enterprisedb.com/blog/jsonb-type-performance-postgresql-94) and
 - [Postgres 9.4 feature highlight - Indexing JSON data with jsonb data type](http://paquier.xyz/postgresql-2/postgres-9-4-feature-highlight-indexing-jsonb/).
 
 ## General Inverted Indexes a.k.a. GIN
