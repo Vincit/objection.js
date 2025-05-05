@@ -30,7 +30,7 @@ app.use((req, res, next) => {
 });
 
 function getKnexForRequest(req, knexCache) {
-  // If you pass the tenantIs a query parameter, you would do something
+  // If you pass the tenantId as a query parameter, you would do something
   // like this.
   let tenantId = req.query.tenantId;
   let knex = knexCache.get(tenantId);
