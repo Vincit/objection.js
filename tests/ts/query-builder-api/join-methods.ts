@@ -60,4 +60,7 @@ import { raw } from '../../..';
   await Person.query().innerJoin('pets', 'pets.foo', 'persons.bar');
   await Person.query().innerJoin(Person.query(), 'persons.foo', 'persons.bar');
   await Person.query().innerJoin((qb) => qb.from('pets').as('pets'), 'pets.foo', 'persons.bar');
+  await Person.query().innerJoin('movies', (join) =>
+    join.onIn('directorId', Person.query().where('age', '>', 32))
+  );
 })();
