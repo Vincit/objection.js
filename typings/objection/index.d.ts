@@ -707,7 +707,7 @@ declare namespace Objection {
   interface ReturningMethod {
     <QB extends AnyQueryBuilder>(
       this: QB,
-      column: string | Raw | (string | Raw)[],
+      column: string | Raw | (string | Raw)[] | readonly (string | Raw)[],
     ): QB extends NumberQueryBuilder<QB> ? ArrayQueryBuilder<QB> : QB;
   }
 
