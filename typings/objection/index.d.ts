@@ -1426,15 +1426,18 @@ declare namespace Objection {
   interface PrototypeType<T> extends Function {
     prototype: T;
   }
-  
+
   interface ConstructorFunctionType<T = any> extends PrototypeType<T> {
     new (...args: any[]): T;
   }
-  
+
   // for internal use on generic static this deduction, copied from https://github.com/microsoft/TypeScript/issues/5863#issuecomment-1483978415
-  type ConstructorType<T = unknown, Static extends Record<string, any> = PrototypeType<T>> = (ConstructorFunctionType<T> | PrototypeType<T>) & {
+  type ConstructorType<T = unknown, Static extends Record<string, any> = PrototypeType<T>> = (
+    | ConstructorFunctionType<T>
+    | PrototypeType<T>
+  ) & {
     [Key in keyof Static]: Static[Key];
-  };  
+  };
 
   export interface ModelConstructor<M extends Model> extends Constructor<M> {}
 
