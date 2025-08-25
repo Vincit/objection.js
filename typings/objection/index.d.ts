@@ -294,6 +294,65 @@ declare namespace Objection {
   >;
 
   /**
+   * Helper types to narrow a model's relation properties based on an object relation expression.
+   * Only relations explicitly present in the expression are kept, non-relational properties are preserved.
+   */
+  type __WithGraph_RelationKeys<M extends Model, E> = Extract<keyof E, ModelRelations<M>>;
+
+  type __WithGraph_NarrowRelatedValue<V, E> =
+    // Single related model
+    V extends Model
+      ? __WithGraph_NarrowModel<V, E>
+      : // Array of related models
+      V extends Array<infer I>
+        ? I extends Model
+          ? Array<__WithGraph_NarrowModel<I, E>>
+          : V
+        : V;
+
+  type __WithGraph_NarrowProp<T, E> = __WithGraph_NarrowRelatedValue<Defined<T>, E> | Extract<T, undefined>;
+
+  /**
+   * Recursively narrows a model type M so that only relations present in E remain.
+   * For included relations, nested relation expression E[K] is applied recursively.
+   */
+  type __WithGraph_NarrowModel<M extends Model, E> = {
+    [K in keyof M as K extends ModelRelations<M>
+      ? (K extends __WithGraph_RelationKeys<M, E> ? K : never)
+      : K]: K extends ModelRelations<M>
+        ? __WithGraph_NarrowProp<M[K], K extends keyof E ? E[K] : unknown>
+        : M[K];
+  };
+
+  /**
+   * Given a QueryBuilder type QB and a relation expression E, produces a QueryBuilder
+   * whose model/result types are narrowed to include only the selected relations.
+   */
+  type __WithGraph_Result<QB extends AnyQueryBuilder, E> =
+    QB extends QueryBuilder<infer M, infer R>
+      ? M extends Model
+        ? QueryBuilder<
+            M,
+            R extends (infer RI)[]
+              ? RI extends M
+                ? Array<__WithGraph_NarrowModel<M, E>>
+                : R
+                : [Extract<R, M>] extends [never]
+                  ? R
+                  : __WithGraph_NarrowModel<M, E> | Exclude<R, M>
+          >
+        : QB
+      : QB;
+
+  interface WithGraphFetchedMethod<QB extends AnyQueryBuilder> {
+    <E extends RelationExpression<ModelType<QB>>>(this: QB, expr: E, options?: GraphOptions): __WithGraph_Result<QB, E>;
+    /**
+     * @deprecated use the object relation expression instead
+     */
+    (this: QB, expr: string, options?: GraphOptions): QB;
+  }
+
+  /**
    * Given a model property type, returns a query builer type of
    * correct kind if the property is a model or a model array.
    */
@@ -1155,11 +1214,7 @@ declare namespace Objection {
     unrelate(): NumberQueryBuilder<this>;
     for(ids: ForIdValue | ForIdValue[]): this;
 
-    withGraphFetched(expr: RelationExpression<M>, options?: GraphOptions): this;
-    /**
-     * @deprecated use the object relation expression instead
-     */
-    withGraphFetched(expr: string, options?: GraphOptions): this;
+  withGraphFetched: WithGraphFetchedMethod<this>;
     withGraphJoined(expr: RelationExpression<M>, options?: GraphOptions): this;
     /**
      * @deprecated use the object relation expression instead
