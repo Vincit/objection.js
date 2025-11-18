@@ -135,6 +135,7 @@ describe('utils', () => {
       testUnderscoreBeforeNumbers('fööBäR', 'föö_bä_r');
 
       testUnderscoreBeforeNumbers('foo1bar2', 'foo_1bar_2');
+      testUnderscoreBeforeNumbers('foo_1bar_2', 'foo_1bar_2', 'foo1bar2');
       testUnderscoreBeforeNumbers('Foo', 'foo', 'foo');
       testUnderscoreBeforeNumbers('FooBar', 'foo_bar', 'fooBar');
       testUnderscoreBeforeNumbers('märkäLänttiÄäliö', 'märkä_läntti_ääliö');
