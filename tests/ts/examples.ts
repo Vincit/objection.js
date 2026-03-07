@@ -759,6 +759,9 @@ const rowsPageRunAfter: PromiseLike<objection.Page<Person>> = Person.query()
 
 // `retuning` should change the return value from number to T[]
 const rowsUpdateReturning: PromiseLike<Person[]> = Person.query().update({}).returning('*');
+const rowsUpdateReturningWithOptions: PromiseLike<Person[]> = Person.query()
+  .update({})
+  .returning('*', { includeTriggerModifications: true });
 
 const rowPatchReturningFirst: PromiseLike<Person | undefined> = Person.query()
   .patch({})

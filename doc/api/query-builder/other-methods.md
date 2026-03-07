@@ -709,6 +709,8 @@ queryBuilder = queryBuilder.skipUndefined();
 
 If this method is called for a builder then undefined values passed to the query builder methods don't cause an exception but are ignored instead.
 
+`skipUndefined()` is deprecated and will be removed in objection 4.0.
+
 For example the following query will return all `Person` rows if `req.query.firstName` is `undefined`.
 
 ##### Return value
