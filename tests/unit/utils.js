@@ -12,7 +12,7 @@ const {
 const { range } = require('lodash');
 const { compose, mixin } = require('../../lib/utils/mixin');
 const { map } = require('../../lib/utils/promiseUtils');
-const { jsonEquals, uniqBy } = require('../../lib/utils/objectUtils');
+const { jsonEquals, uniqBy, union } = require('../../lib/utils/objectUtils');
 
 describe('utils', () => {
   describe('mixin', () => {
@@ -448,6 +448,12 @@ describe('utils', () => {
           item.map((x) => (Buffer.isBuffer(x) ? x.toString('hex') : x)).join(','),
         ),
       ).to.eql(items);
+    });
+  });
+
+  describe('union', () => {
+    it('does not keep duplicates from the first array', () => {
+      expect(union([1, 1, 2], [2, 3])).to.eql([1, 2, 3]);
     });
   });
 });
