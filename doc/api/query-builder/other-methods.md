@@ -131,6 +131,14 @@ Replaces the current context with an empty object.
 | ----------------------------------- | ---------------------------------- |
 | [QueryBuilder](/api/query-builder/) | `this` query builder for chaining. |
 
+## tableName()
+
+```js
+const tableName = queryBuilder.tableName();
+```
+
+Returns the table name for the query model class.
+
 ## tableNameFor()
 
 ```js
@@ -150,6 +158,16 @@ Returns the table name for a given model class in the query. Usually the table n
 | Type   | Description                                       |
 | ------ | ------------------------------------------------- |
 | string | The source table (or view) name for `modelClass`. |
+
+## tableRef()
+
+```js
+const tableRef = queryBuilder.tableRef();
+```
+
+Returns the name that should be used to refer to the query's table.
+Usually a table can be referred to using its name, but `tableRef` can return a different
+value for example in case an alias has been given.
 
 ## tableRefFor()
 

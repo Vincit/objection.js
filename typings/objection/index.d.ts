@@ -1110,6 +1110,8 @@ declare namespace Objection {
     modelClass: ModelClassMethod<M>;
     tableNameFor: TableRefForMethod;
     tableRefFor: TableRefForMethod;
+    tableName(): string;
+    tableRef(): string;
     reject: OneArgMethod<any, this>;
     resolve: OneArgMethod<any, this>;
     transacting: OneArgMethod<TransactionOrKnex, this>;
