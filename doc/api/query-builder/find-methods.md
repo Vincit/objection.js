@@ -676,7 +676,18 @@ See [knex documentation](https://knexjs.org/guide/query-builder.html#where)
 
 ## whereNotColumn()
 
-See [knex documentation](https://knexjs.org/guide/query-builder.html#where)
+See [knex documentation](https://knexjs.org/guide/query-builder.html#wherecolumn)
+
+`whereNotColumn` compares columns against columns. Both sides are treated as column identifiers,
+not values. Use `whereNot` when comparing a column against a literal value.
+
+```js
+// Compares two columns.
+await Person.query().whereNotColumn('firstName', 'lastName');
+
+// Compares a column against a value.
+await Person.query().whereNot('firstName', 'Jennifer');
+```
 
 ##### Return value
 
