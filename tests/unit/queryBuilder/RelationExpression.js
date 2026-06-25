@@ -1163,6 +1163,10 @@ describe('RelationExpression', () => {
     testToString('a.^');
     testToString('a.^3');
     testToString('[a.*, b.c.^]');
+    testToString('a(f1).^');
+    testToString('a(f1).^3');
+    testToString('a as b.^');
+    testToString('a(f1) as b.^');
   });
 
   describe('#isSubExpression', () => {
