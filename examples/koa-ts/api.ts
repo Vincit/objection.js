@@ -18,7 +18,7 @@ export default (router: KoaRouter) => {
       const insertedGraph = await Person.query(trx)
         // For security reasons, limit the relations that can be inserted.
         .allowGraph('[pets, children.[pets, movies], movies, parent]')
-        .insertGraph(ctx.request.body)
+        .insertGraph(requestBody(ctx))
 
       return insertedGraph
     })
@@ -73,7 +73,8 @@ export default (router: KoaRouter) => {
     }
 
     if (ctx.query.orderBy) {
-      query.orderBy(takeFirst(ctx.query.orderBy))
+      const orderBy = Array.isArray(ctx.query.orderBy) ? ctx.query.orderBy[0] : ctx.query.orderBy
+      query.orderBy(orderBy as string)
     }
 
     if (ctx.query.withPetCount) {
@@ -94,7 +95,7 @@ export default (router: KoaRouter) => {
    * Update a single Person.
    */
   router.patch('/persons/:id', async (ctx) => {
-    const numUpdated = await Person.query().findById(ctx.params.id).patch(ctx.request.body)
+    const numUpdated = await Person.query().findById(ctx.params.id).patch(requestBody(ctx))
 
     ctx.body = {
       success: numUpdated == 1,
@@ -118,7 +119,7 @@ export default (router: KoaRouter) => {
   router.post('/persons/:id/children', async (ctx) => {
     const personId = parseInt(ctx.params.id)
 
-    const child = await Person.relatedQuery('children').for(personId).insert(ctx.request.body)
+    const child = await Person.relatedQuery('children').for(personId).insert(requestBody(ctx))
 
     ctx.body = child
   })
@@ -167,7 +168,7 @@ export default (router: KoaRouter) => {
   router.post('/persons/:id/pets', async (ctx) => {
     const personId = parseInt(ctx.params.id)
 
-    const pet = await Person.relatedQuery('pets').for(personId).insert(ctx.request.body)
+    const pet = await Person.relatedQuery('pets').for(personId).insert(requestBody(ctx))
 
     ctx.body = pet
   })
@@ -199,7 +200,7 @@ export default (router: KoaRouter) => {
    * Insert a new movie.
    */
   router.post('/movies', async (ctx) => {
-    const movie = await Movie.query().insert(ctx.request.body)
+    const movie = await Movie.query().insert(requestBody(ctx))
     ctx.body = movie
   })
 
@@ -240,6 +241,6 @@ export default (router: KoaRouter) => {
   })
 }
 
-function takeFirst<T>(item: T | ReadonlyArray<T>): T {
-  return Array.isArray(item) ? item[0] : item
+function requestBody(ctx: KoaRouter.RouterContext): any {
+  return ctx.request.body
 }
