@@ -1890,6 +1890,13 @@ declare namespace Objection {
     $comment?: string;
 
     /**
+     * @see https://json-schema.org/draft/2019-09/release-notes
+     */
+    $defs?: {
+      [key: string]: JSONSchemaDefinition;
+    };
+
+    /**
      * @see https://tools.ietf.org/html/draft-handrews-json-schema-validation-01#section-6.1
      */
     type?: JSONSchemaTypeName | JSONSchemaTypeName[];
@@ -1968,6 +1975,7 @@ declare namespace Objection {
 
     /**
      * @see https://tools.ietf.org/html/draft-handrews-json-schema-validation-01#section-9
+     * @deprecated Rename to $defs
      */
     definitions?: {
       [key: string]: JSONSchemaDefinition;
