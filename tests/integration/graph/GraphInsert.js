@@ -1116,7 +1116,13 @@ module.exports = (session) => {
 
     function createModels() {
       mockKnex = mockKnexFactory(session.knex, function (_, oldImpl, args) {
-        ++numExecutedQueries;
+        const queryString = this.toSQL().sql;
+        if (
+          queryString.match(/select \* from information_schema\.columns/) == null &&
+          queryString.match(/PRAGMA/) == null
+        ) {
+          ++numExecutedQueries;
+        }
         return oldImpl.apply(this, args);
       });
 

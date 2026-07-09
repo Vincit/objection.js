@@ -20,11 +20,24 @@ describe('BelongsToOneRelation', () => {
   let relation;
   let compositeKeyRelation;
 
+  let keepColumnInfo = false;
+  let skippedColumnInfo = 0;
+
   before(() => {
     let knex = Knex({ client: 'pg' });
 
     mockKnex = knexMocker(knex, function (mock, oldImpl, args) {
-      executedQueries.push(this.toString());
+      const queryString = this.toString();
+      const matchColInfo = queryString.match(/select \* from information_schema\.columns/) != null;
+
+      if (matchColInfo && keepColumnInfo && skippedColumnInfo++ > 0) {
+        executedQueries.push(queryString);
+      } else if (!matchColInfo) {
+        executedQueries.push(queryString);
+      } else {
+        const promise = Promise.resolve([]);
+        return promise.then.apply(promise, args);
+      }
 
       let result = mockKnexQueryResults.shift() || [];
       let promise = Promise.resolve(result);
@@ -36,6 +49,8 @@ describe('BelongsToOneRelation', () => {
   beforeEach(() => {
     mockKnexQueryResults = [];
     executedQueries = [];
+    keepColumnInfo = false;
+    skippedColumnInfo = 0;
 
     OwnerModel = class OwnerModel extends Model {
       static get tableName() {
