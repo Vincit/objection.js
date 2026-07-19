@@ -30,6 +30,7 @@ declare namespace Objection {
 
   const snakeCaseMappers: SnakeCaseMappersFactory;
   const knexSnakeCaseMappers: KnexSnakeCaseMappersFactory;
+  const knexIdentifierMapping: KnexIdentifierMappingFactory;
 
   const transaction: transaction;
   const initialize: initialize;
@@ -1352,6 +1353,10 @@ declare namespace Objection {
 
   export interface KnexSnakeCaseMappersFactory {
     (options?: SnakeCaseMappersOptions): KnexMappers;
+  }
+
+  export interface KnexIdentifierMappingFactory {
+    (colToProp: Record<string, string>): KnexMappers;
   }
 
   export type ValidationErrorType =
