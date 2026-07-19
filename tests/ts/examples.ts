@@ -4,6 +4,7 @@ import * as objection from '../../';
 import {
   DBError,
   fn,
+  knexIdentifierMapping,
   QueryBuilder,
   raw,
   ref,
@@ -1283,3 +1284,18 @@ async () => {
 };
 
 Person.fromJson({ id: 1 }).$modelClass.query();
+
+// knexIdentifierMapping (issue #1947)
+() => {
+  const mappers: objection.KnexMappers = knexIdentifierMapping({
+    MyId: 'id',
+    MyProp: 'prop',
+    MyAnotherProp: 'anotherProp',
+  });
+
+  knex({
+    client: 'sqlite3',
+    connection: { filename: ':memory:' },
+    ...mappers,
+  });
+};
