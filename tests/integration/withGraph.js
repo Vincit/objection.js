@@ -1126,6 +1126,49 @@ module.exports = (session) => {
         });
     });
 
+    it('resultSize should support aliased selections in groupBy and having with joinEager', () => {
+      // Postgres doesn't support selection aliases in `having`.
+      if (session.isPostgres()) {
+        return;
+      }
+
+      const query = Model1.query()
+        .select('Model1.id', 'Model1.model1Prop1 as prop')
+        .whereIn('Model1.id', [1, 6])
+        .withGraphJoined('model1Relation2')
+        .groupBy('Model1.id', 'model1Relation2.id_col')
+        .having('prop', '=', 'hello 1');
+
+      return Promise.all([query, query.resultSize()]).then(([models, size]) => {
+        expect(models.map((it) => it.id)).to.eql([1]);
+        expect(size).to.equal(1);
+      });
+    });
+
+    it('resultSize should support a column selected twice with groupBy and joinEager', async () => {
+      const query = Model1.query()
+        .select('Model1.*', 'Model1.id')
+        .whereIn('Model1.id', [1, 6])
+        .withGraphJoined('model1Relation2')
+        .groupBy('Model1.id', 'model1Relation2.id_col');
+
+      const [models, size] = await Promise.all([query, query.resultSize()]);
+      expect(models.map((it) => it.id).sort()).to.eql([1, 6]);
+      expect(size).to.equal(2);
+    });
+
+    it('resultSize should support an aliased selection in groupBy with joinEager', async () => {
+      const query = Model1.query()
+        .select('Model1.id', 'Model1.model1Prop1 as prop')
+        .whereIn('Model1.id', [1, 6])
+        .withGraphJoined('model1Relation2')
+        .groupBy('Model1.id', 'prop', 'model1Relation2.id_col');
+
+      const [models, size] = await Promise.all([query, query.resultSize()]);
+      expect(models.map((it) => it.id).sort()).to.eql([1, 6]);
+      expect(size).to.equal(2);
+    });
+
     it('page should count the root models with joinEager', () => {
       return Model1.query()
         .whereIn('Model1.id', [1, 6])

@@ -1721,6 +1721,25 @@ describe('QueryBuilder', () => {
         });
     });
 
+    it('resultSize should keep the selections when grouping', () => {
+      Person.tableMetadata = () => ({ columns: ['id', 'name'] });
+      Animal.tableMetadata = () => ({ columns: ['id', 'ownerId'] });
+      mockKnexQueryResults = [[{ count: '1' }]];
+
+      return Person.query()
+        .select('Person.id', 'Person.name as personName')
+        .withGraphJoined('pets')
+        .groupBy('Person.id', 'pets.id')
+        .having('personName', '=', 'A')
+        .resultSize()
+        .then((res) => {
+          expect(res).to.equal(1);
+          expect(executedQueries).to.eql([
+            'select count(*) as "count" from (select distinct "id" from (select "Person"."id", "Person"."name" as "personName", "pets"."id" as "pets:id", "pets"."ownerId" as "pets:ownerId" from "Person" left join "Animal" as "pets" on "pets"."ownerId" = "Person"."id" group by "Person"."id", "pets"."id" having "personName" = \'A\') as "inner") as "temp"',
+          ]);
+        });
+    });
+
     it('page should count the distinct root models in the total count query', () => {
       Person.tableMetadata = () => ({ columns: ['id', 'name'] });
       Animal.tableMetadata = () => ({ columns: ['id', 'name', 'ownerId'] });
