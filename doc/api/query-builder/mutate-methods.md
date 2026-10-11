@@ -610,14 +610,20 @@ Relate (attach) an existing item to another item through a relation.
 This method doesn't create a new item but only updates the foreign keys. In
 the case of a many-to-many relation, creates a join row to the join table.
 
-On Postgres multiple items can be related by giving an array of identifiers.
+Multiple items can be related by giving an array of identifiers: for has-many
+relations on all databases, for many-to-many relations only on Postgres and SQL
+Server, as it needs a batch insert. Belongs-to-one relations take one
+identifier.
 
-The return value of the query is the number of affected items. On Postgres you
-can chain [returning('\*')](/api/query-builder/find-methods.html#returning) to get
-the affected rows instead: the inserted join table rows for many-to-many
+The return value of the query is the number of affected items. On all databases
+except MySQL you can chain [returning('\*')](/api/query-builder/find-methods.html#returning)
+to get the affected rows instead: the inserted join table rows for many-to-many
 relations, the updated related rows for has-many relations and the updated owner
-rows for belongs-to-one relations. As the TypeScript typings can't tell these
-apart, the rows are typed as `any`.
+rows for belongs-to-one relations. MySQL has no `returning`: there, many-to-many
+relations return the join rows built from the input, without columns generated
+by the database, and the other relations still return the number of affected
+items. As the TypeScript typings can't tell these apart, the rows are typed as
+`any`.
 
 ##### Arguments
 

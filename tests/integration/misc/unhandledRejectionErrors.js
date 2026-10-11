@@ -55,6 +55,13 @@ module.exports = (session) => {
       ]);
     });
 
+    it('handles each unhandled rejection once', async () => {
+      Promise.reject(new Error('unhandled'));
+      await new Promise((resolve) => setTimeout(resolve, 10));
+      expect(unhandledErrors).to.have.length(1);
+      expect(unhandledErrors[0].message).to.equal('unhandled');
+    });
+
     it('range', (done) => {
       Model1.query()
         .table('doesnt_exist')

@@ -479,7 +479,17 @@ function inc(obj, key) {
 }
 
 function registerUnhandledRejectionHandler() {
-  process.on('unhandledRejection', (error) => {
+  // Mocha removes its own listener and re-emits each rejection from user code,
+  // so this listener receives it twice. Handle each rejected promise once.
+  const handledPromises = new WeakSet();
+
+  process.on('unhandledRejection', (error, promise) => {
+    if (handledPromises.has(promise)) {
+      return;
+    }
+
+    handledPromises.add(promise);
+
     if (TestSession.unhandledRejectionHandlers.length === 0) {
       console.error(error.stack);
     }
