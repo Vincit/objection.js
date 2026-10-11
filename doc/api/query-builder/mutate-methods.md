@@ -612,7 +612,8 @@ The return value of the query is the number of affected items. On Postgres you
 can chain [returning('\*')](/api/query-builder/find-methods.html#returning) to get
 the affected rows instead: the inserted join table rows for many-to-many
 relations, the updated related rows for has-many relations and the updated owner
-rows for belongs-to-one relations.
+rows for belongs-to-one relations. As the TypeScript typings can't tell these
+apart, the rows are typed as `any`.
 
 ##### Arguments
 

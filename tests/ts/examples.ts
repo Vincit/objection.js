@@ -824,13 +824,38 @@ const rowsUpdateReturningWithOptions: PromiseLike<Person[]> = Person.query()
   .update({})
   .returning('*', { includeTriggerModifications: true });
 
-// `returning` should change the return value of `relate` from number to T[]
+// `returning` accepts multiple columns, optionally followed by the options.
+const rowsPatchReturningColumns: PromiseLike<Person[]> = Person.query()
+  .patch({})
+  .returning('id', 'firstName', ['lastName'], { includeTriggerModifications: true });
+
+// The options can be optional, as in 3.6.0.
+(returningOptions?: objection.ReturningOptions) => {
+  const rows: PromiseLike<Person[]> = Person.query()
+    .insert([{ firstName: 'Jack' }])
+    .returning('*', returningOptions);
+};
+
+// `returning` should change the return value of `relate` from number to rows,
+// which can be join rows, related rows or owner rows, depending on the relation.
 const numRelated: PromiseLike<number> = Person.relatedQuery('pets').for(1).relate(2);
 
 const rowsRelateReturning: PromiseLike<Animal[]> = Person.relatedQuery('pets')
   .for(1)
   .relate(2)
   .returning('*');
+
+async () => {
+  const joinRows = await Person.relatedQuery('movies').for(123).relate([50, 60]).returning('*');
+  console.log(joinRows[0].personId, joinRows[0].movieId);
+
+  const rows = await Person.relatedQuery('movies')
+    .for(123)
+    .relate(50)
+    .debug()
+    .returning('personId', 'movieId', { includeTriggerModifications: true });
+  console.log(rows[0].personId);
+};
 
 // Executing a query builder should be equivalent to treating it
 // as a promise directly, regardless of query builder return type:
@@ -1441,4 +1466,20 @@ Person.fromJson({ id: 1 }).$modelClass.query();
     connection: { filename: ':memory:' },
     ...mappers,
   });
+};
+
+// Each mapper factory only accepts the options it supports.
+() => {
+  const options: objection.SnakeCaseMappersOptions = { upperCase: true, preserveJsonKeys: true };
+  objection.snakeCaseMappers(options);
+  const knexOptions: objection.KnexSnakeCaseMappersOptions = { upperCase: true };
+  objection.knexSnakeCaseMappers(knexOptions);
+  const shared: objection.SnakeCaseOptions = { noDoubleUnderscores: true };
+  objection.snakeCaseMappers(shared);
+  objection.knexSnakeCaseMappers(shared);
+
+  // @ts-expect-error
+  objection.knexSnakeCaseMappers({ preserveJsonKeys: true });
+  // @ts-expect-error
+  knexIdentifierMapping({ MyId: 'id' }, { upperCase: true });
 };

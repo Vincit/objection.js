@@ -352,6 +352,14 @@ async function fetchGraph() {
   type _d = Expect<Equal<typeof d, Person>>;
   const e = await Person.fetchGraph(persons, expr, { skipFetched: true });
   type _e = Expect<Equal<typeof e, Person[]>>;
+
+  // Passing the model type explicitly still compiles, but doesn't narrow.
+  const f = await Person.fetchGraph<Person>(person, 'pets');
+  type _f = Expect<Equal<typeof f, Person>>;
+  const g = await Person.fetchGraph<Person>(persons, 'pets');
+  type _g = Expect<Equal<typeof g, Person[]>>;
+  const h = await Person.fetchGraph<Person, 'pets'>(persons, 'pets');
+  h[0].pets.length;
 }
 
 async function customQueryBuilders() {

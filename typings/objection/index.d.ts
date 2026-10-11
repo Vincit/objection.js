@@ -374,7 +374,8 @@ declare namespace Objection {
 
   /**
    * Converts the query builder NQB to the same result kind as QB:
-   * array, single, maybe-single or page.
+   * array, single, maybe-single or page. Any other result type, e.g. after
+   * `castTo()` or `patch()`, falls back to QB, without narrowing.
    */
   type WithResultKind<QB extends AnyQueryBuilder, NQB extends AnyQueryBuilder> = [
     ResultType<QB>,
@@ -423,7 +424,9 @@ declare namespace Objection {
         ? I extends Model
           ? I[] | PartialModelObject<I>[]
           : Expression<T[K]>
-        : Expression<T[K]>;
+        : NonNullable<T[K]> extends Model
+          ? Expression<T[K]> | PartialModelObject<NonNullable<T[K]>> // nullable to-one relations
+          : Expression<T[K]>;
   };
 
   /**
@@ -1000,13 +1003,35 @@ declare namespace Objection {
     includeTriggerModifications?: boolean;
   }
 
+  type ReturningColumn = string | Raw | readonly (string | Raw)[];
+
+  /**
+   * The arguments of `returning()`: any number of columns or column arrays,
+   * optionally followed by an options object.
+   */
+  type ReturningArgs =
+    ReturningColumn[] | [ReturningColumn, ...ReturningColumn[], ReturningOptions | undefined];
+
   interface ReturningMethod {
     <QB extends AnyQueryBuilder>(
       this: QB,
-      column: string | Raw | (string | Raw)[] | readonly (string | Raw)[],
-      options?: ReturningOptions,
+      ...args: ReturningArgs
     ): QB extends NumberQueryBuilder<QB> ? ArrayQueryBuilder<QB> : QB;
   }
+
+  /**
+   * With `returning()`, `relate()` returns the inserted join rows for
+   * many-to-many relations, the updated related rows for has-many relations
+   * and the updated owner rows for belongs-to-one relations. The typings can't
+   * tell these apart, so the rows are typed as `any`.
+   */
+  interface RelateReturningMethod<M extends Model> {
+    (...args: ReturningArgs): QueryBuilder<M, any[]>;
+  }
+
+  type RelateQueryBuilder<QB extends AnyQueryBuilder> = {
+    returning: RelateReturningMethod<ModelType<QB>>;
+  } & NumberQueryBuilder<QB>;
 
   interface TimeoutOptions {
     cancel: boolean;
@@ -1388,7 +1413,7 @@ declare namespace Objection {
 
     relate(
       ids: MaybeCompositeId | MaybeCompositeId[] | PartialModelObject<M> | PartialModelObject<M>[],
-    ): NumberQueryBuilder<this>;
+    ): RelateQueryBuilder<this>;
 
     unrelate(): NumberQueryBuilder<this>;
     for(ids: ForIdValue | ForIdValue[]): this;
@@ -1720,18 +1745,25 @@ declare namespace Objection {
     constructor(config: AjvConfig);
   }
 
-  export interface SnakeCaseMappersOptions {
+  /**
+   * The options shared by `snakeCaseMappers` and `knexSnakeCaseMappers`.
+   */
+  export interface SnakeCaseOptions {
     upperCase?: boolean;
     underscoreBeforeDigits?: boolean;
     underscoreBetweenUppercaseLetters?: boolean;
     noDoubleUnderscores?: boolean;
+  }
+
+  export interface SnakeCaseMappersOptions extends SnakeCaseOptions {
     /**
      * Only convert the column part of field expressions like
      * `jsonColumn:someKey` and keep their JSON keys as written.
-     * Only used by `snakeCaseMappers`.
      */
     preserveJsonKeys?: boolean;
   }
+
+  export interface KnexSnakeCaseMappersOptions extends SnakeCaseOptions {}
 
   export interface ColumnNameMappers {
     parse(json: Pojo): Pojo;
@@ -1748,7 +1780,7 @@ declare namespace Objection {
   }
 
   export interface KnexSnakeCaseMappersFactory {
-    (options?: SnakeCaseMappersOptions): KnexMappers;
+    (options?: KnexSnakeCaseMappersOptions): KnexMappers;
   }
 
   export interface KnexIdentifierMappingFactory {
@@ -2026,14 +2058,16 @@ declare namespace Objection {
     static bindKnex<M>(this: M, trxOrKnex: TransactionOrKnex): M;
     static bindTransaction<M>(this: M, trxOrKnex: TransactionOrKnex): M;
 
-    static fetchGraph<M extends Model, const E extends RelationExpression<M>>(
+    // E defaults to `string` so that `fetchGraph<Person>(...)` still compiles,
+    // without narrowing, as TypeScript doesn't infer the remaining arguments.
+    static fetchGraph<M extends Model, const E extends RelationExpression<M> = string>(
       this: ConstructorType<M>,
       modelOrObject: PartialModelObject<M>,
       expression: E,
       options?: FetchGraphOptions,
     ): SingleQueryBuilder<WithGraphModelQueryBuilder<M, E>>;
 
-    static fetchGraph<M extends Model, const E extends RelationExpression<M>>(
+    static fetchGraph<M extends Model, const E extends RelationExpression<M> = string>(
       this: ConstructorType<M>,
       modelOrObject: PartialModelObject<M>[],
       expression: E,
