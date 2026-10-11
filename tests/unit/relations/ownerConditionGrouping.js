@@ -287,6 +287,141 @@ describe('relation owner condition grouping (#2191)', () => {
     });
   });
 
+  describe('wheres added by *ById hooks', () => {
+    it('patchAndFetchById() after orWhere', () => {
+      expect(
+        sql(
+          owner()
+            .$relatedQuery('pets')
+            .where('name', 'a')
+            .orWhere('name', 'b')
+            .patchAndFetchById(1, { name: 'c' }),
+        ),
+      ).to.equal(
+        `update "pets" set "name" = 'c' where ("name" = 'a' or "name" = 'b') and "pets"."id" = 1 and "pets"."ownerId" in (1)`,
+      );
+    });
+
+    it('patchAndFetchById() after orWhere without a relation', () => {
+      expect(
+        sql(
+          Pet.query().where('name', 'a').orWhere('name', 'b').patchAndFetchById(1, { name: 'c' }),
+        ),
+      ).to.equal(
+        `update "pets" set "name" = 'c' where ("name" = 'a' or "name" = 'b') and "pets"."id" = 1`,
+      );
+    });
+
+    it('$query().patch() with orWhere', () => {
+      expect(
+        sql(
+          Pet.fromJson({ id: 1 })
+            .$query()
+            .patch({ name: 'c' })
+            .where('name', 'a')
+            .orWhere('name', 'b'),
+        ),
+      ).to.equal(
+        `update "pets" set "name" = 'c' where "pets"."id" = 1 and ("name" = 'a' or "name" = 'b')`,
+      );
+    });
+
+    it('findById() called by the user stays in the user group', () => {
+      expect(sql(owner().$relatedQuery('pets').findById(1).orWhere('name', 'b'))).to.equal(
+        `select "pets".* from "pets" where "pets"."ownerId" in (1) and ("pets"."id" = 1 or "name" = 'b')`,
+      );
+    });
+
+    it('asFindQuery() in afterUpdate keeps the where groups of the executed query', async () => {
+      const findQueries = [];
+
+      Pet = class extends Pet {
+        static afterUpdate({ asFindQuery }) {
+          findQueries.push(sql(asFindQuery()));
+        }
+      };
+      Pet.knex(mockKnex);
+
+      await Owner.relatedQuery('pets')
+        .for(1)
+        .patchAndFetchById(1, { name: 'c' })
+        .orWhere('name', 'b');
+
+      expect(executedQueries).to.eql([
+        `update "pets" set "name" = 'c' where "pets"."id" = 1 and "pets"."ownerId" in (1) and ("name" = 'b')`,
+      ]);
+      expect(findQueries).to.eql([
+        `select "pets".* from "pets" where "pets"."ownerId" in (1) and "pets"."id" = 1 and ("name" = 'b')`,
+      ]);
+    });
+  });
+
+  describe('building an executed query again', () => {
+    let findQueries = null;
+
+    beforeEach(() => {
+      findQueries = [];
+
+      Pet = class extends Pet {
+        static afterUpdate({ asFindQuery }) {
+          findQueries.push(sql(asFindQuery()));
+        }
+
+        static afterDelete({ asFindQuery }) {
+          findQueries.push(sql(asFindQuery()));
+        }
+      };
+      Pet.knex(mockKnex);
+    });
+
+    const onBuild = (query) => query.onBuild((query) => query.where('hidden', false));
+    const where = `where ("hidden" = false and "name" = 'a' or "name" = 'b') and "pets"."ownerId" in (1)`;
+    const findQuery = `select "pets".* from "pets" ${where}`;
+
+    it('patch() with orWhere and an onBuild() hook', async () => {
+      await onBuild(owner().$relatedQuery('pets'))
+        .where('name', 'a')
+        .orWhere('name', 'b')
+        .patch({ name: 'c' });
+
+      expect(executedQueries).to.eql([`update "pets" set "name" = 'c' ${where}`]);
+      expect(findQueries).to.eql([findQuery]);
+    });
+
+    it('delete() with orWhere and an onBuild() hook', async () => {
+      await onBuild(owner().$relatedQuery('pets')).where('name', 'a').orWhere('name', 'b').delete();
+
+      expect(executedQueries).to.eql([`delete from "pets" ${where}`]);
+      expect(findQueries).to.eql([findQuery]);
+    });
+
+    it('patch() with orWhere and an onBuild() hook in a modifier', async () => {
+      await owner()
+        .$relatedQuery('pets')
+        .modify(onBuild)
+        .where('name', 'a')
+        .orWhere('name', 'b')
+        .patch({ name: 'c' });
+
+      expect(executedQueries).to.eql([`update "pets" set "name" = 'c' ${where}`]);
+      expect(findQueries).to.eql([findQuery]);
+    });
+  });
+
+  describe('wheres added in onBuildKnex()', () => {
+    it('are built', () => {
+      expect(
+        sql(
+          Pet.query()
+            .where('name', 'a')
+            .onBuildKnex((knexQuery, query) => {
+              query.where('age', 2);
+            }),
+        ),
+      ).to.equal(`select "pets".* from "pets" where "name" = 'a' and "age" = 2`);
+    });
+  });
+
   describe('BelongsToOneRelation', () => {
     it('find', () => {
       expect(

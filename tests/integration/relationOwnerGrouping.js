@@ -96,6 +96,17 @@ module.exports = (session) => {
         expect(await model2Ids((it) => it.model2_prop1 === 'x')).to.eql([1, 2]);
       });
 
+      it('patchAndFetchById', async () => {
+        const patched = await owner1()
+          .$relatedQuery('model1Relation2')
+          .where('model2_prop1', 'a')
+          .orWhere('model2_prop1', 'b')
+          .patchAndFetchById(2, { model2Prop2: 100 });
+
+        expect(patched.idCol).to.equal(2);
+        expect(await model2Ids((it) => it.model2_prop2 === 100)).to.eql([2]);
+      });
+
       it('unrelate', async () => {
         const numUnrelated = await owner1()
           .$relatedQuery('model1Relation2')
