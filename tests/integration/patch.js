@@ -186,6 +186,21 @@ module.exports = (session) => {
           });
       });
 
+      it('should patch multiple with an order', async () => {
+        const numUpdated = await Model1.query()
+          .patch({ model1Prop1: 'updated text' })
+          .where('model1Prop1', '<', 'hello 3')
+          .orderBy('id');
+
+        expect(numUpdated).to.equal(2);
+        const rows = await session.knex('Model1').orderBy('id');
+        expect(rows.map((row) => row.model1Prop1)).to.eql([
+          'updated text',
+          'updated text',
+          'hello 3',
+        ]);
+      });
+
       it('should accept subqueries for the same table in where groups and join clauses', async () => {
         const subquery = () => Model1.query().select('id').where('id', 1);
 
@@ -542,6 +557,17 @@ module.exports = (session) => {
             expectPartEql(rows[1], { id: 2, model1Prop1: 'updated text' });
             expectPartEql(rows[2], { id: 3, model1Prop1: 'hello 3' });
           });
+      });
+
+      it('should patch and fetch a model with an order', async () => {
+        const fetchedModel = await Model1.query()
+          .patchAndFetchById(2, { model1Prop1: 'updated text' })
+          .orderBy('id');
+
+        expect(fetchedModel.id).to.equal(2);
+        expect(fetchedModel.model1Prop1).to.equal('updated text');
+        const rows = await session.knex('Model1').orderBy('id');
+        expect(rows.map((row) => row.model1Prop1)).to.eql(['hello 1', 'updated text', 'hello 3']);
       });
 
       it('should apply `select` to the fetch query', async () => {

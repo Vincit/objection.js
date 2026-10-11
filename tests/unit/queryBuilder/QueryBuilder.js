@@ -742,6 +742,46 @@ describe('QueryBuilder', () => {
     });
   });
 
+  describe('order of updates and deletes', () => {
+    const query = (client) => TestModel.query(Knex({ client, useNullAsDefault: true }));
+
+    it('should leave the order to knex on postgres, mysql and sqlite', () => {
+      const patchSql = (client) =>
+        query(client).patch({ a: 1 }).where('b', 2).orderBy('c').toKnexQuery().toString();
+
+      expect(patchSql('pg')).to.equal('update "Model" set "a" = 1 where "b" = 2');
+      expect(patchSql('mysql')).to.equal(
+        'update `Model` set `a` = 1 where `b` = 2 order by `c` asc',
+      );
+      expect(patchSql('sqlite3')).to.equal('update `Model` set `a` = 1 where `b` = 2');
+    });
+
+    it('should leave out the order on mssql', () => {
+      expect(
+        query('mssql').patch({ a: 1 }).where('b', 2).orderBy('c').toKnexQuery().toString(),
+      ).to.equal('update [Model] set [a] = 1 where [b] = 2;select @@rowcount');
+      expect(
+        query('mssql').patchAndFetchById(1, { a: 1 }).orderBy('c').toKnexQuery().toString(),
+      ).to.equal('update [Model] set [a] = 1 where [Model].[id] = 1;select @@rowcount');
+      expect(
+        query('mssql')
+          .update({ a: 1 })
+          .onBuild((builder) => builder.orderBy('c'))
+          .toKnexQuery()
+          .toString(),
+      ).to.equal('update [Model] set [a] = 1;select @@rowcount');
+      expect(query('mssql').delete().where('b', 2).orderBy('c').toKnexQuery().toString()).to.equal(
+        'delete from [Model] where [b] = 2;select @@rowcount',
+      );
+    });
+
+    it('should keep the order with a limit on mssql', () => {
+      expect(
+        query('mssql').patch({ a: 1 }).orderBy('c').limit(1).toKnexQuery().toString(),
+      ).to.equal('update top (1) [Model] set [a] = 1 order by [c] asc;select @@rowcount');
+    });
+  });
+
   describe('delete with joinRelated and a modifier (#2799)', () => {
     class Person extends Model {
       static get tableName() {
