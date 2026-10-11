@@ -9,7 +9,7 @@
     "test:fast": "mocha --slow 10 --timeout 15000 --reporter spec --recursive tests --bail --exclude \"tests/unit/relations/files/**\"",
     "test:typings": "tsc && prettier --check \"typings/**/*.ts\" \"tests/ts/**/*.ts\"",
     "db:up": "docker compose up -d --wait",
-    "db:down": "docker compose down -v",
+    "db:down": "docker compose --profile mssql down -v",
     "build:parsers": "npx --yes peggy@5.1.0 --format commonjs -o lib/queryBuilder/parsers/jsonFieldExpressionParser.js lib/queryBuilder/parsers/jsonFieldExpressionParser.pegjs && npx --yes peggy@5.1.0 --format commonjs -o lib/queryBuilder/parsers/relationExpressionParser.js lib/queryBuilder/parsers/relationExpressionParser.pegjs && prettier --write \"lib/queryBuilder/parsers/*Parser.js\"",
     "prettier": "prettier --write \"{examples,lib,tests,testUtils,typings,doc}/**/*.{js,ts}\"",
     "eslint": "eslint --format codeframe \"examples/**/*.js\" \"lib/**/*.js\" \"tests/**/*.js\" \"testUtils/**/*.js\" \"*.js\"",
@@ -82,6 +82,7 @@
     "pg": "^8.15.6",
     "prettier": "3.9.9",
     "sqlite3": "^5.1.7",
+    "tedious": "^20.3.7",
     "typescript": ">=5.8.3",
     "vitepress": "1.6.4"
   }

@@ -211,6 +211,9 @@ class TestSession {
   createDb() {
     const knex = this.knex;
     const opt = this.opt;
+    // SQL Server rejects `SET NULL` on the self reference of Model1 and on the
+    // references that would be a second cascade path to the join tables.
+    const setNull = this.isMsSql() ? 'NO ACTION' : 'SET NULL';
 
     return Promise.resolve()
       .then(() => knex.schema.dropTableIfExists('Model1Model2'))
@@ -219,57 +222,55 @@ class TestSession {
       .then(() => knex.schema.dropTableIfExists('model2'))
       .then(() => knex.schema.dropTableIfExists('Model1'))
       .then(() => knex.schema.dropTableIfExists('model3'))
+      .then(() =>
+        this.createTable('Model1', (table, { increments }) => {
+          increments('id');
+          table.integer('model1Id').index().unsigned().references('Model1.id').onDelete(setNull);
+          table.string('model1Prop1');
+          table.integer('model1Prop2');
+        }),
+      )
+      .then(() =>
+        this.createTable('model2', (table, { increments }) => {
+          increments('id_col');
+          table.integer('model1_id').index().unsigned().references('Model1.id').onDelete(setNull);
+          table.string('model2_prop1');
+          table.integer('model2_prop2');
+        }),
+      )
+      .then(() =>
+        this.createTable('model3', (table, { increments }) => {
+          increments('id');
+          table.string('model3Prop1');
+          table.text('model3JsonProp');
+        }),
+      )
+      .then(() =>
+        this.createTable('Model1Model2', (table, { increments }) => {
+          increments('id');
+          table.string('extra1');
+          table.string('extra2');
+          table.string('extra3');
+          table
+            .integer('model1Id')
+            .unsigned()
+            .notNullable()
+            .references('id')
+            .inTable('Model1')
+            .onDelete('CASCADE')
+            .index();
+          table
+            .integer('model2Id')
+            .unsigned()
+            .notNullable()
+            .references('id_col')
+            .inTable('model2')
+            .onDelete('CASCADE')
+            .index();
+        }),
+      )
       .then(() => {
         return knex.schema
-          .createTable('Model1', (table) => {
-            table.increments('id').primary();
-            table
-              .integer('model1Id')
-              .index()
-              .unsigned()
-              .references('Model1.id')
-              .onDelete('SET NULL');
-            table.string('model1Prop1');
-            table.integer('model1Prop2');
-          })
-          .createTable('model2', (table) => {
-            table.increments('id_col').primary();
-            table
-              .integer('model1_id')
-              .index()
-              .unsigned()
-              .references('Model1.id')
-              .onDelete('SET NULL');
-            table.string('model2_prop1');
-            table.integer('model2_prop2');
-          })
-          .createTable('model3', (table) => {
-            table.increments('id').primary();
-            table.string('model3Prop1');
-            table.text('model3JsonProp');
-          })
-          .createTable('Model1Model2', (table) => {
-            table.increments('id').primary();
-            table.string('extra1');
-            table.string('extra2');
-            table.string('extra3');
-            table
-              .integer('model1Id')
-              .unsigned()
-              .notNullable()
-              .references('id')
-              .inTable('Model1')
-              .onDelete('CASCADE')
-              .index();
-            table
-              .integer('model2Id')
-              .unsigned()
-              .notNullable()
-              .references('id_col')
-              .inTable('model2')
-              .onDelete('CASCADE')
-              .index();
-          })
           .createTable('Model1Model2One', (table) => {
             table
               .integer('model1Id')
@@ -362,6 +363,10 @@ class TestSession {
                   return trx.raw(
                     'ALTER SEQUENCE "' + table + '_' + idCol + '_seq" RESTART WITH ' + (maxId + 1),
                   );
+                } else if (knexUtils.isMsSql(trx)) {
+                  return trx.raw(
+                    `ALTER SEQUENCE [${getSequenceName(table)}] RESTART WITH ${maxId + 1}`,
+                  );
                 } else if (knexUtils.isMySql(trx)) {
                   return trx.raw('ALTER TABLE ' + table + ' AUTO_INCREMENT = ' + (maxId + 1));
                 } else {
@@ -372,6 +377,36 @@ class TestSession {
         })
         .then(() => data);
     });
+  }
+
+  // Like `knex.schema.createTable()`, with an `increments()` for the callback
+  // that creates an auto-incrementing primary key. SQL Server can't insert
+  // explicit values into identity columns, which the tests do, so the values
+  // come from a sequence there.
+  createTable(tableName, callback) {
+    const { knex } = this;
+
+    if (!this.isMsSql()) {
+      return knex.schema.createTable(tableName, (table) =>
+        callback(table, { increments: (column) => table.increments(column) }),
+      );
+    }
+
+    const sequence = getSequenceName(tableName);
+
+    return knex.schema
+      .raw(`DROP SEQUENCE IF EXISTS [${sequence}]`)
+      .raw(`CREATE SEQUENCE [${sequence}] AS int START WITH 1`)
+      .createTable(tableName, (table) =>
+        callback(table, {
+          increments: (column) =>
+            table
+              .integer(column)
+              .notNullable()
+              .primary()
+              .defaultTo(knex.raw(`NEXT VALUE FOR [${sequence}]`)),
+        }),
+      );
   }
 
   destroy() {
@@ -399,6 +434,10 @@ class TestSession {
   isSqlite() {
     return knexUtils.isSqlite(this.knex);
   }
+
+  isMsSql() {
+    return knexUtils.isMsSql(this.knex);
+  }
 }
 
 TestSession.staticInitCalled = false;
@@ -409,6 +448,10 @@ TestSession.hookCounter = 0;
 // increments a `${name}Called` property. The hook is asynchronous
 // every other time it is called so that the synchronous path is
 // also tested.
+function getSequenceName(tableName) {
+  return `${tableName}_id_seq`;
+}
+
 function createHook(name, ms, extraAction) {
   const hook = (model, args) => {
     // Increment the property so that it can be checked in the tests.

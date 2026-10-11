@@ -66,8 +66,20 @@ describe('integration tests', () => {
         database: 'objection_test',
       }),
     },
+    {
+      client: 'mssql',
+      connection: connection('mssql', {
+        host: '127.0.0.1',
+        port: 51433,
+        user: 'sa',
+        password: 'Objection1!',
+        database: 'objection_test',
+      }),
+    },
   ].filter((it) => {
-    return DATABASES.length === 0 || DATABASES.includes(it.client);
+    // SQL Server only runs when requested, as its database isn't started by
+    // default, see docker-compose.yml.
+    return DATABASES.length === 0 ? it.client !== 'mssql' : DATABASES.includes(it.client);
   });
 
   const sessions = testDatabaseConfigs.map((knexConfig) => {

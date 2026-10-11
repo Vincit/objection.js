@@ -9,7 +9,8 @@
     "noImplicitUseStrict": false,
     "noImplicitAny": true,
     "strict": true,
-    "target": "es6"
+    "target": "es6",
+    "types": ["node"]
   },
   "include": ["tests/ts/**/*.ts"]
 }

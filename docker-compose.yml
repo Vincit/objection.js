@@ -37,6 +37,25 @@ services:
       interval: 1s
       retries: 60
 
+  mssql:
+    image: 'mcr.microsoft.com/mssql/server:2022-latest'
+    # There is no arm64 image of SQL Server.
+    platform: linux/amd64
+    # Only started on request, e.g. `npm run db:up -- mssql`, as the image is
+    # large and runs emulated on arm64.
+    profiles: [mssql]
+    ports:
+      - '51433:1433'
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=Objection1!
+    healthcheck:
+      # The image can't create a database on its own, so the healthcheck creates
+      # it once the server accepts connections.
+      test: /opt/mssql-tools18/bin/sqlcmd -C -S 127.0.0.1 -U sa -P "$$MSSQL_SA_PASSWORD" -Q "IF DB_ID('objection_test') IS NULL CREATE DATABASE objection_test"
+      interval: 2s
+      retries: 60
+
 configs:
   mysql-init:
     # The image can only create users with a password. The tests create

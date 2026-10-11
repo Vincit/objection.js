@@ -8,9 +8,10 @@ module.exports = (session) => {
     const { knex } = session;
     let Person;
 
-    before(() => {
-      return knex.schema.dropTableIfExists('persons').createTable('persons', (table) => {
-        table.increments('id').primary();
+    before(async () => {
+      await knex.schema.dropTableIfExists('persons');
+      await session.createTable('persons', (table, { increments }) => {
+        increments('id');
         table.string('name');
         table.integer('parentId');
       });
@@ -82,7 +83,9 @@ module.exports = (session) => {
             raw('?', raw('?', val(1))),
             Person.relatedQuery('children').select('id').limit(1),
           ),
-          sql: 'select "persons".* from "persons" where ? = (select "id" from "persons" as "children" where "children"."parentId" = "persons"."id" limit ?)',
+          sql: session.isMsSql()
+            ? 'select "persons".* from "persons" where ? = (select top (?) "id" from "persons" as "children" where "children"."parentId" = "persons"."id")'
+            : 'select "persons".* from "persons" where ? = (select "id" from "persons" as "children" where "children"."parentId" = "persons"."id" limit ?)',
           bindings: [1, 1],
         });
       });
@@ -129,5 +132,5 @@ function testSql({ query, sql, bindings }) {
 }
 
 function normalizeSql(sql) {
-  return sql.replace(/`/g, '"');
+  return sql.replace(/[`[\]]/g, '"');
 }

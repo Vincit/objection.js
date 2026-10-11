@@ -91,7 +91,12 @@ module.exports = (session) => {
       ]);
     });
 
-    it('should insert with onConflict().ignore()', async () => {
+    it('should insert with onConflict().ignore()', async function () {
+      // knex doesn't support `onConflict()` on SQL Server.
+      if (session.isMsSql()) {
+        return this.skip();
+      }
+
       await JobExecution.query().insert({ name: 'a', runs: 1 });
       const job = await JobExecution.query()
         .insert({ name: 'a', runs: 2 })

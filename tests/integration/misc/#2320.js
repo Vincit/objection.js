@@ -5,6 +5,13 @@ module.exports = (session) => {
   describe('insert().onConflict().ignore() results #2320 #2597 #2661', () => {
     const { knex } = session;
 
+    before(function () {
+      // knex doesn't support `onConflict()` on SQL Server.
+      if (session.isMsSql()) {
+        this.skip();
+      }
+    });
+
     class Tag extends Model {
       static get tableName() {
         return 'onConflictTags';

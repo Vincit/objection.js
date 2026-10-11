@@ -30,21 +30,19 @@ module.exports = (session) => {
       }
     }
 
-    before(() => {
-      return knex.schema
-        .dropTableIfExists('users')
-        .dropTableIfExists('roles')
-        .createTable('users', (table) => {
-          table.increments('id').primary();
-          table.string('firstName');
-          table.string('lastName');
-          table.string('passwordHash');
-        })
-        .createTable('roles', (table) => {
-          table.increments('id').primary();
-          table.string('name');
-          table.integer('userId');
-        });
+    before(async () => {
+      await knex.schema.dropTableIfExists('users').dropTableIfExists('roles');
+      await session.createTable('users', (table, { increments }) => {
+        increments('id');
+        table.string('firstName');
+        table.string('lastName');
+        table.string('passwordHash');
+      });
+      await session.createTable('roles', (table, { increments }) => {
+        increments('id');
+        table.string('name');
+        table.integer('userId');
+      });
     });
 
     after(() => {

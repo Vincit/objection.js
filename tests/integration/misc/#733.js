@@ -6,9 +6,10 @@ module.exports = (session) => {
     let knex = session.knex;
     let Person;
 
-    before(() => {
-      return knex.schema.dropTableIfExists('Person').createTable('Person', (table) => {
-        table.increments('id').primary();
+    before(async () => {
+      await knex.schema.dropTableIfExists('Person');
+      await session.createTable('Person', (table, { increments }) => {
+        increments('id');
         table.string('name');
         table.integer('parentId');
       });

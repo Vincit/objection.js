@@ -654,7 +654,7 @@ module.exports = (session) => {
             relatives: [
               {
                 name: 'Nick',
-                isFriend: raw('1 = 1'),
+                isFriend: raw('?', [true]),
               },
               {
                 name: 'Sandra',
@@ -748,7 +748,7 @@ module.exports = (session) => {
               relatives: [
                 {
                   name: 'Nick',
-                  isFriend: raw('1 = 1'),
+                  isFriend: raw('?', [true]),
                 },
                 {
                   '#ref': 'brad',
@@ -804,7 +804,7 @@ module.exports = (session) => {
               relatives: [
                 {
                   '#dbRef': ID_NOT_IN_DB,
-                  isFriend: raw('1 = 1'),
+                  isFriend: raw('?', [true]),
                 },
                 {
                   name: 'Sandra',
@@ -848,7 +848,7 @@ module.exports = (session) => {
               relatives: [
                 {
                   id: ID_NOT_IN_DB,
-                  isFriend: raw('1 = 1'),
+                  isFriend: raw('?', [true]),
                 },
                 {
                   name: 'Sandra',
@@ -896,7 +896,7 @@ module.exports = (session) => {
               relatives: [
                 {
                   id: ID_NOT_IN_DB,
-                  isFriend: raw('1 = 1'),
+                  isFriend: raw('?', [true]),
                 },
                 {
                   name: 'Sandra',
@@ -1082,32 +1082,32 @@ module.exports = (session) => {
       return graph;
     }
 
-    function createSchema() {
-      return session.knex.schema
+    async function createSchema() {
+      await session.knex.schema
         .dropTableIfExists('relatives')
         .dropTableIfExists('pets')
-        .dropTableIfExists('persons')
-        .createTable('persons', (table) => {
-          table.increments('id');
-          table.string('name');
-          table.text('data');
-        })
-        .createTable('pets', (table) => {
-          table.increments('id');
-          table.string('name');
-          table.integer('ownerId').unsigned().references('persons.id');
-          table.integer('favoritePersonId').unsigned().references('persons.id');
-        })
-        .createTable('relatives', (table) => {
-          table.increments('id');
-          table.boolean('isFriend').defaultTo(false);
-          table.boolean('isParent').defaultTo(true);
-          table.boolean('isChild').defaultTo(false);
-          table.integer('personId1').unsigned().references('persons.id');
-          table.integer('personId2').unsigned().references('persons.id');
-          // Disallow duplicates.
-          table.unique(['personId1', 'personId2']);
-        });
+        .dropTableIfExists('persons');
+      await session.createTable('persons', (table, { increments }) => {
+        increments('id');
+        table.string('name');
+        table.text('data');
+      });
+      await session.createTable('pets', (table, { increments }) => {
+        increments('id');
+        table.string('name');
+        table.integer('ownerId').unsigned().references('persons.id');
+        table.integer('favoritePersonId').unsigned().references('persons.id');
+      });
+      await session.createTable('relatives', (table, { increments }) => {
+        increments('id');
+        table.boolean('isFriend').defaultTo(false);
+        table.boolean('isParent').defaultTo(true);
+        table.boolean('isChild').defaultTo(false);
+        table.integer('personId1').unsigned().references('persons.id');
+        table.integer('personId2').unsigned().references('persons.id');
+        // Disallow duplicates.
+        table.unique(['personId1', 'personId2']);
+      });
     }
 
     function dropSchema() {

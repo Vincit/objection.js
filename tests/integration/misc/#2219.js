@@ -81,7 +81,12 @@ module.exports = (session) => {
         .withGraphJoined('pets(withToys)')
         .modifiers({
           withToys: (query) =>
-            modifier(query.select('Pet.name').join('Toy', 'Toy.petId', 'Pet.id').groupBy('Pet.id')),
+            modifier(
+              query
+                .select('Pet.name')
+                .join('Toy', 'Toy.petId', 'Pet.id')
+                .groupBy('Pet.id', 'Pet.ownerId', 'Pet.name'),
+            ),
         })
         .orderBy('pets.id')
         .then((owner) => owner.pets);
@@ -106,7 +111,10 @@ module.exports = (session) => {
         .withGraphJoined('pets(withToys)')
         .modifiers({
           withToys: (query) =>
-            query.count('* as n').join('Toy', 'Toy.petId', 'Pet.id').groupBy('Pet.id'),
+            query
+              .count('* as n')
+              .join('Toy', 'Toy.petId', 'Pet.id')
+              .groupBy('Pet.id', 'Pet.ownerId'),
         })
         .orderBy('pets.id')
         .then((owner) => owner.pets);
@@ -161,7 +169,12 @@ module.exports = (session) => {
       ]);
     });
 
-    it('ignores aggregates without an alias', async () => {
+    it('ignores aggregates without an alias', async function () {
+      // SQL Server requires a name for every column of the joined subquery.
+      if (session.isMsSql()) {
+        return this.skip();
+      }
+
       const pets = await fetchPets((query) => query.count('Toy.id'));
 
       expect(pets).to.eql([{ name: 'Fluffy' }, { name: 'Doggo' }]);

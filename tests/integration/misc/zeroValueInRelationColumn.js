@@ -6,18 +6,16 @@ module.exports = (session) => {
     let Table1;
     let Table2;
 
-    before(() => {
-      return session.knex.schema
-        .dropTableIfExists('table1')
-        .dropTableIfExists('table2')
-        .createTable('table1', (table) => {
-          table.increments('id').primary();
-          table.integer('value').notNullable();
-        })
-        .createTable('table2', (table) => {
-          table.increments('id').primary();
-          table.integer('value').notNullable();
-        });
+    before(async () => {
+      await session.knex.schema.dropTableIfExists('table1').dropTableIfExists('table2');
+      await session.createTable('table1', (table, { increments }) => {
+        increments('id');
+        table.integer('value').notNullable();
+      });
+      await session.createTable('table2', (table, { increments }) => {
+        increments('id');
+        table.integer('value').notNullable();
+      });
     });
 
     after(() => {

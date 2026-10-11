@@ -1313,7 +1313,13 @@ module.exports = (session) => {
               });
           });
 
-          it('should be able to fetch the rows about to be updated`', () => {
+          it('should be able to fetch the rows about to be updated`', function () {
+            // knex puts the lock of `forUpdate()` after the join on SQL Server,
+            // instead of after the table.
+            if (session.isMsSql()) {
+              return this.skip();
+            }
+
             return Person.query()
               .findOne({ name: 'Jennifer' })
               .then((person) => {
@@ -2137,7 +2143,13 @@ module.exports = (session) => {
               });
           });
 
-          it('should be able to fetch the rows about to be deleted`', () => {
+          it('should be able to fetch the rows about to be deleted`', function () {
+            // knex puts the lock of `forUpdate()` after the join on SQL Server,
+            // instead of after the table.
+            if (session.isMsSql()) {
+              return this.skip();
+            }
+
             return Person.query()
               .findOne({ name: 'Jennifer' })
               .then((person) => {

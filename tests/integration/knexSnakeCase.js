@@ -122,7 +122,7 @@ module.exports = (session) => {
             table.string('firstName');
           })
           .then(() => {
-            return knex(table).insert({ id: 1, firstName: 'fooBar' });
+            return knex(table).insert({ firstName: 'fooBar' });
           })
           .then(() => {
             return knex(table);
@@ -526,7 +526,7 @@ module.exports = (session) => {
             table.string('firstName');
           })
           .then(() => {
-            return knex(table).insert({ id: 1, firstName: 'fooBar' });
+            return knex(table).insert({ firstName: 'fooBar' });
           })
           .then(() => {
             return knex(table);

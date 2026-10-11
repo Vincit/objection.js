@@ -6,20 +6,18 @@ module.exports = (session) => {
     let knex = session.knex;
     let Person;
 
-    before(() => {
-      return knex.schema
-        .dropTableIfExists('Person')
-        .dropTableIfExists('PersonPerson')
-        .createTable('Person', (table) => {
-          table.increments('id').primary();
-          table.string('name');
-        })
-        .createTable('PersonPerson', (table) => {
-          table.increments('id').primary();
-          table.integer('awesomeness');
-          table.integer('person1Id');
-          table.integer('person2Id');
-        });
+    before(async () => {
+      await knex.schema.dropTableIfExists('Person').dropTableIfExists('PersonPerson');
+      await session.createTable('Person', (table, { increments }) => {
+        increments('id');
+        table.string('name');
+      });
+      await session.createTable('PersonPerson', (table, { increments }) => {
+        increments('id');
+        table.integer('awesomeness');
+        table.integer('person1Id');
+        table.integer('person2Id');
+      });
     });
 
     after(() => {

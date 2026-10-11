@@ -1127,8 +1127,8 @@ module.exports = (session) => {
     });
 
     it('resultSize should support aliased selections in groupBy and having with joinEager', () => {
-      // Postgres doesn't support selection aliases in `having`.
-      if (session.isPostgres()) {
+      // Postgres and SQL Server don't support selection aliases in `having`.
+      if (session.isPostgres() || session.isMsSql()) {
         return;
       }
 
@@ -1150,7 +1150,16 @@ module.exports = (session) => {
         .select('Model1.*', 'Model1.id')
         .whereIn('Model1.id', [1, 6])
         .withGraphJoined('model1Relation2')
-        .groupBy('Model1.id', 'model1Relation2.id_col');
+        .groupBy(
+          'Model1.id',
+          'Model1.model1Id',
+          'Model1.model1Prop1',
+          'Model1.model1Prop2',
+          'model1Relation2.id_col',
+          'model1Relation2.model1_id',
+          'model1Relation2.model2_prop1',
+          'model1Relation2.model2_prop2',
+        );
 
       const [models, size] = await Promise.all([query, query.resultSize()]);
       expect(models.map((it) => it.id).sort()).to.eql([1, 6]);
@@ -1158,6 +1167,11 @@ module.exports = (session) => {
     });
 
     it('resultSize should support an aliased selection in groupBy with joinEager', async () => {
+      // SQL Server doesn't support selection aliases in `groupBy`.
+      if (session.isMsSql()) {
+        return;
+      }
+
       const query = Model1.query()
         .select('Model1.id', 'Model1.model1Prop1 as prop')
         .whereIn('Model1.id', [1, 6])

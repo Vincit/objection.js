@@ -744,7 +744,7 @@ module.exports = (session) => {
                 .select('*', (builder) => {
                   let raw;
 
-                  if (utils.isMySql(session.knex)) {
+                  if (session.isMySql() || session.isMsSql()) {
                     raw = Model2.raw('concat(model2_prop1, model2_prop2)');
                   } else {
                     raw = Model2.raw('model2_prop1 || model2_prop2');
@@ -788,7 +788,7 @@ module.exports = (session) => {
 
         it('raw in select', () => {
           return Model2.query()
-            .select('model2.*', raw('?? + ? as ??', 'model2_prop2', 10, 'model2_prop2'))
+            .select('id_col', raw('?? + ? as ??', 'model2_prop2', 10, 'model2_prop2'))
             .orderBy('id_col')
             .then((models) => {
               expect(models.map((it) => it.idCol)).to.eql([1, 2, 3]);

@@ -24,7 +24,7 @@ module.exports = (session) => {
         .select('Model1.*')
         .count('model1Relation2.id_col as relCount')
         .joinRelated('model1Relation2')
-        .groupBy('Model1.id')
+        .groupBy('Model1.id', 'Model1.model1Id', 'Model1.model1Prop1', 'Model1.model1Prop2')
         .orderBy('Model1.model1Prop1')
         .then((models) => {
           expect(models[0].relCount).to.eql(3);

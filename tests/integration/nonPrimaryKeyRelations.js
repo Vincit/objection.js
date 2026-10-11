@@ -1010,7 +1010,7 @@ module.exports = (session) => {
   });
 
   function concat(str1, str2) {
-    if (session.isMySql()) {
+    if (session.isMySql() || session.isMsSql()) {
       return raw(`CONCAT(${str1}, ${str2})`);
     } else {
       return raw(`${str1} || ${str2}`);

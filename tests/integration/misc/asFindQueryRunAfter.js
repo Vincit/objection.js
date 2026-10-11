@@ -7,13 +7,12 @@ module.exports = (session) => {
     let Person;
     let hookResults;
 
-    before(() => {
-      return knex.schema
-        .dropTableIfExists('as_find_query_person')
-        .createTable('as_find_query_person', (table) => {
-          table.increments('id').primary();
-          table.string('name');
-        });
+    before(async () => {
+      await knex.schema.dropTableIfExists('as_find_query_person');
+      await session.createTable('as_find_query_person', (table, { increments }) => {
+        increments('id');
+        table.string('name');
+      });
     });
 
     after(() => {

@@ -8,25 +8,25 @@ module.exports = (session) => {
     let BusinessUnit;
     let Field;
 
-    before(() => {
-      return session.knex.schema
+    before(async () => {
+      await session.knex.schema
         .dropTableIfExists('data_extension_field')
         .dropTableIfExists('data_extension')
-        .dropTableIfExists('business_unit')
-        .createTable('business_unit', (table) => {
-          table.increments('id').primary();
-          table.string('name');
-        })
-        .createTable('data_extension', (table) => {
-          table.increments('id').primary();
-          table.string('name');
-          table.integer('business_unit_id');
-        })
-        .createTable('data_extension_field', (table) => {
-          table.increments('id').primary();
-          table.string('name');
-          table.integer('data_extension_id');
-        });
+        .dropTableIfExists('business_unit');
+      await session.createTable('business_unit', (table, { increments }) => {
+        increments('id');
+        table.string('name');
+      });
+      await session.createTable('data_extension', (table, { increments }) => {
+        increments('id');
+        table.string('name');
+        table.integer('business_unit_id');
+      });
+      await session.createTable('data_extension_field', (table, { increments }) => {
+        increments('id');
+        table.string('name');
+        table.integer('data_extension_id');
+      });
     });
 
     after(async () => {

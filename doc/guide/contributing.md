@@ -60,6 +60,13 @@ Docker only runs the two database servers, PostgreSQL 17 and MySQL 8.4, as defin
 
 CI also runs the tests on MySQL 5.7. To do that locally, add its override file: `COMPOSE_FILE=docker-compose.yml:docker-compose.mysql57.yml npm run db:up`.
 
+CI also runs the tests on SQL Server 2022. Its image is large and runs emulated on arm64, so `npm run db:up` doesn't start it, and `npm test` only runs its tests when they are requested:
+
+```bash
+npm run db:up -- mssql # Start SQL Server, on the port 51433.
+DATABASES=mssql npm run test:fast
+```
+
 You can run the tests on a subset of databases by setting the `DATABASES` env variable. SQLite needs no setup, so this works without Docker:
 
 ```bash
@@ -67,19 +74,21 @@ DATABASES=sqlite3 npm test
 DATABASES=postgres npm test
 ```
 
-To use your own databases instead, set the `OBJECTION_TEST_POSTGRES_*` and `OBJECTION_TEST_MYSQL_*` env variables. The PostgreSQL user needs to own the database or be a superuser, as the tests create schemas in it. The MySQL user needs to be able to create databases and to use the `mysql_native_password` authentication plugin.
+To use your own databases instead, set the `OBJECTION_TEST_POSTGRES_*`, `OBJECTION_TEST_MYSQL_*` and `OBJECTION_TEST_MSSQL_*` env variables. The PostgreSQL user needs to own the database or be a superuser, as the tests create schemas in it. The MySQL user needs to be able to create databases and to use the `mysql_native_password` authentication plugin. The SQL Server user needs to be able to create tables and sequences.
 
-| Variable                                   | Default for PostgreSQL | Default for MySQL |
-| ------------------------------------------ | ---------------------- | ----------------- |
-| `OBJECTION_TEST_{POSTGRES,MYSQL}_HOST`     | `127.0.0.1`            | `127.0.0.1`       |
-| `OBJECTION_TEST_{POSTGRES,MYSQL}_PORT`     | `55432`                | `33306`           |
-| `OBJECTION_TEST_{POSTGRES,MYSQL}_USER`     | `objection`            | `objection`       |
-| `OBJECTION_TEST_{POSTGRES,MYSQL}_PASSWORD` | none                   | none              |
-| `OBJECTION_TEST_{POSTGRES,MYSQL}_DATABASE` | `objection_test`       | `objection_test`  |
+| Variable                                         | Default for PostgreSQL | Default for MySQL | Default for SQL Server |
+| ------------------------------------------------ | ---------------------- | ----------------- | ---------------------- |
+| `OBJECTION_TEST_{POSTGRES,MYSQL,MSSQL}_HOST`     | `127.0.0.1`            | `127.0.0.1`       | `127.0.0.1`            |
+| `OBJECTION_TEST_{POSTGRES,MYSQL,MSSQL}_PORT`     | `55432`                | `33306`           | `51433`                |
+| `OBJECTION_TEST_{POSTGRES,MYSQL,MSSQL}_USER`     | `objection`            | `objection`       | `sa`                   |
+| `OBJECTION_TEST_{POSTGRES,MYSQL,MSSQL}_PASSWORD` | none                   | none              | `Objection1!`          |
+| `OBJECTION_TEST_{POSTGRES,MYSQL,MSSQL}_DATABASE` | `objection_test`       | `objection_test`  | `objection_test`       |
 
 The SQLite tests use a new database file in the system's temporary directory for each run, which is deleted afterwards. Set `OBJECTION_TEST_SQLITE_FILE` to use a file of your choice, which is kept.
 
 The tests are run with [mocha](https://mochajs.org/). `npm test` also lints the code and checks the typings. Use `npm run test:fast` to only run the tests, stopping at the first failure.
+
+SQL Server can't insert explicit values into auto-incrementing (identity) columns. Tests that insert rows with explicit ids create their tables with `session.createTable()` instead of `knex.schema.createTable()`, and their id columns with the `increments()` it passes to the callback.
 
 [prettier](https://prettier.io/) is used to format the code. Remember to run `npm run prettier` before committing code.
 

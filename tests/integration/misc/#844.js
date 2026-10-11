@@ -7,31 +7,26 @@ module.exports = (session) => {
     let Person;
     let Movie;
 
-    before(() => {
-      return knex.schema
+    before(async () => {
+      await knex.schema
         .dropTableIfExists('Person_Movie')
         .dropTableIfExists('Movie')
-        .dropTableIfExists('Person')
-        .createTable('Person', (table) => {
-          table.increments('id').primary();
-          table.integer('parentId').unsigned().references('id').inTable('Person');
-          table.string('name');
-          table.integer('age');
-        })
-        .createTable('Movie', (table) => {
-          table.increments('id').primary();
-          table.string('name');
-        })
-        .createTable('Person_Movie', (table) => {
-          table.increments('id').primary();
-          table
-            .integer('personId')
-            .unsigned()
-            .references('id')
-            .inTable('Person')
-            .onDelete('CASCADE');
-          table.integer('movieId').unsigned().references('id').inTable('Movie').onDelete('CASCADE');
-        });
+        .dropTableIfExists('Person');
+      await session.createTable('Person', (table, { increments }) => {
+        increments('id');
+        table.integer('parentId').unsigned().references('id').inTable('Person');
+        table.string('name');
+        table.integer('age');
+      });
+      await session.createTable('Movie', (table, { increments }) => {
+        increments('id');
+        table.string('name');
+      });
+      await session.createTable('Person_Movie', (table, { increments }) => {
+        increments('id');
+        table.integer('personId').unsigned().references('id').inTable('Person').onDelete('CASCADE');
+        table.integer('movieId').unsigned().references('id').inTable('Movie').onDelete('CASCADE');
+      });
     });
 
     after(() => {

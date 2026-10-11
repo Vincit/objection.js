@@ -15,16 +15,19 @@ jobs:
       matrix:
         node-version: [16.x, 18.x, 20.x, 22.x, 24.x]
         knex: [default]
-        mysql: ['8.4']
-        # Also test the oldest supported knex version and MySQL 5.7, each as a
-        # separate job.
+        database: [default]
+        # Also test the oldest supported knex version, MySQL 5.7 and SQL Server,
+        # each as a separate job.
         include:
           - node-version: 16.x
             knex: 2.3.0
-            mysql: '8.4'
+            database: default
           - node-version: 24.x
             knex: default
-            mysql: '5.7'
+            database: mysql-5.7
+          - node-version: 24.x
+            knex: default
+            database: mssql
 
     steps:
       - uses: actions/checkout@v4
@@ -43,7 +46,7 @@ jobs:
 
       # The generated parsers have to match their grammars. One job is enough.
       - name: Check the generated parsers
-        if: matrix.node-version == '24.x' && matrix.knex == 'default' && matrix.mysql == '8.4'
+        if: matrix.node-version == '24.x' && matrix.knex == 'default' && matrix.database == 'default'
         run: |
           npm run build:parsers
           git diff --exit-code lib/queryBuilder/parsers
@@ -51,14 +54,15 @@ jobs:
       # The documented minimum TypeScript version has to compile the typings
       # and their tests. One job is enough.
       - name: Check the typings with TypeScript 5.1
-        if: matrix.node-version == '24.x' && matrix.knex == 'default' && matrix.mysql == '8.4'
+        if: matrix.node-version == '24.x' && matrix.knex == 'default' && matrix.database == 'default'
         run: npx --yes -p typescript@5.1.6 tsc
 
       - name: Start test databases
         env:
-          COMPOSE_FILE: ${{ matrix.mysql == '5.7' && 'docker-compose.yml:docker-compose.mysql57.yml' || 'docker-compose.yml' }}
-          # The MySQL 5.7 job only needs MySQL, all services start otherwise.
-          SERVICES: ${{ matrix.mysql == '5.7' && 'mysql' || '' }}
+          COMPOSE_FILE: ${{ matrix.database == 'mysql-5.7' && 'docker-compose.yml:docker-compose.mysql57.yml' || 'docker-compose.yml' }}
+          # The MySQL 5.7 and SQL Server jobs only need their database, the
+          # default services start otherwise.
+          SERVICES: ${{ matrix.database == 'mysql-5.7' && 'mysql' || matrix.database == 'mssql' && 'mssql' || '' }}
         run: |
           # Retry the pull, public.ecr.aws rate limits anonymous pulls.
           for i in 1 2 3 4 5; do
@@ -68,14 +72,15 @@ jobs:
           npm run db:up -- $SERVICES
 
       - name: Run tests
-        if: matrix.knex == 'default' && matrix.mysql != '5.7'
+        if: matrix.knex == 'default' && matrix.database == 'default'
         run: npm test
 
       # The typings of older knex versions don't compile with current
-      # TypeScript, so only the test suite runs against them. The MySQL 5.7 job
-      # only runs the MySQL tests, the other jobs already lint and check typings.
+      # TypeScript, so only the test suite runs against them. The MySQL 5.7 and
+      # SQL Server jobs only run the tests of their database, the other jobs
+      # already lint and check typings.
       - name: Run tests without linting and typings
-        if: matrix.knex != 'default' || matrix.mysql == '5.7'
+        if: matrix.knex != 'default' || matrix.database != 'default'
         env:
-          DATABASES: ${{ matrix.mysql == '5.7' && 'mysql' || '' }}
+          DATABASES: ${{ matrix.database == 'mysql-5.7' && 'mysql' || matrix.database == 'mssql' && 'mssql' || '' }}
         run: npx mocha --slow 10 --timeout 15000 --reporter spec --recursive tests --exclude "tests/unit/relations/files/**"

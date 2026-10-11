@@ -97,30 +97,30 @@ module.exports = (session) => {
       static tableName = 'toy';
     }
 
-    before(() => {
-      return knex.schema
+    before(async () => {
+      await knex.schema
         .dropTableIfExists('petToy')
         .dropTableIfExists('pet')
         .dropTableIfExists('toy')
-        .dropTableIfExists('person')
-        .createTable('person', (table) => {
-          table.increments('id').primary();
-          table.string('firstName');
-        })
-        .createTable('pet', (table) => {
-          table.increments('id').primary();
-          table.string('name');
-          table.integer('ownerId').unsigned().references('person.id').onDelete('cascade');
-        })
-        .createTable('toy', (table) => {
-          table.increments('id').primary();
-          table.string('toyName');
-          table.float('price');
-        })
-        .createTable('petToy', (table) => {
-          table.integer('petId').unsigned().references('pet.id').notNullable().onDelete('cascade');
-          table.integer('toyId').unsigned().references('toy.id').notNullable().onDelete('cascade');
-        });
+        .dropTableIfExists('person');
+      await session.createTable('person', (table, { increments }) => {
+        increments('id');
+        table.string('firstName');
+      });
+      await session.createTable('pet', (table, { increments }) => {
+        increments('id');
+        table.string('name');
+        table.integer('ownerId').unsigned().references('person.id').onDelete('cascade');
+      });
+      await session.createTable('toy', (table, { increments }) => {
+        increments('id');
+        table.string('toyName');
+        table.float('price');
+      });
+      await knex.schema.createTable('petToy', (table) => {
+        table.integer('petId').unsigned().references('pet.id').notNullable().onDelete('cascade');
+        table.integer('toyId').unsigned().references('toy.id').notNullable().onDelete('cascade');
+      });
     });
 
     after(() => {

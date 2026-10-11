@@ -1748,6 +1748,13 @@ module.exports = (session) => {
     });
 
     describe('.query().insert().onConflict()', () => {
+      before(function () {
+        // knex doesn't support `onConflict()` on SQL Server.
+        if (session.isMsSql()) {
+          this.skip();
+        }
+      });
+
       beforeEach(() => {
         return session.populate([]);
       });
