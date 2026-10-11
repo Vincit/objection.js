@@ -1205,6 +1205,41 @@ describe('Model', () => {
       expect(clone.e[0]).to.not.equal(model.e[0]);
     });
 
+    it('should copy buffers', () => {
+      const model = Model1.fromJson({ a: Buffer.from('abc'), b: [Buffer.from('def')] });
+      const clone = model.$clone();
+
+      clone.a[0] = 0;
+      clone.b[0][0] = 0;
+
+      expect(Buffer.isBuffer(clone.a)).to.equal(true);
+      expect(model.a.toString()).to.equal('abc');
+      expect(model.b[0].toString()).to.equal('def');
+    });
+
+    it('should keep URLs and other built-ins with internal state', () => {
+      class Model extends modelClass('Model') {
+        static get jsonSchema() {
+          return {
+            type: 'object',
+            properties: {
+              url: { type: 'object' },
+            },
+          };
+        }
+      }
+
+      const url = new URL('http://example.com/path');
+      const model = Model.fromJson({ url });
+
+      for (const json of [model.toJSON(), model.$clone()]) {
+        expect(json.url).to.be(url);
+        expect(json.url.href).to.equal('http://example.com/path');
+      }
+
+      expect(JSON.parse(JSON.stringify(model))).to.eql({ url: 'http://example.com/path' });
+    });
+
     it('should shallow clone', () => {
       let Model = modelClass('Model');
 

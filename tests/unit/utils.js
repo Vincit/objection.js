@@ -478,6 +478,31 @@ describe('utils', () => {
       expect(clone).not.to.have.property('hidden');
     });
 
+    it('clones objects with a custom `Symbol.toStringTag`', () => {
+      class Decimal {
+        constructor(value) {
+          this.d = [value];
+        }
+      }
+
+      Decimal.prototype[Symbol.toStringTag] = 'Decimal';
+
+      const value = {
+        decimal: new Decimal(1),
+        tagged: { [Symbol.toStringTag]: 'Tagged', a: { b: 1 } },
+      };
+      const clone = cloneDeep(value);
+
+      expect(clone.decimal).not.to.be(value.decimal);
+      expect(clone.decimal).to.be.a(Decimal);
+      expect(clone.decimal.d).to.eql([1]);
+      expect(clone.decimal.d).not.to.be(value.decimal.d);
+      expect(clone.tagged).not.to.be(value.tagged);
+      expect(clone.tagged[Symbol.toStringTag]).to.equal('Tagged');
+      expect(clone.tagged.a).to.eql({ b: 1 });
+      expect(clone.tagged.a).not.to.be(value.tagged.a);
+    });
+
     it('copies a `__proto__` key as a property', () => {
       const clone = cloneDeep(JSON.parse('{ "__proto__": { "x": 1 } }'));
 
@@ -538,12 +563,89 @@ describe('utils', () => {
     });
 
     it("keeps values it can't clone", () => {
-      const value = { fn() {}, error: new Error('error'), weakMap: new WeakMap() };
+      const value = {
+        fn() {},
+        error: new Error('error'),
+        typeError: new TypeError('error'),
+        promise: Promise.resolve(),
+        weakMap: new WeakMap(),
+        weakSet: new WeakSet(),
+        number: Object(1),
+      };
       const clone = cloneDeep(value);
 
-      expect(clone.fn).to.be(value.fn);
-      expect(clone.error).to.be(value.error);
-      expect(clone.weakMap).to.be(value.weakMap);
+      for (const key of Object.keys(value)) {
+        expect(clone[key]).to.be(value[key]);
+      }
+    });
+
+    it('keeps built-ins with a non-writable `Symbol.toStringTag` as they are', () => {
+      class TemporalLike {
+        #value;
+
+        constructor(value) {
+          this.#value = value;
+        }
+
+        get value() {
+          return this.#value;
+        }
+
+        get [Symbol.toStringTag]() {
+          return 'Temporal.PlainDate';
+        }
+      }
+
+      class TemporalLikeValue extends TemporalLike {}
+
+      Object.defineProperty(TemporalLikeValue.prototype, Symbol.toStringTag, {
+        value: 'Temporal.Instant',
+        writable: false,
+      });
+
+      function* generator() {}
+
+      const value = {
+        url: new URL('http://example.com/path?a=1'),
+        searchParams: new URLSearchParams('a=1'),
+        temporalLike: new TemporalLike(1),
+        temporalLikeValue: new TemporalLikeValue(2),
+        dateTimeFormat: new Intl.DateTimeFormat('en'),
+        generator: generator(),
+      };
+      const clone = cloneDeep(value);
+
+      for (const key of Object.keys(value)) {
+        expect(clone[key]).to.be(value[key]);
+      }
+
+      expect(clone.url.href).to.equal('http://example.com/path?a=1');
+      expect(clone.searchParams.get('a')).to.equal('1');
+      expect(clone.temporalLike.value).to.equal(1);
+      expect(clone.temporalLikeValue.value).to.equal(2);
+    });
+
+    it('clones objects with an own or inherited writable `Symbol.toStringTag`', () => {
+      class Decimal {
+        constructor(value) {
+          this.d = [value];
+        }
+      }
+
+      Decimal.prototype[Symbol.toStringTag] = 'Decimal';
+
+      const own = { [Symbol.toStringTag]: 'Own', a: { b: 1 } };
+      const inherited = new Decimal(1);
+      const clone = cloneDeep({ own, inherited });
+
+      expect(clone.own).not.to.be(own);
+      expect(clone.inherited).not.to.be(inherited);
+      expect(clone.inherited.d).not.to.be(inherited.d);
+      // The tags are left as they were.
+      expect(Object.getOwnPropertySymbols(own)).to.eql([Symbol.toStringTag]);
+      expect(own[Symbol.toStringTag]).to.equal('Own');
+      expect(Object.getOwnPropertySymbols(inherited)).to.eql([]);
+      expect(inherited[Symbol.toStringTag]).to.equal('Decimal');
     });
   });
 
