@@ -565,6 +565,49 @@ module.exports = (session) => {
         expect(await joinRows()).to.eql(expected);
       });
 
+      describe('asFindQuery() in a static afterUpdate hook', () => {
+        let foundIds = null;
+
+        beforeEach(() => {
+          foundIds = null;
+          Model2.afterUpdate = async ({ asFindQuery }) => {
+            const models = await asFindQuery().select('model2.id_col').orderBy('model2.id_col');
+            foundIds = models.map((model) => model.idCol);
+          };
+        });
+
+        afterEach(() => {
+          delete Model2.afterUpdate;
+        });
+
+        it('should find the related rows of the patched join rows with only join table extras', async () => {
+          const model = await owner(1);
+          await model
+            .$relatedQuery('model1Relation3')
+            .patch({ extra2: 'z' })
+            .whereIn('model2.model2_prop1', ['b', 'c']);
+
+          expect(foundIds).to.eql([2, 3]);
+        });
+
+        it('should find the related rows of the join rows with only join table extras that the patch changes', async () => {
+          const model = await owner(1);
+          await model
+            .$relatedQuery('model1Relation3')
+            .patch({ extra1: 'changed' })
+            .where('Model1Model2.extra1', 'x2');
+
+          expect(foundIds).to.eql([2]);
+        });
+
+        it('should find nothing with none()', async () => {
+          const model = await owner(1);
+          await model.$relatedQuery('model1Relation3').patch({ extra2: 'z' }).none();
+
+          expect(foundIds).to.eql([]);
+        });
+      });
+
       describe('with more related rows than one statement can filter by (#161)', () => {
         // More ids than SQL Server accepts as bound values in one statement,
         // patched in several batches:

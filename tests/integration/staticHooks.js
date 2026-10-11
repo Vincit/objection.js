@@ -1214,6 +1214,20 @@ module.exports = (session) => {
               expect(queries.length).to.equal(0);
             });
         });
+
+        it('`asFindQuery` should find the rows of a canceled query instead of the cancel value', async () => {
+          let found = null;
+
+          Movie.beforeUpdate = createHookSpy(async ({ asFindQuery, cancelQuery }) => {
+            cancelQuery(['lol']);
+            found = await asFindQuery().select('name').where('name', 'like', '%gam%');
+          });
+
+          const result = await Movie.query().update({ name: 'Updated' });
+
+          expect(result).to.eql(['lol']);
+          expect(found.map((movie) => movie.name)).to.eql(['Hungergames']);
+        });
       });
 
       describe('$query', () => {
