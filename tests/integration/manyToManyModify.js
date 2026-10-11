@@ -269,6 +269,53 @@ module.exports = (session) => {
         expect(await joinRows()).to.eql(allJoinRows);
       });
 
+      it('should patch nothing with none()', async () => {
+        const model = await owner(1);
+        const numUpdated = await model
+          .$relatedQuery('model1Relation3')
+          .patch({ model2Prop2: 10, extra2: 'z' })
+          .none();
+
+        expect(numUpdated).to.equal(0);
+        expect(await model2Rows()).to.eql([
+          [1, 1],
+          [2, 2],
+          [3, 3],
+        ]);
+        expect(await joinRows()).to.eql(allJoinRows);
+      });
+
+      it('should patch nothing if resolved in a hook', async () => {
+        const model = await owner(1);
+        const numUpdated = await model
+          .$relatedQuery('model1Relation3')
+          .patch({ model2Prop2: 10, extra2: 'z' })
+          .runBefore((_, builder) => {
+            builder.resolve(0);
+          });
+
+        expect(numUpdated).to.equal(0);
+        expect(await model2Rows()).to.eql([
+          [1, 1],
+          [2, 2],
+          [3, 3],
+        ]);
+        expect(await joinRows()).to.eql(allJoinRows);
+      });
+
+      it('should patch nothing if resolved in a hook with only join table extras', async () => {
+        const model = await owner(1);
+        const numUpdated = await model
+          .$relatedQuery('model1Relation3')
+          .patch({ extra2: 'z' })
+          .runBefore((_, builder) => {
+            builder.resolve(0);
+          });
+
+        expect(numUpdated).to.equal(0);
+        expect(await joinRows()).to.eql(allJoinRows);
+      });
+
       it('should only patch the join table extras of join rows matching a filter on the join table (#1853)', async () => {
         const model = await owner(1);
         await model

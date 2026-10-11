@@ -1285,6 +1285,76 @@ describe('QueryBuilder', () => {
         });
     });
 
+    it('should not modify the instance of an instance patch', async () => {
+      const model = TestModel.fromJson({ id: 1, a: 1 });
+      const result = await model.$query().patch({ a: 2 }).none();
+
+      expect(result).to.equal(0);
+      expect(model.a).to.equal(1);
+      expect(executedQueries).to.have.length(0);
+    });
+
+    it('should not modify the owners of a belongs to one relation delete', async () => {
+      class Pet extends TestModel {
+        static get relationMappings() {
+          return {
+            owner: {
+              relation: Model.BelongsToOneRelation,
+              modelClass: TestModel,
+              join: {
+                from: 'Model.ownerId',
+                to: 'Model.id',
+              },
+            },
+          };
+        }
+      }
+
+      const pet = Pet.fromJson({ id: 1, ownerId: 2 });
+      const result = await pet.$relatedQuery('owner').delete().none();
+
+      expect(result).to.equal(0);
+      expect(pet.ownerId).to.equal(2);
+      expect(executedQueries).to.have.length(0);
+
+      const resolved = await pet
+        .$relatedQuery('owner')
+        .delete()
+        .runBefore((_, builder) => {
+          builder.resolve(0);
+        });
+
+      expect(resolved).to.equal(0);
+      expect(pet.ownerId).to.equal(2);
+      expect(executedQueries).to.have.length(0);
+    });
+
+    it('should not modify the instance of an instance patch resolved in a hook', async () => {
+      const model = TestModel.fromJson({ id: 1, a: 1 });
+      const result = await model
+        .$query()
+        .patch({ a: 2 })
+        .runBefore((_, builder) => {
+          builder.resolve(0);
+        });
+
+      expect(result).to.equal(0);
+      expect(model.a).to.equal(1);
+      expect(executedQueries).to.have.length(0);
+    });
+
+    it('should count falsy values passed to resolve() as resolved', () => {
+      for (const value of [0, false, '', undefined]) {
+        const builder = TestModel.query().resolve(value);
+
+        expect(builder.isExplicitlyResolvedOrRejected()).to.equal(true);
+        expect(builder.isExecutable()).to.equal(false);
+      }
+
+      expect(TestModel.query().isExplicitlyResolvedOrRejected()).to.equal(false);
+      expect(TestModel.query().reject(0).isExplicitlyResolvedOrRejected()).to.equal(true);
+    });
+
     it('should return an empty array for update and delete queries with returning', () => {
       return Promise.all([
         TestModel.query().none().patch({ a: 1 }).returning('*'),
