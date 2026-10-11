@@ -788,7 +788,11 @@ module.exports = (session) => {
 
         it('raw in select', () => {
           return Model2.query()
-            .select('id_col', raw('?? + ? as ??', 'model2_prop2', 10, 'model2_prop2'))
+            .select(
+              // SQL Server returns both same-named columns as an array.
+              session.isMsSql() ? 'id_col' : 'model2.*',
+              raw('?? + ? as ??', 'model2_prop2', 10, 'model2_prop2'),
+            )
             .orderBy('id_col')
             .then((models) => {
               expect(models.map((it) => it.idCol)).to.eql([1, 2, 3]);

@@ -11,6 +11,8 @@ const { asArray } = require('../../../lib/utils/objectUtils');
 
 module.exports = (session) => {
   const ID_NOT_IN_DB = 1000000;
+  // SQL Server has no boolean expressions, so it gets a bound value instead.
+  const rawTrue = () => (session.isMsSql() ? raw('?', [true]) : raw('1 = 1'));
 
   describe('GraphInsert tests', () => {
     let Pet = null;
@@ -654,7 +656,7 @@ module.exports = (session) => {
             relatives: [
               {
                 name: 'Nick',
-                isFriend: raw('?', [true]),
+                isFriend: rawTrue(),
               },
               {
                 name: 'Sandra',
@@ -748,7 +750,7 @@ module.exports = (session) => {
               relatives: [
                 {
                   name: 'Nick',
-                  isFriend: raw('?', [true]),
+                  isFriend: rawTrue(),
                 },
                 {
                   '#ref': 'brad',
@@ -804,7 +806,7 @@ module.exports = (session) => {
               relatives: [
                 {
                   '#dbRef': ID_NOT_IN_DB,
-                  isFriend: raw('?', [true]),
+                  isFriend: rawTrue(),
                 },
                 {
                   name: 'Sandra',
@@ -848,7 +850,7 @@ module.exports = (session) => {
               relatives: [
                 {
                   id: ID_NOT_IN_DB,
-                  isFriend: raw('?', [true]),
+                  isFriend: rawTrue(),
                 },
                 {
                   name: 'Sandra',
@@ -896,7 +898,7 @@ module.exports = (session) => {
               relatives: [
                 {
                   id: ID_NOT_IN_DB,
-                  isFriend: raw('?', [true]),
+                  isFriend: rawTrue(),
                 },
                 {
                   name: 'Sandra',

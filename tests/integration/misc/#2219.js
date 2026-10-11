@@ -85,7 +85,8 @@ module.exports = (session) => {
               query
                 .select('Pet.name')
                 .join('Toy', 'Toy.petId', 'Pet.id')
-                .groupBy('Pet.id', 'Pet.ownerId', 'Pet.name'),
+                // SQL Server needs every selected column in `groupBy`.
+                .groupBy('Pet.id', ...(session.isMsSql() ? ['Pet.ownerId', 'Pet.name'] : [])),
             ),
         })
         .orderBy('pets.id')
@@ -114,7 +115,7 @@ module.exports = (session) => {
             query
               .count('* as n')
               .join('Toy', 'Toy.petId', 'Pet.id')
-              .groupBy('Pet.id', 'Pet.ownerId'),
+              .groupBy('Pet.id', ...(session.isMsSql() ? ['Pet.ownerId'] : [])),
         })
         .orderBy('pets.id')
         .then((owner) => owner.pets);

@@ -570,12 +570,12 @@ queryBuilder = queryBuilder.onBuildKnex(onBuildKnex);
 
 Functions registered with this method are called each time the query is built into an SQL string. This method is ran after [onBuild](/api/query-builder/other-methods.html#onbuild) methods but before [runAfter](/api/query-builder/other-methods.html#runafter) methods.
 
-If you need to modify the SQL query at query build time, this is the place to do it in addition to `onBuild`. The only difference between `onBuildKnex` and `onBuild` is that in `onBuild` you can modify the objection's query builder. In `onBuildKnex` the objection builder has been compiled into a knex query builder and any modifications to the objection builder will be ignored.
+If you need to modify the SQL query at query build time, this is the place to do it in addition to `onBuild`. The only difference between `onBuildKnex` and `onBuild` is that in `onBuild` you can modify the objection's query builder. In `onBuildKnex` the objection builder is being compiled into a knex query builder, which is the one to modify.
 
 Unlike the `run` methods (`runAfter`, `runBefore` etc.) these must be synchronous. Also you should not register any `run` methods from these. You should _only_ call the query building methods of the **knexBuilder** provided as a parameter.
 
 ::: warning
-You should never call any query building (or any other mutating) method on the `objectionBuilder` in this function. If you do, those calls will get ignored. At this point the query builder has been compiled into a knex query builder and you should only modify that. You can call non mutating methods like `hasSelects`, `hasWheres` etc. on the objection builder.
+You should never call any query building (or any other mutating) method on the `objectionBuilder` in this function. Calls like `where()` that map directly to the knex query still get applied, but calls that need the `onBuild` phase, like `findById()` or `withGraphJoined()`, have no effect. Modify the knex builder instead. You can call non mutating methods like `hasSelects`, `hasWheres` etc. on the objection builder. Don't return the objection builder from the function: a returned value replaces the knex builder.
 :::
 
 ##### Arguments

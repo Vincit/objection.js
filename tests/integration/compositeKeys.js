@@ -296,6 +296,7 @@ module.exports = (session) => {
       it('updateAndFetchById should accept a composite id', () => {
         return A.query()
           .updateAndFetchById([1, '2'], { aval: 'updated' })
+          .orderBy(['id1', 'id2'])
           .then((model) => {
             expect(model).to.eql({ id1: 1, id2: '2', aval: 'updated', bid3: null, bid4: null });
             return session.knex('A').orderBy(['id1', 'id2']);

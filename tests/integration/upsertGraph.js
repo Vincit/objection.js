@@ -2114,6 +2114,77 @@ module.exports = (session) => {
         }
       }
 
+      it('should only insert the missing models with the options of insertGraph', async () => {
+        await Model1.query(session.knex).upsertGraph(
+          {
+            id: 2,
+            model1Prop1: 'updated root 2',
+            model1Relation2: [
+              { idCol: 1, model2Prop1: 'updated hasMany 1' },
+              { idCol: 10, model2Prop1: 'inserted hasMany 10' },
+              { model2Prop1: 'inserted hasMany' },
+            ],
+          },
+          { fetchStrategy, noUpdate: true, noDelete: true, noUnrelate: true, insertMissing: true },
+        );
+
+        const root = await Model1.query(session.knex)
+          .findById(2)
+          .withGraphFetched('model1Relation2');
+
+        expect(root.model1Prop1).to.equal('root 2');
+        expect(root.model1Relation2.map((it) => it.model2Prop1).sort()).to.eql([
+          'hasMany 1',
+          'hasMany 2',
+          'inserted hasMany',
+          'inserted hasMany 10',
+        ]);
+      });
+
+      it('should apply #unrelate and #delete also with the options of insertGraph', async () => {
+        await Model1.query(session.knex).upsertGraph(
+          {
+            id: 2,
+            model1Relation2: [
+              { idCol: 1, '#delete': true },
+              { idCol: 2, '#unrelate': true },
+            ],
+          },
+          {
+            fetchStrategy,
+            allowMarkers: true,
+            noUpdate: true,
+            noDelete: true,
+            noUnrelate: true,
+            insertMissing: true,
+          },
+        );
+
+        const rows = await session.knex('model2').whereIn('id_col', [1, 2]).orderBy('id_col');
+        expect(rows.map((it) => [it.id_col, it.model1_id])).to.eql([[2, null]]);
+      });
+
+      it('should point to the allowMarkers option also with the options of insertGraph', async () => {
+        const err = await Model1.query(session.knex)
+          .upsertGraph(
+            { id: 2, model1Relation2: [{ idCol: 1, '#delete': true }, { idCol: 2 }] },
+            {
+              fetchStrategy,
+              noUpdate: true,
+              noDelete: true,
+              noUnrelate: true,
+              insertMissing: true,
+            },
+          )
+          .catch((err) => err);
+
+        expect(err).to.be.a(ValidationError);
+        expect(err.type).to.equal('InvalidGraph');
+        expect(err.message).to.equal(
+          '#unrelate and #delete markers are not allowed in a graph by default. see the allowMarkers upsertGraph option',
+        );
+      });
+
       it('should relate and unrelate some models if `unrelate` and `relate` are arrays of relation paths', () => {
         const upsert = {
           // the root gets updated because it has an id
