@@ -447,6 +447,33 @@ function addPetsNarrowed<QB extends QueryBuilder<Person>>(query: QB): QB {
   return query.withGraphFetched('pets');
 }
 
+// The same applies to helpers that are generic over the model type.
+function addChildren<M extends Model>(query: QueryBuilder<M>): QueryBuilder<M> {
+  return query.withGraphFetched<string>('children');
+}
+
+function addChildrenNarrowed<M extends Model>(query: QueryBuilder<M>): QueryBuilder<M> {
+  // @ts-expect-error
+  return query.withGraphFetched('children');
+}
+
+async function reassignment() {
+  // A variable inferred from a narrowed query only accepts narrowed queries.
+  let a = Person.query().withGraphFetched('pets');
+  // @ts-expect-error
+  a = Person.query();
+
+  // Annotating the variable with the declared type allows reassignment.
+  let b: QueryBuilder<Person> = Person.query().withGraphFetched('pets');
+  b = Person.query();
+  b = b.withGraphFetched('children');
+  const c: Person[] = await b;
+
+  // So does opting out of the narrowing.
+  let d = Person.query().withGraphFetched<string>('pets');
+  d = Person.query();
+}
+
 class Owner extends Model {
   id!: number;
   name!: string;

@@ -83,4 +83,4 @@ The tests are run with [mocha](https://mochajs.org/). `npm test` also lints the 
 
 [prettier](https://prettier.io/) is used to format the code. Remember to run `npm run prettier` before committing code.
 
-The parsers of relation expressions and JSON field expressions in `lib/queryBuilder/parsers` are generated from the `.pegjs` grammars next to them with [Peggy](https://peggyjs.org/). After changing a grammar, run `npm run build:parsers` and commit the generated files with it. CI checks that they match the grammars.
+The parsers of relation expressions and JSON field expressions in `lib/queryBuilder/parsers` are generated from the `.pegjs` grammars next to them with [Peggy](https://peggyjs.org/). After changing a grammar, run `npm run build:parsers` (Peggy 5 needs Node 20 or newer) and commit the generated files with it. CI checks that they match the grammars.

@@ -234,14 +234,25 @@ The narrowed types remain assignable to the declared ones, so existing type anno
 
 - Only literal expressions are narrowed. An expression of type `string` (e.g. a variable or a function argument) leaves the result type as it was.
 - Nodes the type-level parser doesn't understand are skipped instead of reported: aliased relations (`pets as dogs`), `*` and recursion (`children.^`, where `children` itself is still narrowed) are not narrowed, and unknown relation names are ignored.
-- Generic helpers with an explicit query builder return type no longer compile, since the narrowed query builder is a different type than `QB`. Pass `string` as type argument to opt out of the narrowing and keep `QB`:
+- The narrowed query builder is a different type than the one it was created from. It can be assigned to the declared type, but not the other way around. This causes type errors in two cases:
+  - Reassigning a `let` variable whose type was inferred from a narrowed query: `let query = Person.query().withGraphFetched('pets')` can't be assigned `Person.query()` later on, and assigning it `query.withGraphFetched('children')` can fail with "Type instantiation is excessively deep and possibly infinite". Annotate the variable with the declared type instead.
+  - Generic helpers with an explicit return type, whether they are generic over the query builder or over the model type. Pass `string` as type argument to opt out of the narrowing and keep the query builder type.
 
 ```ts
+let query: QueryBuilder<Person> = Person.query().withGraphFetched('pets');
+query = query.withGraphFetched('children');
+
 function withPets<QB extends QueryBuilder<Person>>(query: QB): QB {
   // `query.withGraphFetched('pets')` would be a type error here.
   return query.withGraphFetched<string>('pets');
 }
+
+function withChildren<M extends Model>(query: QueryBuilder<M>): QueryBuilder<M> {
+  return query.withGraphFetched<string>('children');
+}
 ```
+
+The narrowing requires TypeScript 5.0 or newer, as do the typings since objection 3.3.0.
 
 ## withGraphJoined()
 

@@ -24,6 +24,8 @@ other databases also, but you only get the id of the first (or last) inserted ob
 as a result. If you need batch insert on other databases you can use knex directly
 through [knexQuery](/api/model/static-methods.html#static-knexquery).
 
+Relations in the inserted objects are ignored: `insert` only inserts the columns of the model's own table. Use [insertGraph](/api/query-builder/mutate-methods.html#insertgraph) to insert related objects too. In TypeScript, the data type (`PartialModelObject`) accepts nested relation data, so this isn't reported as a type error.
+
 ##### Arguments
 
 | Argument        | Type                                                                                                           | Description       |
@@ -150,6 +152,8 @@ Creates a patch query.
 The patch object is validated against the model's [jsonSchema](/api/model/static-properties.html#static-jsonschema) (if one is defined) _but_ the `required` property of the [jsonSchema](/api/model/static-properties.html#static-jsonschema) is ignored. This way the properties in the patch object are still validated but an error isn't thrown if the patch object doesn't contain all required properties.
 
 If validation fails the Promise is rejected with a [ValidationError](/api/types/#class-validationerror).
+
+Relations in the patch object are ignored, only the columns of the model's own table are updated. Use [upsertGraph](/api/query-builder/mutate-methods.html#upsertgraph) to update related objects too. In TypeScript, the data type (`PartialModelObject`) accepts nested relation data, so this isn't reported as a type error.
 
 The return value of the query will be the number of affected rows. If you want to update a single row and retrieve the updated row as a result, you may want to use the [patchById](/api/query-builder/mutate-methods.html#patchbyid) or [patchAndFetchById](/api/query-builder/mutate-methods.html#patchandfetchbyid) methods or _take a look at [this recipe](/recipes/returning-tricks.html) if you're using Postgres_.
 

@@ -21,3 +21,7 @@ You can use the `next` tag to install an alpha/beta/RC version:
 ```bash
 npm install objection@next
 ```
+
+## TypeScript
+
+Objection ships with its own TypeScript typings. Since objection 3.3.0, they require TypeScript 5.0 or newer.
