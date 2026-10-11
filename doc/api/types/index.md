@@ -174,6 +174,8 @@ Caveats when using special characters in keys:
 5. Empty keys `objectColumn:[""]` or `objectColumn:['']` Column `{ "" : "I was referred" }`
 6. Keys containing dots, square brackets, single quotes and double quotes in one json key is not currently supported
 
+Keys with a `:` in the objects passed to [patch](/api/query-builder/mutate-methods.html#patch) and [update](/api/query-builder/mutate-methods.html#update) are field expressions that write into json columns, e.g. `patch({ 'jsonColumn:some.key': value })`, unless the model's [jsonSchema](/api/model/static-properties.html#static-jsonschema) declares them in its `properties`. Declared keys like `'ns:name'` are normal properties and columns. The query only knows the properties of `jsonSchema`, not those added by [$beforeValidate](/api/model/instance-methods.html#beforevalidate).
+
 There are some special methods that accept `FieldExpression` strings directly, like [whereJsonSupersetOf](/api/query-builder/find-methods.html#wherejsonsupersetof) but you can use `FieldExpressions` anywhere with [ref](/api/objection/#ref). Here's an example:
 
 ```js

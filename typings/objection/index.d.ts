@@ -1088,6 +1088,11 @@ declare namespace Objection {
   export interface InsertGraphOptions {
     relate?: boolean | string | string[];
     allowRefs?: boolean;
+    /**
+     * @deprecated Has no effect, since `insertGraph()` rejects `#unrelate` and
+     * `#delete` markers. Removed in objection 4.0.
+     */
+    allowMarkers?: boolean;
   }
 
   interface InsertGraphMethod<M extends Model> {

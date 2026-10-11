@@ -162,7 +162,7 @@ This generates an SQL `update` query. While there's also the [update](/api/query
 :::
 
 ::: warning
-[raw](/api/objection/#raw), subqueries and other "query properties" in the patch object are not validated. Fields specified using [FieldExpressions](/api/types/#type-fieldexpression) like `'meta:a.b'` are validated against the schema of the nested property (`properties.meta.properties.a.properties.b`), unless they access array items (`'meta:list[0]'`).
+[raw](/api/objection/#raw), subqueries and other "query properties" in the patch object are not validated. Fields specified using [FieldExpressions](/api/types/#type-fieldexpression) like `'meta:a.b'` are validated against the schema of the nested property (`properties.meta.properties.a.properties.b`), unless they access array items (`'meta:list[0]'`). Keys with a `:` that the schema declares in `properties` are normal properties and columns, not field expressions.
 :::
 
 ##### Arguments
@@ -320,6 +320,8 @@ Creates an update query.
 The update object is validated against the model's [jsonSchema](/api/model/static-properties.html#static-jsonschema). If validation fails the Promise is rejected with a [ValidationError](/api/types/#class-validationerror).
 
 Use `update` if you update the whole row with all its columns. Otherwise, using the [patch](/api/query-builder/mutate-methods.html#patch) method is recommended. When `update` method is used, the validation respects the schema's `required` properties and throws a [ValidationError](/api/types/#class-validationerror) if any of them are missing. [patch](/api/query-builder/mutate-methods.html#patch) ignores the `required` properties and only validates the ones that are found.
+
+[FieldExpressions](/api/types/#type-fieldexpression) like `'meta:a.b'` only write parts of a json column, so they are validated like in [patch](/api/query-builder/mutate-methods.html#patch): against the schema of the nested property, without its `required` properties and default values. The json column itself counts as present and doesn't get its `default`. Keys with a `:` that the schema declares in `properties` are normal properties and columns, not field expressions.
 
 The return value of the query will be the number of affected rows. If you want to update a single row and retrieve the updated row as a result, you may want to use the [updateById](/api/query-builder/mutate-methods.html#updatebyid) or [updateAndFetchById](/api/query-builder/mutate-methods.html#updateandfetchbyid) methods or _take a look at [this recipe](/recipes/returning-tricks.html) if you're using Postgres_.
 
