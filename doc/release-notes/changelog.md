@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.7.1
+
+### Other
+
+- The knex peer dependency is `>=2.3.0 <4`, the versions objection is tested with, so package managers report a future knex 4 as incompatible until it is tested. [#95](https://github.com/ditojs/objection/issues/95)
+
 ## 3.7.0
 
 ### Security

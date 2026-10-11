@@ -66,7 +66,7 @@
     "db-errors": "^0.2.3"
   },
   "peerDependencies": {
-    "knex": ">=2.3.0"
+    "knex": ">=2.3.0 <4"
   },
   "devDependencies": {
     "@types/node": "^22.15.3",
