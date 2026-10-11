@@ -122,5 +122,95 @@ module.exports = (session) => {
       expect(await JobExecution.query().delete().where('name', 'a')).to.equal(1);
       expect(await rows()).to.eql([]);
     });
+
+    describe('as the join model of a many-to-many relation', () => {
+      before(() => {
+        return knex.schema
+          .dropTableIfExists('job_tag')
+          .dropTableIfExists('job')
+          .dropTableIfExists('tag')
+          .createTable('job', (table) => {
+            table.integer('id').primary();
+          })
+          .createTable('tag', (table) => {
+            table.integer('id').primary();
+          })
+          .createTable('job_tag', (table) => {
+            table.integer('job_id');
+            table.integer('tag_id');
+          });
+      });
+
+      after(() => {
+        return knex.schema
+          .dropTableIfExists('job_tag')
+          .dropTableIfExists('job')
+          .dropTableIfExists('tag');
+      });
+
+      beforeEach(async () => {
+        await knex('job_tag').delete();
+        await knex('job').delete();
+        await knex('tag').delete();
+        await knex('job').insert({ id: 1 });
+        await knex('tag').insert([{ id: 1 }, { id: 2 }]);
+      });
+
+      class Tag extends Model {
+        static tableName = 'tag';
+      }
+
+      class GetterJobTag extends Model {
+        static get tableName() {
+          return 'job_tag';
+        }
+
+        static get idColumn() {
+          return null;
+        }
+      }
+
+      class FieldJobTag extends Model {
+        static tableName = 'job_tag';
+        static idColumn = null;
+      }
+
+      for (const JobTag of [GetterJobTag, FieldJobTag]) {
+        it(`should relate, find and unrelate with ${JobTag.name}`, async () => {
+          class Job extends Model {
+            static tableName = 'job';
+
+            static relationMappings = {
+              tags: {
+                relation: Model.ManyToManyRelation,
+                modelClass: Tag,
+                join: {
+                  from: 'job.id',
+                  through: {
+                    modelClass: JobTag,
+                    from: 'job_tag.job_id',
+                    to: 'job_tag.tag_id',
+                  },
+                  to: 'tag.id',
+                },
+              },
+            };
+          }
+
+          const job = Job.bindKnex(knex).fromJson({ id: 1 });
+
+          await job.$relatedQuery('tags').relate(1);
+          await job.$relatedQuery('tags').relate(2);
+          const tags = await job.$relatedQuery('tags').orderBy('tag.id');
+          expect(tags.map((tag) => tag.id)).to.eql([1, 2]);
+
+          expect(await job.$relatedQuery('tags').unrelate().where('tag.id', 1)).to.equal(1);
+          expect(await knex('job_tag')).to.eql([{ job_id: 1, tag_id: 2 }]);
+
+          // The join model class is not modified by the relation.
+          expect(JobTag.getIdColumn()).to.equal(null);
+        });
+      }
+    });
   });
 };
