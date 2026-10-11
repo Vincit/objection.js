@@ -4355,6 +4355,32 @@ describe('QueryBuilder', () => {
         expect(builder.findOperation(WhereInEagerOperation).graphOptions.maxBatchSize).to.equal(1);
       });
 
+      it('should warn and ignore joinOperation for fetched relations', () => {
+        const warnings = [];
+        const originalWarn = console.warn;
+        console.warn = (message) => warnings.push(message);
+        resetDeprecations();
+
+        try {
+          const builder = Person.query()
+            .withGraphJoined('pets')
+            .withGraphFetched('movies', { joinOperation: 'innerJoin' })
+            .withGraph('[pets, parent]', { joinOperation: 'rightJoin' });
+
+          expect(builder.findOperation(WhereInEagerOperation).joinOperations).to.eql([]);
+          expect(builder.findOperation(JoinEagerOperation).joinOperations).to.have.length(1);
+          expect(warnings).to.eql([
+            'The joinOperation option only applies to withGraphJoined() and is ignored for the ' +
+              'fetched relations "movies".',
+            'The joinOperation option only applies to withGraphJoined() and is ignored for the ' +
+              'fetched relations "parent".',
+          ]);
+        } finally {
+          console.warn = originalWarn;
+          resetDeprecations();
+        }
+      });
+
       it('should load the merged graph', () => {
         mockKnexQueryResults = [flatRows(), movieRows()];
 

@@ -32,6 +32,19 @@ module.exports = (session) => {
             },
           },
 
+          manyTags: {
+            relation: Model.ManyToManyRelation,
+            modelClass: Tag,
+            join: {
+              from: 'issue2667Post.tagIds',
+              through: {
+                from: 'issue2667PostTag.postId',
+                to: 'issue2667PostTag.tagId',
+              },
+              to: 'issue2667Tag.id',
+            },
+          },
+
           compositeTags: {
             relation: Model.HasManyRelation,
             modelClass: Tag,
@@ -63,6 +76,7 @@ module.exports = (session) => {
       Post.knex(knex);
 
       await knex.schema
+        .dropTableIfExists('issue2667PostTag')
         .dropTableIfExists('issue2667Post')
         .dropTableIfExists('issue2667Tag')
         .createTable('issue2667Tag', (t) => {
@@ -80,6 +94,10 @@ module.exports = (session) => {
           } else {
             t.text('data');
           }
+        })
+        .createTable('issue2667PostTag', (t) => {
+          t.integer('postId');
+          t.integer('tagId');
         });
 
       await knex('issue2667Tag').insert([
@@ -95,7 +113,10 @@ module.exports = (session) => {
     });
 
     after(async () => {
-      await knex.schema.dropTableIfExists('issue2667Post').dropTableIfExists('issue2667Tag');
+      await knex.schema
+        .dropTableIfExists('issue2667PostTag')
+        .dropTableIfExists('issue2667Post')
+        .dropTableIfExists('issue2667Tag');
     });
 
     beforeEach(() => {
@@ -124,6 +145,17 @@ module.exports = (session) => {
 
       await Post.query().withGraphFetched('tags');
       expect(warnings).to.eql([expectedWarning]);
+    });
+
+    it('should warn for many-to-many relations', async () => {
+      const posts = await Post.query().withGraphFetched('manyTags').orderBy('id');
+
+      expect(posts.map((it) => it.manyTags)).to.eql([[], []]);
+      expect(warnings).to.eql([
+        'Fetching relation "manyTags" of Post: the join property "issue2667Post.tagIds" of some ' +
+          'owner models holds an array, which is not supported, so no related models are found ' +
+          'for them. Map the relation from a column that holds a single key instead.',
+      ]);
     });
 
     it('$fetchGraph() should warn once if owner join properties hold arrays', async () => {
