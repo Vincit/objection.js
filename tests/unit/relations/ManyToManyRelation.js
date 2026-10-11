@@ -1394,7 +1394,7 @@ describe('ManyToManyRelation', () => {
         });
     });
 
-    it("should leave out the order of the relation's modify in the subquery", () => {
+    it("should keep the order of the relation's modify in the subquery", () => {
       createModifiedRelation((builder) => builder.orderBy('someColumn'));
       let owner = OwnerModel.fromJson({ oid: 666 });
 
@@ -1406,23 +1406,7 @@ describe('ManyToManyRelation', () => {
         .where('gender', 'male')
         .then(() => {
           expect(executedQueries).to.eql([
-            `delete from "RelatedModel" where "RelatedModel"."id" in (select "RelatedModel"."id" from "RelatedModel" inner join "JoinModel" on "RelatedModel"."rid" = "JoinModel"."relatedId" where "JoinModel"."ownerId" in (666) and "gender" = 'male')`,
-          ]);
-        });
-    });
-
-    it("should keep the order of the relation's modify with a limit", () => {
-      createModifiedRelation((builder) => builder.orderBy('someColumn').limit(10));
-      let owner = OwnerModel.fromJson({ oid: 666 });
-
-      return QueryBuilder.forClass(RelatedModel)
-        .deleteOperationFactory((builder) => {
-          return relation.delete(builder, RelationOwner.create(owner));
-        })
-        .delete()
-        .then(() => {
-          expect(executedQueries).to.eql([
-            `delete from "RelatedModel" where "RelatedModel"."id" in (select "RelatedModel"."id" from "RelatedModel" inner join "JoinModel" on "RelatedModel"."rid" = "JoinModel"."relatedId" where "JoinModel"."ownerId" in (666) order by "someColumn" asc limit 10)`,
+            `delete from "RelatedModel" where "RelatedModel"."id" in (select "RelatedModel"."id" from "RelatedModel" inner join "JoinModel" on "RelatedModel"."rid" = "JoinModel"."relatedId" where "JoinModel"."ownerId" in (666) and "gender" = 'male' order by "someColumn" asc)`,
           ]);
         });
     });
@@ -1728,7 +1712,7 @@ describe('ManyToManyRelation', () => {
         });
     });
 
-    it('should leave out the order of an onBuild hook in the subquery', () => {
+    it('should keep the order of an onBuild hook in the subquery', () => {
       mockKnexQueryResults = [1];
       let owner = OwnerModel.fromJson({ oid: 666 });
 
@@ -1747,7 +1731,7 @@ describe('ManyToManyRelation', () => {
         .where('RelatedModel.code', 55)
         .then(() => {
           expect(executedQueries).to.eql([
-            `delete from "JoinModel" where "JoinModel"."ownerId" in (666) and exists (select 1 from "RelatedModel" where "RelatedModel"."rid" = "JoinModel"."relatedId" and "RelatedModel"."code" = 55)`,
+            `delete from "JoinModel" where "JoinModel"."ownerId" in (666) and exists (select 1 from "RelatedModel" where "RelatedModel"."rid" = "JoinModel"."relatedId" and "RelatedModel"."code" = 55 order by "RelatedModel"."rid" asc)`,
           ]);
         });
     });
@@ -1946,6 +1930,102 @@ describe('ManyToManyRelation', () => {
   describe('mssql', () => {
     beforeEach(() => {
       useClient('mssql');
+    });
+
+    it("delete should leave out the order of the relation's modify in the subquery", () => {
+      createModifiedRelation((builder) => builder.orderBy('someColumn'));
+      let owner = OwnerModel.fromJson({ oid: 666 });
+
+      return QueryBuilder.forClass(RelatedModel)
+        .deleteOperationFactory((builder) => {
+          return relation.delete(builder, RelationOwner.create(owner));
+        })
+        .delete()
+        .where('gender', 'male')
+        .then(() => {
+          expect(executedQueries).to.eql([
+            "delete from [RelatedModel] where [RelatedModel].[id] in ((select [RelatedModel].[id] from [RelatedModel] inner join [JoinModel] on [RelatedModel].[rid] = [JoinModel].[relatedId] where [JoinModel].[ownerId] in (666) and [gender] = 'male'));select @@rowcount",
+          ]);
+        });
+    });
+
+    it("delete should keep the order of the relation's modify with a limit", () => {
+      createModifiedRelation((builder) => builder.orderBy('someColumn').limit(10));
+      let owner = OwnerModel.fromJson({ oid: 666 });
+
+      return QueryBuilder.forClass(RelatedModel)
+        .deleteOperationFactory((builder) => {
+          return relation.delete(builder, RelationOwner.create(owner));
+        })
+        .delete()
+        .then(() => {
+          expect(executedQueries).to.eql([
+            'delete from [RelatedModel] where [RelatedModel].[id] in ((select top (10) [RelatedModel].[id] from [RelatedModel] inner join [JoinModel] on [RelatedModel].[rid] = [JoinModel].[relatedId] where [JoinModel].[ownerId] in (666) order by [someColumn] asc));select @@rowcount',
+          ]);
+        });
+    });
+
+    it('unrelate should leave out the order of an onBuild hook in the subquery', () => {
+      mockKnexQueryResults = [1];
+      let owner = OwnerModel.fromJson({ oid: 666 });
+
+      return QueryBuilder.forClass(RelatedModel)
+        .unrelateOperationFactory((builder) => {
+          return relation.unrelate(builder, RelationOwner.create(owner));
+        })
+        .context({
+          onBuild(builder) {
+            if (builder.isFind()) {
+              builder.orderBy('RelatedModel.rid');
+            }
+          },
+        })
+        .unrelate()
+        .where('RelatedModel.code', 55)
+        .then(() => {
+          expect(executedQueries).to.eql([
+            'delete from [JoinModel] where [JoinModel].[ownerId] in (666) and exists (select 1 from [RelatedModel] where [RelatedModel].[rid] = [JoinModel].[relatedId] and [RelatedModel].[code] = 55);select @@rowcount',
+          ]);
+        });
+    });
+
+    it('find should leave out the order of join.through.modify in the joined subquery', () => {
+      createJoinThroughModifiedRelation((builder) =>
+        builder.where('someColumn', 'foo').orderBy('someColumn'),
+      );
+      let owner = OwnerModel.fromJson({ oid: 666 });
+
+      return QueryBuilder.forClass(RelatedModel)
+        .findOperationFactory((builder) => {
+          return relation.find(builder, RelationOwner.create(owner));
+        })
+        .then(() => {
+          expect(executedQueries).to.eql([
+            "select [RelatedModel].*, [JoinModel].[ownerId] as [objectiontmpjoin0] from [RelatedModel] inner join (select [JoinModel].* from [JoinModel] where [someColumn] = 'foo') as [JoinModel] on [RelatedModel].[rid] = [JoinModel].[relatedId] where [JoinModel].[ownerId] in (666)",
+          ]);
+        });
+    });
+
+    it('joinRelated should leave out the order of join.through.modify in the joined subquery', () => {
+      OwnerModel.relationMappings = {
+        related: {
+          relation: ManyToManyRelation,
+          modelClass: RelatedModel,
+          join: {
+            from: 'OwnerModel.oid',
+            through: {
+              from: 'JoinModel.ownerId',
+              to: 'JoinModel.relatedId',
+              modify: (builder) => builder.where('someColumn', 'foo').orderBy('someColumn'),
+            },
+            to: 'RelatedModel.rid',
+          },
+        },
+      };
+
+      expect(OwnerModel.query().joinRelated('related').toKnexQuery().toString()).to.equal(
+        "select [OwnerModel].* from [OwnerModel] inner join (select [JoinModel].* from [JoinModel] where [someColumn] = 'foo') as [related_join] on [related_join].[ownerId] = [OwnerModel].[oid] inner join [RelatedModel] as [related] on [related_join].[relatedId] = [related].[rid]",
+      );
     });
 
     it('unrelate should select the related rows of the join rows', () => {

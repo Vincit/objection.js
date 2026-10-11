@@ -22,6 +22,18 @@ module.exports = (session) => {
             },
           },
 
+          pet: {
+            relation: Model.HasOneRelation,
+            modelClass: Animal,
+            modify: (builder) => {
+              builder.modify(builder.context().hasOne);
+            },
+            join: {
+              from: 'person.id',
+              to: 'animal.ownerId',
+            },
+          },
+
           pets: {
             relation: Model.HasManyRelation,
             modelClass: Animal,
@@ -420,6 +432,51 @@ module.exports = (session) => {
       it('many to many relation', () => {});
     });
 
+    describe('withGraphJoined', () => {
+      it('has one relation with an ordered first()', async () => {
+        Animal.useLimitInFirst = true;
+
+        try {
+          const people = await Person.query()
+            .withGraphJoined('pet')
+            .context(modifyHasOne((qb) => qb.orderBy('name', 'desc').first()))
+            .orderBy('person.name');
+
+          expect(people.map((person) => [person.name, person.pet?.name ?? null])).to.eql([
+            ['Arnold', 'Stalin'],
+            ['Gustav', null],
+            ['Meinhard', null],
+          ]);
+        } finally {
+          Animal.useLimitInFirst = false;
+        }
+      });
+
+      it('has many relation with distinctOn', async function () {
+        if (!session.isPostgres()) {
+          return this.skip();
+        }
+
+        // The order decides which of the pets named 'Freud' is selected.
+        const meinhard = await findMeinhard();
+        await meinhard.$relatedQuery('pets').insert({ name: 'Freud' });
+        const people = await Person.query()
+          .withGraphJoined('pets')
+          .context(
+            modifyHasMany((qb) => qb.distinctOn('name').orderBy('name').orderBy('id', 'desc')),
+          )
+          .orderBy('person.name');
+
+        expect(
+          people.map((person) => [person.name, person.pets.map((pet) => pet.name).sort()]),
+        ).to.eql([
+          ['Arnold', ['Stalin']],
+          ['Gustav', []],
+          ['Meinhard', ['Freud', 'Ruffus']],
+        ]);
+      });
+    });
+
     describe('joinRelated', () => {
       it('belongs to one relation', () => {});
 
@@ -451,6 +508,12 @@ module.exports = (session) => {
     function modifyBelongsToOne(query) {
       return {
         belongsToOne: query,
+      };
+    }
+
+    function modifyHasOne(query) {
+      return {
+        hasOne: query,
       };
     }
 

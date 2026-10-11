@@ -4086,30 +4086,47 @@ describe('QueryBuilder', () => {
         });
     });
 
-    it('withGraphJoined() should leave out the order of a modifier in the joined subquery', () => {
-      mockKnexQueryResults = [flatRows()];
+    describe('order of a modifier in the joined subquery', () => {
+      const joinSql = (client, modifier) =>
+        Person.query(Knex({ client, useNullAsDefault: true }))
+          .withGraphJoined('pets')
+          .modifyGraph('pets', modifier)
+          .toKnexQuery()
+          .toString();
 
-      return Person.query()
-        .withGraphJoined('pets')
-        .modifyGraph('pets', (qb) => qb.where('name', 'A10').orderBy('name'))
-        .then(() => {
-          expect(executedQueries[0]).to.contain(
-            'left join (select "Animal".* from "Animal" where "name" = \'A10\') as "pets"',
-          );
-        });
-    });
+      it('should keep the order on postgres, mysql and sqlite', () => {
+        const modifier = (qb) => qb.where('name', 'A10').orderBy('name');
 
-    it('withGraphJoined() should keep the order of a modifier with a limit', () => {
-      mockKnexQueryResults = [flatRows()];
+        expect(joinSql('pg', modifier)).to.contain(
+          'left join (select "Animal".* from "Animal" where "name" = \'A10\' order by "name" asc) as "pets"',
+        );
+        expect(joinSql('mysql', modifier)).to.contain(
+          "left join (select `Animal`.* from `Animal` where `name` = 'A10' order by `name` asc) as `pets`",
+        );
+        expect(joinSql('sqlite3', modifier)).to.contain(
+          "left join (select `Animal`.* from `Animal` where `name` = 'A10' order by `name` asc) as `pets`",
+        );
+      });
 
-      return Person.query()
-        .withGraphJoined('pets')
-        .modifyGraph('pets', (qb) => qb.orderBy('name').limit(5))
-        .then(() => {
-          expect(executedQueries[0]).to.contain(
-            'left join (select "Animal".* from "Animal" order by "name" asc limit 5) as "pets"',
-          );
-        });
+      it('should leave out the order on mssql', () => {
+        expect(joinSql('mssql', (qb) => qb.where('name', 'A10').orderBy('name'))).to.contain(
+          "left join (select [Animal].* from [Animal] where [name] = 'A10') as [pets]",
+        );
+      });
+
+      it('should keep the order with a limit on mssql', () => {
+        expect(joinSql('mssql', (qb) => qb.orderBy('name').limit(5))).to.contain(
+          'left join (select top (5) [Animal].* from [Animal] order by [name] asc) as [pets]',
+        );
+      });
+
+      it('should keep the order with first() and useLimitInFirst on mssql', () => {
+        Animal.useLimitInFirst = true;
+
+        expect(joinSql('mssql', (qb) => qb.orderBy('name').first())).to.contain(
+          'left join (select top (1) [Animal].* from [Animal] order by [name] asc) as [pets]',
+        );
+      });
     });
 
     it('graphModifiersAtPath() should return the modifiers once', () => {
