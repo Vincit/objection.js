@@ -4479,6 +4479,28 @@ describe('QueryBuilder', () => {
         }
       });
 
+      it('should warn and ignore limitPerParent for joined relations', () => {
+        const warnings = [];
+        const originalWarn = console.warn;
+        console.warn = (message) => warnings.push(message);
+        resetDeprecations();
+
+        try {
+          Person.query()
+            .withGraphFetched('movies', { limitPerParent: true })
+            .withGraphJoined('pets', { limitPerParent: true })
+            .withGraphJoined('pets', { limitPerParent: true });
+
+          expect(warnings).to.eql([
+            'The limitPerParent option only applies to withGraphFetched() and is ignored for ' +
+              'the joined relations "pets".',
+          ]);
+        } finally {
+          console.warn = originalWarn;
+          resetDeprecations();
+        }
+      });
+
       it('should load the merged graph', () => {
         mockKnexQueryResults = [flatRows(), movieRows()];
 

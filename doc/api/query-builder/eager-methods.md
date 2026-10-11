@@ -15,8 +15,8 @@ As mentioned, this method uses multiple queries to fetch the related objects. Ob
 **Limitations:**
 
 - Relations cannot be referenced in the root query because they are not joined.
-- `limit` and `page` methods will work incorrectly when applied to a relation using `modifyGraph` or `modifiers` because they will be applied on a query that fetches relations for multiple parents. You can use `limit` and `page` for the root query. To limit the related items per parent, set the `maxBatchSize` [graph option](/api/types/#type-graphoptions) to `1` so that each parent gets its own query.
-- `first` doesn't limit the related items per parent when applied to a relation using `modifyGraph` or `modifiers`: all matching related items are still assigned to the parents, or with `useLimitInFirst`, the whole query is limited to one item. Use `limit(1)` together with `maxBatchSize: 1` instead.
+- `limit`, `offset` and `page` methods apply to the whole query that fetches a relation for multiple parents when used in `modifyGraph`, `modifiers` or the `modify` of a relation mapping, not to the related items of each parent. You can use them for the root query. To limit the related items per parent, set the `limitPerParent` [graph option](/api/types/#type-graphoptions), see [below](#limiting-related-items-per-parent). `page` and `range` always apply to all parents.
+- Without `limitPerParent`, `first` doesn't limit the related items per parent when applied to a relation: all matching related items are still assigned to the parents, or with `useLimitInFirst`, the whole query is limited to one item.
 
 See the [eager loading](/guide/query-examples.html#eager-loading) section for more examples and [RelationExpression](/api/types/#type-relationexpression) for more info about the relation expression language.
 
@@ -25,6 +25,28 @@ See the [fetchGraph](/api/model/static-methods.html#static-fetchgraph) and [\$fe
 **About performance:**
 
 Note that while [withGraphJoined](/api/query-builder/eager-methods.html#withgraphjoined) sounds more performant than [withGraphFetched](/api/query-builder/eager-methods.html#withgraphfetched), both methods have very similar performance in most cases and [withGraphFetched](/api/query-builder/eager-methods.html#withgraphfetched) is actually much much faster in some cases where the [relationExpression](/api/types/#type-relationexpression) contains multiple many-to-many or has-many relations. The flat record list the db returns for joins can have an incredible amount of duplicate information in some cases. Transferring + parsing that data from the db to node can be very costly, even though the actual joins in the db are very fast. You shouldn't select [withGraphJoined](/api/query-builder/eager-methods.html#withgraphjoined) blindly just because it sounds more peformant. The three rules of optimization apply here too: 1. Don't optimize 2. Don't optimize yet 3. Profile before optimizing. When you don't actually need joins, use [withGraphFetched](/api/query-builder/eager-methods.html#withgraphfetched).
+
+##### Limiting related items per parent
+
+With the `limitPerParent` [graph option](/api/types/#type-graphoptions), `limit`, `offset` and `first` in graph modifiers and in the `modify` of relation mappings apply to the related items of each parent:
+
+```js
+const people = await Person.query()
+  .withGraphFetched('pets(latest)', { limitPerParent: true })
+  .modifiers({
+    latest: (query) => query.orderBy('createdAt', 'desc').limit(3)
+  });
+
+// Up to three pets per person.
+console.log(people[0].pets.length);
+```
+
+It can be enabled for all queries of a model through [defaultGraphOptions](/api/model/static-properties.html#static-defaultgraphoptions). Note:
+
+- The relation query becomes a subquery, and its order moves into a `row_number()` window function that numbers the related items of each parent. The order can only refer to the related table's columns and to the names of the result columns, including aliases: ordering by a column that isn't selected doesn't work, and neither does ordering by a column qualified with another table's name, e.g. `orderBy('owner.name')` after `joinRelated('owner')` or a column of the join table of a many-to-many relation. The names of the selected columns need to be unique.
+- Relation queries with `page` or `range` keep limiting all parents together.
+- MySQL supports window functions since 8.0. On older versions, objection fetches relations with a limit with one query per parent instead. Knex 3.3 and newer detect the MySQL version on the first connection. With older versions of knex, set `version: '5.7.0'` in the knex configuration.
+- `withGraphJoined` ignores the option and logs a warning.
 
 ##### Arguments
 

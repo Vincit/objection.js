@@ -897,6 +897,345 @@ module.exports = (session) => {
         });
     });
 
+    describe('limitPerParent option', () => {
+      const relatedIds = (models, relation, idProp = 'idCol') =>
+        models.map((model) => {
+          const related = model[relation];
+          return [
+            model.id ?? model.idCol,
+            Array.isArray(related) ? related.map((it) => it[idProp]) : related && related[idProp],
+          ];
+        });
+
+      const fetchModel1s = (expr, modify, opt = { limitPerParent: true }) =>
+        Model1.query()
+          .withGraphFetched(expr, opt)
+          .whereExists(Model1.relatedQuery('model1Relation2'))
+          .modifyGraph('model1Relation2', modify)
+          .orderBy('id');
+
+      it('should apply limit() per parent in a HasManyRelation', async () => {
+        const models = await fetchModel1s('model1Relation2', (query) =>
+          query.orderBy('id_col', 'desc').limit(1),
+        );
+
+        expect(relatedIds(models, 'model1Relation2')).to.eql([
+          [1, [2]],
+          [4, [4]],
+          [6, [3]],
+        ]);
+      });
+
+      it('should apply limit() to all parents without the option', async () => {
+        const models = await fetchModel1s(
+          'model1Relation2',
+          (query) => query.orderBy('id_col', 'desc').limit(1),
+          {},
+        );
+
+        expect(relatedIds(models, 'model1Relation2')).to.eql([
+          [1, []],
+          [4, [4]],
+          [6, []],
+        ]);
+      });
+
+      it('should apply offset() per parent', async () => {
+        const models = await fetchModel1s('model1Relation2', (query) =>
+          query.orderBy('id_col', 'desc').limit(1).offset(1),
+        );
+
+        expect(relatedIds(models, 'model1Relation2')).to.eql([
+          [1, [1]],
+          [4, []],
+          [6, []],
+        ]);
+      });
+
+      it('should apply first() per parent', async () => {
+        const models = await fetchModel1s('model1Relation2', (query) =>
+          query.orderBy('id_col', 'desc').first(),
+        );
+
+        expect(relatedIds(models, 'model1Relation2')).to.eql([
+          [1, [2]],
+          [4, [4]],
+          [6, [3]],
+        ]);
+      });
+
+      it('should apply orderByRaw() per parent', async () => {
+        const models = await fetchModel1s('model1Relation2', (query) =>
+          query.orderByRaw('case when id_col = ? then 0 else 1 end, id_col desc', [1]).limit(1),
+        );
+
+        expect(relatedIds(models, 'model1Relation2')).to.eql([
+          [1, [1]],
+          [4, [4]],
+          [6, [3]],
+        ]);
+      });
+
+      it('should apply nulls first and last of orderBy() per parent', async () => {
+        await Model2.query().findById(2).patch({ model2Prop1: null });
+
+        const fetchFirst = (nulls) =>
+          fetchModel1s('model1Relation2', (query) =>
+            query.orderBy('model2_prop1', 'asc', nulls).limit(1),
+          );
+
+        expect(relatedIds(await fetchFirst('first'), 'model1Relation2')).to.eql([
+          [1, [2]],
+          [4, [4]],
+          [6, [3]],
+        ]);
+        expect(relatedIds(await fetchFirst('last'), 'model1Relation2')).to.eql([
+          [1, [1]],
+          [4, [4]],
+          [6, [3]],
+        ]);
+      });
+
+      it('should apply a limit of an onBuildKnex() hook per parent', async () => {
+        const models = await fetchModel1s('model1Relation2', (query) =>
+          query.orderBy('id_col', 'desc').onBuildKnex((knexQuery) => knexQuery.limit(1)),
+        );
+
+        expect(relatedIds(models, 'model1Relation2')).to.eql([
+          [1, [2]],
+          [4, [4]],
+          [6, [3]],
+        ]);
+      });
+
+      it('should ignore limit(null) like knex', async () => {
+        const models = await fetchModel1s('model1Relation2', (query) =>
+          query.orderBy('id_col', 'desc').limit(null),
+        );
+
+        expect(relatedIds(models, 'model1Relation2')).to.eql([
+          [1, [2, 1]],
+          [4, [4]],
+          [6, [3]],
+        ]);
+      });
+
+      it('should keep limiting all parents with range()', async () => {
+        const models = await fetchModel1s('model1Relation2', (query) =>
+          query.orderBy('id_col', 'desc').range(0, 0).limit(2),
+        );
+
+        expect(relatedIds(models, 'model1Relation2')).to.eql([
+          [1, []],
+          [4, [4]],
+          [6, [3]],
+        ]);
+      });
+
+      if (session.isPostgres() || session.isMySql()) {
+        it('should keep the timeout() of the relation query', async () => {
+          const sleep = session.isPostgres() ? 'pg_sleep(0.3)' : 'sleep(0.3)';
+          let error = null;
+
+          try {
+            await fetchModel1s('model1Relation2', (query) =>
+              query.select('*', raw(sleep)).orderBy('id_col', 'desc').limit(1).timeout(50),
+            );
+          } catch (err) {
+            error = err;
+          }
+
+          expect(error).to.be.a(Error);
+          expect(error.message).to.contain('Defined query timeout of 50ms exceeded');
+        });
+      }
+
+      it('should keep the order of the related models', async () => {
+        const models = await fetchModel1s('model1Relation2', (query) =>
+          query.orderBy('id_col', 'desc').limit(2),
+        );
+
+        expect(relatedIds(models, 'model1Relation2')).to.eql([
+          [1, [2, 1]],
+          [4, [4]],
+          [6, [3]],
+        ]);
+        expect(models[0].model1Relation2[0]).to.be.a(Model2);
+        expect(models[0].model1Relation2[0]).to.not.have.property('objectiontmprownum');
+      });
+
+      it('should fetch nested relations of the limited models', async () => {
+        const models = await fetchModel1s('model1Relation2.model2Relation1', (query) =>
+          query.orderBy('id_col', 'desc').limit(1),
+        ).modifyGraph('model1Relation2.model2Relation1', (query) => query.orderBy('id'));
+
+        expect(relatedIds(models, 'model1Relation2')).to.eql([
+          [1, [2]],
+          [4, [4]],
+          [6, [3]],
+        ]);
+        expect(relatedIds(models[0].model1Relation2, 'model2Relation1', 'id')).to.eql([
+          [2, [5, 6]],
+        ]);
+      });
+
+      it('should apply limit() per parent in a ManyToManyRelation', async () => {
+        await Model2.query().findById(1).patch({ model1Id: null });
+        await Model2.relatedQuery('model2Relation1').for(1).relate({ id: 5, aliasedExtra: 'x' });
+
+        const models = await Model2.query()
+          .whereIn('id_col', [1, 2, 3])
+          .withGraphFetched('model2Relation1', { limitPerParent: true })
+          .modifyGraph('model2Relation1', (query) => query.orderBy('id', 'desc').limit(1))
+          .orderBy('id_col');
+
+        expect(relatedIds(models, 'model2Relation1', 'id')).to.eql([
+          [1, [5]],
+          [2, [6]],
+          [3, []],
+        ]);
+        expect(models[1].model2Relation1[0].aliasedExtra).to.equal('extra 6');
+      });
+
+      it('should apply limit() of a relation mapping modify per parent', async () => {
+        class Model1Latest extends Model1 {
+          static get relationMappings() {
+            return {
+              ...super.relationMappings,
+              latestModel2: {
+                relation: Model1.HasOneRelation,
+                modelClass: Model2,
+                join: { from: 'Model1.id', to: 'model2.model1_id' },
+                modify: (query) => query.orderBy('id_col', 'desc').limit(1),
+              },
+            };
+          }
+        }
+
+        const models = await Model1Latest.query()
+          .withGraphFetched('latestModel2', { limitPerParent: true })
+          .whereExists(Model1Latest.relatedQuery('latestModel2'))
+          .orderBy('id');
+
+        expect(relatedIds(models, 'latestModel2')).to.eql([
+          [1, 2],
+          [4, 4],
+          [6, 3],
+        ]);
+      });
+
+      it('should support limitPerParent in defaultGraphOptions', async () => {
+        class Model1Defaults extends Model1 {
+          static get defaultGraphOptions() {
+            return { limitPerParent: true };
+          }
+        }
+
+        const models = await Model1Defaults.query()
+          .withGraphFetched('model1Relation2')
+          .whereExists(Model1Defaults.relatedQuery('model1Relation2'))
+          .modifyGraph('model1Relation2', (query) => query.orderBy('id_col', 'desc').limit(1))
+          .orderBy('id');
+
+        expect(relatedIds(models, 'model1Relation2')).to.eql([
+          [1, [2]],
+          [4, [4]],
+          [6, [3]],
+        ]);
+      });
+
+      if (session.isMySql()) {
+        describe('without window functions', () => {
+          let knex;
+          let queries;
+
+          // Simulate MySQL 5.7, as knex only detects the server's version
+          // if it isn't configured.
+          const createModel = (ModelClass) =>
+            ModelClass.bindKnex(
+              mockKnexFactory(knex, function (mock, oldImpl, args) {
+                queries.push(this.toSQL().sql);
+                return oldImpl.apply(this, args);
+              }),
+            );
+
+          before(() => {
+            knex = require('knex')({ ...session.opt.knexConfig, version: '5.7.0' });
+          });
+
+          after(() => {
+            return knex.destroy();
+          });
+
+          beforeEach(() => {
+            queries = [];
+          });
+
+          it('should fetch the related models of each parent separately', async () => {
+            const TestModel = createModel(Model1);
+            const models = await TestModel.query()
+              .withGraphFetched('model1Relation2', { limitPerParent: true })
+              .whereExists(TestModel.relatedQuery('model1Relation2'))
+              .modifyGraph('model1Relation2', (query) => query.orderBy('id_col', 'desc').first())
+              .orderBy('id');
+
+            expect(relatedIds(models, 'model1Relation2')).to.eql([
+              [1, [2]],
+              [4, [4]],
+              [6, [3]],
+            ]);
+            expect(queries).to.have.length(4);
+            expect(queries.join()).to.not.contain('row_number');
+          });
+
+          it('should fetch the related models of each parent separately for a relation mapping modify', async () => {
+            class Model1Latest extends Model1 {
+              static get relationMappings() {
+                return {
+                  ...super.relationMappings,
+                  latestModel2: {
+                    relation: Model1.HasOneRelation,
+                    modelClass: Model2,
+                    join: { from: 'Model1.id', to: 'model2.model1_id' },
+                    modify: (query) => query.orderBy('id_col', 'desc').limit(1),
+                  },
+                };
+              }
+            }
+
+            const TestModel = createModel(Model1Latest);
+            const models = await TestModel.query()
+              .withGraphFetched('latestModel2', { limitPerParent: true })
+              .whereExists(TestModel.relatedQuery('latestModel2'))
+              .orderBy('id');
+
+            expect(relatedIds(models, 'latestModel2')).to.eql([
+              [1, 2],
+              [4, 4],
+              [6, 3],
+            ]);
+            expect(queries).to.have.length(4);
+          });
+
+          it('should fetch the related models of all parents together without a limit', async () => {
+            const TestModel = createModel(Model1);
+            const models = await TestModel.query()
+              .withGraphFetched('model1Relation2', { limitPerParent: true })
+              .whereExists(TestModel.relatedQuery('model1Relation2'))
+              .modifyGraph('model1Relation2', (query) => query.orderBy('id_col', 'desc'))
+              .orderBy('id');
+
+            expect(relatedIds(models, 'model1Relation2')).to.eql([
+              [1, [2, 1]],
+              [4, [4]],
+              [6, [3]],
+            ]);
+            expect(queries).to.have.length(2);
+          });
+        });
+      }
+    });
+
     it('setting maxBatchSize option to 1 should cause relations to be fetched naively to each parent separately', () => {
       return Model1.query()
         .withGraphFetched('model1Relation2', { maxBatchSize: 1 })

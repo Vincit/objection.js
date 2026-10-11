@@ -730,6 +730,10 @@ const rowsEager: PromiseLike<Person[]> = Person.query().withGraphFetched('foo.ba
   joinOperation: 'innerJoin',
 });
 
+const rowsEagerLimited: PromiseLike<Person[]> = Person.query().withGraphFetched('pets', {
+  limitPerParent: true,
+});
+
 const rowsEager2: PromiseLike<Person[]> = Person.query().withGraphFetched({
   pets: {
     owner: {

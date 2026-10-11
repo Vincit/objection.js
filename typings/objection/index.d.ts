@@ -1142,6 +1142,7 @@ declare namespace Objection {
     aliases?: { [key: string]: string };
     joinOperation?: string;
     maxBatchSize?: number;
+    limitPerParent?: boolean;
   }
 
   export interface WithGraphOptions extends GraphOptions {
