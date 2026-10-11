@@ -48,6 +48,12 @@ jobs:
           npm run build:parsers
           git diff --exit-code lib/queryBuilder/parsers
 
+      # The documented minimum TypeScript version has to compile the typings
+      # and their tests. One job is enough.
+      - name: Check the typings with TypeScript 5.1
+        if: matrix.node-version == '24.x' && matrix.knex == 'default' && matrix.mysql == '8.4'
+        run: npx --yes -p typescript@5.1.6 tsc
+
       - name: Start test databases
         env:
           COMPOSE_FILE: ${{ matrix.mysql == '5.7' && 'docker-compose.yml:docker-compose.mysql57.yml' || 'docker-compose.yml' }}

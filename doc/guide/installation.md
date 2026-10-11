@@ -24,4 +24,4 @@ npm install objection@next
 
 ## TypeScript
 
-Objection ships with its own TypeScript typings. Since objection 3.3.0, they require TypeScript 5.0 or newer.
+Objection ships with its own TypeScript typings. They require TypeScript 5.1 or newer.
