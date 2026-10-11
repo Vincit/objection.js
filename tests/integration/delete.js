@@ -103,14 +103,7 @@ module.exports = (session) => {
         });
       }
 
-      it('should delete multiple', function () {
-        // model2 rows still reference the deleted rows, which needs
-        // `ON DELETE SET NULL`. SQL Server can't have it there, as a second
-        // cascade path to the join tables.
-        if (session.isMsSql()) {
-          return this.skip();
-        }
-
+      it('should delete multiple', () => {
         return Model1.query()
           .delete()
           .where('model1Prop1', '<', 'hello 3')
@@ -311,15 +304,6 @@ module.exports = (session) => {
 
     describe('.$relatedQuery().delete()', () => {
       describe('belongs to one relation', () => {
-        before(function () {
-          // The owners still reference the deleted rows, which needs
-          // `ON DELETE SET NULL`. SQL Server can't have it on Model1's
-          // reference to itself.
-          if (session.isMsSql()) {
-            this.skip();
-          }
-        });
-
         let parent1;
         let parent2;
 
@@ -856,15 +840,6 @@ module.exports = (session) => {
 
     describe('relatedQuery().delete()', () => {
       describe('belongs to one relation', () => {
-        before(function () {
-          // The owners still reference the deleted rows, which needs
-          // `ON DELETE SET NULL`. SQL Server can't have it on Model1's
-          // reference to itself.
-          if (session.isMsSql()) {
-            this.skip();
-          }
-        });
-
         beforeEach(() => {
           return session.populate([
             {

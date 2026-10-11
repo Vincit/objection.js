@@ -212,8 +212,10 @@ class TestSession {
     const knex = this.knex;
     const opt = this.opt;
     // SQL Server rejects `SET NULL` on the self reference of Model1 and on the
-    // references that would be a second cascade path to the join tables.
-    const setNull = this.isMsSql() ? 'NO ACTION' : 'SET NULL';
+    // references that would be a second cascade path to the join tables, so
+    // the references to Model1 have no foreign key constraint there.
+    const referenceModel1 = (column) =>
+      this.isMsSql() ? column : column.references('Model1.id').onDelete('SET NULL');
 
     return Promise.resolve()
       .then(() => knex.schema.dropTableIfExists('Model1Model2'))
@@ -225,7 +227,7 @@ class TestSession {
       .then(() =>
         this.createTable('Model1', (table, { increments }) => {
           increments('id');
-          table.integer('model1Id').index().unsigned().references('Model1.id').onDelete(setNull);
+          referenceModel1(table.integer('model1Id').index().unsigned());
           table.string('model1Prop1');
           table.integer('model1Prop2');
         }),
@@ -233,7 +235,7 @@ class TestSession {
       .then(() =>
         this.createTable('model2', (table, { increments }) => {
           increments('id_col');
-          table.integer('model1_id').index().unsigned().references('Model1.id').onDelete(setNull);
+          referenceModel1(table.integer('model1_id').index().unsigned());
           table.string('model2_prop1');
           table.integer('model2_prop2');
         }),

@@ -1905,7 +1905,12 @@ module.exports = (session) => {
             await Model1.query(trx).upsertGraph(upsert, { fetchStrategy, allowMarkers: true });
 
             const root = await Model1.query(trx).findById(2).withGraphFetched('model1Relation1');
-            expect(root.model1Id).to.equal(null);
+            // The owner's reference to the deleted row is removed by
+            // `ON DELETE SET NULL`, which SQL Server can't have on Model1's
+            // reference to itself.
+            if (prop === '#unrelate' || !session.isMsSql()) {
+              expect(root.model1Id).to.equal(null);
+            }
             expect(root.model1Relation1).to.equal(null);
 
             const row = await trx('Model1').where('id', 3).first();
