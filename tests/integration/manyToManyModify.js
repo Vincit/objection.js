@@ -479,6 +479,92 @@ module.exports = (session) => {
         expect(await joinRows()).to.eql(expected);
       });
 
+      it('should only patch the join rows of the related rows that limit() picks', async function () {
+        // Only MySQL supports a limit in updates.
+        if (!session.isMySql()) {
+          this.skip();
+        }
+
+        const model = await owner(1);
+        const numUpdated = await model
+          .$relatedQuery('model1Relation3')
+          .patch({ model2Prop2: 10, extra2: 'z' })
+          .whereIn('model2.model2_prop1', ['a', 'b', 'c'])
+          .orderBy('model2.model2_prop1', 'desc')
+          .limit(2);
+
+        expect(numUpdated).to.equal(2);
+        expect(await model2Rows()).to.eql([
+          [1, 1],
+          [2, 10],
+          [3, 10],
+        ]);
+
+        const expected = allJoinRows.slice();
+        expected[2] = [1, 2, 'x2', 'z'];
+        expected[3] = [1, 3, 'x3', 'z'];
+        expect(await joinRows()).to.eql(expected);
+      });
+
+      it('should count the related rows and not their join rows with limit()', async function () {
+        // Only MySQL supports a limit in updates.
+        if (!session.isMySql()) {
+          this.skip();
+        }
+
+        // Model2 1 has two join rows, so it's picked once.
+        const model = await owner(1);
+        const numUpdated = await model
+          .$relatedQuery('model1Relation3')
+          .patch({ model2Prop2: 10, extra2: 'z' })
+          .orderBy('model2.id_col')
+          .limit(2)
+          .offset(0);
+
+        expect(numUpdated).to.equal(2);
+        expect(await model2Rows()).to.eql([
+          [1, 10],
+          [2, 10],
+          [3, 3],
+        ]);
+
+        const expected = allJoinRows.slice();
+        expected[0] = [1, 1, 'x1', 'z'];
+        expected[1] = [1, 1, 'dup', 'z'];
+        expected[2] = [1, 2, 'x2', 'z'];
+        expect(await joinRows()).to.eql(expected);
+      });
+
+      it('should patch the join table extras ordered by a join table column without limit()', async () => {
+        const model = await owner(1);
+        await model
+          .$relatedQuery('model1Relation3')
+          .patch({ extra2: 'z' })
+          .orderBy('Model1Model2.extra1');
+
+        const expected = allJoinRows.map((row) => (row[0] === 1 ? [...row.slice(0, 3), 'z'] : row));
+        expect(await joinRows()).to.eql(expected);
+      });
+
+      it('should only patch the join table extras of the related rows that limit() and offset() pick', async function () {
+        // Only MySQL supports a limit in updates.
+        if (!session.isMySql()) {
+          this.skip();
+        }
+
+        const model = await owner(1);
+        await model
+          .$relatedQuery('model1Relation3')
+          .patch({ extra2: 'z' })
+          .orderBy('model2.id_col')
+          .limit(1)
+          .offset(1);
+
+        const expected = allJoinRows.slice();
+        expected[2] = [1, 2, 'x2', 'z'];
+        expect(await joinRows()).to.eql(expected);
+      });
+
       describe('with more related rows than one statement can filter by (#161)', () => {
         // More ids than SQL Server accepts as bound values in one statement,
         // patched in several batches:
@@ -518,6 +604,26 @@ module.exports = (session) => {
           expect(numUpdated).to.equal(ids.length);
           expect(await patchedIds()).to.eql(ids);
           expect(await patchedJoinRowIds()).to.eql(ids);
+        });
+
+        it('should patch the related rows that limit() picks and their join rows in batches', async function () {
+          // Only MySQL supports a limit in updates.
+          if (!session.isMySql()) {
+            this.skip();
+          }
+
+          const someIds = ids.slice(0, 600);
+          const model = await owner(1);
+          const numUpdated = await model
+            .$relatedQuery('model1Relation3')
+            .patch({ model2Prop2: 10, extra2: 'z' })
+            .where('Model1Model2.extra1', 'many')
+            .orderBy('model2.id_col')
+            .limit(someIds.length);
+
+          expect(numUpdated).to.equal(someIds.length);
+          expect(await patchedIds()).to.eql(someIds);
+          expect(await patchedJoinRowIds()).to.eql(someIds);
         });
 
         it('should return the patched rows of all batches with returning()', async function () {
