@@ -3998,7 +3998,7 @@ describe('QueryBuilder', () => {
 
         expect(() => builder[second]('pets')).to.throwException((err) => {
           expect(err.message).to.equal(
-            'relation `pets` cannot be loaded with both withGraphJoined and withGraphFetched',
+            'relation "pets" cannot be loaded with both withGraphJoined and withGraphFetched',
           );
         });
       });
@@ -4008,7 +4008,7 @@ describe('QueryBuilder', () => {
 
         expect(() => builder[second]('pets.owner')).to.throwException((err) => {
           expect(err.message).to.equal(
-            'relation `pets` cannot be loaded with both withGraphJoined and withGraphFetched',
+            'relation "pets" cannot be loaded with both withGraphJoined and withGraphFetched',
           );
         });
       });
@@ -4016,7 +4016,7 @@ describe('QueryBuilder', () => {
       it(`should throw if \`*\` is used when mixing ${first} and ${second}`, () => {
         const builder = Person.query()[first]('*');
 
-        expect(() => builder[second]('pets')).to.throwException(/relation expression `\*`/);
+        expect(() => builder[second]('pets')).to.throwException(/relation expression "\*"/);
       });
     });
 
@@ -4419,7 +4419,7 @@ describe('QueryBuilder', () => {
           Person.query().withGraphJoined('pets').withGraph('pets', { algorithm: 'fetch' });
         }).to.throwException((err) => {
           expect(err.message).to.equal(
-            'relation `pets` cannot be loaded with both withGraphJoined and withGraphFetched',
+            'relation "pets" cannot be loaded with both withGraphJoined and withGraphFetched',
           );
         });
       });

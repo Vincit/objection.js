@@ -3385,7 +3385,7 @@ module.exports = (session) => {
             .withGraphFetched('model1Relation1.model1Relation1');
         }).to.throwException((err) => {
           expect(err.message).to.equal(
-            'relation `model1Relation1` cannot be loaded with both withGraphJoined and withGraphFetched',
+            'relation "model1Relation1" cannot be loaded with both withGraphJoined and withGraphFetched',
           );
         });
       });

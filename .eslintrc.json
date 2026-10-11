@@ -14,5 +14,15 @@
     "es6": true,
     "node": true,
     "mocha": true
-  }
+  },
+  "overrides": [
+    {
+      "files": [
+        "lib/**/*.js"
+      ],
+      "parserOptions": {
+        "ecmaVersion": 2020
+      }
+    }
+  ]
 }
