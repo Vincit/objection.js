@@ -748,5 +748,89 @@ module.exports = (session) => {
         });
       }
     });
+
+    describe('owners without a primary key (#2305)', () => {
+      let Owner;
+      let Item;
+
+      before(() => {
+        return knex.schema
+          .dropTableIfExists('cyclic_nopk_item')
+          .dropTableIfExists('cyclic_nopk_owner')
+          .createTable('cyclic_nopk_owner', (table) => {
+            table.string('name');
+            table.integer('favoriteItemId');
+          })
+          .createTable('cyclic_nopk_item', (table) => {
+            table.increments('id').primary();
+            table.string('name');
+            table.string('ownerName');
+          });
+      });
+
+      after(() => {
+        return knex.schema
+          .dropTableIfExists('cyclic_nopk_item')
+          .dropTableIfExists('cyclic_nopk_owner');
+      });
+
+      before(() => {
+        Owner = class Owner extends Model {
+          static get tableName() {
+            return 'cyclic_nopk_owner';
+          }
+
+          static get idColumn() {
+            return null;
+          }
+
+          static get relationMappings() {
+            return {
+              items: {
+                relation: Model.HasManyRelation,
+                modelClass: Item,
+                join: { from: 'cyclic_nopk_owner.name', to: 'cyclic_nopk_item.ownerName' },
+              },
+
+              favoriteItem: {
+                relation: Model.BelongsToOneRelation,
+                modelClass: Item,
+                join: { from: 'cyclic_nopk_owner.favoriteItemId', to: 'cyclic_nopk_item.id' },
+              },
+            };
+          }
+        };
+
+        Item = class Item extends Model {
+          static get tableName() {
+            return 'cyclic_nopk_item';
+          }
+        };
+
+        Owner.knex(knex);
+        Item.knex(knex);
+      });
+
+      it('should not defer foreign keys of owners that cannot be patched', async () => {
+        await Owner.query().insert({ name: 'Other' });
+
+        await expectCyclicError(
+          Owner.query().insertGraph(
+            {
+              name: 'Jennifer',
+              items: [{ '#id': 'felix', name: 'Felix' }],
+              favoriteItem: { '#ref': 'felix' },
+            },
+            { allowRefs: true },
+          ),
+        );
+
+        expect(await Owner.query()).to.eql([{ name: 'Other', favoriteItemId: null }]);
+        expect(await Item.query().resultSize()).to.equal(0);
+
+        await Owner.query().delete();
+        await Item.query().delete();
+      });
+    });
   });
 };
