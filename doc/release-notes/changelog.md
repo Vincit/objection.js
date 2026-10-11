@@ -1,10 +1,11 @@
 # Changelog
 
-## 3.7.1
+## 3.8.0
 
 ### Fixes
 
 - **Behaviour change:** `update()` validates field expression keys like `'meta:color'` against the nested schema of the json column, like `patch()` since 3.3.0. Invalid values are rejected now. `required` inside the json column doesn't apply, as only parts of it are written, while the other properties are validated as before. Until now the keys were validated as top-level properties: `additionalProperties: false` rejected them, a required json column counted as missing, and its `default` replaced the whole stored value. [#160](https://github.com/ditojs/objection/issues/160)
+- Many-to-many `patch()` / `update()` with extra properties patch the join rows before the related rows, and the related rows by the ids that matched the filters before. A filter on a column that the patch changes, e.g. `.patch({ name: 'renamed', role: 'new' }).where('movies.name', 'old')`, left the join rows unchanged, as it no longer matched once the related row was updated. Such patches run one more query, which selects the ids of the related rows. [#161](https://github.com/ditojs/objection/issues/161)
 
 ### Docs
 

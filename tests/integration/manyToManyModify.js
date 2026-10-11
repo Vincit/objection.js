@@ -340,6 +340,22 @@ module.exports = (session) => {
         expect(await joinRows()).to.eql(allJoinRows);
       });
 
+      it('should patch nothing if the related rows to patch are fetched first and none match (#161)', async () => {
+        const model = await owner(1);
+        const numUpdated = await model
+          .$relatedQuery('model1Relation3')
+          .patch({ model2Prop2: 10, extra2: 'z' })
+          .where('model2.model2_prop2', 999);
+
+        expect(numUpdated).to.equal(0);
+        expect(await model2Rows()).to.eql([
+          [1, 1],
+          [2, 2],
+          [3, 3],
+        ]);
+        expect(await joinRows()).to.eql(allJoinRows);
+      });
+
       it('should patch nothing with none()', async () => {
         const model = await owner(1);
         const numUpdated = await model
@@ -405,6 +421,44 @@ module.exports = (session) => {
         if (byKeys) {
           expected[1] = [1, 1, 'dup', 'z'];
         }
+        expect(await joinRows()).to.eql(expected);
+      });
+
+      it('should patch the join table extras of rows matching a filter on a related column that the patch changes (#161)', async () => {
+        const model = await owner(1);
+        const numUpdated = await model
+          .$relatedQuery('model1Relation3')
+          .patch({ model2Prop2: 10, extra2: 'z' })
+          .where('model2.model2_prop2', 2);
+
+        expect(numUpdated).to.equal(1);
+        expect(await model2Rows()).to.eql([
+          [1, 1],
+          [2, 10],
+          [3, 3],
+        ]);
+
+        const expected = allJoinRows.slice();
+        expected[2] = [1, 2, 'x2', 'z'];
+        expect(await joinRows()).to.eql(expected);
+      });
+
+      it('should patch the related rows matching a filter on an extra that the patch changes (#161)', async () => {
+        const model = await owner(1);
+        const numUpdated = await model
+          .$relatedQuery('model1Relation3')
+          .patch({ model2Prop2: 10, extra1: 'changed' })
+          .where('Model1Model2.extra1', 'x2');
+
+        expect(numUpdated).to.equal(1);
+        expect(await model2Rows()).to.eql([
+          [1, 1],
+          [2, 10],
+          [3, 3],
+        ]);
+
+        const expected = allJoinRows.slice();
+        expected[2] = [1, 2, 'changed', 'y'];
         expect(await joinRows()).to.eql(expected);
       });
 

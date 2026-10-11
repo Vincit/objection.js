@@ -1755,7 +1755,7 @@ describe('ManyToManyRelation', () => {
 
   describe('patch join table extras', () => {
     it('should apply the filters to both the related table and the join table', () => {
-      mockKnexQueryResults = [1, 1];
+      mockKnexQueryResults = [[{ id: 5 }], 1, 1];
       let owner = OwnerModel.fromJson({ oid: 666 });
 
       return QueryBuilder.forClass(RelatedModel)
@@ -1768,8 +1768,28 @@ describe('ManyToManyRelation', () => {
         .then((result) => {
           expect(result).to.equal(1);
           expect(executedQueries).to.eql([
-            `update "RelatedModel" set "a" = 'str1' where "RelatedModel"."id" in (select "RelatedModel"."id" from "RelatedModel" inner join "JoinModel" on "RelatedModel"."rid" = "JoinModel"."relatedId" where "JoinModel"."ownerId" in (666) and "RelatedModel"."code" = 55 and "JoinModel"."extra1" = 'foo')`,
+            `select "RelatedModel"."id" from "RelatedModel" inner join "JoinModel" on "RelatedModel"."rid" = "JoinModel"."relatedId" where "JoinModel"."ownerId" in (666) and "RelatedModel"."code" = 55 and "JoinModel"."extra1" = 'foo'`,
             `update "JoinModel" set "extra2" = 'extraVal' where "JoinModel"."ownerId" in (666) and exists (select 1 from "RelatedModel" where "RelatedModel"."rid" = "JoinModel"."relatedId" and "RelatedModel"."code" = 55 and "JoinModel"."extra1" = 'foo')`,
+            `update "RelatedModel" set "a" = 'str1' where ("RelatedModel"."id" in (5))`,
+          ]);
+        });
+    });
+
+    it('should patch no related rows if the filters match none', () => {
+      mockKnexQueryResults = [[]];
+      let owner = OwnerModel.fromJson({ oid: 666 });
+
+      return QueryBuilder.forClass(RelatedModel)
+        .patchOperationFactory((builder) => {
+          return relation.patch(builder, RelationOwner.create(owner));
+        })
+        .patch({ a: 'str1', extra2: 'extraVal' })
+        .where('RelatedModel.code', 55)
+        .then(() => {
+          expect(executedQueries).to.eql([
+            `select "RelatedModel"."id" from "RelatedModel" inner join "JoinModel" on "RelatedModel"."rid" = "JoinModel"."relatedId" where "JoinModel"."ownerId" in (666) and "RelatedModel"."code" = 55`,
+            `update "JoinModel" set "extra2" = 'extraVal' where "JoinModel"."ownerId" in (666) and exists (select 1 from "RelatedModel" where "RelatedModel"."rid" = "JoinModel"."relatedId" and "RelatedModel"."code" = 55)`,
+            `update "RelatedModel" set "a" = 'str1' where (1 = 0)`,
           ]);
         });
     });
@@ -1866,7 +1886,7 @@ describe('ManyToManyRelation', () => {
     });
 
     it('patch should fetch the keys of the join rows first', () => {
-      mockKnexQueryResults = [1, [{ ownerId: 666, relatedId: 5 }], 1];
+      mockKnexQueryResults = [[{ id: 5 }], [{ ownerId: 666, relatedId: 5 }], 1, 1];
       let owner = OwnerModel.fromJson({ oid: 666 });
 
       return QueryBuilder.forClass(RelatedModel)
@@ -1878,9 +1898,10 @@ describe('ManyToManyRelation', () => {
         .then((result) => {
           expect(result).to.equal(1);
           expect(executedQueries).to.eql([
-            "update `RelatedModel` set `a` = 'str1' where `RelatedModel`.`id` in (select * from (select `RelatedModel`.`id` from `RelatedModel` inner join `JoinModel` on `RelatedModel`.`rid` = `JoinModel`.`relatedId` where `JoinModel`.`ownerId` in (666) and `code` = 55) as `mysql_subquery_fix`)",
+            'select `RelatedModel`.`id` from `RelatedModel` inner join `JoinModel` on `RelatedModel`.`rid` = `JoinModel`.`relatedId` where `JoinModel`.`ownerId` in (666) and `code` = 55',
             'select `JoinModel`.`ownerId`, `JoinModel`.`relatedId` from `JoinModel` where `JoinModel`.`ownerId` in (666) and exists (select 1 from `RelatedModel` where `RelatedModel`.`rid` = `JoinModel`.`relatedId` and `code` = 55)',
             "update `JoinModel` set `extra2` = 'extraVal' where `JoinModel`.`ownerId` in (666) and (`JoinModel`.`ownerId`, `JoinModel`.`relatedId`) in ((666, 5))",
+            "update `RelatedModel` set `a` = 'str1' where (`RelatedModel`.`id` in (5))",
           ]);
         });
     });
@@ -1987,7 +2008,25 @@ describe('ManyToManyRelation', () => {
     });
 
     it('patch should use the related table row ids', () => {
-      mockKnexQueryResults = [1, 1];
+      mockKnexQueryResults = [1];
+      let owner = OwnerModel.fromJson({ oid: 666 });
+
+      return QueryBuilder.forClass(RelatedModel)
+        .patchOperationFactory((builder) => {
+          return relation.patch(builder, RelationOwner.create(owner));
+        })
+        .patch({ a: 'str1' })
+        .where('code', 55)
+        .then((result) => {
+          expect(result).to.equal(1);
+          expect(executedQueries).to.eql([
+            "update `RelatedModel` set `a` = 'str1' where `RelatedModel`.`_rowid_` in (select `RelatedModel`.`_rowid_` from `RelatedModel` inner join `JoinModel` on `RelatedModel`.`rid` = `JoinModel`.`relatedId` where `JoinModel`.`ownerId` in (666) and `code` = 55)",
+          ]);
+        });
+    });
+
+    it('patch with extras should patch the join rows first and the related rows by their ids (#161)', () => {
+      mockKnexQueryResults = [[{ id: 5 }], 1, 1];
       let owner = OwnerModel.fromJson({ oid: 666 });
 
       return QueryBuilder.forClass(RelatedModel)
@@ -1999,8 +2038,9 @@ describe('ManyToManyRelation', () => {
         .then((result) => {
           expect(result).to.equal(1);
           expect(executedQueries).to.eql([
-            "update `RelatedModel` set `a` = 'str1' where `RelatedModel`.`_rowid_` in (select `RelatedModel`.`_rowid_` from `RelatedModel` inner join `JoinModel` on `RelatedModel`.`rid` = `JoinModel`.`relatedId` where `JoinModel`.`ownerId` in (666) and `code` = 55)",
+            'select `RelatedModel`.`id` from `RelatedModel` inner join `JoinModel` on `RelatedModel`.`rid` = `JoinModel`.`relatedId` where `JoinModel`.`ownerId` in (666) and `code` = 55',
             "update `JoinModel` set `extra2` = 'extraVal' where `JoinModel`.`ownerId` in (666) and exists (select 1 from `RelatedModel` where `RelatedModel`.`rid` = `JoinModel`.`relatedId` and `code` = 55)",
+            "update `RelatedModel` set `a` = 'str1' where (`RelatedModel`.`id` in (5))",
           ]);
         });
     });

@@ -20,6 +20,7 @@ module.exports = (session) => {
 
     before(() => {
       return session.knex.schema
+        .dropTableIfExists('A_B_extra')
         .dropTableIfExists('A_B')
         .dropTableIfExists('A')
         .dropTableIfExists('B')
@@ -42,11 +43,19 @@ module.exports = (session) => {
           table.string('aid2');
           table.integer('bid3');
           table.string('bid4');
+        })
+        .createTable('A_B_extra', (table) => {
+          table.integer('aid1');
+          table.string('aid2');
+          table.integer('bid3');
+          table.string('bid4');
+          table.string('abval');
         });
     });
 
     after(() => {
       return session.knex.schema
+        .dropTableIfExists('A_B_extra')
         .dropTableIfExists('A_B')
         .dropTableIfExists('A')
         .dropTableIfExists('B');
@@ -115,6 +124,19 @@ module.exports = (session) => {
                 through: {
                   from: ['A_B.bid3', 'A_B.bid4'],
                   to: ['A_B.aid1', 'A_B.aid2'],
+                },
+                to: ['A.id1', 'A.id2'],
+              },
+            },
+            abWithExtra: {
+              relation: Model.ManyToManyRelation,
+              modelClass: ModelA,
+              join: {
+                from: ['B.id3', 'B.id4'],
+                through: {
+                  from: ['A_B_extra.bid3', 'A_B_extra.bid4'],
+                  to: ['A_B_extra.aid1', 'A_B_extra.aid2'],
+                  extra: ['abval'],
                 },
                 to: ['A.id1', 'A.id2'],
               },
@@ -341,6 +363,7 @@ module.exports = (session) => {
           session.knex('A').delete(),
           session.knex('B').delete(),
           session.knex('A_B').delete(),
+          session.knex('A_B_extra').delete(),
         ]);
       });
 
@@ -669,6 +692,7 @@ module.exports = (session) => {
           session.knex('A').delete(),
           session.knex('B').delete(),
           session.knex('A_B').delete(),
+          session.knex('A_B_extra').delete(),
         ]);
       });
 
@@ -1239,6 +1263,45 @@ module.exports = (session) => {
                 { id1: 22, id2: '21', aval: 'XX', bid3: null, bid4: null },
               ]);
             });
+        });
+
+        describe('patch with extras (#161)', () => {
+          beforeEach(() => {
+            return session.knex('A_B_extra').insert([
+              { bid3: 1, bid4: '2', aid1: 2, aid2: '2', abval: 'x' },
+              { bid3: 1, bid4: '2', aid1: 2, aid2: '3', abval: 'y' },
+            ]);
+          });
+
+          function extras() {
+            return session.knex('A_B_extra').orderBy(['aid1', 'aid2']).pluck('abval');
+          }
+
+          it('should patch the related rows matching a filter by their composite ids', async () => {
+            const b2 = await B.query().findById([1, '2']);
+            const numUpdated = await b2
+              .$relatedQuery('abWithExtra')
+              .patch({ aval: 'XX', abval: 'z' })
+              .where('A.aval', 'a4');
+
+            expect(numUpdated).to.equal(1);
+            expect(await session.knex('A').where('aval', 'XX').select('id1', 'id2')).to.eql([
+              { id1: 2, id2: '2' },
+            ]);
+            expect(await extras()).to.eql(['z', 'y']);
+          });
+
+          it('should patch nothing if no related rows match', async () => {
+            const b2 = await B.query().findById([1, '2']);
+            const numUpdated = await b2
+              .$relatedQuery('abWithExtra')
+              .patch({ aval: 'XX', abval: 'z' })
+              .where('A.aval', 'does not exist');
+
+            expect(numUpdated).to.equal(0);
+            expect(await session.knex('A').where('aval', 'XX')).to.eql([]);
+            expect(await extras()).to.eql(['x', 'y']);
+          });
         });
 
         it('delete', () => {
