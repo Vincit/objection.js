@@ -427,7 +427,13 @@ module.exports = (session) => {
 
       describe('json keys with SQL syntax characters', () => {
         const injection = "x') or 1=1 --";
-        const keys = { injection, question: 'a?b', backslash: 'a\\b', quote: 'a"b' };
+        const keys = {
+          injection,
+          question: 'a?b',
+          backslash: 'a\\b',
+          backslashQuestion: 'c\\?d',
+          quote: 'a"b',
+        };
         // Use the bracket notation with whichever quote doesn't appear in the key.
         const expr = (key) => {
           const quote = key.includes("'") ? '"' : "'";

@@ -76,6 +76,26 @@ describe('ReferenceBuilder', () => {
       `??#>'{"a\\\\''\\?b"}'`,
       ['Table.Column'],
     ]);
+    // knex drops backslashes in front of `?`, so they are written as octal
+    // escapes in an escape string literal.
+    expect(toRawArgs(ref(`Table.Column:["a\\?'b"]`))).to.eql([
+      `??#>E'{"a\\134\\134\\?''b"}'`,
+      ['Table.Column'],
+    ]);
+  });
+
+  it('should keep backslashes in front of question marks in json path keys', () => {
+    class TestModel extends Model {
+      static get tableName() {
+        return 'Table';
+      }
+    }
+    const { sql } = TestModel.query(Knex({ client: 'pg' }))
+      .select(ref(`Table.Column:["a\\?b"]`))
+      .toKnexQuery()
+      .toSQL()
+      .toNative();
+    expect(sql).to.contain(`"Table"."Column"#>E'{"a\\134\\134?b"}'`);
   });
 
   it('should keep bindings in order when used as a column in whereIn', () => {
