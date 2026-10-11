@@ -1,5 +1,53 @@
 # Changelog
 
+## 3.7.0
+
+### Security
+
+- **Behaviour change:** the `#unrelate` and `#delete` markers need the new `allowMarkers: true` option in both `insertGraph()` and `upsertGraph()`, like `#ref` needs `allowRefs`. Without it, a marked model throws a `ValidationError` of type `InvalidGraph`, also in `insertGraph()`, which silently skipped marked models before. The markers come from the graph data and take precedence over the `noUnrelate` / `noDelete` options, so graph data from a request body could unrelate or delete related rows that these options were meant to protect. With `allowMarkers: true`, the markers work as in 3.6.0. [#2410](https://github.com/Vincit/objection.js/pull/2410)
+
+### Fixes
+
+- **Behaviour change:** many-to-many `unrelate()` / `patch()` identify the join rows to modify with a correlated `EXISTS` subquery, instead of row ids (`ctid` on Postgres, `_rowid_` on SQLite), the values of all columns (MySQL) or the related ids (MSSQL). The generated SQL changes. This fixes join tables that are Postgres views, `through.modify` filters (on Postgres they failed with `column "tableoid" does not exist`, on SQLite they modified other join rows), MySQL join rows with `FLOAT` or `DATETIME(6)` values that don't survive a round trip through JavaScript, and on MSSQL the filters on the join table, which modified all join rows of the matching related rows. On Postgres, SQLite and MSSQL, join rows that only differ in their extras are told apart, so only the matching one changes. On MySQL, the owner and related keys of the matching join rows are fetched with the subquery first, and the join rows are then modified by these keys, as MySQL doesn't let a statement read the table it modifies, e.g. through filters that read the join table or triggers on it. The keys can't tell apart join rows that only differ in their extras, like before 3.3.0. [#1853](https://github.com/Vincit/objection.js/issues/1853)
+- **Behaviour change:** `upsertGraph()` upserts the subgraphs of related models that it relates recursively. There, arrays of relation paths in the `update` and `noUpdate` options match the full relation path from the root of the graph, like relation expressions since 3.6.0, so they also apply to the root models of the subgraph, e.g. `noUpdate: ['movies']` to the related movies. Before, they were matched against the relation paths from the root of the subgraph. The other options have no effect on the root models of a subgraph. [#131](https://github.com/ditojs/objection/issues/131)
+- **Behaviour change:** `runAfter()` hooks in the queries of relations loaded with `withGraphFetched()` no longer see the join columns that objection selects internally, like the other queries since 3.3.0. Hooks that read these columns get `undefined`. [#45](https://github.com/ditojs/objection/issues/45)
+- A `through.modelClass` join model with `idColumn` returning `null` is no longer changed to use the related join columns as its id [#2305](https://github.com/Vincit/objection.js/issues/2305)
+- Warn once when the `joinOperation` option is passed to `withGraphFetched()` or for fetched relations of `withGraph()`, where it is ignored [#2125](https://github.com/Vincit/objection.js/issues/2125)
+- The warning from 3.4.1 about owner join properties holding arrays also covers many-to-many relations [#2667](https://github.com/Vincit/objection.js/issues/2667)
+- `whereInComposite()` with multiple columns and a subquery works on SQLite, as a row value comparison, instead of throwing
+- `whereInComposite()` with multiple columns and a subquery works on MSSQL
+- Many-to-many `through.modify` filters are kept for model classes bound with `bindKnex()`
+- `insertGraph()` / `upsertGraph()` throw the error about cyclic references for a `#ref` cycle through owners without a primary key, instead of failing to patch the deferred foreign key by id [#2305](https://github.com/Vincit/objection.js/issues/2305)
+- **Behaviour change:** with `none()`, or when a query is resolved with `resolve()` in a hook, patches and updates no longer modify the extras of many-to-many join rows or the instance of `$query()`, and `BelongsToOneRelation` deletes no longer clear the foreign keys of the owners. These were updated although nothing was written. [#2184](https://github.com/Vincit/objection.js/issues/2184)
+- `$clone()`, `toJSON()` and validation copy objects with a writable `Symbol.toStringTag`, e.g. decimal.js numbers, instead of sharing them, which regressed in 3.6.0. Built-ins like `URL` are still shared, like in lodash's `cloneDeep()`.
+- Patch validation keeps boolean subschemas like `properties: { b: false }`. They were dropped, so patches passed that the schema forbids.
+- Patch validation no longer validates field expression keys with numeric parts like `'tags:0'` against object schemas, which rejected patches of array elements
+- Required properties given as query properties, e.g. `raw()`, failed validation with an error about a missing schema when the schema uses `$ref` to the schema of another model class [#2199](https://github.com/Vincit/objection.js/issues/2199)
+- On Postgres, a backslash in front of a `?` in a JSON field expression key is kept, which knex dropped [#2077](https://github.com/Vincit/objection.js/issues/2077)
+- On MySQL, subqueries of the updated or deleted table are also wrapped in where groups and join clauses, which failed with `ER_UPDATE_TABLE_USED`
+- `resultSize()` and the `total` of `page()` with `withGraphJoined()` keep the selections that `groupBy()` and `having()` refer to by alias [#2329](https://github.com/Vincit/objection.js/issues/2329)
+- Relation expressions no longer mistake inherited object properties for relations, e.g. when merging graph expressions or parsing a relation named `constructor` [#63](https://github.com/ditojs/objection/issues/63)
+- `$clone()` no longer prints Node's `Buffer()` deprecation warning (DEP0005)
+
+### Types
+
+- `fetchGraph<Person>()` with only the model type argument compiles again, without narrowing
+- `PartialModelObject` accepts partial objects for nullable to-one relations [#2190](https://github.com/Vincit/objection.js/issues/2190)
+- **Behaviour change:** `snakeCaseMappers()` and `knexSnakeCaseMappers()` take separate option types, `SnakeCaseMappersOptions` and `KnexSnakeCaseMappersOptions`, with `preserveJsonKeys` only on the former, so `knexSnakeCaseMappers({ preserveJsonKeys: true })` no longer compiles. The option never had an effect there. The shared options are `SnakeCaseOptions`.
+- The rows of `relate().returning()` are typed as `any`, and `returning()` accepts multiple columns [#2044](https://github.com/Vincit/objection.js/issues/2044)
+
+### Docs
+
+- Graph option expressions can't name a relation together with relations below it, or repeat a relation like `'[movies.reviews, movies.actors]'` [#131](https://github.com/ditojs/objection/issues/131)
+- Shared validators throw for different schemas with the same `$id`
+- The typings require TypeScript 5.0 since 3.3.0
+- Workarounds for the `withGraph` narrowing with reassignments and generic helpers
+- `insert()` and `patch()` ignore relation data
+
+### Other
+
+- **Behaviour change:** remove the `mapNestedKeys` option of `knexSnakeCaseMappers()` and `knexIdentifierMapping()` that 3.5.0 added. It also converted the keys of JSON columns that the driver returns parsed. Results are converted one level deep again, like before 3.5.0. The `KnexIdentifierMappingOptions` type is removed too. [#2273](https://github.com/Vincit/objection.js/issues/2273)
+
 ## 3.6.0
 
 ### What's new
@@ -86,7 +134,7 @@
 
 ### What's new
 
-- `withGraphFetched()` / `withGraphJoined()` narrow the result types: fetched relations become required on the result. Generic helpers with an explicit `QB` return type need `withGraphFetched<string>()`. [#25](https://github.com/ditojs/objection/pull/25) **Behaviour change:** this also breaks variables declared with `let` that are later assigned an unnarrowed query, helpers generic over the model type that return `QueryBuilder<M>`, and explicit type arguments like `Person.fetchGraph<Person>()` (fixed in 3.6.1). Annotate the variable, or use `withGraphFetched<string>()`.
+- `withGraphFetched()` / `withGraphJoined()` narrow the result types: fetched relations become required on the result. Generic helpers with an explicit `QB` return type need `withGraphFetched<string>()`. [#25](https://github.com/ditojs/objection/pull/25) **Behaviour change:** this also breaks variables declared with `let` that are later assigned an unnarrowed query, helpers generic over the model type that return `QueryBuilder<M>`, and explicit type arguments like `Person.fetchGraph<Person>()` (fixed in 3.7.0). Annotate the variable, or use `withGraphFetched<string>()`.
 - Add `withGraph()` with algorithm-agnostic merging, and `isJoinChildQuery()` [#63](https://github.com/ditojs/objection/issues/63)
 - Add `patchById()` and `updateById()` [#1415](https://github.com/Vincit/objection.js/issues/1415)
 - `insertGraph()` / `upsertGraph()` resolve cyclic `#ref` dependencies by deferring `BelongsToOne` foreign keys. Graphs that threw before now succeed, and the deferred foreign keys are written with one `patch()` per owner model, which runs its update hooks. [#1482](https://github.com/Vincit/objection.js/issues/1482)
