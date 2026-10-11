@@ -1418,6 +1418,16 @@ async () => {
 
 Person.fromJson({ id: 1 }).$modelClass.query();
 
+// The mapNestedKeys option of 3.5.0 was removed, with its options type.
+() => {
+  // @ts-expect-error
+  objection.knexSnakeCaseMappers({ mapNestedKeys: true });
+  // @ts-expect-error
+  knexIdentifierMapping({ MyId: 'id' }, { mapNestedKeys: true });
+  // @ts-expect-error
+  const options: objection.KnexIdentifierMappingOptions = {};
+};
+
 // knexIdentifierMapping (issue #1947)
 () => {
   const mappers: objection.KnexMappers = knexIdentifierMapping({
@@ -1430,23 +1440,5 @@ Person.fromJson({ id: 1 }).$modelClass.query();
     client: 'sqlite3',
     connection: { filename: ':memory:' },
     ...mappers,
-  });
-};
-
-// knexSnakeCaseMappers and knexIdentifierMapping with mapNestedKeys (issue #2273)
-() => {
-  const snakeCaseMappers: objection.KnexMappers = objection.knexSnakeCaseMappers({
-    upperCase: true,
-    mapNestedKeys: true,
-  });
-
-  const identifierMappers: objection.KnexMappers = knexIdentifierMapping(
-    { MyId: 'id' },
-    { mapNestedKeys: true },
-  );
-
-  knex({
-    client: 'mysql',
-    ...snakeCaseMappers,
   });
 };

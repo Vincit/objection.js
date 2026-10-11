@@ -360,13 +360,12 @@ const { knexSnakeCaseMappers } = require('objection');
 
 Function for adding a snake_case to camelCase conversion to `knex`. Better documented [here](/recipes/snake-case-to-camel-case-conversion.html). The `knexSnakeCaseMappers` function accepts an options object. The available options are:
 
-| Option                            | Type    | Default | Description                                                                                                                                                                                                                                                                                                                                                                                                  |
-| --------------------------------- | ------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| upperCase                         | boolean | `false` | Set to `true` if your columns are UPPER_SNAKE_CASED.                                                                                                                                                                                                                                                                                                                                                         |
-| underscoreBeforeDigits            | boolean | `false` | When `true`, will place an underscore before digits (`foo1Bar2` becomes `foo_1_bar_2`). When `false`, `foo1Bar2` becomes `foo1_bar2`.                                                                                                                                                                                                                                                                        |
-| underscoreBetweenUppercaseLetters | boolean | `false` | When `true`, will place underscores between consecutive uppercase letters (`fooBAR` becomes `foo_b_a_r`). When `false`, `fooBAR` will become `foo_bar`.                                                                                                                                                                                                                                                      |
-| noDoubleUnderscores               | boolean | `false` | When `true`, will never insert an underscore directly after an existing one (with `underscoreBeforeDigits`, `foo_1` stays `foo_1` instead of becoming `foo__1`; `foo_Bar` becomes `foo_bar` instead of `foo__bar`). Underscores already present in the input are kept as is.                                                                                                                                 |
-| mapNestedKeys                     | boolean | `false` | When `true`, the keys of plain objects one level down in the results are converted too, as needed for knex's `nestTables: true` option on MySQL, which returns rows like `{ table_name: { column_name: value } }`. This also converts the top-level keys of JSON columns that the database driver returns as parsed objects, e.g. with `mysql2` or `pg`. The `mysql` driver returns JSON columns as strings. As the option applies to all queries of the knex instance, use a separate instance for the `nestTables` queries. |
+| Option                            | Type    | Default | Description                                                                                                                                                                                                                                                                  |
+| --------------------------------- | ------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| upperCase                         | boolean | `false` | Set to `true` if your columns are UPPER_SNAKE_CASED.                                                                                                                                                                                                                         |
+| underscoreBeforeDigits            | boolean | `false` | When `true`, will place an underscore before digits (`foo1Bar2` becomes `foo_1_bar_2`). When `false`, `foo1Bar2` becomes `foo1_bar2`.                                                                                                                                        |
+| underscoreBetweenUppercaseLetters | boolean | `false` | When `true`, will place underscores between consecutive uppercase letters (`fooBAR` becomes `foo_b_a_r`). When `false`, `fooBAR` will become `foo_bar`.                                                                                                                      |
+| noDoubleUnderscores               | boolean | `false` | When `true`, will never insert an underscore directly after an existing one (with `underscoreBeforeDigits`, `foo_1` stays `foo_1` instead of becoming `foo__1`; `foo_Bar` becomes `foo_bar` instead of `foo__bar`). Underscores already present in the input are kept as is. |
 
 ##### Examples
 
@@ -406,32 +405,6 @@ const knex = Knex({
 });
 ```
 
-To also convert the column names in the results of knex's `nestTables: true` option on MySQL
-
-```js
-const { knexSnakeCaseMappers } = require('objection');
-const Knex = require('knex');
-
-const knex = Knex({
-  client: 'mysql',
-
-  connection: {
-    host: '127.0.0.1',
-    user: 'objection',
-    database: 'objection_test'
-  }
-
-  ...knexSnakeCaseMappers({ mapNestedKeys: true })
-});
-
-const rows = await knex('personsTable')
-  .join('animalsTable', 'personsTable.idColumn', 'animalsTable.ownerId')
-  .options({ nestTables: true });
-
-// [{ personsTable: { idColumn: 1, firstName: 'Jennifer' }, animalsTable: { ... } }]
-console.log(rows);
-```
-
 For older nodes:
 
 ```js
@@ -457,7 +430,7 @@ const knex = Knex({
 const { knexIdentifierMapping } = require('objection');
 ```
 
-Like [knexSnakeCaseMappers](/api/objection/#knexsnakecasemappers), but can be used to make an arbitrary static mapping between column names and property names. In the examples, you would have identifiers `MyId`, `MyProp` and `MyAnotherProp` in the database and you would like to map them into `id`, `prop` and `anotherProp` in the code. Like `knexSnakeCaseMappers`, it accepts the `mapNestedKeys` option as a second argument: `knexIdentifierMapping(colToProp, { mapNestedKeys: true })`.
+Like [knexSnakeCaseMappers](/api/objection/#knexsnakecasemappers), but can be used to make an arbitrary static mapping between column names and property names. In the examples, you would have identifiers `MyId`, `MyProp` and `MyAnotherProp` in the database and you would like to map them into `id`, `prop` and `anotherProp` in the code.
 
 ##### Examples
 

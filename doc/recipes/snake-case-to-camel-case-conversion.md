@@ -25,7 +25,7 @@ exports.down = knex => {
 
 **knexSnakeCaseMappers:**
 
-See [here](/api/objection/#knexsnakecasemappers) for the full list of options that can be passed to `knexSnakeCaseMappers`. Results are only converted one level deep, so column names in the nested rows of knex's `nestTables: true` option on MySQL need the `mapNestedKeys` option: `knexSnakeCaseMappers({ mapNestedKeys: true })`.
+See [here](/api/objection/#knexsnakecasemappers) for the full list of options that can be passed to `knexSnakeCaseMappers`.
 
 ```js
 const Knex = require('knex');

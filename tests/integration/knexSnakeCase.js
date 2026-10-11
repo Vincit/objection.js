@@ -266,45 +266,6 @@ module.exports = (session) => {
           });
       });
 
-      if (session.isMySql()) {
-        it('nestTables', async () => {
-          const query = (knex) =>
-            knex('movie')
-              .join('personMovie', 'movie.id', 'personMovie.movieId')
-              .select('movie.movieName', 'personMovie.personId')
-              .orderBy('movie.movieName')
-              .options({ nestTables: true });
-
-          const [person] = await Person.query(knex).where('firstName', 'Seppo');
-          const nestTablesKnex = Knex({
-            ...session.opt.knexConfig,
-            ...knexSnakeCaseMappers({ mapNestedKeys: true }),
-          });
-
-          try {
-            expect(await query(nestTablesKnex)).to.eql([
-              {
-                movie: { movieName: 'Salkkarit 2, the low quality continues' },
-                personMovie: { personId: person.id },
-              },
-              {
-                movie: { movieName: 'Salkkarit the movie' },
-                personMovie: { personId: person.id },
-              },
-            ]);
-          } finally {
-            await nestTablesKnex.destroy();
-          }
-
-          // Without the option, only the table names are mapped.
-          const [row] = await query(knex);
-          expect(row).to.eql({
-            movie: { movie_name: 'Salkkarit 2, the low quality continues' },
-            personMovie: { person_id: person.id },
-          });
-        });
-      }
-
       if (session.isPostgres()) {
         it('update with json references', () => {
           return Person.query(knex)

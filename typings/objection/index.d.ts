@@ -1731,22 +1731,6 @@ declare namespace Objection {
      * Only used by `snakeCaseMappers`.
      */
     preserveJsonKeys?: boolean;
-    /**
-     * Also convert the keys of plain objects one level down in the results,
-     * e.g. the rows of knex's `nestTables: true` option on MySQL. Also applies
-     * to JSON columns parsed by the driver.
-     * Only used by `knexSnakeCaseMappers`.
-     */
-    mapNestedKeys?: boolean;
-  }
-
-  export interface KnexIdentifierMappingOptions {
-    /**
-     * Also convert the keys of plain objects one level down in the results,
-     * e.g. the rows of knex's `nestTables: true` option on MySQL. Also applies
-     * to JSON columns parsed by the driver.
-     */
-    mapNestedKeys?: boolean;
   }
 
   export interface ColumnNameMappers {
@@ -1768,7 +1752,7 @@ declare namespace Objection {
   }
 
   export interface KnexIdentifierMappingFactory {
-    (colToProp: Record<string, string>, options?: KnexIdentifierMappingOptions): KnexMappers;
+    (colToProp: Record<string, string>): KnexMappers;
   }
 
   export type ValidationErrorType =

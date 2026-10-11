@@ -9,7 +9,6 @@ const {
   camelCaseKeys,
   snakeCaseMappers,
   knexSnakeCaseMappers,
-  knexIdentifierMapping,
 } = require('../../lib/utils/identifierMapping');
 
 const { compose, mixin } = require('../../lib/utils/mixin');
@@ -307,87 +306,24 @@ describe('utils', () => {
       });
     });
 
-    describe('knex mappers and mapNestedKeys', () => {
-      const date = new Date();
-      const buffer = Buffer.from('foo');
-
-      const rows = () => [
-        {
-          some_table: { id: 1, foo_bar: 'a', created_at: date, data_blob: buffer },
-          other_table: { id: 2, some_name: null, json_col: '{"foo_bar":1}' },
-          '': { row_count: 3 },
-        },
-      ];
-
-      it('only maps the top level keys by default (unchanged behaviour)', () => {
+    describe('knex mappers', () => {
+      it('only map the top level keys', () => {
+        const date = new Date();
         const mappers = knexSnakeCaseMappers();
 
-        expect(mappers.postProcessResponse(rows())).to.eql([
+        expect(
+          mappers.postProcessResponse([
+            {
+              some_table: { id: 1, foo_bar: 'a', created_at: date },
+              json_col: { foo_bar: 1 },
+            },
+          ]),
+        ).to.eql([
           {
-            someTable: { id: 1, foo_bar: 'a', created_at: date, data_blob: buffer },
-            otherTable: { id: 2, some_name: null, json_col: '{"foo_bar":1}' },
-            '': { row_count: 3 },
+            someTable: { id: 1, foo_bar: 'a', created_at: date },
+            jsonCol: { foo_bar: 1 },
           },
         ]);
-
-        expect(mappers.postProcessResponse({ json_col: { foo_bar: 1 } })).to.eql({
-          jsonCol: { foo_bar: 1 },
-        });
-      });
-
-      it('maps the keys of nested objects one level down with `mapNestedKeys: true`', () => {
-        const mappers = knexSnakeCaseMappers({ mapNestedKeys: true });
-        const [row] = mappers.postProcessResponse(rows());
-
-        expect(row).to.eql({
-          someTable: { id: 1, fooBar: 'a', createdAt: date, dataBlob: buffer },
-          otherTable: { id: 2, someName: null, jsonCol: '{"foo_bar":1}' },
-          '': { rowCount: 3 },
-        });
-
-        expect(row.someTable.createdAt).to.equal(date);
-        expect(row.someTable.dataBlob).to.equal(buffer);
-      });
-
-      it('maps a single nested row with `mapNestedKeys: true`', () => {
-        const mappers = knexSnakeCaseMappers({ mapNestedKeys: true });
-
-        expect(mappers.postProcessResponse({ some_table: { foo_bar: [{ baz_qux: 1 }] } })).to.eql({
-          someTable: { fooBar: [{ baz_qux: 1 }] },
-        });
-      });
-
-      it('leaves flat rows and other values unchanged with `mapNestedKeys: true`', () => {
-        const mappers = knexSnakeCaseMappers({ mapNestedKeys: true });
-
-        expect(
-          mappers.postProcessResponse([{ some_table_foo_bar: 1, created_at: date, tags: ['a_b'] }]),
-        ).to.eql([{ someTableFooBar: 1, createdAt: date, tags: ['a_b'] }]);
-
-        expect(mappers.postProcessResponse(1)).to.equal(1);
-        expect(mappers.postProcessResponse(null)).to.equal(null);
-      });
-
-      it('combines `mapNestedKeys` with other options', () => {
-        const mappers = knexSnakeCaseMappers({ mapNestedKeys: true, upperCase: true });
-
-        expect(mappers.postProcessResponse([{ SOME_TABLE: { FOO_BAR: 1 } }])).to.eql([
-          { someTable: { fooBar: 1 } },
-        ]);
-      });
-
-      it('knexIdentifierMapping supports `mapNestedKeys` too', () => {
-        const colToProp = { MyTable: 'myTable', MyProp: 'prop' };
-
-        expect(
-          knexIdentifierMapping(colToProp).postProcessResponse([{ MyTable: { MyProp: 1 } }]),
-        ).to.eql([{ myTable: { MyProp: 1 } }]);
-
-        expect(
-          knexIdentifierMapping(colToProp, { mapNestedKeys: true }).postProcessResponse([
-            { MyTable: { MyProp: 1 } },
-          ]),
-        ).to.eql([{ myTable: { prop: 1 } }]);
       });
     });
   });
