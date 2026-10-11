@@ -442,6 +442,20 @@ module.exports = (session) => {
 
             expect(await session.knex('Model1').where('model1Prop1', 'root')).to.eql([]);
           });
+
+          it(`should throw if ${prop} is used for a root model, with allowMarkers: ${allowMarkers}`, async () => {
+            const err = await Model1.query()
+              .insertGraph({ model1Prop1: 'root', [prop]: true }, { allowMarkers })
+              .catch((err) => err);
+
+            expect(err).to.be.a(ValidationError);
+            expect(err.type).to.equal('InvalidGraph');
+            expect(err.message).to.equal(
+              '#unrelate and #delete can only be used for related models, not for root models',
+            );
+
+            expect(await session.knex('Model1').where('model1Prop1', 'root')).to.eql([]);
+          });
         }
       }
 

@@ -2052,20 +2052,32 @@ module.exports = (session) => {
       });
 
       for (const prop of ['#unrelate', '#delete']) {
-        it(`should fail if ${prop} is used for a root model`, async () => {
-          const err = await Model1.query(session.knex)
-            .upsertGraph({ id: 2, [prop]: true }, { fetchStrategy, allowMarkers: true })
-            .catch((err) => err);
+        for (const allowMarkers of [false, true]) {
+          it(`should fail if ${prop} is used for a root model, with allowMarkers: ${allowMarkers}`, async () => {
+            const err = await Model1.query(session.knex)
+              .upsertGraph(
+                {
+                  id: 2,
+                  [prop]: true,
+                  model1Relation2: [{ idCol: 1, [prop]: true }, { idCol: 2 }],
+                },
+                { fetchStrategy, allowMarkers },
+              )
+              .catch((err) => err);
 
-          expect(err).to.be.a(ValidationError);
-          expect(err.type).to.equal('InvalidGraph');
-          expect(err.message).to.equal(
-            '#unrelate and #delete can only be used for related models, not for root models',
-          );
+            expect(err).to.be.a(ValidationError);
+            expect(err.type).to.equal('InvalidGraph');
+            expect(err.message).to.equal(
+              '#unrelate and #delete can only be used for related models, not for root models',
+            );
 
-          const row = await session.knex('Model1').where('id', 2).first();
-          expect(row.id).to.equal(2);
-        });
+            const row = await session.knex('Model1').where('id', 2).first();
+            expect(row.id).to.equal(2);
+
+            const rows = await session.knex('model2').where('model1_id', 2).orderBy('id_col');
+            expect(rows.map((it) => it.id_col)).to.eql([1, 2]);
+          });
+        }
       }
 
       for (const [unrelateProp, deleteProp] of [
