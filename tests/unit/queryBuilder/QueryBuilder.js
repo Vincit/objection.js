@@ -4071,6 +4071,32 @@ describe('QueryBuilder', () => {
         });
     });
 
+    it('withGraphJoined() should leave out the order of a modifier in the joined subquery', () => {
+      mockKnexQueryResults = [flatRows()];
+
+      return Person.query()
+        .withGraphJoined('pets')
+        .modifyGraph('pets', (qb) => qb.where('name', 'A10').orderBy('name'))
+        .then(() => {
+          expect(executedQueries[0]).to.contain(
+            'left join (select "Animal".* from "Animal" where "name" = \'A10\') as "pets"',
+          );
+        });
+    });
+
+    it('withGraphJoined() should keep the order of a modifier with a limit', () => {
+      mockKnexQueryResults = [flatRows()];
+
+      return Person.query()
+        .withGraphJoined('pets')
+        .modifyGraph('pets', (qb) => qb.orderBy('name').limit(5))
+        .then(() => {
+          expect(executedQueries[0]).to.contain(
+            'left join (select "Animal".* from "Animal" order by "name" asc limit 5) as "pets"',
+          );
+        });
+    });
+
     it('graphModifiersAtPath() should return the modifiers once', () => {
       const builder = Person.query()
         .modifyGraph('pets', () => {})
