@@ -474,6 +474,17 @@ module.exports = (session) => {
         expect(await joinRows()).to.eql([...withoutRows(2), filteredJoinRow]);
       });
 
+      it('should apply the filter with a model class bound to a knex instance', async () => {
+        const numDeleted = await FilteredModel1.bindKnex(session.knex)
+          .fromJson({ id: 1 })
+          .$relatedQuery('filteredRelation')
+          .unrelate()
+          .where('model2.id_col', 2);
+
+        expect(numDeleted).to.equal(1);
+        expect(await joinRows()).to.eql([...withoutRows(2), filteredJoinRow]);
+      });
+
       it('should unrelate rows matching a filter on the join table', async () => {
         const numDeleted = await filteredOwner()
           .$relatedQuery('filteredRelation')
