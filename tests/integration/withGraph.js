@@ -1679,6 +1679,32 @@ module.exports = (session) => {
           });
       });
 
+      it('distinct * should remove duplicate rows', async () => {
+        // Join the two `model1Relation2` rows of model 1 to have duplicate rows:
+        const models = await Model1.query()
+          .distinct('*')
+          .joinRelated('model1Relation2')
+          .withGraphJoined('model1Relation1')
+          .orderBy('Model1.id')
+          .limit(2);
+
+        expect(models.map((it) => it.id)).to.eql([1, 4]);
+      });
+
+      it('distinctOn + select * should select the distinct column', async function () {
+        if (!session.isPostgres()) {
+          return this.skip();
+        }
+
+        const models = await Model1.query()
+          .distinctOn('Model1.model1Prop1')
+          .select('*')
+          .where('Model1.id', 1)
+          .withGraphJoined('model1Relation2');
+
+        expect(models.map((it) => it.model1Prop1)).to.eql(['hello 1']);
+      });
+
       // Disabled for sqlite because it doesn't have `concat` function :)
       if (!session.isSqlite()) {
         it('select * + raw should work', () => {

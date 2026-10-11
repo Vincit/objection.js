@@ -5055,6 +5055,20 @@ describe('QueryBuilder', () => {
       );
     });
 
+    it('should keep the kind of select of the select all of the root table', () => {
+      const sql = (query) => query.withGraphJoined('pets').toKnexQuery().toString();
+      const expected = (select) =>
+        `${select} "Person"."id" as "id", "Person"."name" as "name", "pets"."id" as "pets:id", "pets"."name" as "pets:name", "pets"."ownerId" as "pets:ownerId" ` +
+        'from "Person" left join "Animal" as "pets" on "pets"."ownerId" = "Person"."id"';
+
+      expect(sql(Person.query().distinct('*'))).to.equal(expected('select distinct'));
+      expect(sql(Person.query().distinct('Person.*'))).to.equal(expected('select distinct'));
+      expect(sql(Person.query().columns('*'))).to.equal(expected('select'));
+      expect(sql(Person.query().distinctOn('Person.name').select('*'))).to.equal(
+        expected('select distinct on ("Person"."name")'),
+      );
+    });
+
     it('should still select all columns of a relation if a modifier only selects aliased subqueries', () => {
       const sql = Person.query()
         .withGraphJoined('pets(selectPet)')
