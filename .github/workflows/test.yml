@@ -29,6 +29,12 @@ jobs:
             knex: default
             database: mssql
 
+    env:
+      COMPOSE_FILE: ${{ matrix.database == 'mysql-5.7' && 'docker-compose.yml:docker-compose.mysql57.yml' || 'docker-compose.yml' }}
+      # The MySQL 5.7 and SQL Server jobs only need their database, the default
+      # services start otherwise.
+      SERVICES: ${{ matrix.database == 'mysql-5.7' && 'mysql' || matrix.database == 'mssql' && 'mssql' || '' }}
+
     steps:
       - uses: actions/checkout@v7
 
@@ -57,19 +63,55 @@ jobs:
         if: matrix.node-version == '24.x' && matrix.knex == 'default' && matrix.database == 'default'
         run: npx --yes -p typescript@5.1.6 tsc
 
+      # Cache the database images, as their registries rate limit anonymous
+      # pulls. The month in the key picks up updates of their floating tags.
+      # SQL Server isn't cached: mcr.microsoft.com doesn't rate limit, and its
+      # large image restores no faster than it pulls.
+      - name: Determine database images
+        id: images
+        if: matrix.database != 'mssql'
+        run: |
+          images=$(docker compose config --images $SERVICES | sort | xargs)
+          {
+            echo "images=$images"
+            echo "path=$RUNNER_TEMP/database-images.tar"
+            echo "key=database-images $(date +%Y-%m) $images"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Restore database images
+        id: cache
+        if: steps.images.outcome == 'success'
+        uses: actions/cache/restore@v6
+        with:
+          path: ${{ steps.images.outputs.path }}
+          key: ${{ steps.images.outputs.key }}
+
       - name: Start test databases
         env:
-          COMPOSE_FILE: ${{ matrix.database == 'mysql-5.7' && 'docker-compose.yml:docker-compose.mysql57.yml' || 'docker-compose.yml' }}
-          # The MySQL 5.7 and SQL Server jobs only need their database, the
-          # default services start otherwise.
-          SERVICES: ${{ matrix.database == 'mysql-5.7' && 'mysql' || matrix.database == 'mssql' && 'mssql' || '' }}
+          IS_CACHED: ${{ steps.cache.outputs.cache-hit == 'true' }}
+          IMAGES: ${{ steps.images.outputs.images }}
+          IMAGES_PATH: ${{ steps.images.outputs.path }}
         run: |
-          # Retry the pull, public.ecr.aws rate limits anonymous pulls.
-          for i in 1 2 3 4 5; do
-            docker compose pull $SERVICES && break
-            sleep $((i * 15))
-          done
+          if $IS_CACHED; then
+            docker load -i "$IMAGES_PATH"
+          else
+            # Retry the pull, Docker Hub rate limits anonymous pulls.
+            for i in 1 2 3 4 5; do
+              docker compose pull $SERVICES && break
+              sleep $((i * 15))
+            done
+            if [ -n "$IMAGES" ]; then
+              docker save -o "$IMAGES_PATH" $IMAGES
+            fi
+          fi
           npm run db:up -- $SERVICES
+
+      - name: Save database images
+        if: steps.cache.outcome == 'success' && steps.cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v6
+        with:
+          path: ${{ steps.images.outputs.path }}
+          key: ${{ steps.images.outputs.key }}
 
       - name: Run tests
         if: matrix.knex == 'default' && matrix.database == 'default'

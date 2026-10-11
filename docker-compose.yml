@@ -5,7 +5,7 @@ name: objection
 
 services:
   postgres:
-    image: 'public.ecr.aws/docker/library/postgres:17'
+    image: 'postgres:17'
     command: postgres -c fsync=off -c synchronous_commit=off -c full_page_writes=off -c random_page_cost=1.0
     ports:
       - '55432:5432'
@@ -19,7 +19,7 @@ services:
       interval: 1s
       retries: 60
   mysql:
-    image: 'public.ecr.aws/docker/library/mysql:8.4'
+    image: 'mysql:8.4'
     # The mysql driver only supports mysql_native_password, which MySQL 8.4
     # disables by default. Enable it and make it the default for new users.
     command: --mysql-native-password=ON --authentication-policy=mysql_native_password
