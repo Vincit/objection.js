@@ -5758,14 +5758,11 @@ describe('QueryBuilder', () => {
     });
   });
 
-  describe('mssql constraint violations (#2688)', () => {
-    // The shape of the errors of the `tedious` driver used by knex for mssql.
-    const createMsSqlError = (number, message) => {
-      const err = new Error(message);
-      err.code = 'EREQUEST';
-      err.originalError = Object.assign(new Error(message), { info: { number, class: 14 } });
-      return err;
-    };
+  describe('mssql errors', () => {
+    // The shape of the errors of the `tedious` driver used by knex for mssql,
+    // as thrown for these violations by SQL Server 2022.
+    const createMsSqlError = (number, message, severity = 14) =>
+      Object.assign(new Error(message), { code: 'EREQUEST', number, class: severity });
 
     const insertWithError = (error) => {
       const knex = knexMocker(Knex({ client: 'mssql' }), (mock, oldImpl, args) => {
@@ -5815,6 +5812,44 @@ describe('QueryBuilder', () => {
       expect(err.constraint).to.equal('user_email_unique');
     });
 
+    it('should throw a ForeignKeyViolationError for foreign key violations', async () => {
+      const err = await expectError(
+        createMsSqlError(
+          547,
+          'The DELETE statement conflicted with the REFERENCE constraint "pet_ownerid_foreign". The conflict occurred in database "test", table "dbo.pet", column \'ownerId\'.',
+          16,
+        ),
+        objection.ForeignKeyViolationError,
+      );
+
+      expect(err.table).to.equal('pet');
+      expect(err.constraint).to.equal('pet_ownerid_foreign');
+    });
+
+    it('should throw a NotNullViolationError for not null violations', async () => {
+      const err = await expectError(
+        createMsSqlError(
+          515,
+          "Cannot insert the value NULL into column 'name', table 'test.dbo.user'; column does not allow nulls. INSERT fails.",
+          16,
+        ),
+        objection.NotNullViolationError,
+      );
+
+      expect(err.column).to.equal('name');
+    });
+
+    it('should keep the error of tedious as the native error', async () => {
+      const error = createMsSqlError(
+        2627,
+        "Violation of UNIQUE KEY constraint 'user_email_unique'. Cannot insert duplicate key in object 'dbo.user'. The duplicate key value is (a@b.c).",
+      );
+      const err = await expectError(error, objection.UniqueViolationError);
+
+      expect(err.nativeError).to.equal(error);
+      expect(err.message).to.equal(error.message);
+    });
+
     it('should throw a DBError for other errors', async () => {
       const err = await expectError(
         createMsSqlError(2627, 'Some other message.'),
@@ -5822,6 +5857,19 @@ describe('QueryBuilder', () => {
       );
 
       expect(err).to.not.be.a(objection.UniqueViolationError);
+    });
+
+    it('should throw unknown errors unchanged', async () => {
+      const error = createMsSqlError(1033, 'The ORDER BY clause is invalid.', 15);
+      let thrown;
+
+      try {
+        await insertWithError(error);
+      } catch (err) {
+        thrown = err;
+      }
+
+      expect(thrown).to.equal(error);
     });
   });
 });
