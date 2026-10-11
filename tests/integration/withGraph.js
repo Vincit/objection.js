@@ -2865,18 +2865,25 @@ module.exports = (session) => {
 
       it('should not expose internally selected columns to runAfter', () => {
         const queries = [
-          () => Model1.query().withGraphJoined('model1Relation1'),
-          () => Model1.query().withGraphFetched('model1Relation2'),
-          ...orders.map(
-            (order) => () =>
-              callInOrder(Model1.query(), order, 'model1Relation1', 'model1Relation2'),
-          ),
+          {
+            create: () => Model1.query().withGraphJoined('model1Relation1'),
+            joined: true,
+          },
+          {
+            create: () => Model1.query().withGraphFetched('model1Relation2'),
+            fetched: true,
+          },
+          ...orders.map((order) => ({
+            create: () => callInOrder(Model1.query(), order, 'model1Relation1', 'model1Relation2'),
+            joined: true,
+            fetched: true,
+          })),
         ];
 
-        return promiseMap(queries, (createQuery) => {
+        return promiseMap(queries, ({ create, joined, fetched }) => {
           let runAfterModels = null;
 
-          return createQuery()
+          return create()
             .select('Model1.model1Prop1')
             .where('Model1.id', 1)
             .runAfter((models) => {
@@ -2891,10 +2898,42 @@ module.exports = (session) => {
               expect(models[0].model1Prop1).to.equal('hello 1');
 
               const { model1Relation1, model1Relation2 } = models[0];
-              expect(model1Relation1 === undefined || model1Relation1.id === 2).to.equal(true);
-              expect(model1Relation2 === undefined || model1Relation2.length === 2).to.equal(true);
+              expect(model1Relation1 && model1Relation1.id).to.equal(joined ? 2 : undefined);
+              expect(model1Relation2 && model1Relation2.length).to.equal(fetched ? 2 : undefined);
             });
         });
+      });
+
+      it('should not expose internally selected columns of fetched relations to runAfter', () => {
+        const keys = [];
+
+        return Model1.query()
+          .select('Model1.model1Prop1')
+          .where('Model1.id', 1)
+          .withGraphFetched('model1Relation2(selectProp1).model2Relation1(selectProp1)')
+          .modifiers({
+            selectProp1: (builder) =>
+              builder.select(builder.modelClass() === Model1 ? 'model1Prop1' : 'model2_prop1'),
+          })
+          .context({
+            // Called for the root query and the queries of the fetched relations.
+            runAfter(models, builder) {
+              for (const model of models) {
+                const props = Object.keys(model).sort().join(', ');
+                keys.push(`${builder.modelClass().name}: ${props}`);
+              }
+              return models;
+            },
+          })
+          .then(() => {
+            expect(keys.sort()).to.eql([
+              'Model1: model1Prop1',
+              'Model1: model1Prop1',
+              'Model1: model1Prop1, model1Relation2',
+              'Model2: model2Prop1, model2Relation1',
+              'Model2: model2Prop1, model2Relation1',
+            ]);
+          });
       });
 
       it('page should work', () => {
