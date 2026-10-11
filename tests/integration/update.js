@@ -212,7 +212,7 @@ module.exports = (session) => {
           .catch(done);
       });
 
-      it.skip('should pass validation if query properties are passed in for required', () => {
+      it('should pass validation if query properties are passed in for required', () => {
         const ModelWithSchema = subClassWithSchema(Model1, {
           type: 'object',
           required: ['model1Prop1'],
@@ -230,11 +230,7 @@ module.exports = (session) => {
             return session.knex(Model1.getTableName());
           })
           .then((rows) => {
-            expect(rows.map((it) => it.model1Prop1).sort()).to.eql([
-              'hello 1',
-              'hello 2',
-              'hello 3',
-            ]);
+            expect(rows.map((it) => it.model1Prop1).sort()).to.eql(['hello 1', 'hello 3', 'text']);
           });
       });
 

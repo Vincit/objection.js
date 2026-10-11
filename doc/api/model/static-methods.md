@@ -802,7 +802,7 @@ You can override this method to return an instance of your custom validator. The
 
 If you want to use the default json schema based [AjvValidator](/api/types/#class-ajvvalidator) but want to modify it, you can use the `objection.AjvValidator` constructor. See the default implementation example.
 
-If you want to share the same validator instance between multiple models, that's completely fine too. Simply implement `createValidator` so that it always returns the same object instead of creating a new one.
+If you want to share the same validator instance between multiple models, that's completely fine too. Simply implement `createValidator` so that it always returns the same object instead of creating a new one. Note that a shared `AjvValidator` compiles the schemas of all these models on the same `Ajv` instance, where each `$id` can only be added once. Model classes that share an `$id` therefore need the same `uniqueTag()` (by default made of the `tableName` and the class name, as with [bound](/api/model/static-methods.html#static-bindknex) model classes) and the same `jsonSchema`. Two model classes with the same `uniqueTag()` but different schemas sharing an `$id` cause Ajv to throw a `schema with key or id "..." already exists` error.
 
 ##### Examples
 

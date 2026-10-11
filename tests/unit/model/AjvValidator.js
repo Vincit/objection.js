@@ -371,6 +371,33 @@ describe('AjvValidator', () => {
       expect(validate({ b: 'str' })).to.be(false);
     });
 
+    it('should keep boolean schemas', () => {
+      const schema = {
+        type: 'object',
+        required: ['a'],
+        properties: {
+          a: { type: 'string' },
+          b: false,
+          c: true,
+          d: { anyOf: [false, { type: 'string', required: ['x'] }] },
+          e: { if: { type: 'string' }, then: false },
+        },
+        definitions: {
+          f: false,
+        },
+      };
+      const validate = patchValidator(schema);
+      expect(validate.schema.properties.b).to.be(false);
+      expect(validate.schema.properties.c).to.be(true);
+      expect(validate.schema.properties.d.anyOf).to.eql([false, { type: 'string' }]);
+      expect(validate.schema.properties.e.then).to.be(false);
+      expect(validate.schema.definitions.f).to.be(false);
+      expect(validate({ a: 'str', c: 1, d: 'str', e: 1 })).to.be(true);
+      expect(validate({ b: 1 })).to.be(false);
+      expect(validate({ d: 1 })).to.be(false);
+      expect(validate({ e: 'str' })).to.be(false);
+    });
+
     it('should keep top-level not schemas intact', () => {
       const schema = {
         type: 'object',
@@ -566,6 +593,13 @@ describe('AjvValidator', () => {
       }).to.not.throwException();
     });
 
+    it('should not validate field expression keys with numeric keys', () => {
+      expect(() => {
+        TestModel.fromJson({ 'tags:0': 'foo', 'tags:-1': 'bar' }, { patch: true });
+        TestModel.fromJson({ 'meta:nested.1.x': 'foo' }, { patch: true });
+      }).to.not.throwException();
+    });
+
     it('should not modify the input json', () => {
       const json = { name: 'foo', 'meta:b': 'foo' };
       const model = TestModel.fromJson(json, { patch: true });
@@ -669,6 +703,39 @@ describe('AjvValidator', () => {
       expect(() => IdModel.fromJson({ a: raw('?', 'x'), b: 'x' })).to.throwException((err) => {
         expect(err.data.b[0].keyword).to.equal('type');
       });
+    });
+
+    it('should resolve $refs to the schemas of other model classes', () => {
+      const validator = new AjvValidator({});
+      const sharedModelClass = (tableName, schema) =>
+        class extends modelClass(tableName, schema) {
+          static createValidator() {
+            return validator;
+          }
+        };
+
+      const RefTarget = sharedModelClass('RefTarget', {
+        $id: 'RefTarget',
+        type: 'object',
+        properties: { a: { type: 'string' } },
+      });
+      const RefSource = sharedModelClass('RefSource', {
+        $id: 'RefSource',
+        type: 'object',
+        required: ['a'],
+        properties: {
+          a: { type: 'integer' },
+          target: { $ref: 'RefTarget' },
+        },
+      });
+
+      RefTarget.fromJson({ a: 'x' });
+      expect(RefSource.fromJson({ a: raw('1'), target: { a: 'x' } }).target).to.eql({ a: 'x' });
+      expect(() => RefSource.fromJson({ a: raw('1'), target: { a: 1 } })).to.throwException(
+        (err) => {
+          expect(err.data['target.a'][0].keyword).to.equal('type');
+        },
+      );
     });
   });
 });
