@@ -606,6 +606,53 @@ module.exports = (session) => {
 
           expect(foundIds).to.eql([]);
         });
+
+        for (const [title, patch] of [
+          ['', { model2Prop2: 10 }],
+          [' with join table extras', { model2Prop2: 10, extra2: 'z' }],
+          [' with only join table extras', { extra2: 'z' }],
+        ]) {
+          it(`should find the patched row of patchAndFetchById()${title}`, async () => {
+            const model = await owner(1);
+            await model
+              .$relatedQuery('model1Relation3')
+              .patchAndFetchById(2, patch)
+              .where('model2.model2_prop1', 'b');
+
+            expect(foundIds).to.eql([2]);
+          });
+
+          it(`should keep the id condition of patchAndFetchById() apart from an orWhere${title}`, async () => {
+            const model = await owner(1);
+            await model
+              .$relatedQuery('model1Relation3')
+              .patchAndFetchById(1, patch)
+              .where('model2.model2_prop1', 'does not exist')
+              .orWhere('model2.model2_prop1', 'b');
+
+            expect(foundIds).to.eql([]);
+            expect(await model2Rows()).to.eql([
+              [1, 1],
+              [2, 2],
+              [3, 3],
+            ]);
+          });
+
+          it(`should find nothing if the filters of patchAndFetchById() match nothing${title}`, async () => {
+            const model = await owner(1);
+            await model
+              .$relatedQuery('model1Relation3')
+              .patchAndFetchById(2, patch)
+              .where('model2.model2_prop1', 'does not exist');
+
+            expect(foundIds).to.eql([]);
+            expect(await model2Rows()).to.eql([
+              [1, 1],
+              [2, 2],
+              [3, 3],
+            ]);
+          });
+        }
       });
 
       describe('with more related rows than one statement can filter by (#161)', () => {
