@@ -1778,6 +1778,127 @@ describe('ManyToManyRelation', () => {
         });
     });
 
+    describe('in batches of ids (#161)', () => {
+      const owner = () => RelationOwner.create(OwnerModel.fromJson({ oid: 666 }));
+      const range = (from, to) => Array.from({ length: to - from + 1 }, (_, i) => from + i);
+      const selectIds = `select "RelatedModel"."id" from "RelatedModel" inner join "JoinModel" on "RelatedModel"."rid" = "JoinModel"."relatedId" where "JoinModel"."ownerId" in (666) and "RelatedModel"."code" = 55`;
+      const patchJoinRows = `update "JoinModel" set "extra2" = 'extraVal' where "JoinModel"."ownerId" in (666) and exists (select 1 from "RelatedModel" where "RelatedModel"."rid" = "JoinModel"."relatedId" and "RelatedModel"."code" = 55)`;
+      const patchRelated = (ids) =>
+        `update "RelatedModel" set "a" = 'str1' where ("RelatedModel"."id" in (${ids.join(', ')}))`;
+
+      function patch() {
+        return QueryBuilder.forClass(RelatedModel)
+          .patchOperationFactory((builder) => relation.patch(builder, owner()))
+          .patch({ a: 'str1', extra2: 'extraVal' })
+          .where('RelatedModel.code', 55);
+      }
+
+      it('should patch the related rows in batches of 500 ids and sum the counts', async () => {
+        const ids = range(1, 1001);
+        mockKnexQueryResults = [ids.map((id) => ({ id })), 1001, 500, 500, 1];
+
+        const result = await patch();
+
+        expect(result).to.equal(1001);
+        expect(executedQueries).to.eql([
+          selectIds,
+          patchJoinRows,
+          patchRelated(range(1, 500)),
+          patchRelated(range(501, 1000)),
+          patchRelated([1001]),
+        ]);
+      });
+
+      it('should patch each related row once if it has several join rows', async () => {
+        mockKnexQueryResults = [[{ id: 5 }, { id: 6 }, { id: 5 }], 3, 2];
+
+        const result = await patch();
+
+        expect(result).to.equal(2);
+        expect(executedQueries).to.eql([selectIds, patchJoinRows, patchRelated([5, 6])]);
+      });
+
+      it('should concatenate the returned rows of all batches', async () => {
+        const ids = range(1, 501);
+        mockKnexQueryResults = [
+          ids.map((id) => ({ id })),
+          501,
+          range(1, 500).map((id) => ({ id, a: 'str1' })),
+          [{ id: 501, a: 'str1' }],
+        ];
+
+        const result = await patch().returning('*');
+
+        expect(result.map((model) => model.id)).to.eql(ids);
+        expect(result.every((model) => model instanceof RelatedModel)).to.equal(true);
+        expect(executedQueries.slice(2)).to.eql([
+          `${patchRelated(range(1, 500))} returning *`,
+          `${patchRelated([501])} returning *`,
+        ]);
+      });
+
+      it('should count each column of composite ids', async () => {
+        class CompositeRelatedModel extends RelatedModel {
+          static get idColumn() {
+            return ['cid', 'did'];
+          }
+        }
+
+        const compositeRelation = new ManyToManyRelation('nameOfOurRelation', OwnerModel);
+        compositeRelation.setMapping({
+          modelClass: CompositeRelatedModel,
+          relation: ManyToManyRelation,
+          join: {
+            from: 'OwnerModel.oid',
+            through: {
+              from: 'JoinModel.ownerId',
+              to: ['JoinModel.relatedCId', 'JoinModel.relatedDId'],
+              extra: ['extra2'],
+            },
+            to: ['RelatedModel.cid', 'RelatedModel.did'],
+          },
+        });
+
+        const ids = range(1, 251).map((id) => [id, id + 1000]);
+        mockKnexQueryResults = [ids.map(([cid, did]) => ({ cid, did })), 251, 250, 1];
+        const values = (ids) => ids.map(([cid, did]) => `(${cid}, ${did})`).join(', ');
+
+        const result = await QueryBuilder.forClass(CompositeRelatedModel)
+          .patchOperationFactory((builder) => compositeRelation.patch(builder, owner()))
+          .patch({ a: 'str1', extra2: 'extraVal' });
+
+        expect(result).to.equal(251);
+        expect(executedQueries.slice(2)).to.eql([
+          `update "RelatedModel" set "a" = 'str1' where (("RelatedModel"."cid", "RelatedModel"."did") in (${values(ids.slice(0, 250))}))`,
+          `update "RelatedModel" set "a" = 'str1' where (("RelatedModel"."cid", "RelatedModel"."did") in (${values(ids.slice(250))}))`,
+        ]);
+      });
+
+      it('should filter the find query of the static hooks by all ids in one statement', async () => {
+        const ids = range(1, 501);
+        let findQuery = null;
+
+        // The model classes are created anew for each test.
+        RelatedModel.afterUpdate = ({ asFindQuery }) => {
+          findQuery = asFindQuery().select('RelatedModel.id').toKnexQuery().toString();
+        };
+        mockKnexQueryResults = [ids.map((id) => ({ id })), 501, 500, 1];
+
+        await patch();
+
+        expect(executedQueries.length).to.equal(4);
+        expect(findQuery).to.equal(
+          `select "JoinModel"."ownerId" as "objectiontmpjoin0", "RelatedModel"."rid", "RelatedModel"."id" from "RelatedModel" inner join "JoinModel" on "RelatedModel"."rid" = "JoinModel"."relatedId" where "JoinModel"."ownerId" in (666) and "RelatedModel"."id" in (${ids.join(', ')})`,
+        );
+      });
+
+      it('should build a single statement with the filter subquery', () => {
+        expect(patch().toKnexQuery().toString()).to.equal(
+          `update "RelatedModel" set "a" = 'str1' where ("RelatedModel"."id" in (select "RelatedModel"."id" from "RelatedModel" inner join "JoinModel" on "RelatedModel"."rid" = "JoinModel"."relatedId" where "JoinModel"."ownerId" in (666) and "RelatedModel"."code" = 55))`,
+        );
+      });
+    });
+
     it('should only patch the join table if only extras are patched', () => {
       mockKnexQueryResults = [1];
       let owner = OwnerModel.fromJson({ oid: 666 });

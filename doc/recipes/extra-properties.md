@@ -108,4 +108,6 @@ await linda
   .where('movies.name', 'Curvature');
 ```
 
+A `patch` or `update` that changes both `extra` properties and properties of the related model runs several statements: it fetches the ids of the related rows matching the filters, updates their join rows, and then updates the related rows by their ids, in batches of up to 500 values per statement to stay below the database's limit. If one of these statements fails, the earlier ones aren't rolled back, so run the query in a [transaction](/guide/transactions.html) if it needs to be atomic. [asFindQuery](/api/types/#type-statichookarguments) in the static `after` hooks of such a query finds the updated rows by all their ids in one statement, so with a very large number of rows it can exceed that limit.
+
 `extra` properties also work with [withGraphFetched](/api/query-builder/eager-methods.html#withgraphfetched) [insertGraph](/api/query-builder/mutate-methods.html#insertgraph) and [upsertGraph](/api/query-builder/mutate-methods.html#upsertgraph).

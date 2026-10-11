@@ -478,6 +478,87 @@ module.exports = (session) => {
         }
         expect(await joinRows()).to.eql(expected);
       });
+
+      describe('with more related rows than one statement can filter by (#161)', () => {
+        // More ids than SQL Server accepts as bound values in one statement,
+        // patched in several batches:
+        const ids = Array.from({ length: 2101 }, (_, index) => 101 + index);
+
+        beforeEach(async () => {
+          const rows = ids.map((id) => ({ id_col: id, model2_prop2: 0 }));
+          const joinRows = ids.map((id) => ({ model1Id: 1, model2Id: id, extra1: 'many' }));
+
+          await session.knex.batchInsert('model2', rows, 300);
+          await session.knex.batchInsert('Model1Model2', joinRows, 300);
+        });
+
+        afterEach(() => {
+          delete Model2.afterUpdate;
+        });
+
+        function patchedIds() {
+          return session.knex('model2').where('model2_prop2', 10).orderBy('id_col').pluck('id_col');
+        }
+
+        function patchedJoinRowIds() {
+          return session
+            .knex('Model1Model2')
+            .where('extra2', 'z')
+            .orderBy('model2Id')
+            .pluck('model2Id');
+        }
+
+        it('should patch all of them and their join rows', async () => {
+          const model = await owner(1);
+          const numUpdated = await model
+            .$relatedQuery('model1Relation3')
+            .patch({ model2Prop2: 10, extra2: 'z' })
+            .where('Model1Model2.extra1', 'many');
+
+          expect(numUpdated).to.equal(ids.length);
+          expect(await patchedIds()).to.eql(ids);
+          expect(await patchedJoinRowIds()).to.eql(ids);
+        });
+
+        it('should return the patched rows of all batches with returning()', async function () {
+          if (!session.isPostgres() && !session.isMsSql()) {
+            this.skip();
+          }
+
+          const model = await owner(1);
+          const models = await model
+            .$relatedQuery('model1Relation3')
+            .patch({ model2Prop2: 10, extra2: 'z' })
+            .where('Model1Model2.extra1', 'many')
+            .returning('*');
+
+          expect(models.every((model) => model instanceof Model2)).to.equal(true);
+          expect(models.map((model) => model.idCol).sort((a, b) => a - b)).to.eql(ids);
+          expect(models.every((model) => model.model2Prop2 === 10)).to.equal(true);
+        });
+
+        it('should find the patched rows with asFindQuery() in a static afterUpdate hook', async () => {
+          // Two batches, but few enough ids for the single find statement.
+          const someIds = ids.slice(0, 600);
+          let foundIds = null;
+
+          Model2.afterUpdate = async ({ asFindQuery }) => {
+            const models = await asFindQuery().select('model2.id_col').orderBy('model2.id_col');
+            foundIds = models.map((model) => model.idCol);
+          };
+
+          const model = await owner(1);
+          const numUpdated = await model
+            .$relatedQuery('model1Relation3')
+            .patch({ model2Prop2: 10, extra2: 'z' })
+            .where('Model1Model2.extra1', 'many')
+            .where('model2.id_col', '<=', someIds[someIds.length - 1]);
+
+          expect(numUpdated).to.equal(someIds.length);
+          expect(foundIds).to.eql(someIds);
+          expect(await patchedIds()).to.eql(someIds);
+        });
+      });
     });
 
     describe('with a through.modify filter on the join table', () => {
