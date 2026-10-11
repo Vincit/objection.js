@@ -4970,6 +4970,92 @@ describe('QueryBuilder', () => {
     });
   });
 
+  describe('distinctOn() with withGraphJoined() and withGraphFetched()', () => {
+    let Person;
+    let Animal;
+
+    beforeEach(() => {
+      Person = class Person extends Model {
+        static get tableName() {
+          return 'Person';
+        }
+
+        static tableMetadata() {
+          return { columns: ['id', 'name'] };
+        }
+
+        static get relationMappings() {
+          return {
+            pets: {
+              relation: Model.HasManyRelation,
+              modelClass: Animal,
+              join: { from: 'Person.id', to: 'Animal.ownerId' },
+            },
+          };
+        }
+      };
+
+      Animal = class Animal extends Model {
+        static get tableName() {
+          return 'Animal';
+        }
+
+        static tableMetadata() {
+          return { columns: ['id', 'name', 'ownerId'] };
+        }
+      };
+
+      Person.knex(mockKnex);
+    });
+
+    it('should not treat its columns as selections in withGraphJoined()', () => {
+      const sql = Person.query()
+        .distinctOn('Person.name')
+        .withGraphJoined('pets(oneOfEach)')
+        .modifiers({
+          oneOfEach: (query) => query.distinctOn('name'),
+        })
+        .toKnexQuery()
+        .toString();
+
+      expect(sql).to.equal(
+        'select distinct on ("Person"."name") "Person"."id" as "id", "Person"."name" as "name", "pets"."id" as "pets:id", "pets"."name" as "pets:name", "pets"."ownerId" as "pets:ownerId" ' +
+          'from "Person" left join (select distinct on ("name") "Animal".* from "Animal") as "pets" on "pets"."ownerId" = "Person"."id"',
+      );
+    });
+
+    it('should not treat its columns as selections in joinRelated()', () => {
+      const sql = Person.query()
+        .joinRelated('pets(oneOfEach)')
+        .modifiers({
+          oneOfEach: (query) => query.distinctOn('ownerId'),
+        })
+        .toKnexQuery()
+        .toString();
+
+      expect(sql).to.equal(
+        'select "Person".* from "Person" inner join (select distinct on ("ownerId") "Animal".* from "Animal") as "pets" on "pets"."ownerId" = "Person"."id"',
+      );
+    });
+
+    it('should not treat its columns as selections in withGraphFetched()', () => {
+      mockKnexQueryResults = [[{ id: 1, name: 'P1' }], [{ id: 10, name: 'A1', ownerId: 1 }]];
+
+      return Person.query()
+        .distinctOn('name')
+        .withGraphFetched('pets(oneOfEach)')
+        .modifiers({
+          oneOfEach: (query) => query.distinctOn('name'),
+        })
+        .then(() => {
+          expect(executedQueries).to.eql([
+            'select distinct on ("name") "Person".* from "Person"',
+            'select distinct on ("name") "Animal".* from "Animal" where "Animal"."ownerId" in (1)',
+          ]);
+        });
+    });
+  });
+
   describe('aliased selections in withGraphJoined modifiers (#2365)', () => {
     let Person;
     let Animal;

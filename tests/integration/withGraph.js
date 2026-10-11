@@ -1715,6 +1715,40 @@ module.exports = (session) => {
       });
     }
 
+    it('distinctOn should not select its columns', async function () {
+      if (!session.isPostgres()) {
+        return this.skip();
+      }
+
+      for (const method of ['withGraphFetched', 'withGraphJoined']) {
+        const [{ model1Relation2, ...model }] = await Model1.query()
+          .distinctOn('Model1.model1Prop1')
+          .where('Model1.id', 1)
+          [method]('model1Relation2(oneOfEach)')
+          .modifiers({
+            oneOfEach(query) {
+              query.distinctOn('model1_id');
+            },
+          });
+
+        expect(model).to.eql({
+          id: 1,
+          model1Id: 2,
+          model1Prop1: 'hello 1',
+          model1Prop2: null,
+          $afterFindCalled: 1,
+        });
+        expect(model1Relation2).to.have.length(1);
+        expect(Object.keys(model1Relation2[0]).sort()).to.eql([
+          '$afterFindCalled',
+          'idCol',
+          'model1Id',
+          'model2Prop1',
+          'model2Prop2',
+        ]);
+      }
+    });
+
     // Throws in objection 4.0, see ditojs/objection#53.
     it.skip('should fail with a clear error when a duplicate relation is detected', () => {
       expect(() => {
