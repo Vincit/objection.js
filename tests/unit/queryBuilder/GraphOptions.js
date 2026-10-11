@@ -65,10 +65,28 @@ describe('GraphOptions', () => {
   });
 
   describe('rebasedOptions', () => {
-    it('should only keep the relation paths below the new root', () => {
-      const options = new GraphOptions({ noInsert: ['a', 'a.b', 'ab.c', 'a.b.c', 'x.a'] });
-      const rebased = options.rebasedOptions(createNode('a'));
-      expect(rebased.options.noInsert).to.eql(['b', 'b.c']);
+    function rebasedMatches(noInsert, rootRelationPathKey, relationPathKey) {
+      const options = new GraphOptions({ noInsert }).rebasedOptions(
+        createNode(rootRelationPathKey),
+      );
+      return options._hasOption(createNode(relationPathKey), 'noInsert');
+    }
+
+    for (const noInsert of [['a', 'a.b', 'ab.c', 'x.a'], '[a.b, ab.c, x.a]']) {
+      it(`should match ${JSON.stringify(noInsert)} against the full relation path`, () => {
+        expect(rebasedMatches(noInsert, 'a', 'b')).to.equal(true);
+        expect(rebasedMatches(noInsert, 'a', 'c')).to.equal(false);
+        expect(rebasedMatches(noInsert, 'a', 'a')).to.equal(false);
+        expect(rebasedMatches(noInsert, 'x', 'a')).to.equal(true);
+      });
+    }
+
+    it('should match the new root', () => {
+      expect(rebasedMatches(['a'], 'a', '')).to.equal(true);
+      expect(rebasedMatches('a', 'a', '')).to.equal(true);
+      expect(rebasedMatches(['a'], 'b', '')).to.equal(false);
+      expect(rebasedMatches(['a.b'], 'a.b', '')).to.equal(true);
+      expect(rebasedMatches(['b'], 'a.b', '')).to.equal(false);
     });
   });
 });

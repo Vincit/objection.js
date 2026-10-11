@@ -3867,9 +3867,7 @@ module.exports = (session) => {
           });
         }
 
-        // Arrays of relation paths don't match the root of the recursive upsert,
-        // so `noUpdate: ['model1Relation3']` still updates idCol=1.
-        for (const noUpdate of [true, 'model1Relation3']) {
+        for (const noUpdate of [true, 'model1Relation3', ['model1Relation3']]) {
           it(`should respect noUpdate: ${JSON.stringify(noUpdate)} in recursive upserts`, () => {
             const upsert = {
               id: 2,

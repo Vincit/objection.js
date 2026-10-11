@@ -1389,7 +1389,7 @@ await Person.query().upsertGraph(
 
 You can disable updates, inserts, deletes etc. for the whole [upsertGraph](/api/query-builder/mutate-methods.html#upsertgraph) operation or for individual relations by using the `noUpdate`, `noInsert`, `noDelete` etc. options. See [UpsertGraphOptions](/api/types/#type-upsertgraphoptions) docs for more info.
 
-Instead of a list of relation paths, these options also accept a relation expression in the same syntax as [withGraphFetched](/api/query-builder/eager-methods.html#withgraphfetched). Like the list, it only matches the relations at the end of the paths it names, not the relations along the way. `'*'` matches all relations at any depth, and recursive expressions like `'parent.^'` every level of the recursion. The root models are never matched:
+Instead of a list of relation paths, these options also accept a relation expression in the same syntax as [withGraphFetched](/api/query-builder/eager-methods.html#withgraphfetched). Like the list, it only matches the relations at the end of the paths it names, not the relations along the way. To match a relation together with relations below it, use a list like `['movies', 'movies.reviews']`. `'*'` matches all relations at any depth, and recursive expressions like `'parent.^'` every level of the recursion. The root models are never matched:
 
 ```js
 // Update existing people and insert new ones, but don't insert
