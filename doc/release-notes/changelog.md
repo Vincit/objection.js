@@ -2,6 +2,10 @@
 
 ## 3.7.1
 
+### Fixes
+
+- **Behaviour change:** `update()` validates field expression keys like `'meta:color'` against the nested schema of the json column, like `patch()` since 3.3.0. Invalid values are rejected now. `required` inside the json column doesn't apply, as only parts of it are written, while the other properties are validated as before. Until now the keys were validated as top-level properties: `additionalProperties: false` rejected them, a required json column counted as missing, and its `default` replaced the whole stored value. [#160](https://github.com/ditojs/objection/issues/160)
+
 ### Docs
 
 - The typings require TypeScript 5.1, and CI checks them with it. With TypeScript 5.0, methods of custom query builders like `firstWithName() { return this.where(...).first(); }` are implicitly `any` without a return type annotation.

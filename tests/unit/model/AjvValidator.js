@@ -622,10 +622,79 @@ describe('AjvValidator', () => {
       );
       expect(model).to.eql({ 'meta:b': 'foo' });
     });
+  });
 
-    it('should not change the validation of field expression keys in non-patch mode', () => {
-      const data = validationErrorData(() => TestModel.fromJson({ name: 'foo', 'meta:b': 'foo' }));
-      expect(Object.keys(data)).to.eql(['meta:b']);
+  describe('update validation with field expression keys', () => {
+    const schema = {
+      type: 'object',
+      additionalProperties: false,
+      required: ['name', 'meta'],
+      properties: {
+        id: { type: 'integer' },
+        name: { type: 'string' },
+        status: { type: 'string', default: 'new' },
+        meta: {
+          type: 'object',
+          additionalProperties: false,
+          required: ['a'],
+          default: { a: 'default' },
+          properties: {
+            a: { type: 'string' },
+            b: { type: 'string' },
+          },
+        },
+      },
+    };
+
+    const TestModel = modelClass('test', schema);
+
+    function validationErrorData(fn) {
+      try {
+        fn();
+      } catch (err) {
+        expect(err).to.be.a(TestModel.ValidationError);
+        return err.data;
+      }
+      throw new Error('expected a validation error');
+    }
+
+    it('should validate field expression keys against the nested schema', () => {
+      const data = validationErrorData(() => TestModel.fromJson({ name: 'foo', 'meta:b': 1 }));
+      expect(Object.keys(data)).to.eql(['meta.b']);
+      expect(data['meta.b'][0].keyword).to.equal('type');
+    });
+
+    it('should count the json column as present, without its required properties', () => {
+      expect(TestModel.fromJson({ name: 'foo', 'meta:b': 'foo' })['meta:b']).to.equal('foo');
+    });
+
+    it('should still require the other required properties', () => {
+      const data = validationErrorData(() => TestModel.fromJson({ 'meta:b': 'foo' }));
+      expect(Object.keys(data)).to.eql(['name']);
+      expect(data.name[0].keyword).to.equal('required');
+    });
+
+    it('should not set the default value of the json column', () => {
+      const model = TestModel.fromJson({ name: 'foo', 'meta:b': 'foo' });
+      expect(model).to.eql({ name: 'foo', status: 'new', 'meta:b': 'foo' });
+    });
+
+    it('should work together with required properties given as query properties', () => {
+      expect(TestModel.fromJson({ name: raw('?', 'foo'), 'meta:b': 'foo' })['meta:b']).to.equal(
+        'foo',
+      );
+      const data = validationErrorData(() =>
+        TestModel.fromJson({ name: raw('?', 'foo'), 'meta:b': 1 }),
+      );
+      expect(Object.keys(data)).to.eql(['meta.b']);
+    });
+
+    it('should not change the validation of the json column without field expressions', () => {
+      const data = validationErrorData(() =>
+        TestModel.fromJson({ name: 'foo', meta: { b: 'foo' } }),
+      );
+      expect(Object.keys(data)).to.eql(['meta.a']);
+      expect(TestModel.fromJson({ name: 'foo' }).meta).to.eql({ a: 'default' });
     });
   });
 
