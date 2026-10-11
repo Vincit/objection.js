@@ -197,6 +197,15 @@ import { Animal } from '../fixtures/animal';
 
   await Person.query().upsertGraph([{ id: 1, pets: [{ name: 'Not inserted' }] }], options);
 
+  // Markers need the `allowMarkers` option.
+  await Person.query().upsertGraph(
+    { id: 1, pets: [{ id: 2, '#delete': true }], movies: [{ id: 2, '#unrelate': true }] },
+    { noDelete: true, allowMarkers: true },
+  );
+
+  // @ts-expect-error: allowMarkers is a boolean.
+  await Person.query().upsertGraph({ id: 1 }, { allowMarkers: 'pets' });
+
   // @ts-expect-error: graph options don't accept numbers.
   await Person.query().upsertGraph({ id: 1 }, { noInsert: 1 });
 

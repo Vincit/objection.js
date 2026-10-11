@@ -156,4 +156,9 @@ import { Person } from '../fixtures/person';
       ],
     },
   ]);
+
+  await Person.query().insertGraph(
+    { firstName: 'Jennifer' },
+    { allowRefs: true, allowMarkers: true },
+  );
 })();

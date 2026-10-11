@@ -1647,6 +1647,7 @@ module.exports = (session) => {
           return Model1.query(trx)
             .upsertGraph(upsert, {
               fetchStrategy,
+              allowMarkers: true,
               relate: true,
               noDelete: true,
               unrelate: ['model1Relation1'],
@@ -1727,6 +1728,39 @@ module.exports = (session) => {
         });
       });
 
+      it('should #unrelate and #delete models referenced with #dbRef', () => {
+        return transaction(session.knex, async (trx) => {
+          await Model1.query(trx).upsertGraph(
+            {
+              id: 2,
+              model1Relation1: { '#dbRef': 3, '#unrelate': true },
+              model1Relation2: [
+                { idCol: 1, model2Relation1: [{ id: 4 }, { '#dbRef': 5, '#unrelate': true }] },
+                { idCol: 2, model2Relation1: [{ '#dbRef': 6, '#delete': true }, { id: 7 }] },
+              ],
+            },
+            { fetchStrategy, allowMarkers: true, noDelete: ['model1Relation2'] },
+          );
+
+          await Model1.query(trx).upsertGraph(
+            { id: 2, model1Relation2: [{ '#dbRef': 1, '#delete': true }, { idCol: 2 }] },
+            { fetchStrategy, allowMarkers: true, noDelete: ['model1Relation2.model2Relation1'] },
+          );
+
+          const result = await Model1.query(trx)
+            .findById(2)
+            .withGraphFetched('[model1Relation1, model1Relation2.model2Relation1(orderById)]');
+
+          expect(result.model1Relation1).to.equal(null);
+          expect(result.model1Relation2.map((it) => it.idCol)).to.eql([2]);
+          expect(result.model1Relation2[0].model2Relation1.map((it) => it.id)).to.eql([7]);
+
+          const model1Ids = (await trx('Model1')).map((it) => it.id).sort((a, b) => a - b);
+          // Row 6 was deleted, rows 3 and 5 were unrelated.
+          expect(model1Ids).to.eql([1, 2, 3, 4, 5, 7]);
+        });
+      });
+
       it('should not fail when trying to #unrelate or #delete a model which either does not exist or is linked elsewhere', () => {
         const upsert = {
           id: 2,
@@ -1756,6 +1790,7 @@ module.exports = (session) => {
           return Model1.query(trx)
             .upsertGraph(upsert, {
               fetchStrategy,
+              allowMarkers: true,
               relate: true,
               noDelete: true,
             })
@@ -1840,7 +1875,7 @@ module.exports = (session) => {
         };
 
         return transaction(session.knex, async (trx) => {
-          await Model1.query(trx).upsertGraph(upsert, { fetchStrategy });
+          await Model1.query(trx).upsertGraph(upsert, { fetchStrategy, allowMarkers: true });
 
           const result = omitIrrelevantProps(
             await Model1.query(trx)
@@ -1867,7 +1902,7 @@ module.exports = (session) => {
           };
 
           return transaction(session.knex, async (trx) => {
-            await Model1.query(trx).upsertGraph(upsert, { fetchStrategy });
+            await Model1.query(trx).upsertGraph(upsert, { fetchStrategy, allowMarkers: true });
 
             const root = await Model1.query(trx).findById(2).withGraphFetched('model1Relation1');
             expect(root.model1Id).to.equal(null);
@@ -1904,7 +1939,7 @@ module.exports = (session) => {
         };
 
         return transaction(session.knex, async (trx) => {
-          await Model1.query(trx).upsertGraph(upsert, { fetchStrategy });
+          await Model1.query(trx).upsertGraph(upsert, { fetchStrategy, allowMarkers: true });
 
           const root = await Model1.query(trx).findById(2).withGraphFetched('model1Relation2');
           expect(root.model1Relation2).to.eql([]);
@@ -1986,7 +2021,7 @@ module.exports = (session) => {
                 { idCol: 2 },
               ],
             },
-            { fetchStrategy, unrelate: true, noDelete: true },
+            { fetchStrategy, allowMarkers: true, unrelate: true, noDelete: true },
           );
 
           // `#unrelate` overrides `noUnrelate: true`. Missing id=7 is kept.
@@ -1995,7 +2030,7 @@ module.exports = (session) => {
               id: 2,
               model1Relation2: [{ idCol: 2, model2Relation1: [{ id: 6, '#unrelate': true }] }],
             },
-            { fetchStrategy, noUnrelate: true, noDelete: true },
+            { fetchStrategy, allowMarkers: true, noUnrelate: true, noDelete: true },
           );
 
           const result = await Model2.query(trx)
@@ -2014,7 +2049,7 @@ module.exports = (session) => {
       for (const prop of ['#unrelate', '#delete']) {
         it(`should fail if ${prop} is used for a root model`, async () => {
           const err = await Model1.query(session.knex)
-            .upsertGraph({ id: 2, [prop]: true }, { fetchStrategy })
+            .upsertGraph({ id: 2, [prop]: true }, { fetchStrategy, allowMarkers: true })
             .catch((err) => err);
 
           expect(err).to.be.a(ValidationError);
@@ -2026,6 +2061,40 @@ module.exports = (session) => {
           const row = await session.knex('Model1').where('id', 2).first();
           expect(row.id).to.equal(2);
         });
+      }
+
+      for (const [unrelateProp, deleteProp] of [
+        ['#unrelate', '#delete'],
+        ['@unrelate', '@delete'],
+      ]) {
+        for (const prop of [unrelateProp, deleteProp]) {
+          it(`should fail if ${prop} is used without the allowMarkers option`, async () => {
+            const { graphUnrelateProp, graphDeleteProp } = Model2;
+            Model2.graphUnrelateProp = unrelateProp;
+            Model2.graphDeleteProp = deleteProp;
+
+            try {
+              const err = await Model1.query(session.knex)
+                .upsertGraph(
+                  { id: 2, model1Relation2: [{ idCol: 1, [prop]: true }, { idCol: 2 }] },
+                  { fetchStrategy },
+                )
+                .catch((err) => err);
+
+              expect(err).to.be.a(ValidationError);
+              expect(err.type).to.equal('InvalidGraph');
+              expect(err.message).to.equal(
+                `${unrelateProp} and ${deleteProp} markers are not allowed in a graph by default. see the allowMarkers insert/upsert graph option`,
+              );
+
+              const rows = await session.knex('model2').where('model1_id', 2).orderBy('id_col');
+              expect(rows.map((it) => it.id_col)).to.eql([1, 2]);
+            } finally {
+              Model2.graphUnrelateProp = graphUnrelateProp;
+              Model2.graphDeleteProp = graphDeleteProp;
+            }
+          });
+        }
       }
 
       it('should relate and unrelate some models if `unrelate` and `relate` are arrays of relation paths', () => {

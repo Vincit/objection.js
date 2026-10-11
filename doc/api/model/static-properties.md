@@ -500,7 +500,7 @@ class Person extends Model {
 }
 ```
 
-Name of the property used to mark a related model in an `upsertGraph` graph to be unrelated. See [this section](/guide/query-examples.html#graph-upserts) for more information.
+Name of the property used to mark a related model in an `upsertGraph` graph to be unrelated. The marker needs the `allowMarkers` option of `insertGraph` and `upsertGraph`. See [this section](/guide/query-examples.html#graph-upserts) for more information.
 
 NOTE: You cannot use any of the model's properties as `graphUnrelateProp`. For example if your model has a property `unrelate`, you cannot set `graphUnrelateProp = 'unrelate'`.
 
@@ -516,7 +516,7 @@ class Person extends Model {
 }
 ```
 
-Name of the property used to mark a related model in an `upsertGraph` graph to be deleted. See [this section](/guide/query-examples.html#graph-upserts) for more information.
+Name of the property used to mark a related model in an `upsertGraph` graph to be deleted. The marker needs the `allowMarkers` option of `insertGraph` and `upsertGraph`. See [this section](/guide/query-examples.html#graph-upserts) for more information.
 
 NOTE: You cannot use any of the model's properties as `graphDeleteProp`. For example if your model has a property `delete`, you cannot set `graphDeleteProp = 'delete'`.
 

@@ -462,7 +462,7 @@ queryBuilder = queryBuilder.upsertGraph(graph, options);
 
 See the [section about graph upserts](/guide/query-examples.html#graph-upserts)
 
-In addition to the `#id`, `#ref` and `#dbRef` special properties supported by [insertGraph](/api/query-builder/mutate-methods.html#insertgraph), related models in the graph can be marked with `'#unrelate': true` or `'#delete': true` to unrelate or delete them individually, regardless of the `unrelate`, `noUnrelate` and `noDelete` options. See [this section](/guide/query-examples.html#graph-upserts) for details.
+In addition to the `#id`, `#ref` and `#dbRef` special properties supported by [insertGraph](/api/query-builder/mutate-methods.html#insertgraph), related models in the graph can be marked with `'#unrelate': true` or `'#delete': true` to unrelate or delete them individually, regardless of the `unrelate`, `noUnrelate` and `noDelete` options. Like `#ref`, these special properties need to be enabled with the `allowMarkers` option, since they let whoever provides the graph unrelate or delete related models. See [this section](/guide/query-examples.html#graph-upserts) for details.
 
 ::: warning
 WARNING!

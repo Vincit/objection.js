@@ -421,6 +421,55 @@ module.exports = (session) => {
           });
       });
 
+      it('should skip models marked with #unrelate or #delete and their relations', async () => {
+        const model = await Model1.query().insertGraph(
+          {
+            model1Prop1: 'root',
+
+            model1Relation2: [
+              { model2Prop1: 'inserted' },
+              {
+                model2Prop1: 'marked',
+                '#delete': true,
+                model2Relation1: [{ model1Prop1: 'child of marked' }],
+              },
+            ],
+
+            model1Relation3: [{ idCol: population.model1Relation3[0].idCol, '#unrelate': true }],
+          },
+          { relate: true, allowMarkers: true },
+        );
+
+        const result = await Model1.query()
+          .findById(model.id)
+          .withGraphFetched('[model1Relation2.model2Relation1, model1Relation3]');
+
+        expect(result.model1Relation2.map((it) => it.model2Prop1)).to.eql(['inserted']);
+        expect(result.model1Relation3).to.eql([]);
+
+        const rows = await session.knex('Model1').where('model1Prop1', 'child of marked');
+        expect(rows).to.eql([]);
+      });
+
+      for (const prop of ['#unrelate', '#delete']) {
+        it(`should throw if ${prop} is used without the allowMarkers option`, async () => {
+          const err = await Model1.query()
+            .insertGraph({
+              model1Prop1: 'root',
+              model1Relation2: [{ model2Prop1: 'marked', [prop]: true }],
+            })
+            .catch((err) => err);
+
+          expect(err).to.be.a(ValidationError);
+          expect(err.type).to.equal('InvalidGraph');
+          expect(err.message).to.equal(
+            '#unrelate and #delete markers are not allowed in a graph by default. see the allowMarkers insert/upsert graph option',
+          );
+
+          expect(await session.knex('Model1').where('model1Prop1', 'root')).to.eql([]);
+        });
+      }
+
       it('trying to relate a HasManyRelation should throw', (done) => {
         Model1.query()
           .insertGraph(

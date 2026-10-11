@@ -1403,7 +1403,7 @@ await Person.query().upsertGraph(person, {
 });
 ```
 
-If you need to unrelate or delete individual models without listing all the other models of a relation, you can mark them with the special properties `#unrelate` and `#delete`. This is especially useful together with the `noDelete` and `noUnrelate` options, which keep all models that are missing from the graph intact. The names of the special properties can be changed using the [graphUnrelateProp](/api/model/static-properties.html#static-graphunrelateprop) and [graphDeleteProp](/api/model/static-properties.html#static-graphdeleteprop) static properties.
+If you need to unrelate or delete individual models without listing all the other models of a relation, you can mark them with the special properties `#unrelate` and `#delete`. This is especially useful together with the `noDelete` and `noUnrelate` options, which keep all models that are missing from the graph intact. The names of the special properties can be changed using the [graphUnrelateProp](/api/model/static-properties.html#static-graphunrelateprop) and [graphDeleteProp](/api/model/static-properties.html#static-graphdeleteprop) static properties. Like `#ref`, the special properties need to be enabled with the `allowMarkers` option.
 
 ```js
 await Person.query().upsertGraph(
@@ -1440,10 +1440,15 @@ await Person.query().upsertGraph(
   },
   {
     relate: true,
-    noDelete: true
+    noDelete: true,
+    allowMarkers: true
   }
 );
 ```
+
+::: warning
+The special properties come from the graph data, so with `allowMarkers: true` whoever provides the graph can unrelate or delete any model that is related to the models in the graph, even if the `noDelete` or `noUnrelate` option is set. Don't pass a request body to `upsertGraph` with `allowMarkers: true` unless that is intended. [allowGraph](/api/query-builder/eager-methods.html#allowgraph) limits the relations the graph can contain.
+:::
 
 The special properties work like this:
 
@@ -1452,5 +1457,6 @@ The special properties work like this:
 - The marked model itself is not updated and its relations are ignored, so nothing inside its graph gets inserted, updated, related, unrelated or deleted. Like other deletes, the delete is not recursive (unless you have defined `ON DELETE CASCADE` or other hooks in the db).
 - Only models that are currently related to the parent model are unrelated or deleted. Marked models that don't exist or are related to a different model are ignored. They are never inserted or related, even with the `relate` or `insertMissing` options.
 - Only the value `true` marks a model. Other values are ignored and the properties are never written to the database.
+- Without the `allowMarkers` option, a `ValidationError` is thrown if a model is marked.
 - The special properties can't be used for the root models of the graph. A `ValidationError` is thrown if a root model is marked.
 - The special properties only have an effect in [upsertGraph](/api/query-builder/mutate-methods.html#upsertgraph). Marked related models are skipped by [insertGraph](/api/query-builder/mutate-methods.html#insertgraph).
