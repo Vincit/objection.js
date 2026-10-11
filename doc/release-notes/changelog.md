@@ -15,7 +15,7 @@
 
 ### Other
 
-- Replace the custom build of lodash's `cloneDeep()` from 2018 with a small implementation, which `$clone()`, `toJSON()` and validation use to copy objects in model properties. It copies model data the same way, 2 to 4 times faster. Objects with a `null` prototype keep it instead of getting `Object.prototype`, and `BigInt64Array` / `BigUint64Array` are copied instead of shared.
+- Replace the custom build of lodash's `cloneDeep()` from 2018 with a small implementation, which `$clone()`, `toJSON()` and validation use to copy objects in model properties. It copies model data the same way, 2 to 4 times faster. Objects with a `null` prototype keep it instead of getting `Object.prototype`, `BigInt64Array` / `BigUint64Array` are copied instead of shared, and so are Buffers nested in objects, which shared their memory with the original before.
 - The parsers of relation expressions and JSON field expressions are generated with [Peggy](https://peggyjs.org/) instead of PEG.js 0.10, with `npm run build:parsers`. Parse results and error messages are the same.
 - The example projects use current versions of their dependencies and need Node.js 20.17 or newer
 
@@ -52,12 +52,12 @@
 
 - `insertGraph()` / `upsertGraph()` with `relate: true` silently dropped `HasManyRelation` / `HasOneRelation` children whose composite id contains the foreign key, and deleted the existing ones without inserting them again [#2544](https://github.com/Vincit/objection.js/issues/2544)
 - Required properties given as query properties, e.g. `raw()`, `val()`, `ref()` or subqueries, failed validation [#2199](https://github.com/Vincit/objection.js/issues/2199)
-- `upsertGraph()` treated JSON arrays and objects as unchanged when they loosely equal the current value, e.g. `false` and `[]` [#1874](https://github.com/Vincit/objection.js/issues/1874)
+- `upsertGraph()` treated JSON arrays and objects as unchanged when they loosely equal the current value, e.g. `false` and `[]`. **Behaviour change:** these values are now patched. [#1874](https://github.com/Vincit/objection.js/issues/1874)
 - Many-to-many and has-one-through relations whose join table is also the related table failed with SQL errors in `withGraphFetched()`, `$relatedQuery()` and `relatedQuery()`. `unrelate()` and patching join table extras on such relations throw an error instead of modifying the wrong rows. [#1803](https://github.com/Vincit/objection.js/issues/1803)
-- Patch validation rejected valid patches when an `anyOf` / `oneOf` option only consisted of `required` [#1681](https://github.com/Vincit/objection.js/issues/1681)
+- Patch validation rejected valid patches when an `anyOf` / `oneOf` option only consisted of `required`, which 3.3.0 didn't cover yet [#1681](https://github.com/Vincit/objection.js/issues/1681)
 - Throw `UniqueViolationError` for primary key violations on MSSQL [#2688](https://github.com/Vincit/objection.js/issues/2688)
-- `$fetchGraph()` / `fetchGraph()` / `$relatedQuery()` warn once when owner models are missing a join property, e.g. a foreign key left out of a partial `select()`. The relation silently came back empty. [#1832](https://github.com/Vincit/objection.js/issues/1832)
-- `withGraphJoined()` checks column aliases against the identifier length limit of the database (MySQL 256, MSSQL 128, SQLite none) instead of always the 63 of Postgres [#2242](https://github.com/Vincit/objection.js/issues/2242)
+- `$fetchGraph()` / `fetchGraph()` / `$relatedQuery()` warn once when owner models are missing a join property, e.g. an id left out of a partial `select()`. The relation silently came back empty. Since 3.6.0, the foreign keys of `BelongsToOneRelation` owners no longer warn, see [#132](https://github.com/ditojs/objection/issues/132). [#1832](https://github.com/Vincit/objection.js/issues/1832)
+- `withGraphJoined()` checks column aliases against the identifier length limit of the database (MySQL 256, MSSQL 128, SQLite none) instead of always the 63 of Postgres, and the error points to the `minimize` option. The limit isn't configurable. [#2242](https://github.com/Vincit/objection.js/issues/2242)
 - `withGraphFetched()` / `$fetchGraph()` warn once when related models are missing a join property, e.g. snake_case relation mappings with `knexSnakeCaseMappers()`. They were silently dropped. [#2258](https://github.com/Vincit/objection.js/issues/2258)
 - `insertGraph()` / `upsertGraph()` warn once per unknown option, e.g. a misspelled `noInset`. The option is ignored, and will throw in 4.0. [#84](https://github.com/ditojs/objection/issues/84)
 
@@ -75,23 +75,23 @@
 
 ### Other
 
-- **Breaking for old knex:** the knex peer dependency is `>=2.3.0` instead of `>=1.0.1`. Some fixes of 3.3.0 don't work with older knex versions. CI now also tests knex 2.3.0. [#95](https://github.com/ditojs/objection/issues/95)
+- **Breaking for old knex:** the knex peer dependency is `>=2.3.0` instead of `>=1.0.1`. Some fixes of 3.3.0 don't work with older knex versions. CI now also tests knex 2.3.0. Part of [#95](https://github.com/ditojs/objection/issues/95)
 - Tests no longer use bluebird, lodash and uuid
 
 ## 3.3.0
 
 ### Security
 
-- Escape keys in JSON field expressions. A `'` in a key used in `ref()`, a patch or update with field expression keys, or the `whereJson*` methods broke out of the SQL string literal, allowing SQL injection when keys come from user input. [#2077](https://github.com/Vincit/objection.js/issues/2077)
+- Escape keys in JSON field expressions. A `?` in a key used in `ref()`, a patch or update with field expression keys, or the `whereJson*` methods was read by knex as a binding placeholder [#2077](https://github.com/Vincit/objection.js/issues/2077), and a `'` broke out of the SQL string literal, allowing SQL injection when keys come from user input.
 
 ### What's new
 
-- `withGraphFetched()` / `withGraphJoined()` narrow the result types: fetched relations become required on the result. Generic helpers with an explicit `QB` return type need `withGraphFetched<string>()`. [#25](https://github.com/ditojs/objection/pull/25)
+- `withGraphFetched()` / `withGraphJoined()` narrow the result types: fetched relations become required on the result. Generic helpers with an explicit `QB` return type need `withGraphFetched<string>()`. [#25](https://github.com/ditojs/objection/pull/25) **Behaviour change:** this also breaks variables declared with `let` that are later assigned an unnarrowed query, helpers generic over the model type that return `QueryBuilder<M>`, and explicit type arguments like `Person.fetchGraph<Person>()` (fixed in 3.6.1). Annotate the variable, or use `withGraphFetched<string>()`.
 - Add `withGraph()` with algorithm-agnostic merging, and `isJoinChildQuery()` [#63](https://github.com/ditojs/objection/issues/63)
 - Add `patchById()` and `updateById()` [#1415](https://github.com/Vincit/objection.js/issues/1415)
-- `insertGraph()` / `upsertGraph()` resolve cyclic `#ref` dependencies by deferring `BelongsToOne` foreign keys [#1482](https://github.com/Vincit/objection.js/issues/1482)
+- `insertGraph()` / `upsertGraph()` resolve cyclic `#ref` dependencies by deferring `BelongsToOne` foreign keys. Graphs that threw before now succeed, and the deferred foreign keys are written with one `patch()` per owner model, which runs its update hooks. [#1482](https://github.com/Vincit/objection.js/issues/1482)
 - Add a `preserveJsonKeys` option to `snakeCaseMappers()` to map only the column part of field expressions [#1089](https://github.com/Vincit/objection.js/issues/1089)
-- Support empty keys in JSON field expressions, e.g. `col:[""]` [#2680](https://github.com/Vincit/objection.js/pull/2680). **Behaviour change:** `col:[""]` and `col:['']` used to refer to a key consisting of the two quote characters.
+- Support empty keys in JSON field expressions, e.g. `col:[""]` [#2680](https://github.com/Vincit/objection.js/pull/2680). **Behaviour change:** `col:[""]` and `col:['']` used to refer to a key consisting of the two quote characters, `col:[a,b]` to the path `a.b` instead of the key `a,b`, and spaces around keys in brackets were trimmed.
 - `whereJson*` methods accept `ref()`, `val()`, `raw()` and subqueries on the right side
 - Pass `returning()` options, e.g. `includeTriggerModifications`, on to knex [#2309](https://github.com/Vincit/objection.js/issues/2309)
 
@@ -99,24 +99,25 @@
 
 - Group the user's where clauses when adding a relation's owner condition. `$relatedQuery(...).where(a).orWhere(b).delete()` / `patch()` affected **other owners' rows**, and finds returned them. [#2191](https://github.com/Vincit/objection.js/issues/2191), [#1909](https://github.com/Vincit/objection.js/issues/1909)
 - `findByIds([])` / `whereInComposite()` with an empty array and composite ids produced invalid SQL, and **matched every row on SQLite** [#1914](https://github.com/Vincit/objection.js/issues/1914)
-- `onConflict().ignore()`: inserted rows were assigned to the wrong models, `$setDatabaseJson` could crash, and `insertAndFetch()` fetched undefined ids [#2320](https://github.com/Vincit/objection.js/issues/2320), [#2597](https://github.com/Vincit/objection.js/issues/2597), [#2661](https://github.com/Vincit/objection.js/issues/2661)
+- `onConflict().ignore()`: inserted rows were assigned to the wrong models, `$setDatabaseJson` could crash, and `insertAndFetch()` fetched undefined ids. **Behaviour change:** on SQLite this uses `RETURNING`, which needs SQLite 3.35 or newer, and it throws when it can't match the returned rows to the models, e.g. with ids generated by the database. Ignored models are still returned, with their input values. [#2320](https://github.com/Vincit/objection.js/issues/2320), [#2597](https://github.com/Vincit/objection.js/issues/2597), [#2661](https://github.com/Vincit/objection.js/issues/2661)
 - `asFindQuery()` in many-to-many update and delete hooks lost its filters [#2266](https://github.com/Vincit/objection.js/issues/2266)
-- Patch validation: `not` schemas stay intact [#1681](https://github.com/Vincit/objection.js/issues/1681), and nested `required` is stripped for nullable and untyped objects [#1664](https://github.com/Vincit/objection.js/issues/1664)
-- `resultSize()` and `page()` count root models with `withGraphJoined()` [#2329](https://github.com/Vincit/objection.js/issues/2329), [#2143](https://github.com/Vincit/objection.js/issues/2143)
+- Patch validation: `not` schemas stay intact [#1681](https://github.com/Vincit/objection.js/issues/1681), and nested `required` is also stripped for nullable and untyped objects, extending the 3.1.2 fix [#1664](https://github.com/Vincit/objection.js/issues/1664)
+- `resultSize()` and the `total` of `page()` count root models instead of joined rows with `withGraphJoined()` [#2143](https://github.com/Vincit/objection.js/issues/2143), [#2329](https://github.com/Vincit/objection.js/issues/2329). The limit of `page()` still applies to the joined rows.
 - Keep aliased subquery and raw selections in `withGraphJoined()` modifiers [#2365](https://github.com/Vincit/objection.js/issues/2365)
-- Map column names in `whereJson*` methods with `knexSnakeCaseMappers`
+- Map column names in `whereJson*` methods with `knexSnakeCaseMappers`. **Behaviour change:** column names given in database format are mapped again, which changes some of them, e.g. `data_2` with `underscoreBeforeDigits`.
 - Match `table.*` selections through knex identifier mapping [#2288](https://github.com/Vincit/objection.js/issues/2288)
 - Use the keys of modified `graphExpressionObject()` results [#2793](https://github.com/Vincit/objection.js/issues/2793)
-- Track internally selected columns on the query builder, so `runAfter()` hooks never see them [#45](https://github.com/ditojs/objection/issues/45)
-- **Behaviour change:** many-to-many `unrelate()` / `patch()` only modify the join rows matching the filters, not all join rows of the matching related rows [#1853](https://github.com/Vincit/objection.js/issues/1853). The generated SQL of these operations changes. On MySQL, the join table filter avoids `ER_CANT_UPDATE_USED_TABLE_IN_SF_OR_TRG` [#2127](https://github.com/Vincit/objection.js/issues/2127), and `unrelate()` returns `0` instead of `[]` when nothing matches. Ported from [#2406](https://github.com/Vincit/objection.js/pull/2406).
+- Track internally selected columns on the query builder, so `runAfter()` hooks of the query never see them. The queries of relations loaded with `withGraphFetched()` still do. [#45](https://github.com/ditojs/objection/issues/45)
+- **Behaviour change:** many-to-many `unrelate()` / `patch()` only modify the join rows matching the filters, not all join rows of the matching related rows [#1853](https://github.com/Vincit/objection.js/issues/1853). The generated SQL of these operations changes. On MySQL, the matching join rows are fetched in a separate query, which avoids `ER_UPDATE_TABLE_USED` ("You can't specify target table … for update in FROM clause") [#2127](https://github.com/Vincit/objection.js/issues/2127) and `ER_CANT_UPDATE_USED_TABLE_IN_SF_OR_TRG` when a trigger on the join table modifies the related table [#2406](https://github.com/Vincit/objection.js/pull/2406), and `unrelate()` returns `0` instead of `[]` when nothing matches. Ported from [#2406](https://github.com/Vincit/objection.js/pull/2406).
 - **Behaviour change:** `asFindQuery()` in hooks no longer applies the `runAfter()` callbacks of the original query, including those of `throwIfNotFound()` and `traverse()`, and returns `[]` instead of `[undefined]` for a `findById()` that finds nothing [#2093](https://github.com/Vincit/objection.js/issues/2093)
-- **Behaviour change:** field expression keys in patch objects, e.g. `'meta:a.b'`, are validated against the nested schema, so patches that passed before can fail validation [#1666](https://github.com/Vincit/objection.js/issues/1666)
+- **Behaviour change:** field expression keys in patch objects, e.g. `'meta:a.b'`, are validated against the nested schema of the JSON column. Patches like `{ 'meta:b': value }` no longer fail with `additionalProperties: false`, but patches that passed before can fail the nested schema [#1666](https://github.com/Vincit/objection.js/issues/1666)
 - **Behaviour change:** the `joinOperation` option of `withGraphJoined()` applies per call, no longer to all relations of the query [#2125](https://github.com/Vincit/objection.js/issues/2125)
-- **Behaviour change:** `withGraphJoined()` throws when it can't identify rows, e.g. for a model without a primary key, instead of silently merging them [#2748](https://github.com/Vincit/objection.js/issues/2748), [#2737](https://github.com/Vincit/objection.js/issues/2737)
+- **Behaviour change:** `withGraphJoined()` throws when it can't identify rows, instead of silently merging them [#2737](https://github.com/Vincit/objection.js/issues/2737). It still needs a primary key on every model, and models without one throw a clear error [#2748](https://github.com/Vincit/objection.js/issues/2748).
 - `insertGraph()` / `upsertGraph()` warn when `onConflict()`, `ignore()` or `merge()` is used. The clause is ignored, and will throw in 4.0. [#2156](https://github.com/Vincit/objection.js/issues/2156)
 
 ### Types
 
+- **Breaking for TypeScript < 5.0:** the typings use `const` type parameters, so they need TypeScript 5.0 or newer. `skipLibCheck` doesn't help, as older versions can't parse them.
 - Export the db-errors classes as types [#2499](https://github.com/Vincit/objection.js/issues/2499)
 
 ### Docs
@@ -137,9 +138,9 @@ Objection is now maintained at [ditojs/objection](https://github.com/ditojs/obje
 
 ### What's new
 
-- Support mixing `withGraphJoined()` and `withGraphFetched()` in the same query. Before, the last method called silently decided the algorithm for all relations. A top-level relation can only be loaded with one of them. [#2269](https://github.com/Vincit/objection.js/issues/2269)
+- Support mixing `withGraphJoined()` and `withGraphFetched()` in the same query. Before, the last method called silently decided the algorithm for all relations. A top-level relation can only be loaded with one of them. **Behaviour change:** loading the same top-level relation with both, e.g. `withGraphFetched('pets').withGraphJoined('pets.toys')`, throws. Before, all relations were joined. [#2269](https://github.com/Vincit/objection.js/issues/2269)
 - Add `none()` to make a query match no rows [#2184](https://github.com/Vincit/objection.js/issues/2184)
-- `upsertGraph()`: mark individual related models with `#unrelate` or `#delete` [#2410](https://github.com/Vincit/objection.js/pull/2410)
+- `upsertGraph()`: mark individual related models with `#unrelate` or `#delete` [#2410](https://github.com/Vincit/objection.js/pull/2410). Since 3.7.0, the markers need the `allowMarkers: true` option.
 - Return rows from `relate()` with `returning()` [#2044](https://github.com/Vincit/objection.js/issues/2044)
 - Apply `select()` to the fetch query of `updateAndFetch()`, `patchAndFetch()` and their `ById` variants [#1938](https://github.com/Vincit/objection.js/issues/1938)
 - Add a `noDoubleUnderscores` option to the snake case mappers [#2805](https://github.com/Vincit/objection.js/issues/2805)
@@ -150,7 +151,7 @@ Objection is now maintained at [ditojs/objection](https://github.com/ditojs/obje
 
 - **Behaviour change:** throw when `for()` is used outside of `relatedQuery()`. It was silently ignored before, so `Model.query().for(1).delete()` deleted **every row** of the table. [#2185](https://github.com/Vincit/objection.js/issues/2185)
 - **Behaviour change:** throw when `for()` is called after a write method on a `relatedQuery()`. Before, `update()`, `patch()` and `delete()` silently did nothing, and `insert()` and `relate()` wrote `NULL` foreign keys.
-- Fix validators being shared between models with the same `uniqueTag()` but different schemas [#2540](https://github.com/Vincit/objection.js/issues/2540)
+- Fix validators being shared between models with the same `uniqueTag()` but different schemas. Part of [#2540](https://github.com/Vincit/objection.js/issues/2540)
 - Fix `orderBy()` with refs and raws as array items [#2252](https://github.com/Vincit/objection.js/issues/2252)
 - Clear an `orderBy` added at build time, e.g. by a relation's `modify`, from the `resultSize()` and `page()` count query [#2747](https://github.com/Vincit/objection.js/issues/2747)
 - Support `Model.ref()` references in relation join mappings [#1873](https://github.com/Vincit/objection.js/issues/1873)
@@ -162,13 +163,13 @@ Objection is now maintained at [ditojs/objection](https://github.com/ditojs/obje
 ### Types
 
 - Fix `first()` infinite type recursion in custom query builder methods [#2637](https://github.com/Vincit/objection.js/issues/2637)
-- Keep nested relation data type-checked when inserting model data interfaces [#2190](https://github.com/Vincit/objection.js/issues/2190)
+- `PartialModelObject` accepts partial model data for nested relations, so inserting objects typed with data-only interfaces type-checks [#2190](https://github.com/Vincit/objection.js/issues/2190)
 - Keep custom query builder types after `throwIfNotFound()`
 - Add a `QueryBuilder` constructor typing for custom query builders [#2306](https://github.com/Vincit/objection.js/issues/2306)
-- Allow `null` and readonly arrays for `idColumn`, readonly arrays for `jsonAttributes` [#2693](https://github.com/Vincit/objection.js/issues/2693), [#2745](https://github.com/Vincit/objection.js/issues/2745)
+- Allow `null` and readonly arrays for `idColumn`, readonly arrays for `jsonAttributes`. Code that reads them needs to handle these types. Models without a primary key are supported at runtime since 3.4.0. [#2693](https://github.com/Vincit/objection.js/issues/2693), [#2745](https://github.com/Vincit/objection.js/issues/2745)
 - Allow `bigint` values in where methods [#2318](https://github.com/Vincit/objection.js/issues/2318)
-- Support object joins, `limit()` / `offset()` with `skipBinding`, and aliased aggregates [#2189](https://github.com/Vincit/objection.js/issues/2189)
-- Fix `tableNameFor()` and `tableRefFor()` return and argument types [#2790](https://github.com/Vincit/objection.js/pull/2790)
+- Support object joins, `limit()` / `offset()` with `skipBinding`, and aliased aggregates. Part of [#2189](https://github.com/Vincit/objection.js/issues/2189)
+- Fix the `tableNameFor()`, `tableRefFor()` and `aliasFor()` typings [#2790](https://github.com/Vincit/objection.js/pull/2790)
 - Add `knexIdentifierMapping` [#1947](https://github.com/Vincit/objection.js/issues/1947)
 - Add `tableName()`, `tableRef()` and `emptyInstance()` to `QueryBuilder` [#2792](https://github.com/Vincit/objection.js/pull/2792), [#2794](https://github.com/Vincit/objection.js/pull/2794)
 - Add the column list overload of `with()` [#2749](https://github.com/Vincit/objection.js/issues/2749)
@@ -185,7 +186,7 @@ Objection is now maintained at [ditojs/objection](https://github.com/ditojs/obje
 
 ### Other
 
-- Drop Node 14 from CI. Objection still supports it, but knex 3 requires Node 16+.
+- Drop Node 14 from CI, since knex 3 requires Node 16+. Objection's `engines` still include Node 14, but it's no longer tested.
 
 Thanks to everyone whose pull requests made it into this release: @amit-meshbey, @androvonx95, @bilalakbar, @Bolt4243, @cesumilo, @falkenhawk, @geeksilva97, @IlyaSemenov, @kapouer, @kartikdp, @LiahMartens, @max-kahnt-keylight, @nickbouldien, @nickfuryoc, @ralcorta and @salisbury-espinosa.
 
