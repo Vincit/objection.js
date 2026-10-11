@@ -216,6 +216,62 @@ module.exports = (session) => {
           expect(JobTag.getIdColumn()).to.equal(null);
         });
       }
+
+      describe('resultSize() with withGraphJoined()', () => {
+        class JobTag extends FieldJobTag {
+          static relationMappings = {
+            tag: {
+              relation: Model.BelongsToOneRelation,
+              modelClass: Tag,
+              join: {
+                from: 'job_tag.tag_id',
+                to: 'tag.id',
+              },
+            },
+
+            // The tags of the same job, including this one.
+            jobTags: {
+              relation: Model.HasManyRelation,
+              modelClass: FieldJobTag,
+              join: {
+                from: 'job_tag.job_id',
+                to: 'job_tag.job_id',
+              },
+            },
+          };
+        }
+
+        const query = () => JobTag.bindKnex(knex).query();
+
+        beforeEach(() => {
+          // Without a primary key, rows can be identical.
+          return knex('job_tag').insert([
+            { job_id: 1, tag_id: 1 },
+            { job_id: 1, tag_id: 1 },
+            { job_id: 1, tag_id: 2 },
+          ]);
+        });
+
+        it('should count the rows with to-one joins', async () => {
+          expect(await query().withGraphJoined('tag').resultSize()).to.equal(3);
+        });
+
+        it('should count no rows with to-one joins', async () => {
+          await knex('job_tag').delete();
+          expect(await query().withGraphJoined('tag').resultSize()).to.equal(0);
+        });
+
+        it('should throw a clear error with to-many joins', async () => {
+          // Each job tag joins all job tags of its job.
+          try {
+            await query().withGraphJoined('[tag, jobTags]').resultSize();
+          } catch (err) {
+            expect(err.message).to.equal('model JobTag has no idColumn');
+            return;
+          }
+          throw new Error('should not get here');
+        });
+      });
     });
   });
 };
