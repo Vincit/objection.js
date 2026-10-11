@@ -130,5 +130,51 @@ module.exports = (session) => {
         });
       });
     }
+
+    describe('column selections', () => {
+      let DataExtension;
+
+      before(() => {
+        DataExtension = class DataExtension extends Model {
+          static get tableName() {
+            return 'dataExtension';
+          }
+
+          static get relationMappings() {
+            return {
+              businessUnit: {
+                relation: Model.BelongsToOneRelation,
+                modelClass: BusinessUnit,
+                join: {
+                  from: 'dataExtension.businessUnitId',
+                  to: 'businessUnit.id',
+                },
+              },
+            };
+          }
+        };
+      });
+
+      for (const selection of [
+        'data_extension.business_unit_id',
+        'data_extension.business_unit_id as businessUnitId',
+      ]) {
+        it(`should keep the relation column of select('${selection}')`, async () => {
+          const [result] = await DataExtension.query(knex)
+            .select(selection)
+            .withGraphFetched('businessUnit');
+
+          expect(result.businessUnitId).to.equal(1);
+          expect(result.businessUnit.name).to.equal('Unit');
+        });
+
+        it(`should not select the relation column of select('${selection}') again`, () => {
+          const sql = (query) => query.toKnexQuery().toQuery();
+          const query = DataExtension.query(knex).select(selection);
+
+          expect(sql(query.clone().withGraphFetched('businessUnit'))).to.equal(sql(query));
+        });
+      }
+    });
   });
 };

@@ -2083,6 +2083,31 @@ module.exports = (session) => {
         expect(models.map((it) => it.model1Prop1)).to.eql(['hello 1']);
       });
 
+      it("should fail if the user's selections select other columns under the names of its columns", async () => {
+        const expectError = async (query, selection, alias, column) => {
+          const err = await query.withGraphJoined('model1Relation1').catch((err) => err);
+
+          expect(err.message).to.equal(
+            `withGraphJoined: the selection '${selection}' selects '${alias}', ` +
+              `the name under which the column '${column}' is selected. ` +
+              'Select it under a different name.',
+          );
+        };
+
+        await expectError(
+          Model1.query().select('*', ref('Model1.id').as('model1Prop1')),
+          'Model1.id as model1Prop1',
+          'model1Prop1',
+          'Model1.model1Prop1',
+        );
+        await expectError(
+          Model1.query().select('Model1.*', 'model1Relation1.id'),
+          'model1Relation1.id',
+          'id',
+          'Model1.id',
+        );
+      });
+
       // Disabled for sqlite because it doesn't have `concat` function :)
       if (!session.isSqlite()) {
         it('select * + raw should work', () => {

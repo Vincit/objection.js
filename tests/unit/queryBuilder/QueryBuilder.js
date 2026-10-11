@@ -5334,6 +5334,179 @@ describe('QueryBuilder', () => {
     });
   });
 
+  describe('user selections named like the columns of withGraphJoined()', () => {
+    let Person;
+    let Animal;
+
+    beforeEach(() => {
+      Person = class Person extends Model {
+        static get tableName() {
+          return 'Person';
+        }
+
+        static tableMetadata() {
+          return { columns: ['id', 'name'] };
+        }
+
+        static get relationMappings() {
+          return {
+            pets: {
+              relation: Model.HasManyRelation,
+              modelClass: Animal,
+              join: { from: 'Person.id', to: 'Animal.ownerId' },
+            },
+          };
+        }
+      };
+
+      Animal = class Animal extends Model {
+        static get tableName() {
+          return 'Animal';
+        }
+
+        static tableMetadata() {
+          return { columns: ['id', 'name', 'ownerId'] };
+        }
+      };
+
+      Person.knex(mockKnex);
+    });
+
+    const expectError = (query, selection, alias, column) =>
+      expect(() => query.withGraphJoined('pets').toKnexQuery()).to.throwException((err) => {
+        expect(err.message).to.equal(
+          `withGraphJoined: the selection '${selection}' selects '${alias}', ` +
+            `the name under which the column '${column}' is selected. ` +
+            'Select it under a different name.',
+        );
+      });
+
+    it('should throw if the user selects other columns under the names of its columns', () => {
+      expectError(
+        Person.query().select('*', ref('Person.id').as('name')),
+        'Person.id as name',
+        'name',
+        'Person.name',
+      );
+      expectError(Person.query().select('*', 'pets.name'), 'pets.name', 'name', 'Person.name');
+      expectError(
+        Person.query().select('*', ref('Person.id').as('pets:name')),
+        'Person.id as pets:name',
+        'pets:name',
+        'pets.name',
+      );
+    });
+
+    it('should throw if the user selects other columns under the names of the ids', () => {
+      expectError(Person.query().select('Person.*', 'pets.id'), 'pets.id', 'id', 'Person.id');
+      expectError(Person.query().select('pets.id'), 'pets.id', 'id', 'Person.id');
+      expectError(
+        Person.query().select('*', 'Person.name as id'),
+        'Person.name as id',
+        'id',
+        'Person.id',
+      );
+      expectError(Person.query().select('pets.*'), 'pets.*', 'id', 'Person.id');
+      expectError(
+        Person.query().select('*', ref('Person.id').as('pets:id')),
+        'Person.id as pets:id',
+        'pets:id',
+        'pets.id',
+      );
+    });
+
+    it('should throw if the user selects raws, subqueries or aggregates under the names of the ids', () => {
+      const expectIdError = (query, name, column) =>
+        expect(() => query.withGraphJoined('pets').toKnexQuery()).to.throwException((err) => {
+          expect(err.message).to.equal(
+            `withGraphJoined: a raw, subquery or aggregate selection selects '${name}', ` +
+              `the name under which the id column '${column}' is selected. ` +
+              'Select it under a different name, or select the id column itself.',
+          );
+        });
+
+      expectIdError(
+        Person.query().select('*', raw('?? as ??', ['Person.id', 'id'])),
+        'id',
+        'Person.id',
+      );
+      expectIdError(Person.query().select(raw('??', ['Person.id']).as('id')), 'id', 'Person.id');
+      expectIdError(
+        Person.query().select('*', Animal.query().max('id').as('id')),
+        'id',
+        'Person.id',
+      );
+      expectIdError(Person.query().select('*').max('pets.id as pets:id'), 'pets:id', 'pets.id');
+    });
+
+    it('should let raws, subqueries and aggregates replace its columns', () => {
+      const sql = (query) => query.withGraphJoined('pets').toKnexQuery().toString();
+      const expected = (selection) =>
+        `select ${selection}, "Person"."id" as "id", "pets"."id" as "pets:id", "pets"."name" as "pets:name", "pets"."ownerId" as "pets:ownerId" ` +
+        'from "Person" left join "Animal" as "pets" on "pets"."ownerId" = "Person"."id"';
+
+      expect(
+        sql(Person.query().select('*', raw('upper(??) as ??', ['Person.name', 'name']))),
+      ).to.equal(expected('upper("Person"."name") as "name"'));
+      expect(sql(Person.query().select('*', raw('upper(??)', 'Person.name').as('name')))).to.equal(
+        expected('upper("Person"."name") as "name"'),
+      );
+      expect(sql(Person.query().select('*', Animal.query().max('name').as('name')))).to.equal(
+        expected('(select max("name") from "Animal") as "name"'),
+      );
+      expect(sql(Person.query().select('*').max('pets.name as name'))).to.equal(
+        expected('max("pets"."name") as "name"'),
+      );
+    });
+
+    it('should compare the names after mapping the identifiers', () => {
+      const knex = Knex({ client: 'pg', ...objection.knexSnakeCaseMappers() });
+
+      class Owner extends Person {
+        static tableMetadata() {
+          return { columns: ['id', 'firstName', 'ownerId'] };
+        }
+      }
+
+      expectError(
+        Owner.query(knex).select('*', ref('pets.name').as('first_name')),
+        'pets.name as first_name',
+        'first_name',
+        'Person.firstName',
+      );
+      expectError(
+        Owner.query(knex).select('*', 'pets.owner_id'),
+        'pets.owner_id',
+        'owner_id',
+        'Person.ownerId',
+      );
+      expect(
+        Owner.query(knex)
+          .select('*', 'Person.first_name')
+          .withGraphJoined('pets')
+          .toKnexQuery()
+          .toString(),
+      ).to.equal(
+        'select "person"."first_name", "person"."id" as "id", "person"."owner_id" as "owner_id", "pets"."id" as "pets:id", "pets"."name" as "pets:name", "pets"."owner_id" as "pets:owner_id" ' +
+          'from "person" left join "animal" as "pets" on "pets"."owner_id" = "person"."id"',
+      );
+    });
+
+    // Regression guard for selecting the same columns as `withGraphJoined()`:
+    it('should select the columns that the user selects only once', () => {
+      const sql = Person.query()
+        .select('id', 'Person.name', 'pets.id as pets:id')
+        .withGraphJoined('pets')
+        .toKnexQuery()
+        .toString();
+
+      expect(sql).to.equal(
+        'select "id", "Person"."name", "pets"."id" as "pets:id", "pets"."name" as "pets:name", "pets"."ownerId" as "pets:ownerId" ' +
+          'from "Person" left join "Animal" as "pets" on "pets"."ownerId" = "Person"."id"',
+      );
+    });
+  });
+
   describe('onConflict() with graph inserts (#2156)', () => {
     let Person;
 
