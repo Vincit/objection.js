@@ -4307,6 +4307,15 @@ describe('QueryBuilder', () => {
         );
       });
 
+      it('should not mistake inherited object properties for loaded relations', () => {
+        const builder = Person.query()
+          .withGraphJoined('pets')
+          .withGraphFetched('movies')
+          .withGraph('constructor');
+
+        expect(relationsOf(builder)).to.eql({ join: ['pets'], fetch: ['movies', 'constructor'] });
+      });
+
       it('should still throw for contradicting explicit algorithms', () => {
         expect(() => {
           Person.query().withGraphJoined('pets').withGraph('pets', { algorithm: 'fetch' });

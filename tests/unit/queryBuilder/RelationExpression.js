@@ -1153,6 +1153,60 @@ describe('RelationExpression', () => {
     testMerge('a.b(f)', 'a.b(g)', 'a.b(f, g)');
   });
 
+  describe('inherited object properties (#63)', () => {
+    it("shouldn't be mistaken for relations when parsing", () => {
+      const warnings = [];
+      const originalWarn = console.warn;
+      console.warn = (message) => warnings.push(message);
+
+      try {
+        expect(RelationExpression.create('constructor').toString()).to.equal('constructor');
+        expect(RelationExpression.create('[constructor, toString]').toString()).to.equal(
+          '[constructor, toString]',
+        );
+      } finally {
+        console.warn = originalWarn;
+      }
+
+      expect(warnings).to.eql([]);
+    });
+
+    it("shouldn't be returned as child expressions", () => {
+      const expression = RelationExpression.create('a');
+
+      expect(expression.childExpression('constructor')).to.equal(null);
+      expect(expression.childExpression('toString')).to.equal(null);
+      expect(expression.childExpression('a')).to.be.a(RelationExpression);
+    });
+
+    it("shouldn't be mistaken for relations of model graphs", () => {
+      const { Model } = require('../../../');
+
+      class Item extends Model {
+        static get tableName() {
+          return 'Item';
+        }
+
+        static get relationMappings() {
+          return {
+            toString: {
+              relation: Model.HasManyRelation,
+              modelClass: Item,
+              join: { from: 'Item.id', to: 'Item.parentId' },
+            },
+          };
+        }
+      }
+
+      const child = Item.fromJson({ id: 2 });
+      child.toString = [];
+      const item = Item.fromJson({ id: 1 });
+      item.toString = [child];
+
+      expect(RelationExpression.fromModelGraph(item).toString()).to.equal('toString.toString');
+    });
+  });
+
   describe('#toString', () => {
     testToString('a');
     testToString('a.b');
