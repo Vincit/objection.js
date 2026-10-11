@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.8.1
+
+### Fixes
+
+- `upsertGraph()` replacing the row of a `BelongsToOneRelation`, e.g. `{ id: 1, pet: { id: 2 } }`, points the owner to the new row before it deletes the old one. Before, the old row was deleted first: with a `NOT NULL` foreign key and `ON DELETE CASCADE`, the database deleted the owner and `upsertGraph()` still succeeded, and foreign keys without `ON DELETE` action failed. Removing the row with `pet: null` still deletes it first and leaves the owner's reference to the database.
+
 ## 3.8.0
 
 ### What's new

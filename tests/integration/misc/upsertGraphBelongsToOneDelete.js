@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const { Model } = require('../../../');
+const { Model, ForeignKeyViolationError } = require('../../../');
 
 module.exports = (session) => {
   describe('upsertGraph() deleting the row of a BelongsToOneRelation', () => {
@@ -38,6 +38,25 @@ module.exports = (session) => {
           table.integer('id').primary();
           createPetId(table);
         });
+    }
+
+    // Replacing the row first points the owner to the new row and then
+    // deletes the old one, so it works with every foreign key.
+    function itShouldReplaceTheRow() {
+      it('should point the owner to an inserted row and delete the old one', async () => {
+        await Owner.query().upsertGraph({ id: 1, pet: { id: 2 } }, { insertMissing: true });
+
+        expect(await knex('bt1_delete_owner')).to.eql([{ id: 1, petId: 2 }]);
+        expect(await knex('bt1_delete_pet')).to.eql([{ id: 2 }]);
+      });
+
+      it('should point the owner to a related row and delete the old one', async () => {
+        await knex('bt1_delete_pet').insert({ id: 2 });
+        await Owner.query().upsertGraph({ id: 1, pet: { id: 2 } }, { relate: true });
+
+        expect(await knex('bt1_delete_owner')).to.eql([{ id: 1, petId: 2 }]);
+        expect(await knex('bt1_delete_pet')).to.eql([{ id: 2 }]);
+      });
     }
 
     before(() => {
@@ -83,6 +102,8 @@ module.exports = (session) => {
         expect(await knex('bt1_delete_owner')).to.eql([{ id: 1, petId: null }]);
         expect(await knex('bt1_delete_pet')).to.eql([]);
       });
+
+      itShouldReplaceTheRow();
     });
 
     describe('with a NOT NULL reference and ON DELETE CASCADE', () => {
@@ -98,6 +119,28 @@ module.exports = (session) => {
         expect(await knex('bt1_delete_owner')).to.eql([]);
         expect(await knex('bt1_delete_pet')).to.eql([]);
       });
+
+      itShouldReplaceTheRow();
+    });
+
+    describe('with a reference without ON DELETE action', () => {
+      before(() => {
+        return createTables((table) => {
+          table.integer('petId').references('bt1_delete_pet.id');
+        });
+      });
+
+      it('should fail to delete the referenced row', async () => {
+        const error = await Owner.query()
+          .upsertGraph({ id: 1, pet: null })
+          .catch((err) => err);
+
+        expect(error).to.be.an.instanceof(ForeignKeyViolationError);
+        expect(await knex('bt1_delete_owner')).to.eql([{ id: 1, petId: 1 }]);
+        expect(await knex('bt1_delete_pet')).to.eql([{ id: 1 }]);
+      });
+
+      itShouldReplaceTheRow();
     });
   });
 };
