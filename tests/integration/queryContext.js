@@ -977,7 +977,7 @@ module.exports = (session) => {
                 .then(() => {
                   expect(mockKnex.executedQueries).to.eql(queries);
                   expect(mockKnex.executedQueries).to.eql([
-                    `delete from \"public\".\"Model1Model2\" where (\"Model1Model2\".\"tableoid\",\"Model1Model2\".\"ctid\") in (select \"Model1Model2\".\"tableoid\", \"Model1Model2\".\"ctid\" from \"public\".\"Model1\" inner join \"public\".\"Model1Model2\" on \"Model1\".\"id\" = \"Model1Model2\".\"model1Id\" where \"Model1Model2\".\"model2Id\" in (1) and \"Model1\".\"id\" = 4) and \"Model1Model2\".\"model2Id\" in (1)`,
+                    `delete from \"public\".\"Model1Model2\" where \"Model1Model2\".\"model2Id\" in (1) and exists (select 1 from \"public\".\"Model1\" where \"Model1\".\"id\" = \"Model1Model2\".\"model1Id\" and \"Model1\".\"id\" = 4)`,
                   ]);
 
                   return session.knex('Model1Model2');

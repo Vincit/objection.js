@@ -350,7 +350,7 @@ describe('relation owner condition grouping (#2191)', () => {
       await owner().$relatedQuery('toys').where('name', 'a').orWhere('name', 'b').unrelate();
 
       expect(executedQueries).to.eql([
-        `delete from "ownersToys" where ("ownersToys"."tableoid","ownersToys"."ctid") in (select "ownersToys"."tableoid", "ownersToys"."ctid" from "toys" inner join "ownersToys" on "toys"."id" = "ownersToys"."toyId" where "ownersToys"."ownerId" in (1) and ("name" = 'a' or "name" = 'b')) and "ownersToys"."ownerId" in (1)`,
+        `delete from "ownersToys" where "ownersToys"."ownerId" in (1) and exists (select 1 from "toys" where "toys"."id" = "ownersToys"."toyId" and ("name" = 'a' or "name" = 'b'))`,
       ]);
     });
 
@@ -364,7 +364,7 @@ describe('relation owner condition grouping (#2191)', () => {
       await owner().$relatedQuery('filteredToys').unrelate();
 
       expect(executedQueries).to.eql([
-        `delete from "ownersToys" where ("ownersToys"."tableoid","ownersToys"."ctid") in (select "ownersToys"."tableoid", "ownersToys"."ctid" from "toys" inner join (select "ownersToys".* from "ownersToys" where "shared" = false or "primary" = true) as "ownersToys" on "toys"."id" = "ownersToys"."toyId" where "ownersToys"."ownerId" in (1) and ("color" = 'red' or "color" = 'blue')) and "ownersToys"."ownerId" in (1) and ("shared" = false or "primary" = true)`,
+        `delete from "ownersToys" where "ownersToys"."ownerId" in (1) and exists (select 1 from "toys" where "toys"."id" = "ownersToys"."toyId" and ("color" = 'red' or "color" = 'blue')) and ("shared" = false or "primary" = true)`,
       ]);
     });
   });

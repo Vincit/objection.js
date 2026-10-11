@@ -1629,7 +1629,7 @@ describe('ManyToManyRelation', () => {
         expect(executedQueries[0]).to.equal(builder.toKnexQuery().toString());
         expect(executedQueries[0]).to.equal(builder.toKnexQuery().toString());
         expect(executedQueries[0]).to.eql(
-          `delete from "JoinModel" where ("JoinModel"."tableoid","JoinModel"."ctid") in (select "JoinModel"."tableoid", "JoinModel"."ctid" from "RelatedModel" inner join "JoinModel" on "RelatedModel"."rid" = "JoinModel"."relatedId" where "JoinModel"."ownerId" in (666) and "someColumn" = 100 and "code" in (55, 66, 77)) and "JoinModel"."ownerId" in (666)`,
+          `delete from "JoinModel" where "JoinModel"."ownerId" in (666) and exists (select 1 from "RelatedModel" where "RelatedModel"."rid" = "JoinModel"."relatedId" and "someColumn" = 100 and "code" in (55, 66, 77))`,
         );
       });
     });
@@ -1652,7 +1652,7 @@ describe('ManyToManyRelation', () => {
         expect(executedQueries[0]).to.equal(builder.toKnexQuery().toString());
         expect(executedQueries[0]).to.equal(builder.toKnexQuery().toString());
         expect(executedQueries[0]).to.eql(
-          `delete from "JoinModel" where ("JoinModel"."tableoid","JoinModel"."ctid") in (select "JoinModel"."tableoid", "JoinModel"."ctid" from "RelatedModel" inner join "JoinModel" on "RelatedModel"."cid" = "JoinModel"."relatedCId" and "RelatedModel"."did" = "JoinModel"."relatedDId" where ("JoinModel"."ownerAId", "JoinModel"."ownerBId") in ((11, 22)) and "code" in (55, 66, 77) and "someColumn" = 100) and ("JoinModel"."ownerAId", "JoinModel"."ownerBId") in ((11, 22))`,
+          `delete from "JoinModel" where ("JoinModel"."ownerAId", "JoinModel"."ownerBId") in ((11, 22)) and exists (select 1 from "RelatedModel" where "RelatedModel"."cid" = "JoinModel"."relatedCId" and "RelatedModel"."did" = "JoinModel"."relatedDId" and "code" in (55, 66, 77) and "someColumn" = 100)`,
         );
       });
     });
@@ -1670,10 +1670,9 @@ describe('ManyToManyRelation', () => {
         .where('JoinModel.extra1', 'foo')
         .then((result) => {
           expect(result).to.equal(1);
-          // Only the join rows that match the filters themselves are deleted,
-          // identified by their row id.
+          // Only the join rows that match the filters themselves are deleted.
           expect(executedQueries).to.eql([
-            `delete from "JoinModel" where ("JoinModel"."tableoid","JoinModel"."ctid") in (select "JoinModel"."tableoid", "JoinModel"."ctid" from "RelatedModel" inner join "JoinModel" on "RelatedModel"."rid" = "JoinModel"."relatedId" where "JoinModel"."ownerId" in (666) and "RelatedModel"."code" = 55 and "JoinModel"."extra1" = 'foo') and "JoinModel"."ownerId" in (666)`,
+            `delete from "JoinModel" where "JoinModel"."ownerId" in (666) and exists (select 1 from "RelatedModel" where "RelatedModel"."rid" = "JoinModel"."relatedId" and "RelatedModel"."code" = 55 and "JoinModel"."extra1" = 'foo')`,
           ]);
         });
     });
@@ -1691,7 +1690,7 @@ describe('ManyToManyRelation', () => {
         .where('jm.extra1', 'foo')
         .then(() => {
           expect(executedQueries).to.eql([
-            `delete from "JoinModel" as "jm" where ("jm"."tableoid","jm"."ctid") in (select "jm"."tableoid", "jm"."ctid" from "RelatedModel" inner join "JoinModel" as "jm" on "RelatedModel"."rid" = "jm"."relatedId" where "jm"."ownerId" in (666) and "jm"."extra1" = 'foo') and "jm"."ownerId" in (666)`,
+            `delete from "JoinModel" as "jm" where "jm"."ownerId" in (666) and exists (select 1 from "RelatedModel" where "RelatedModel"."rid" = "jm"."relatedId" and "jm"."extra1" = 'foo')`,
           ]);
         });
     });
@@ -1713,7 +1712,7 @@ describe('ManyToManyRelation', () => {
           expect(result).to.equal(1);
           expect(executedQueries).to.eql([
             `update "RelatedModel" set "a" = 'str1' where "RelatedModel"."id" in (select "RelatedModel"."id" from "RelatedModel" inner join "JoinModel" on "RelatedModel"."rid" = "JoinModel"."relatedId" where "JoinModel"."ownerId" in (666) and "RelatedModel"."code" = 55 and "JoinModel"."extra1" = 'foo')`,
-            `update "JoinModel" set "extra2" = 'extraVal' where ("JoinModel"."tableoid","JoinModel"."ctid") in (select "JoinModel"."tableoid", "JoinModel"."ctid" from "RelatedModel" inner join "JoinModel" on "RelatedModel"."rid" = "JoinModel"."relatedId" where "JoinModel"."ownerId" in (666) and "RelatedModel"."code" = 55 and "JoinModel"."extra1" = 'foo') and "JoinModel"."ownerId" in (666)`,
+            `update "JoinModel" set "extra2" = 'extraVal' where "JoinModel"."ownerId" in (666) and exists (select 1 from "RelatedModel" where "RelatedModel"."rid" = "JoinModel"."relatedId" and "RelatedModel"."code" = 55 and "JoinModel"."extra1" = 'foo')`,
           ]);
         });
     });
@@ -1730,7 +1729,7 @@ describe('ManyToManyRelation', () => {
         .where('RelatedModel.code', 55)
         .then(() => {
           expect(executedQueries).to.eql([
-            `update "JoinModel" set "extra2" = 'extraVal' where ("JoinModel"."tableoid","JoinModel"."ctid") in (select "JoinModel"."tableoid", "JoinModel"."ctid" from "RelatedModel" inner join "JoinModel" on "RelatedModel"."rid" = "JoinModel"."relatedId" where "JoinModel"."ownerId" in (666) and "RelatedModel"."code" = 55) and "JoinModel"."ownerId" in (666)`,
+            `update "JoinModel" set "extra2" = 'extraVal' where "JoinModel"."ownerId" in (666) and exists (select 1 from "RelatedModel" where "RelatedModel"."rid" = "JoinModel"."relatedId" and "RelatedModel"."code" = 55)`,
           ]);
         });
     });
@@ -1741,36 +1740,41 @@ describe('ManyToManyRelation', () => {
       useClient('mysql');
     });
 
-    it('unrelate should fetch the join rows and delete them by all their columns', () => {
-      mockKnexQueryResults = [
-        [
-          { id: 1, ownerId: 666, relatedId: 5 },
-          { id: 2, ownerId: 666, relatedId: 6 },
-        ],
-        2,
-      ];
+    function unrelate(builder) {
       let owner = OwnerModel.fromJson({ oid: 666 });
 
-      return QueryBuilder.forClass(RelatedModel)
+      return builder
         .unrelateOperationFactory((builder) => {
           return relation.unrelate(builder, RelationOwner.create(owner));
         })
-        .unrelate()
+        .unrelate();
+    }
+
+    it('unrelate should fetch the keys of the join rows first', () => {
+      mockKnexQueryResults = [
+        [
+          { ownerId: 666, relatedId: 5 },
+          { ownerId: 666, relatedId: 6 },
+        ],
+        2,
+      ];
+
+      return unrelate(QueryBuilder.forClass(RelatedModel))
         .whereIn('code', [55, 66, 77])
         .then((result) => {
           expect(result).to.equal(2);
           expect(executedQueries).to.eql([
-            'select `JoinModel`.* from `RelatedModel` inner join `JoinModel` on `RelatedModel`.`rid` = `JoinModel`.`relatedId` where `JoinModel`.`ownerId` in (666) and `code` in (55, 66, 77)',
-            'delete from `JoinModel` where ((`JoinModel`.`id` <=> 1 and `JoinModel`.`ownerId` <=> 666 and `JoinModel`.`relatedId` <=> 5) or (`JoinModel`.`id` <=> 2 and `JoinModel`.`ownerId` <=> 666 and `JoinModel`.`relatedId` <=> 6)) and `JoinModel`.`ownerId` in (666)',
+            'select `JoinModel`.`ownerId`, `JoinModel`.`relatedId` from `JoinModel` where `JoinModel`.`ownerId` in (666) and exists (select 1 from `RelatedModel` where `RelatedModel`.`rid` = `JoinModel`.`relatedId` and `code` in (55, 66, 77))',
+            'delete from `JoinModel` where `JoinModel`.`ownerId` in (666) and (`JoinModel`.`ownerId`, `JoinModel`.`relatedId`) in ((666, 5), (666, 6))',
           ]);
         });
     });
 
-    it('unrelate should match null values of the join rows', () => {
+    it('unrelate should fetch the keys of the join rows first with composite keys', () => {
       mockKnexQueryResults = [
         [
           { ownerAId: 11, ownerBId: 22, relatedCId: 1, relatedDId: 2 },
-          { ownerAId: 11, ownerBId: 22, relatedCId: 3, relatedDId: null },
+          { ownerAId: 11, ownerBId: 22, relatedCId: 3, relatedDId: 4 },
         ],
         2,
       ];
@@ -1785,33 +1789,27 @@ describe('ManyToManyRelation', () => {
         .then((result) => {
           expect(result).to.equal(2);
           expect(executedQueries).to.eql([
-            'select `JoinModel`.* from `RelatedModel` inner join `JoinModel` on `RelatedModel`.`cid` = `JoinModel`.`relatedCId` and `RelatedModel`.`did` = `JoinModel`.`relatedDId` where (`JoinModel`.`ownerAId`, `JoinModel`.`ownerBId`) in ((11, 22)) and `someColumn` = 100',
-            'delete from `JoinModel` where ((`JoinModel`.`ownerAId` <=> 11 and `JoinModel`.`ownerBId` <=> 22 and `JoinModel`.`relatedCId` <=> 1 and `JoinModel`.`relatedDId` <=> 2) or (`JoinModel`.`ownerAId` <=> 11 and `JoinModel`.`ownerBId` <=> 22 and `JoinModel`.`relatedCId` <=> 3 and `JoinModel`.`relatedDId` <=> NULL)) and (`JoinModel`.`ownerAId`, `JoinModel`.`ownerBId`) in ((11, 22))',
+            'select `JoinModel`.`ownerAId`, `JoinModel`.`ownerBId`, `JoinModel`.`relatedCId`, `JoinModel`.`relatedDId` from `JoinModel` where (`JoinModel`.`ownerAId`, `JoinModel`.`ownerBId`) in ((11, 22)) and exists (select 1 from `RelatedModel` where `RelatedModel`.`cid` = `JoinModel`.`relatedCId` and `RelatedModel`.`did` = `JoinModel`.`relatedDId` and `someColumn` = 100)',
+            'delete from `JoinModel` where (`JoinModel`.`ownerAId`, `JoinModel`.`ownerBId`) in ((11, 22)) and (`JoinModel`.`ownerAId`, `JoinModel`.`ownerBId`, `JoinModel`.`relatedCId`, `JoinModel`.`relatedDId`) in ((11, 22, 1, 2), (11, 22, 3, 4))',
           ]);
         });
     });
 
     it('unrelate should return the count of the delete query if no join rows match', () => {
       mockKnexQueryResults = [[], 0];
-      let owner = OwnerModel.fromJson({ oid: 666 });
 
-      return QueryBuilder.forClass(RelatedModel)
-        .unrelateOperationFactory((builder) => {
-          return relation.unrelate(builder, RelationOwner.create(owner));
-        })
-        .unrelate()
+      return unrelate(QueryBuilder.forClass(RelatedModel))
         .where('code', 55)
         .then((result) => {
           expect(result).to.equal(0);
-          expect(executedQueries).to.eql([
-            'select `JoinModel`.* from `RelatedModel` inner join `JoinModel` on `RelatedModel`.`rid` = `JoinModel`.`relatedId` where `JoinModel`.`ownerId` in (666) and `code` = 55',
-            'delete from `JoinModel` where 1 = 0 and `JoinModel`.`ownerId` in (666)',
+          expect(executedQueries.slice(1)).to.eql([
+            'delete from `JoinModel` where `JoinModel`.`ownerId` in (666) and 1 = 0',
           ]);
         });
     });
 
-    it('patch should fetch the join rows before patching their extras', () => {
-      mockKnexQueryResults = [1, [{ id: 3, ownerId: 666, relatedId: 5, extra1: 'foo' }], 1];
+    it('patch should fetch the keys of the join rows first', () => {
+      mockKnexQueryResults = [1, [{ ownerId: 666, relatedId: 5 }], 1];
       let owner = OwnerModel.fromJson({ oid: 666 });
 
       return QueryBuilder.forClass(RelatedModel)
@@ -1824,25 +1822,9 @@ describe('ManyToManyRelation', () => {
           expect(result).to.equal(1);
           expect(executedQueries).to.eql([
             "update `RelatedModel` set `a` = 'str1' where `RelatedModel`.`id` in (select * from (select `RelatedModel`.`id` from `RelatedModel` inner join `JoinModel` on `RelatedModel`.`rid` = `JoinModel`.`relatedId` where `JoinModel`.`ownerId` in (666) and `code` = 55) as `mysql_subquery_fix`)",
-            'select `JoinModel`.* from `RelatedModel` inner join `JoinModel` on `RelatedModel`.`rid` = `JoinModel`.`relatedId` where `JoinModel`.`ownerId` in (666) and `code` = 55',
-            "update `JoinModel` set `extra2` = 'extraVal' where ((`JoinModel`.`id` <=> 3 and `JoinModel`.`ownerId` <=> 666 and `JoinModel`.`relatedId` <=> 5 and `JoinModel`.`extra1` <=> 'foo')) and `JoinModel`.`ownerId` in (666)",
+            'select `JoinModel`.`ownerId`, `JoinModel`.`relatedId` from `JoinModel` where `JoinModel`.`ownerId` in (666) and exists (select 1 from `RelatedModel` where `RelatedModel`.`rid` = `JoinModel`.`relatedId` and `code` = 55)',
+            "update `JoinModel` set `extra2` = 'extraVal' where `JoinModel`.`ownerId` in (666) and (`JoinModel`.`ownerId`, `JoinModel`.`relatedId`) in ((666, 5))",
           ]);
-        });
-    });
-
-    it('unrelate should compare parsed JSON values as strings', () => {
-      mockKnexQueryResults = [[{ ownerId: 666, relatedId: 5, data: { a: 1 } }], 1];
-      let owner = OwnerModel.fromJson({ oid: 666 });
-
-      return QueryBuilder.forClass(RelatedModel)
-        .unrelateOperationFactory((builder) => {
-          return relation.unrelate(builder, RelationOwner.create(owner));
-        })
-        .unrelate()
-        .then(() => {
-          expect(executedQueries[1]).to.equal(
-            'delete from `JoinModel` where ((`JoinModel`.`ownerId` <=> 666 and `JoinModel`.`relatedId` <=> 5 and `JoinModel`.`data` <=> \'{\\"a\\":1}\')) and `JoinModel`.`ownerId` in (666)',
-          );
         });
     });
 
@@ -1865,14 +1847,9 @@ describe('ManyToManyRelation', () => {
     });
 
     it('unrelate should support joins with subqueries', () => {
-      mockKnexQueryResults = [[{ id: 4, ownerId: 666, relatedId: 5 }], 1];
-      let owner = OwnerModel.fromJson({ oid: 666 });
+      mockKnexQueryResults = [[{ ownerId: 666, relatedId: 5 }], 1];
 
-      return QueryBuilder.forClass(RelatedModel)
-        .unrelateOperationFactory((builder) => {
-          return relation.unrelate(builder, RelationOwner.create(owner));
-        })
-        .unrelate()
+      return unrelate(QueryBuilder.forClass(RelatedModel))
         .join('Other', (join) => {
           join
             .on('Other.id', 'RelatedModel.otherId')
@@ -1881,8 +1858,49 @@ describe('ManyToManyRelation', () => {
         .then((result) => {
           expect(result).to.equal(1);
           expect(executedQueries).to.eql([
-            'select `JoinModel`.* from `RelatedModel` inner join `JoinModel` on `RelatedModel`.`rid` = `JoinModel`.`relatedId` inner join `Other` on `Other`.`id` = `RelatedModel`.`otherId` and `Other`.`code` in (select `code` from `OwnerModel`) where `JoinModel`.`ownerId` in (666)',
-            'delete from `JoinModel` where ((`JoinModel`.`id` <=> 4 and `JoinModel`.`ownerId` <=> 666 and `JoinModel`.`relatedId` <=> 5)) and `JoinModel`.`ownerId` in (666)',
+            'select `JoinModel`.`ownerId`, `JoinModel`.`relatedId` from `JoinModel` where `JoinModel`.`ownerId` in (666) and exists (select 1 from `RelatedModel` inner join `Other` on `Other`.`id` = `RelatedModel`.`otherId` and `Other`.`code` in (select `code` from `OwnerModel`) where `RelatedModel`.`rid` = `JoinModel`.`relatedId`)',
+            'delete from `JoinModel` where `JoinModel`.`ownerId` in (666) and (`JoinModel`.`ownerId`, `JoinModel`.`relatedId`) in ((666, 5))',
+          ]);
+        });
+    });
+  });
+
+  describe('mssql', () => {
+    beforeEach(() => {
+      useClient('mssql');
+    });
+
+    it('unrelate should select the related rows of the join rows', () => {
+      mockKnexQueryResults = [2];
+      let owner = OwnerModel.fromJson({ aid: 11, bid: 22 });
+
+      return QueryBuilder.forClass(RelatedModel)
+        .unrelateOperationFactory((builder) => {
+          return compositeKeyRelation.unrelate(builder, RelationOwner.create(owner));
+        })
+        .unrelate()
+        .where('JoinModel.extra1', 'foo')
+        .orWhere('code', 55)
+        .then(() => {
+          expect(executedQueries).to.eql([
+            "delete from [JoinModel] where exists (select * from (VALUES (11,22)) AS V([objectiontmpjoin0],[objectiontmpjoin1]) where [objectiontmpjoin0] = [JoinModel].[ownerAId] and [objectiontmpjoin1] = [JoinModel].[ownerBId]) and exists (select 1 from [RelatedModel] where [RelatedModel].[cid] = [JoinModel].[relatedCId] and [RelatedModel].[did] = [JoinModel].[relatedDId] and ([JoinModel].[extra1] = 'foo' or [code] = 55));select @@rowcount",
+          ]);
+        });
+    });
+
+    it('patch should select the related rows of the join rows', () => {
+      mockKnexQueryResults = [1, 1];
+      let owner = OwnerModel.fromJson({ oid: 666 });
+
+      return QueryBuilder.forClass(RelatedModel)
+        .patchOperationFactory((builder) => {
+          return relation.patch(builder, RelationOwner.create(owner));
+        })
+        .patch({ extra2: 'extraVal' })
+        .where('code', 55)
+        .then(() => {
+          expect(executedQueries).to.eql([
+            "update [JoinModel] set [extra2] = 'extraVal' where [JoinModel].[ownerId] in (666) and exists (select 1 from [RelatedModel] where [RelatedModel].[rid] = [JoinModel].[relatedId] and [code] = 55);select @@rowcount",
           ]);
         });
     });
@@ -1893,7 +1911,7 @@ describe('ManyToManyRelation', () => {
       useClient('sqlite3');
     });
 
-    it('unrelate should use the join table row ids', () => {
+    it('unrelate should select the related rows of the join rows', () => {
       mockKnexQueryResults = [2];
       let owner = OwnerModel.fromJson({ oid: 666 });
 
@@ -1906,12 +1924,12 @@ describe('ManyToManyRelation', () => {
         .then((result) => {
           expect(result).to.equal(2);
           expect(executedQueries).to.eql([
-            'delete from `JoinModel` where `JoinModel`.`_rowid_` in (select `JoinModel`.`_rowid_` from `RelatedModel` inner join `JoinModel` on `RelatedModel`.`rid` = `JoinModel`.`relatedId` where `JoinModel`.`ownerId` in (666) and `code` in (55, 66, 77)) and `JoinModel`.`ownerId` in (666)',
+            'delete from `JoinModel` where `JoinModel`.`ownerId` in (666) and exists (select 1 from `RelatedModel` where `RelatedModel`.`rid` = `JoinModel`.`relatedId` and `code` in (55, 66, 77))',
           ]);
         });
     });
 
-    it('patch should use the join table row ids for the join table extras', () => {
+    it('patch should use the related table row ids', () => {
       mockKnexQueryResults = [1, 1];
       let owner = OwnerModel.fromJson({ oid: 666 });
 
@@ -1925,7 +1943,7 @@ describe('ManyToManyRelation', () => {
           expect(result).to.equal(1);
           expect(executedQueries).to.eql([
             "update `RelatedModel` set `a` = 'str1' where `RelatedModel`.`_rowid_` in (select `RelatedModel`.`_rowid_` from `RelatedModel` inner join `JoinModel` on `RelatedModel`.`rid` = `JoinModel`.`relatedId` where `JoinModel`.`ownerId` in (666) and `code` = 55)",
-            "update `JoinModel` set `extra2` = 'extraVal' where `JoinModel`.`_rowid_` in (select `JoinModel`.`_rowid_` from `RelatedModel` inner join `JoinModel` on `RelatedModel`.`rid` = `JoinModel`.`relatedId` where `JoinModel`.`ownerId` in (666) and `code` = 55) and `JoinModel`.`ownerId` in (666)",
+            "update `JoinModel` set `extra2` = 'extraVal' where `JoinModel`.`ownerId` in (666) and exists (select 1 from `RelatedModel` where `RelatedModel`.`rid` = `JoinModel`.`relatedId` and `code` = 55)",
           ]);
         });
     });

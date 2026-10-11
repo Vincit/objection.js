@@ -605,6 +605,34 @@ describe('QueryBuilder', () => {
         });
     });
 
+    it('should create a where-in query for composite id and a subquery in mssql', () => {
+      const knex = Knex({ client: 'mssql' });
+      const sql = TestModel.query(knex)
+        .whereInComposite(['A.a', 'B.b'], TestModel.query(knex).select('a', 'b'))
+        .toKnexQuery()
+        .toString();
+
+      expect(sql).to.equal(
+        'select [Model].* from [Model] where exists (select * from (select [a], [b] from [Model]) AS V([objectiontmpjoin0],[objectiontmpjoin1]) where [objectiontmpjoin0] = [A].[a] and [objectiontmpjoin1] = [B].[b])',
+      );
+    });
+
+    it('should create a where-in query for composite id and a subquery in sqlite', () => {
+      const knex = Knex({ client: 'sqlite3', useNullAsDefault: true });
+      const sql = (method) =>
+        TestModel.query(knex)
+          [method](['A.a', 'B.b'], TestModel.query(knex).select('a', 'b'))
+          .toKnexQuery()
+          .toString();
+
+      expect(sql('whereInComposite')).to.equal(
+        'select `Model`.* from `Model` where (`A`.`a`, `B`.`b`) in (select `a`, `b` from `Model`)',
+      );
+      expect(sql('whereNotInComposite')).to.equal(
+        'select `Model`.* from `Model` where (`A`.`a`, `B`.`b`) not in (select `a`, `b` from `Model`)',
+      );
+    });
+
     describe('empty array of values for composite id', () => {
       const clients = {
         pg: [
