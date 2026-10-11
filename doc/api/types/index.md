@@ -107,7 +107,6 @@ The options that accept relation paths take either an array of relation paths li
 | --------- | ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | relate    | boolean<br>string<br>string[] | If `true`, models with an `id` are related instead of inserted. Relate functionality can be enabled for a subset of relations of the graph by providing a list of relation paths or a relation expression. See the examples [here](/guide/query-examples.html#graph-inserts). |
 | allowRefs | boolean             | This needs to be `true` if you want to use `#ref` in your graphs. See [this section](/guide/query-examples.html#graph-inserts) for `#ref` usage examples.                                                                                                  |
-| allowMarkers | boolean          | This needs to be `true` to use the `#unrelate` and `#delete` special properties in your graphs. Marked models are skipped by `insertGraph`. See [this section](/guide/query-examples.html#graph-upserts) for details. |
 
 ## `type` FetchGraphOptions
 

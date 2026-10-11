@@ -2084,7 +2084,7 @@ module.exports = (session) => {
               expect(err).to.be.a(ValidationError);
               expect(err.type).to.equal('InvalidGraph');
               expect(err.message).to.equal(
-                `${unrelateProp} and ${deleteProp} markers are not allowed in a graph by default. see the allowMarkers insert/upsert graph option`,
+                `${unrelateProp} and ${deleteProp} markers are not allowed in a graph by default. see the allowMarkers upsertGraph option`,
               );
 
               const rows = await session.knex('model2').where('model1_id', 2).orderBy('id_col');

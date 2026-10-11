@@ -1459,4 +1459,4 @@ The special properties work like this:
 - Only the value `true` marks a model. Other values are ignored and the properties are never written to the database.
 - Without the `allowMarkers` option, a `ValidationError` is thrown if a model is marked.
 - The special properties can't be used for the root models of the graph. A `ValidationError` is thrown if a root model is marked.
-- The special properties only have an effect in [upsertGraph](/api/query-builder/mutate-methods.html#upsertgraph). Marked related models are skipped by [insertGraph](/api/query-builder/mutate-methods.html#insertgraph).
+- The special properties can only be used in [upsertGraph](/api/query-builder/mutate-methods.html#upsertgraph). [insertGraph](/api/query-builder/mutate-methods.html#insertgraph) has nothing to unrelate or delete and throws a `ValidationError` if a model is marked, even with the `allowMarkers` option.

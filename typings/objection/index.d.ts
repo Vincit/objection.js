@@ -1085,7 +1085,6 @@ declare namespace Objection {
   export interface InsertGraphOptions {
     relate?: boolean | string | string[];
     allowRefs?: boolean;
-    allowMarkers?: boolean;
   }
 
   interface InsertGraphMethod<M extends Model> {

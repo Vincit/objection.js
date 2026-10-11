@@ -14,7 +14,7 @@
 
 ### Security
 
-- **Behaviour change:** the `#unrelate` and `#delete` markers need the new `allowMarkers: true` option in both `insertGraph()` and `upsertGraph()`, like `#ref` needs `allowRefs`. Without it, a marked model throws a `ValidationError` of type `InvalidGraph`, also in `insertGraph()`, which silently skipped marked models before. The markers come from the graph data and take precedence over the `noUnrelate` / `noDelete` options, so graph data from a request body could unrelate or delete related rows that these options were meant to protect. With `allowMarkers: true`, the markers work as in 3.6.0. [#2410](https://github.com/Vincit/objection.js/pull/2410)
+- **Behaviour change:** the `#unrelate` and `#delete` markers need the new `allowMarkers: true` option of `upsertGraph()`, like `#ref` needs `allowRefs`. Without it, a marked model throws a `ValidationError` of type `InvalidGraph`. The markers come from the graph data and take precedence over the `noUnrelate` / `noDelete` options, so graph data from a request body could unrelate or delete related rows that these options were meant to protect. With `allowMarkers: true`, the markers work as in 3.6.0. `insertGraph()` has nothing to unrelate or delete and always throws for marked models, which it silently skipped before. [#2410](https://github.com/Vincit/objection.js/pull/2410)
 
 ### Fixes
 

@@ -157,8 +157,8 @@ import { Person } from '../fixtures/person';
     },
   ]);
 
-  await Person.query().insertGraph(
-    { firstName: 'Jennifer' },
-    { allowRefs: true, allowMarkers: true },
-  );
+  await Person.query().insertGraph({ firstName: 'Jennifer' }, { allowRefs: true });
+
+  // @ts-expect-error: insertGraph() rejects markers, so it has no allowMarkers option.
+  await Person.query().insertGraph({ firstName: 'Jennifer' }, { allowMarkers: true });
 })();
