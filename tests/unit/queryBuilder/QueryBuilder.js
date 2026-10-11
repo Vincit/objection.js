@@ -617,6 +617,21 @@ describe('QueryBuilder', () => {
       );
     });
 
+    it('should modify an aliased table through a common table expression in mssql', () => {
+      const knex = Knex({ client: 'mssql' });
+      const sql = (builder) => builder.alias('m').where('m.a', 1).toKnexQuery().toString();
+
+      expect(sql(TestModel.query(knex).delete())).to.equal(
+        'with [m] as (select * from [Model]) delete from [m] where [m].[a] = 1;select @@rowcount',
+      );
+      expect(sql(TestModel.query(knex).patch({ b: 2 }))).to.equal(
+        'with [m] as (select * from [Model]) update [m] set [b] = 2 where [m].[a] = 1;select @@rowcount',
+      );
+      expect(sql(TestModel.query(knex))).to.equal(
+        'select [m].* from [Model] as [m] where [m].[a] = 1',
+      );
+    });
+
     it('should create a where-in query for composite id and a subquery in sqlite', () => {
       const knex = Knex({ client: 'sqlite3', useNullAsDefault: true });
       const sql = (method) =>
