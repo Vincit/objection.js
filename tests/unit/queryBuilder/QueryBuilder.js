@@ -5020,6 +5020,26 @@ describe('QueryBuilder', () => {
         });
     });
 
+    it('should replace the select all of the root table with its columns', () => {
+      const sql = (...selections) =>
+        Person.query()
+          .select(...selections)
+          .withGraphJoined('pets')
+          .toKnexQuery()
+          .toString();
+      const expected = (raws) =>
+        `select ${raws}"Person"."id" as "id", "Person"."name" as "name", "pets"."id" as "pets:id", "pets"."name" as "pets:name", "pets"."ownerId" as "pets:ownerId" ` +
+        'from "Person" left join "Animal" as "pets" on "pets"."ownerId" = "Person"."id"';
+
+      expect(sql('*')).to.equal(expected(''));
+      expect(sql('Person.*', raw('1 as one'))).to.equal(expected('1 as one, '));
+      expect(sql(raw('1 as one'), '*')).to.equal(expected('1 as one, '));
+      expect(sql('Person.*', 'Person.id')).to.equal(
+        'select "Person"."id", "Person"."name" as "name", "pets"."id" as "pets:id", "pets"."name" as "pets:name", "pets"."ownerId" as "pets:ownerId" ' +
+          'from "Person" left join "Animal" as "pets" on "pets"."ownerId" = "Person"."id"',
+      );
+    });
+
     it('should still select all columns of a relation if a modifier only selects aliased subqueries', () => {
       const sql = Person.query()
         .withGraphJoined('pets(selectPet)')
