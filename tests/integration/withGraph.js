@@ -1371,7 +1371,7 @@ module.exports = (session) => {
       });
     }
 
-    // TODO: enable for v2.0.
+    // Throws in objection 4.0, see ditojs/objection#53.
     it.skip('should fail with a clear error when a duplicate relation is detected', () => {
       expect(() => {
         Model1.query().withGraphFetched('[model1Relation1, model1Relation1.model1Relation2]');

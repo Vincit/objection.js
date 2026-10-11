@@ -2,6 +2,7 @@ const chai = require('chai');
 const chaiSubset = require('chai-subset');
 const expect = require('expect.js');
 const { RelationExpression } = require('../../../');
+const { resetDeprecations } = require('../../../lib/utils/deprecate');
 
 chai.use(chaiSubset);
 
@@ -881,7 +882,7 @@ describe('RelationExpression', () => {
       testParseFail('a asb');
       testParseFail('aas b');
       testParseFail('a asd b');
-      // TODO: enable for v2.0.
+      // Throws in objection 4.0, see ditojs/objection#53.
       // testParseFail('[a.b, a.c]');
       // testParseFail('a.[b.c, b.d]');
     });
@@ -1151,6 +1152,28 @@ describe('RelationExpression', () => {
     testMerge('a.a', 'a.^', 'a.^');
     testMerge('a(f)', 'a(g)', 'a(f, g)');
     testMerge('a.b(f)', 'a.b(g)', 'a.b(f, g)');
+  });
+
+  describe('duplicate relations', () => {
+    it('should warn once that only the last one is used', () => {
+      const warnings = [];
+      const originalWarn = console.warn;
+      console.warn = (message) => warnings.push(message);
+      resetDeprecations();
+
+      try {
+        RelationExpression.create('[movies.reviews, movies.actors]');
+        RelationExpression.create('[movies.actors, movies.director]');
+      } finally {
+        console.warn = originalWarn;
+        resetDeprecations();
+      }
+
+      expect(warnings).to.eql([
+        'Duplicate relation "movies" in a relation expression, only the last one is used. ' +
+          'Use "a.[b, c]" instead of "[a.b, a.c]". This will throw an error in objection 4.0.',
+      ]);
+    });
   });
 
   describe('inherited object properties (#63)', () => {
