@@ -186,6 +186,31 @@ module.exports = (session) => {
           });
       });
 
+      it('should accept subqueries for the same table in where groups and join clauses', async () => {
+        const subquery = () => Model1.query().select('id').where('id', 1);
+
+        expect(
+          await Model1.query()
+            .patch({ model1Prop1: 'where group' })
+            .where((builder) => builder.whereIn('id', subquery())),
+        ).to.equal(1);
+
+        if (session.isMySql()) {
+          // knex only supports joins in updates on MySQL.
+          expect(
+            await Model1.query()
+              .patch({ model1Prop1: 'join clause' })
+              .join('model2', (join) => {
+                join.on('model2.model1_id', 'Model1.id').andOnIn('Model1.id', subquery());
+              }),
+          ).to.be.above(0);
+        }
+
+        const rows = await session.knex('Model1').orderBy('id');
+        const expected = session.isMySql() ? 'join clause' : 'where group';
+        expect(rows.map((row) => row.model1Prop1)).to.eql([expected, 'hello 2', 'hello 3']);
+      });
+
       if (session.isPostgres()) {
         it('should patch multiple and return updated rows if returning is useed', () => {
           return Model1.query()
