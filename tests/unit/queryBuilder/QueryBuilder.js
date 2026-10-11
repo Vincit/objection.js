@@ -5,7 +5,7 @@ const Knex = require('knex'),
   knexUtils = require('../../../lib/utils/knexUtils'),
   knexMocker = require('../../../testUtils/mockKnex'),
   { delay } = require('../../../testUtils/testUtils'),
-  { resetDeprecations } = require('../../../lib/utils/deprecate'),
+  { resetWarnings } = require('../../../lib/utils/warnings'),
   ref = objection.ref,
   raw = objection.raw,
   val = objection.val,
@@ -2548,6 +2548,25 @@ describe('QueryBuilder', () => {
     }).to.not.throwException();
   });
 
+  it('skipUndefined() should log a deprecation warning once', () => {
+    const warnings = [];
+    const originalWarn = console.warn;
+    console.warn = (message) => warnings.push(message);
+    resetWarnings();
+
+    try {
+      QueryBuilder.forClass(TestModel).skipUndefined();
+      QueryBuilder.forClass(TestModel).skipUndefined();
+
+      expect(warnings).to.eql([
+        '[objection] skipUndefined() is deprecated and will be removed in objection 4.0',
+      ]);
+    } finally {
+      console.warn = originalWarn;
+      resetWarnings();
+    }
+  });
+
   it('all query builder methods should work if model is not bound to a knex, when the query is', () => {
     class UnboundModel extends Model {
       static get tableName() {
@@ -2657,9 +2676,9 @@ describe('QueryBuilder', () => {
 
   describe('json field expressions on other databases (ditojs#113)', () => {
     const message =
-      'JSON field expressions and the whereJson*() methods of objection are only supported ' +
-      'on PostgreSQL. Use the JSON methods of knex like whereJsonPath() or jsonExtract() ' +
-      'with other databases.';
+      '[objection] JSON field expressions and the whereJson*() methods of objection are only ' +
+      'supported on PostgreSQL. Use the JSON methods of knex like whereJsonPath() or ' +
+      'jsonExtract() with other databases.';
 
     const knexes = {};
     const query = (client) => {
@@ -2672,7 +2691,7 @@ describe('QueryBuilder', () => {
     let originalWarn;
 
     beforeEach(() => {
-      resetDeprecations();
+      resetWarnings();
       warnings = [];
       originalWarn = console.warn;
       console.warn = (message) => warnings.push(message);
@@ -2680,7 +2699,7 @@ describe('QueryBuilder', () => {
 
     afterEach(() => {
       console.warn = originalWarn;
-      resetDeprecations();
+      resetWarnings();
     });
 
     it('should not change the json where methods on postgres', () => {
@@ -4457,7 +4476,7 @@ describe('QueryBuilder', () => {
         const warnings = [];
         const originalWarn = console.warn;
         console.warn = (message) => warnings.push(message);
-        resetDeprecations();
+        resetWarnings();
 
         try {
           const builder = Person.query()
@@ -4468,14 +4487,14 @@ describe('QueryBuilder', () => {
           expect(builder.findOperation(WhereInEagerOperation).joinOperations).to.eql([]);
           expect(builder.findOperation(JoinEagerOperation).joinOperations).to.have.length(1);
           expect(warnings).to.eql([
-            'The joinOperation option only applies to withGraphJoined() and is ignored for the ' +
-              'fetched relations "movies".',
-            'The joinOperation option only applies to withGraphJoined() and is ignored for the ' +
-              'fetched relations "parent".',
+            '[objection] The joinOperation option only applies to withGraphJoined() and is ' +
+              'ignored for the fetched relations "movies".',
+            '[objection] The joinOperation option only applies to withGraphJoined() and is ' +
+              'ignored for the fetched relations "parent".',
           ]);
         } finally {
           console.warn = originalWarn;
-          resetDeprecations();
+          resetWarnings();
         }
       });
 
@@ -4483,7 +4502,7 @@ describe('QueryBuilder', () => {
         const warnings = [];
         const originalWarn = console.warn;
         console.warn = (message) => warnings.push(message);
-        resetDeprecations();
+        resetWarnings();
 
         try {
           Person.query()
@@ -4492,12 +4511,12 @@ describe('QueryBuilder', () => {
             .withGraphJoined('pets', { limitPerParent: true });
 
           expect(warnings).to.eql([
-            'The limitPerParent option only applies to withGraphFetched() and is ignored for ' +
-              'the joined relations "pets".',
+            '[objection] The limitPerParent option only applies to withGraphFetched() and is ' +
+              'ignored for the joined relations "pets".',
           ]);
         } finally {
           console.warn = originalWarn;
-          resetDeprecations();
+          resetWarnings();
         }
       });
 
@@ -5383,7 +5402,7 @@ describe('QueryBuilder', () => {
     let originalWarn;
 
     beforeEach(() => {
-      resetDeprecations();
+      resetWarnings();
       warnings = [];
       originalWarn = console.warn;
       console.warn = (message) => warnings.push(message);
@@ -5391,7 +5410,7 @@ describe('QueryBuilder', () => {
 
     afterEach(() => {
       console.warn = originalWarn;
-      resetDeprecations();
+      resetWarnings();
     });
 
     async function run(createQuery) {
@@ -5411,7 +5430,7 @@ describe('QueryBuilder', () => {
         expect(await run(withOnConflict)).to.eql(expectedQueries);
 
         expect(warnings).to.eql([
-          `onConflict(), ignore() and merge() are not supported by ${method}(). ` +
+          `[objection] onConflict(), ignore() and merge() are not supported by ${method}(). ` +
             'Insert the conflicting rows with a separate insert() query instead. ' +
             'This will throw in objection 4.0.',
         ]);
@@ -5451,7 +5470,7 @@ describe('QueryBuilder', () => {
       };
 
       Person.knex(mockKnex);
-      resetDeprecations();
+      resetWarnings();
       warnings = [];
       originalWarn = console.warn;
       console.warn = (message) => warnings.push(message);
@@ -5461,7 +5480,7 @@ describe('QueryBuilder', () => {
 
     afterEach(() => {
       console.warn = originalWarn;
-      resetDeprecations();
+      resetWarnings();
     });
 
     it('insertGraph() should warn once about an unknown option', async () => {

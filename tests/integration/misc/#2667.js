@@ -1,6 +1,6 @@
 const { Model, ref } = require('../../../');
 const { expect } = require('chai');
-const { resetDeprecations } = require('../../../lib/utils/deprecate');
+const { resetWarnings } = require('../../../lib/utils/warnings');
 
 module.exports = (session) => {
   describe('warn when a relation owner join property holds an array #2667', () => {
@@ -120,7 +120,7 @@ module.exports = (session) => {
     });
 
     beforeEach(() => {
-      resetDeprecations();
+      resetWarnings();
       warnings = [];
       originalWarn = console.warn;
       console.warn = (message) => warnings.push(message);
@@ -128,12 +128,12 @@ module.exports = (session) => {
 
     afterEach(() => {
       console.warn = originalWarn;
-      resetDeprecations();
+      resetWarnings();
     });
 
     const expectedWarning =
-      'Fetching relation "tags" of Post: the join property "issue2667Post.tagIds" of some ' +
-      'owner models holds an array, which is not supported, so no related models are found ' +
+      '[objection] Fetching relation "tags" of Post: the join property "issue2667Post.tagIds" of ' +
+      'some owner models holds an array, which is not supported, so no related models are found ' +
       'for them. Use a ManyToManyRelation through a join table instead.';
 
     it('withGraphFetched() should warn once if owner join properties hold arrays', async () => {
@@ -152,9 +152,10 @@ module.exports = (session) => {
 
       expect(posts.map((it) => it.manyTags)).to.eql([[], []]);
       expect(warnings).to.eql([
-        'Fetching relation "manyTags" of Post: the join property "issue2667Post.tagIds" of some ' +
-          'owner models holds an array, which is not supported, so no related models are found ' +
-          'for them. Map the relation from a column that holds a single key instead.',
+        '[objection] Fetching relation "manyTags" of Post: the join property ' +
+          '"issue2667Post.tagIds" of some owner models holds an array, which is not supported, ' +
+          'so no related models are found for them. Map the relation from a column that holds a ' +
+          'single key instead.',
       ]);
     });
 

@@ -2,7 +2,7 @@ const chai = require('chai');
 const chaiSubset = require('chai-subset');
 const expect = require('expect.js');
 const { RelationExpression } = require('../../../');
-const { resetDeprecations } = require('../../../lib/utils/deprecate');
+const { resetWarnings } = require('../../../lib/utils/warnings');
 
 chai.use(chaiSubset);
 
@@ -1159,19 +1159,20 @@ describe('RelationExpression', () => {
       const warnings = [];
       const originalWarn = console.warn;
       console.warn = (message) => warnings.push(message);
-      resetDeprecations();
+      resetWarnings();
 
       try {
         RelationExpression.create('[movies.reviews, movies.actors]');
         RelationExpression.create('[movies.actors, movies.director]');
       } finally {
         console.warn = originalWarn;
-        resetDeprecations();
+        resetWarnings();
       }
 
       expect(warnings).to.eql([
-        'Duplicate relation "movies" in a relation expression, only the last one is used. ' +
-          'Use "a.[b, c]" instead of "[a.b, a.c]". This will throw an error in objection 4.0.',
+        '[objection] Duplicate relation "movies" in a relation expression, only the last one ' +
+          'is used. Use "a.[b, c]" instead of "[a.b, a.c]". This will throw an error in ' +
+          'objection 4.0.',
       ]);
     });
   });

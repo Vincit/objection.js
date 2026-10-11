@@ -1,6 +1,6 @@
 const { Model } = require('../../../');
 const { expect } = require('chai');
-const { resetDeprecations } = require('../../../lib/utils/deprecate');
+const { resetWarnings } = require('../../../lib/utils/warnings');
 
 module.exports = (session) => {
   describe('warn when fetching relations of owners without join properties #1832', () => {
@@ -150,7 +150,7 @@ module.exports = (session) => {
     });
 
     beforeEach(() => {
-      resetDeprecations();
+      resetWarnings();
       warnings = [];
       originalWarn = console.warn;
       console.warn = (message) => warnings.push(message);
@@ -158,12 +158,12 @@ module.exports = (session) => {
 
     afterEach(() => {
       console.warn = originalWarn;
-      resetDeprecations();
+      resetWarnings();
     });
 
     const expectedWarning =
-      'Fetching relation "pets" of Person: some owner models are missing the join property ' +
-      '"issue1832Person.id", so no related models are found for them. ' +
+      '[objection] Fetching relation "pets" of Person: some owner models are missing the join ' +
+      'property "issue1832Person.id", so no related models are found for them. ' +
       'Select the column in the owner query.';
 
     it('$fetchGraph() should warn if the id is not selected for a HasManyRelation', async () => {
@@ -214,8 +214,8 @@ module.exports = (session) => {
 
       expect(jennifer.petsByCode).to.eql([]);
       expect(warnings).to.eql([
-        'Fetching relation "petsByCode" of Person: some owner models are missing the join ' +
-          'property "issue1832Person.code", so no related models are found for them. ' +
+        '[objection] Fetching relation "petsByCode" of Person: some owner models are missing the ' +
+          'join property "issue1832Person.code", so no related models are found for them. ' +
           'Select the column in the owner query.',
       ]);
     });
@@ -226,8 +226,8 @@ module.exports = (session) => {
 
       expect(tag.animal).to.equal(null);
       expect(warnings).to.eql([
-        'Fetching relation "animal" of Tag: some owner models are missing the join property ' +
-          '"issue1832AnimalTag.animalId", so no related models are found for them. ' +
+        '[objection] Fetching relation "animal" of Tag: some owner models are missing the join ' +
+          'property "issue1832AnimalTag.animalId", so no related models are found for them. ' +
           'Select the column in the owner query.',
       ]);
     });
@@ -268,8 +268,8 @@ module.exports = (session) => {
     });
 
     const expectedThroughWarning = (relation) =>
-      `Fetching relation "${relation}" of Animal: some owner models are missing the join ` +
-      'property "issue1832Animal.id", so no related models are found for them. ' +
+      `[objection] Fetching relation "${relation}" of Animal: some owner models are missing the ` +
+      'join property "issue1832Animal.id", so no related models are found for them. ' +
       'Select the column in the owner query.';
 
     it('$fetchGraph() should warn if the id is not selected for a ManyToManyRelation', async () => {

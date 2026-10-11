@@ -1,7 +1,7 @@
 const Knex = require('knex');
 const { expect } = require('chai');
 const { Model, knexSnakeCaseMappers } = require('../../../');
-const { resetDeprecations } = require('../../../lib/utils/deprecate');
+const { resetWarnings } = require('../../../lib/utils/warnings');
 
 module.exports = (session) => {
   describe('warn when fetched related models are missing join properties #2258', () => {
@@ -117,7 +117,7 @@ module.exports = (session) => {
     });
 
     beforeEach(() => {
-      resetDeprecations();
+      resetWarnings();
       warnings = [];
       originalWarn = console.warn;
       console.warn = (message) => warnings.push(message);
@@ -125,12 +125,12 @@ module.exports = (session) => {
 
     afterEach(() => {
       console.warn = originalWarn;
-      resetDeprecations();
+      resetWarnings();
     });
 
     const expectedWarning =
-      'Fetching relation "snakeRegistrations" of User: some related models are missing ' +
-      'the join property "issue_2258_registration.user_id", so they are not assigned to ' +
+      '[objection] Fetching relation "snakeRegistrations" of User: some related models are ' +
+      'missing the join property "issue_2258_registration.user_id", so they are not assigned to ' +
       'any owner. Check that the relation mapping uses the property names of the models, ' +
       'e.g. camelCase names when using knexSnakeCaseMappers.';
 
@@ -157,8 +157,8 @@ module.exports = (session) => {
     });
 
     const expectedManyToManyWarning =
-      'Fetching relation "strictRoles" of User: some related models are missing the join ' +
-      'table column "issue_2258_user_role.userId" selected as "objectiontmpjoin0", so they ' +
+      '[objection] Fetching relation "strictRoles" of User: some related models are missing the ' +
+      'join table column "issue_2258_user_role.userId" selected as "objectiontmpjoin0", so they ' +
       'are not assigned to any owner. Check that $parseDatabaseJson() and the column name ' +
       'mappers of the related model keep it.';
 

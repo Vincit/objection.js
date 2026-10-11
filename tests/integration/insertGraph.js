@@ -2,7 +2,7 @@ const chai = require('chai');
 const utils = require('../../lib/utils/knexUtils');
 const expect = require('expect.js');
 const { transaction, ValidationError, Model } = require('../../');
-const { resetDeprecations } = require('../../lib/utils/deprecate');
+const { resetWarnings } = require('../../lib/utils/warnings');
 const { cloneDeep, sortBy } = require('../../testUtils/testUtils');
 
 module.exports = (session) => {
@@ -711,7 +711,7 @@ module.exports = (session) => {
       let originalWarn;
 
       beforeEach(() => {
-        resetDeprecations();
+        resetWarnings();
         warnings = [];
         originalWarn = console.warn;
         console.warn = (message) => warnings.push(message);
@@ -720,7 +720,7 @@ module.exports = (session) => {
 
       afterEach(() => {
         console.warn = originalWarn;
-        resetDeprecations();
+        resetWarnings();
       });
 
       const graph = () => ({
@@ -745,7 +745,7 @@ module.exports = (session) => {
           const inserted = await createQuery();
 
           expect(warnings).to.eql([
-            `onConflict(), ignore() and merge() are not supported by ${method}(). ` +
+            `[objection] onConflict(), ignore() and merge() are not supported by ${method}(). ` +
               'Insert the conflicting rows with a separate insert() query instead. ' +
               'This will throw in objection 4.0.',
           ]);
