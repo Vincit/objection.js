@@ -14,6 +14,7 @@ class Person extends Model {
   static get jsonSchema() {
     return {
       type: 'object',
+      additionalProperties: false,
       required: ['firstName', 'lastName'],
 
       properties: {
@@ -25,6 +26,7 @@ class Person extends Model {
 
         address: {
           type: 'object',
+          additionalProperties: false,
           properties: {
             street: { type: 'string' },
             city: { type: 'string' },

@@ -21,6 +21,7 @@ export default class Person extends Model {
   // is created it is checked against this schema. http://json-schema.org/.
   static jsonSchema = {
     type: 'object',
+    additionalProperties: false,
     required: ['firstName', 'lastName'],
 
     properties: {
@@ -32,6 +33,7 @@ export default class Person extends Model {
 
       address: {
         type: 'object',
+        additionalProperties: false,
         properties: {
           street: { type: 'string' },
           city: { type: 'string' },
