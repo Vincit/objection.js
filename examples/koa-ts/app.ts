@@ -26,7 +26,7 @@ app.use(router.routes())
 app.use(router.allowedMethods())
 
 const port = 8641
-app.listen(port, () => {
+app.listen(port, '127.0.0.1', () => {
   console.log('Example app listening at port %s', port)
 })
 

@@ -14,6 +14,7 @@ class Animal extends Model {
   static get jsonSchema() {
     return {
       type: 'object',
+      additionalProperties: false,
       required: ['name'],
 
       properties: {

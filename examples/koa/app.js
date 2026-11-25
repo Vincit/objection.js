@@ -26,7 +26,7 @@ app.use(bodyParser())
 app.use(router.routes())
 app.use(router.allowedMethods())
 
-const server = app.listen(8641, () => {
+const server = app.listen(8641, '127.0.0.1', () => {
   console.log('Example app listening at port %s', server.address().port)
 })
 
